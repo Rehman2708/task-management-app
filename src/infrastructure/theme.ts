@@ -1,0 +1,40 @@
+export const theme = {
+  colors: {
+    primary: "#3F87E9",
+    secondary: "#6697D9",
+    background: "#820a0aff",
+    text: "#000000",
+    border: "#cccccc",
+    error: "#EC5454",
+    success: "#38B000",
+    warning: "#ffa500",
+    transparent: "transparent",
+    white: "#fff",
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+  },
+  fonts: {
+    light: "MontserratAlternates-Light",
+    regular: "MontserratAlternates-Regular",
+    medium: "MontserratAlternates-Medium",
+    semibold: "MontserratAlternates-SemiBold",
+    bold: "MontserratAlternates-Bold",
+  },
+  fontSizes: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 24,
+  },
+  radius: {
+    sm: 4,
+    md: 8,
+    lg: 12,
+  },
+};

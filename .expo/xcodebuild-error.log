@@ -1,0 +1,16 @@
+2025-09-07 16:42:12.412 xcodebuild[9536:4232520] [MT] IDEFileReferenceDebug: [Load] <IDEFileReference, 0x1317eaf60: name:Pods path:group:Pods/Pods.xcodeproj> Failed to load container at path: /Users/apple/Documents/tasksApp/task-frontend/ios/Pods/Pods.xcodeproj, Error: Error Domain=Xcode3ProjectErrorDomain Code=2 "Project /Users/apple/Documents/tasksApp/task-frontend/ios/Pods/Pods.xcodeproj cannot be opened because it is missing its project.pbxproj file." UserInfo={NSLocalizedDescription=Project /Users/apple/Documents/tasksApp/task-frontend/ios/Pods/Pods.xcodeproj cannot be opened because it is missing its project.pbxproj file.}
+--- xcodebuild: WARNING: Unable to open project file '/Users/apple/Documents/tasksApp/task-frontend/ios/Pods/Pods.xcodeproj' in workspace '/Users/apple/Documents/tasksApp/task-frontend/ios/coupletasksfrontendts.xcworkspace'.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, id:6A991D4F-43A5-4BEF-9CCD-3C27D6FD84B5, OS:18.3.1, name:iPhone 16 Pro }
+{ platform:iOS Simulator, id:6A991D4F-43A5-4BEF-9CCD-3C27D6FD84B5, OS:18.3.1, name:iPhone 16 Pro }
+** BUILD FAILED **
+
+
+The following build commands failed:
+	CpResource /Users/apple/Library/Developer/Xcode/DerivedData/coupletasksfrontendts-hhxibugvyuenpigmrylvqkksymdn/Build/Products/Debug-iphonesimulator/RMK.app/MontserratAlternates-Light.ttf /Users/apple/Documents/tasksApp/task-frontend/assets/fonts/MontserratAlternates-Light.ttf (in target 'coupletasksfrontendts' from project 'coupletasksfrontendts')
+	CpResource /Users/apple/Library/Developer/Xcode/DerivedData/coupletasksfrontendts-hhxibugvyuenpigmrylvqkksymdn/Build/Products/Debug-iphonesimulator/RMK.app/MontserratAlternates-Bold.ttf /Users/apple/Documents/tasksApp/task-frontend/assets/fonts/MontserratAlternates-Bold.ttf (in target 'coupletasksfrontendts' from project 'coupletasksfrontendts')
+	CpResource /Users/apple/Library/Developer/Xcode/DerivedData/coupletasksfrontendts-hhxibugvyuenpigmrylvqkksymdn/Build/Products/Debug-iphonesimulator/RMK.app/MontserratAlternates-Medium.ttf /Users/apple/Documents/tasksApp/task-frontend/assets/fonts/MontserratAlternates-Medium.ttf (in target 'coupletasksfrontendts' from project 'coupletasksfrontendts')
+	CpResource /Users/apple/Library/Developer/Xcode/DerivedData/coupletasksfrontendts-hhxibugvyuenpigmrylvqkksymdn/Build/Products/Debug-iphonesimulator/RMK.app/MontserratAlternates-SemiBold.ttf /Users/apple/Documents/tasksApp/task-frontend/assets/fonts/MontserratAlternates-SemiBold.ttf (in target 'coupletasksfrontendts' from project 'coupletasksfrontendts')
+	CpResource /Users/apple/Library/Developer/Xcode/DerivedData/coupletasksfrontendts-hhxibugvyuenpigmrylvqkksymdn/Build/Products/Debug-iphonesimulator/RMK.app/MontserratAlternates-Regular.ttf /Users/apple/Documents/tasksApp/task-frontend/assets/fonts/MontserratAlternates-Regular.ttf (in target 'coupletasksfrontendts' from project 'coupletasksfrontendts')
+	Building workspace coupletasksfrontendts with scheme coupletasksfrontendts and configuration Debug
+(6 failures)

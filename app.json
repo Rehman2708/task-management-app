@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "♥️ RMK",
+    "slug": "♥️ RMK",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/logo.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.abdul2708.tasksfrontendts",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/androidLogo.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.abdul2708.tasksfrontendts",
+      "supportsTablet": true
+    },
+    "web": {
+      "favicon": "./assets/images/logo.png"
+    },
+    "extra": {},
+    "plugins": [],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "experiments": {
+      "disableFontScaling": true
+    }
+  }
+}

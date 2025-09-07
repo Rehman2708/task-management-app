@@ -1,0 +1,127 @@
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ROUTES } from "../enums/routes";
+import { Row, Spacer } from "../tools";
+import { theme } from "../infrastructure/theme";
+import { Ionicons } from "@expo/vector-icons";
+
+export interface TabIconProps {
+  isFocused: boolean;
+  routeName: keyof typeof ROUTES;
+}
+
+const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
+  const icons: Record<keyof typeof ROUTES, string> = {
+    [ROUTES.TASKS]: "book-outline",
+    [ROUTES.HISTORY]: "time-outline",
+    [ROUTES.NOTES]: "document-text-outline",
+    [ROUTES.PROFILE]: "person-outline",
+  };
+
+  const activeIcons: Record<keyof typeof ROUTES, string> = {
+    [ROUTES.TASKS]: "book",
+    [ROUTES.HISTORY]: "time",
+    [ROUTES.NOTES]: "document-text",
+    [ROUTES.PROFILE]: "person",
+  };
+
+  const iconName = isFocused ? activeIcons[routeName] : icons[routeName];
+
+  return (
+    <Ionicons
+      name={iconName}
+      size={24}
+      color={isFocused ? theme.colors.primary : theme.colors.border}
+    />
+  );
+};
+
+const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
+  const styles = useBottomTabStyles();
+  const routeTitles: Record<keyof typeof ROUTES, string> = {
+    [ROUTES.TASKS]: "Tasks",
+    [ROUTES.HISTORY]: "History",
+    [ROUTES.NOTES]: "Notes",
+    [ROUTES.PROFILE]: "Profile",
+  };
+
+  return (
+    <View style={styles.container}>
+      <Row justifyContent="space-between" style={styles.tabBarContainer}>
+        {state.routes.map((route, index) => {
+          const isFocused = state.index === index;
+
+          const handleNavigation = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
+
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name, {
+                screen: route.name,
+                isBottomTab: true,
+              });
+            }
+          };
+
+          return (
+            <Pressable
+              key={route.key}
+              onPress={handleNavigation}
+              accessibilityRole="button"
+              accessibilityLabel={
+                descriptors[route.key].options.tabBarAccessibilityLabel
+              }
+              testID={descriptors[route.key].options.tabBarTestID}
+              style={styles.tab}
+            >
+              <TabIcon
+                isFocused={isFocused}
+                routeName={route.name as keyof typeof ROUTES}
+              />
+              <Spacer size={8} />
+              <Text
+                style={[styles.tabLabel, isFocused && styles.tabLabelFocused]}
+              >
+                {routeTitles[route.name as keyof typeof ROUTES] || route.name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </Row>
+    </View>
+  );
+};
+
+const useBottomTabStyles = () => {
+  return StyleSheet.create({
+    container: {
+      borderTopColor: "#00000009",
+      borderTopWidth: 1,
+    },
+    tabBarContainer: {
+      backgroundColor: "#FFF",
+      paddingHorizontal: 15,
+      paddingBottom: 18,
+      paddingTop: 15,
+    },
+    tab: {
+      alignItems: "center",
+    },
+    tabLabel: {
+      fontSize: theme.fontSizes.sm,
+      color: theme.colors.border,
+      width: 85,
+      textAlign: "center",
+      fontFamily: theme.fonts.regular,
+    },
+    tabLabelFocused: {
+      fontFamily: theme.fonts.semibold,
+      color: theme.colors.primary,
+    },
+  });
+};
+
+export default CustomTabBar;
