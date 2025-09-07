@@ -65,7 +65,10 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
       subTitle={`Notes > ${note ? "Edit Note" : "Create Note"}`}
     >
       <View style={[commonStyles.screenWrapper]}>
-        <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+        <KeyboardAwareScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.container}
+        >
           <CustomInput
             title="Title"
             value={noteTitle}

@@ -30,7 +30,7 @@ export const theme = {
     sm: 14,
     md: 16,
     lg: 18,
-    xl: 24,
+    xl: 22,
   },
   radius: {
     sm: 4,

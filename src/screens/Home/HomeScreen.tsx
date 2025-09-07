@@ -3,7 +3,6 @@ import {
   Text,
   FlatList,
   Pressable,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
@@ -68,27 +67,23 @@ export default function HomeScreen({ navigation }: any) {
 
   return (
     <ScreenWrapper title={`Hey, ${loggedInUser?.name}!`}>
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
-      ) : (
-        <View style={[commonStyles.screenWrapper]}>
-          {tasks.length === 0 ? (
-            <EmptyState text="No active tasks" />
-          ) : (
-            <FlatList
-              data={tasks}
-              keyExtractor={(item) => item._id}
-              renderItem={renderItem}
-              refreshing={loading}
-              onRefresh={fetchTasks}
-            />
-          )}
-        </View>
-      )}
+      <View style={[commonStyles.screenWrapper]}>
+        {tasks.length === 0 ? (
+          <EmptyState
+            text="No active tasks"
+            button={fetchTasks}
+            loading={loading}
+          />
+        ) : (
+          <FlatList
+            data={tasks}
+            keyExtractor={(item) => item._id}
+            renderItem={renderItem}
+            refreshing={loading}
+            onRefresh={fetchTasks}
+          />
+        )}
+      </View>
       <FloatingAdd onPress={() => navigation.navigate(ROUTES.CREATE_TASK)} />
     </ScreenWrapper>
   );

@@ -34,7 +34,7 @@ const CustomInput = ({
   editable = true,
   error = false,
   secureTextEntry,
-  multiline,
+  multiline = false,
   fullFlex = false,
 }: CustomInputProps) => {
   return (
@@ -45,7 +45,11 @@ const CustomInput = ({
       {title && <Text style={styles.label}>{title}</Text>}
 
       <TextInput
-        style={[styles.input, error && styles.errorInput]}
+        style={[
+          styles.input,
+          error && styles.errorInput,
+          multiline && styles.multiline,
+        ]}
         placeholder={placeholder}
         placeholderTextColor={theme.colors.border}
         editable={editable}
@@ -78,6 +82,10 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSizes.sm,
     fontFamily: theme.fonts.regular,
     color: theme.colors.text,
+  },
+  multiline: {
+    height: 100,
+    textAlignVertical: "top",
   },
   errorInput: {
     borderColor: theme.colors.error || "red",

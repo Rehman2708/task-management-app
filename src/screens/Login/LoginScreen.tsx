@@ -42,7 +42,7 @@ export const LoginScreen = () => {
           <>
             <Text style={commonStyles.titleText}>Login</Text>
             <Spacer size={20} />
-            <KeyboardAwareScrollView>
+            <KeyboardAwareScrollView keyboardShouldPersistTaps="handled">
               <CustomInput
                 title="User ID"
                 value={userId}

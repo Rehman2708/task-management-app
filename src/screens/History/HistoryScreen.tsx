@@ -76,34 +76,25 @@ export default function HistoryScreen({ navigation }: any) {
       </View>
     );
 
-  if (!tasks.length)
-    return (
-      <View style={styles.centered}>
-        <Text>No completed or expired tasks found.</Text>
-      </View>
-    );
-
   return (
     <ScreenWrapper title="History">
-      {loading ? (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
-      ) : (
-        <View style={[commonStyles.screenWrapper]}>
-          {tasks.length > 0 ? (
-            <FlatList
-              data={tasks}
-              keyExtractor={(item) => item._id}
-              renderItem={renderTaskCard}
-              onRefresh={fetchCompletedTasks}
-              refreshing={loading}
-            />
-          ) : (
-            <EmptyState text="Nothing to show" />
-          )}
-        </View>
-      )}
+      <View style={[commonStyles.screenWrapper]}>
+        {tasks.length > 0 ? (
+          <FlatList
+            data={tasks}
+            keyExtractor={(item) => item._id}
+            renderItem={renderTaskCard}
+            onRefresh={fetchCompletedTasks}
+            refreshing={loading}
+          />
+        ) : (
+          <EmptyState
+            text="Nothing to show"
+            button={fetchCompletedTasks}
+            loading={loading}
+          />
+        )}
+      </View>
     </ScreenWrapper>
   );
 }

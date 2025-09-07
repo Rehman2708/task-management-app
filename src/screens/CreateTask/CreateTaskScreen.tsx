@@ -48,6 +48,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
     >
       <View style={[commonStyles.screenWrapper]}>
         <KeyboardAwareScrollView
+          keyboardShouldPersistTaps="handled"
           style={styles.container}
           showsVerticalScrollIndicator={false}
         >
@@ -60,6 +61,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
             title="Enter description"
             value={vm.description}
             onChangeText={vm.setDescription}
+            multiline
           />
 
           <Text style={commonStyles.smallText}>Assigned To</Text>

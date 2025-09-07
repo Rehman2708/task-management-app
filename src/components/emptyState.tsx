@@ -1,13 +1,18 @@
-import { Text, Image, ImageSourcePropType } from "react-native";
-import { Column } from "../tools";
+import { Text, Image, ImageSourcePropType, View } from "react-native";
+import { Column, Row } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
+import CustomButton from "./customButton";
 
 const EmptyState = ({
   image = require("../../assets/images/noData.png"),
   text,
+  button,
+  loading,
 }: {
   image?: ImageSourcePropType;
   text: string;
+  button?: () => void;
+  loading?: boolean;
 }) => {
   return (
     <Column
@@ -17,11 +22,22 @@ const EmptyState = ({
       alignItems="center"
     >
       <Image
-        style={{ height: 300, width: 300 }}
+        style={{ height: 250, width: 300 }}
         resizeMode="contain"
         source={image}
       />
       <Text style={commonStyles.subTitleText}>{text}</Text>
+      {button && (
+        <Row style={commonStyles.fullWidth}>
+          <CustomButton
+            loading={loading}
+            title="Refresh"
+            onPress={button}
+            halfWidth
+            rounded
+          />
+        </Row>
+      )}
     </Column>
   );
 };

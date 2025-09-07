@@ -50,7 +50,13 @@ export default function ProfileScreen() {
               },
             ]}
           >
-            <Text style={{ fontSize: 70, fontFamily: theme.fonts.bold }}>
+            <Text
+              style={{
+                fontSize: 50,
+                fontFamily: theme.fonts.bold,
+                color: theme.colors.primary,
+              }}
+            >
               {getInitials(user?.name)}
             </Text>
           </Row>

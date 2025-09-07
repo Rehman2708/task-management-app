@@ -39,7 +39,10 @@ export const RegisterScreen = () => {
         <Logo />
         <Text style={commonStyles.titleText}>Register</Text>
         <Spacer size={20} />
-        <KeyboardAwareScrollView style={{ maxHeight: 540 }}>
+        <KeyboardAwareScrollView
+          keyboardShouldPersistTaps="handled"
+          style={{ maxHeight: 540 }}
+        >
           <CustomInput title="Name" value={name} onChangeText={setName} />
           <CustomInput
             title="User ID"

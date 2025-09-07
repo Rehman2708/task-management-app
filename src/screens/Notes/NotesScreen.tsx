@@ -76,9 +76,6 @@ export default function NotesScreen() {
     <>
       <ScreenWrapper title="Notes">
         <View style={[commonStyles.screenWrapper]}>
-          {loading && (
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-          )}
           {error && <Text style={styles.error}>{error}</Text>}
           {notes.length > 0 ? (
             <FlatList
@@ -90,7 +87,11 @@ export default function NotesScreen() {
               contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
             />
           ) : (
-            <EmptyState text="No notes found" />
+            <EmptyState
+              text="No notes found"
+              button={fetchNotes}
+              loading={loading}
+            />
           )}
         </View>
         <FloatingAdd onPress={() => navigation.navigate(ROUTES.CREATE_NOTE)} />

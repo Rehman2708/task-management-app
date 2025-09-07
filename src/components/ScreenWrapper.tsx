@@ -24,7 +24,7 @@ const ScreenWrapper = ({
       <LinearHeader />
 
       <SafeAreaView style={[commonStyles.screenWrapper]}>
-        <Spacer size={isAndroid ? 10 : 0} />
+        <Spacer size={isAndroid ? (subTitle ? 10 : 20) : 0} />
 
         <View style={{ height: title ? 80 : 0 }}>
           <CustomHeader

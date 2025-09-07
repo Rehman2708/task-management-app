@@ -31,7 +31,7 @@ export function useCreateTaskViewModel(initialTask?: any) {
     initialTask?.frequency || Frequency.Once
   );
   const [priority, setPriority] = useState<Priority>(
-    initialTask?.priority || Priority.Medium
+    initialTask?.priority || Priority.Low
   );
   const [subtasks, setSubtasks] = useState<Subtask[]>(
     initialTask?.subtasks?.map((st: any) => ({

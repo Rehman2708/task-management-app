@@ -127,6 +127,7 @@ export default function TaskDetailScreen({ route }: any) {
             <KeyboardAwareScrollView
               style={commonStyles.fullFlex}
               showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
             >
               <Column gap={6}>
                 <Text style={commonStyles.titleText}>{task.title}</Text>
