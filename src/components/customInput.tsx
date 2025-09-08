@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { theme } from "../infrastructure/theme";
-import { Column } from "../tools";
+import { Column, isAndroid } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
 
 export type CustomInputProps = {
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    padding: 14,
+    padding: isAndroid ? 12 : 14,
     fontSize: theme.fontSizes.sm,
     fontFamily: theme.fonts.regular,
     color: theme.colors.text,

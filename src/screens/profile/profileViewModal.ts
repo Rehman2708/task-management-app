@@ -60,7 +60,7 @@ export function useProfileViewModel() {
       })
     );
   };
-
+  const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
   return {
     user,
     partnerId,
@@ -68,5 +68,6 @@ export function useProfileViewModel() {
     fetchUserDetails,
     addPartner,
     logout,
+    changeThemeScreen,
   };
 }

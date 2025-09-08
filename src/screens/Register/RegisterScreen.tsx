@@ -28,7 +28,6 @@ export const RegisterScreen = () => {
   const handleRegister = async () => {
     try {
       await registerUser();
-      // Navigate to Home/Login screen after success if needed
     } catch (err) {}
   };
   const { navigate } = useNavigation();

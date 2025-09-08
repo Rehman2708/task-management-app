@@ -1,10 +1,20 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { theme } from "../infrastructure/theme";
+import { useHelper } from "../utils/helper";
 
 export default function FloatingAdd({ onPress }: { onPress: () => void }) {
+  const { themeColor } = useHelper();
   return (
-    <TouchableOpacity style={styles.fab} onPress={onPress}>
+    <TouchableOpacity
+      style={[
+        styles.fab,
+        {
+          backgroundColor: themeColor.dark ?? theme.colors.primary,
+        },
+      ]}
+      onPress={onPress}
+    >
       <Text style={styles.plus}>+</Text>
     </TouchableOpacity>
   );
@@ -18,7 +28,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
     elevation: 6,

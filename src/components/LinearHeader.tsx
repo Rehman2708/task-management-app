@@ -2,12 +2,17 @@ import { View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../infrastructure/theme";
 import { isAndroid } from "../tools";
+import { useHelper } from "../utils/helper";
 
 const LinearHeader = () => {
+  const { themeColor } = useHelper();
   return (
     <View>
       <LinearGradient
-        colors={[theme.colors.primary, theme.colors.secondary]}
+        colors={[
+          themeColor.dark ?? theme.colors.primary,
+          themeColor.light ?? theme.colors.secondary,
+        ]}
         style={{
           height: isAndroid ? 80 : 130,
           width: "100%",

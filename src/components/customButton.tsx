@@ -10,6 +10,7 @@ import { theme } from "../infrastructure/theme";
 import { commonStyles } from "../styles/commonstyles";
 import { Row } from "../tools";
 import { Ionicons } from "@expo/vector-icons";
+import { useHelper } from "../utils/helper";
 
 interface ICustomButton {
   title?: string;
@@ -43,8 +44,12 @@ const CustomButton = ({
   success = false,
   sendButton,
 }: ICustomButton) => {
+  const { themeColor } = useHelper();
   const buttonStyles = [
     styles.button,
+    {
+      backgroundColor: themeColor.dark ?? theme.colors.primary,
+    },
     small && styles.small,
     halfWidth && commonStyles.halfWidth,
     rounded && styles.rounded,
@@ -55,12 +60,11 @@ const CustomButton = ({
     disabled && styles.disabled,
     customStyle,
   ];
-
   const textStyles = [
     styles.text,
     small && { ...commonStyles.smallText, ...commonStyles.whiteText },
-    outlined && { color: theme.colors.primary },
-    secondary && { color: theme.colors.secondary },
+    outlined && { color: themeColor.dark ?? theme.colors.primary },
+    secondary && { color: themeColor.light ?? theme.colors.secondary },
     (error || success) && { color: theme.colors.white },
   ];
   if (sendButton) {
@@ -72,7 +76,7 @@ const CustomButton = ({
           style={{
             padding: 12,
             borderRadius: 100,
-            backgroundColor: theme.colors.primary,
+            backgroundColor: themeColor.dark ?? theme.colors.primary,
           }}
         >
           {loading ? (
@@ -80,7 +84,7 @@ const CustomButton = ({
               size="small"
               color={
                 outlined || secondary
-                  ? theme.colors.primary
+                  ? themeColor.dark ?? theme.colors.primary
                   : theme.colors.white
               }
             />
@@ -106,7 +110,9 @@ const CustomButton = ({
         <ActivityIndicator
           size="small"
           color={
-            outlined || secondary ? theme.colors.primary : theme.colors.white
+            outlined || secondary
+              ? themeColor.dark ?? theme.colors.primary
+              : theme.colors.white
           }
         />
       ) : (

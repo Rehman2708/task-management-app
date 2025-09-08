@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AuthRepo } from "../../repositories/auth";
-import {
-  getDataFromAsyncStorage,
-  storeDataInAsyncStorage,
-} from "../../utils/localstorage";
+import { storeDataInAsyncStorage } from "../../utils/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { LocalStorageKey } from "../../enums/localstorage";
 
 export function useLoginViewModel() {
-  const [gettingUser, setGettingUser] = useState(true);
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -46,24 +42,7 @@ export function useLoginViewModel() {
     }
   };
   const Register = () => navigation.navigate(ROUTES.REGISTER);
-  // Check if user already logged in
-  useEffect(() => {
-    (async () => {
-      setGettingUser(true);
-      const { data: user, success } = await getDataFromAsyncStorage(
-        LocalStorageKey.USER
-      );
-      if (success && user) {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: ROUTES.TABS }],
-          })
-        );
-      }
-      setGettingUser(false);
-    })();
-  }, []);
+
   return {
     userId,
     setUserId,
@@ -73,6 +52,5 @@ export function useLoginViewModel() {
     error,
     loginUser,
     Register,
-    gettingUser,
   };
 }

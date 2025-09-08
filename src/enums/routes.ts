@@ -10,4 +10,5 @@ export enum ROUTES {
   CREATE_TASK = "CreateTask",
   CREATE_NOTE = "CreateNote",
   TASK_DETAIL = "TaskDetail",
+  THEME = "Theme",
 }

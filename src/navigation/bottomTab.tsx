@@ -4,6 +4,7 @@ import { ROUTES } from "../enums/routes";
 import { Row, Spacer } from "../tools";
 import { theme } from "../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useHelper } from "../utils/helper";
 
 export interface TabIconProps {
   isFocused: boolean;
@@ -26,12 +27,16 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
   };
 
   const iconName = isFocused ? activeIcons[routeName] : icons[routeName];
-
+  const { themeColor } = useHelper();
   return (
     <Ionicons
       name={iconName}
       size={24}
-      color={isFocused ? theme.colors.primary : theme.colors.border}
+      color={
+        isFocused
+          ? themeColor.dark ?? theme.colors.primary
+          : theme.colors.border
+      }
     />
   );
 };
@@ -44,7 +49,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
     [ROUTES.NOTES]: "Notes",
     [ROUTES.PROFILE]: "Profile",
   };
-
+  const { themeColor } = useHelper();
   return (
     <View style={styles.container}>
       <Row justifyContent="space-between" style={styles.tabBarContainer}>
@@ -83,7 +88,13 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
               />
               <Spacer size={8} />
               <Text
-                style={[styles.tabLabel, isFocused && styles.tabLabelFocused]}
+                style={[
+                  styles.tabLabel,
+                  isFocused && {
+                    ...styles.tabLabelFocused,
+                    color: themeColor.dark ?? theme.colors.primary,
+                  },
+                ]}
               >
                 {routeTitles[route.name as keyof typeof ROUTES] || route.name}
               </Text>
@@ -119,7 +130,6 @@ const useBottomTabStyles = () => {
     },
     tabLabelFocused: {
       fontFamily: theme.fonts.semibold,
-      color: theme.colors.primary,
     },
   });
 };

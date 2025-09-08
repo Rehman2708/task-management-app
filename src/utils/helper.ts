@@ -2,11 +2,25 @@ import { useEffect, useState } from "react";
 import { getDataFromAsyncStorage } from "./localstorage";
 import { IUser } from "../types/auth";
 import { LocalStorageKey } from "../enums/localstorage";
+import { theme } from "../infrastructure/theme";
 
 export function useHelper() {
   const [loggedInUser, setLoggedInUser] = useState<IUser | null>(null);
   const [gettingUser, setGettingUser] = useState<boolean>(true);
-
+  const [themeColor, setThemeColor] = useState({
+    light: theme.colors.secondary,
+    dark: theme.colors.primary,
+  });
+  const fetchThemeColor = async () => {
+    try {
+      const { data } = await getDataFromAsyncStorage(LocalStorageKey.COLOR);
+      setThemeColor(data);
+      return data;
+    } catch (err) {
+      console.error("Error fetching color from storage:", err);
+    } finally {
+    }
+  };
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -21,6 +35,7 @@ export function useHelper() {
       }
     };
 
+    fetchThemeColor();
     fetchUser();
   }, []);
   function getInitials(name = "") {
@@ -35,5 +50,11 @@ export function useHelper() {
 
     return (first + last).toUpperCase();
   }
-  return { loggedInUser, gettingUser, getInitials };
+  return {
+    loggedInUser,
+    gettingUser,
+    getInitials,
+    fetchThemeColor,
+    themeColor,
+  };
 }
