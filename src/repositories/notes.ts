@@ -25,12 +25,10 @@ export interface UpdateNotePayload {
 
 export class NotesRepo {
   // 🔹 Get all notes (optional filter by userId)
-  static async getAllNotes(params?: { userId?: string }) {
-    return ApiService.getApiResponse(
-      AppUrl.getAllNotes,
-      HttpMethods.GET,
-      params
-    );
+  static async getAllNotes(params: { ownerUserId: string }) {
+    const { ownerUserId } = params;
+    const url = `${AppUrl.getAllNotes}/${ownerUserId}`;
+    return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 
   // 🔹 Create a new note

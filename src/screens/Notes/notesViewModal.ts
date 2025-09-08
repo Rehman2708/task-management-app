@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { NotesRepo, Note } from "../../repositories/notes";
+import { LocalStorageKey } from "../../enums/localstorage";
+import { getDataFromAsyncStorage } from "../../utils/localstorage";
 
 export function useNotesListViewModel(userId?: string) {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -11,17 +13,24 @@ export function useNotesListViewModel(userId?: string) {
   }, [userId]);
 
   const fetchNotes = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const params = userId ? { userId } : undefined;
-      const response = await NotesRepo.getAllNotes(params);
-      setNotes(response);
-    } catch (err: any) {
-      console.error("Fetch notes error:", err);
-      setError(err.message || "Failed to fetch notes");
-    } finally {
-      setLoading(false);
+    const { data } = await getDataFromAsyncStorage<{ userId: string }>(
+      LocalStorageKey.USER
+    );
+    if (data?.userId) {
+      try {
+        setLoading(true);
+        setError(null);
+        if (!userId) throw new Error("User ID is required");
+        const response = await NotesRepo.getAllNotes({
+          ownerUserId: data?.userId,
+        });
+        setNotes(response);
+      } catch (err: any) {
+        console.error("Fetch notes error:", err);
+        setError(err.message || "Failed to fetch notes");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -38,29 +47,11 @@ export function useNotesListViewModel(userId?: string) {
     }
   };
 
-  const updateNote = async (noteId: string, noteText: string) => {
-    try {
-      setLoading(true);
-      const updatedNote = await NotesRepo.updateNote(noteId, {
-        note: noteText,
-      });
-      setNotes((prev) =>
-        prev.map((n) => (n._id === noteId ? { ...n, ...updatedNote } : n))
-      );
-    } catch (err: any) {
-      console.error("Update note error:", err);
-      setError(err.message || "Failed to update note");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return {
     notes,
     loading,
     error,
     fetchNotes,
     deleteNote,
-    updateNote,
   };
 }

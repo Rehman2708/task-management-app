@@ -73,25 +73,19 @@ export interface AddCommentPayload {
 }
 
 export class TaskRepo {
-  // 🔹 Get all active tasks
-  static async getActiveTasks(params?: {
-    assignedTo?: AssignedTo;
-    ownerUserId?: string;
-  }) {
-    return ApiService.getApiResponse(
-      AppUrl.getAllTasks,
-      HttpMethods.GET,
-      params
-    );
+  static async getActiveTasks(params: { ownerUserId: string }) {
+    const { ownerUserId } = params;
+    let url = `${AppUrl.getAllTasks}/${ownerUserId}`;
+    return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 
   // 🔹 Get completed/expired tasks
-  static async getCompletedTasks(params?: { ownerUserId?: string }) {
-    return ApiService.getApiResponse(
-      AppUrl.getCompletedTasks,
-      HttpMethods.GET,
-      params
-    );
+  static async getCompletedTasks(params: { ownerUserId: string }) {
+    const { ownerUserId } = params;
+
+    const url = `${AppUrl.getCompletedTasks}/${ownerUserId}`;
+
+    return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 
   // 🔹 Get task by ID

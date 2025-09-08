@@ -44,7 +44,7 @@ export function useRegisterViewModel() {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: ROUTES.LOGIN }],
+          routes: [{ name: ROUTES.TABS }],
         })
       );
 

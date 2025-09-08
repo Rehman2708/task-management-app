@@ -157,33 +157,35 @@ export default function TaskDetailScreen({ route }: any) {
               }
             >
               <Column gap={isAndroid ? 5 : 6}>
-                <Text style={commonStyles.titleText}>{task.title}</Text>
-                {task.description && (
-                  <Text style={commonStyles.smallText}>{task.description}</Text>
+                <Text style={commonStyles.titleText}>{task?.title}</Text>
+                {task?.description && (
+                  <Text style={commonStyles.smallText}>
+                    {task?.description}
+                  </Text>
                 )}
                 <Row justifyContent="space-between">
                   <Text style={commonStyles.tinyText}>
-                    Created By: {task.createdBy}
+                    Created By: {task?.createdBy}
                   </Text>
                   <Text style={commonStyles.tinyText}>
-                    Assigned To: {task.assignedTo}
+                    Assigned To: {task?.assignedTo}
                   </Text>
                 </Row>
-                {task.subtasks.length > 0 && (
+                {task?.subtasks?.length > 0 && (
                   <View style={commonStyles.secondaryContainer}>
                     <Text style={commonStyles.basicText}>Subtasks</Text>
                     <FlatList
-                      data={task.subtasks}
+                      data={task?.subtasks}
                       keyExtractor={(item) => item._id}
                       renderItem={renderSubtask}
                       scrollEnabled={false}
                     />
                   </View>
                 )}
-                {task.comments.length > 0 && (
+                {task?.comments?.length > 0 && (
                   <View style={commonStyles.secondaryContainer}>
                     <Text style={commonStyles.basicText}>Task Comments</Text>
-                    {task.comments?.map((c: any, idx: number) => (
+                    {task?.comments?.map((c: any, idx: number) => (
                       <View key={idx} style={commonStyles.cardContainer}>
                         <Row gap={isAndroid ? 6 : 8} alignItems="center">
                           <Ionicons name="ellipse" size={10} />
@@ -210,7 +212,7 @@ export default function TaskDetailScreen({ route }: any) {
                     }}
                   >
                     <CustomInput
-                      placeholder="Add comment on task..."
+                      placeholder="Add comment on task?..."
                       value={taskComment}
                       onChangeText={setTaskComment}
                       fullFlex

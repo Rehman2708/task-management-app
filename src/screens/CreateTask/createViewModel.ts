@@ -89,7 +89,7 @@ export function useCreateTaskViewModel(initialTask?: any) {
         priority,
         ownerUserId: initialTask?.ownerUserId || user.userId,
         createdBy: initialTask?.createdBy || user.userId,
-        subtasks: subtasks.map((st) => ({
+        subtasks: subtasks?.map((st) => ({
           title: st.title,
           dueDateTime: st.dueDateTime,
           status: st.status || SubtaskStatus.Pending,

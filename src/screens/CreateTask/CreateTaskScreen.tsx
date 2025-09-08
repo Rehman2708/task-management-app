@@ -145,11 +145,11 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
             ))}
           </Row>
           <Text style={styles.label}>Subtasks</Text>
-          {vm.subtasks.map((subtask, index) => (
+          {vm.subtasks?.map((subtask, index) => (
             <View key={index} style={commonStyles.cardContainer}>
               <CustomInput
                 title="Subtask title"
-                value={subtask.title}
+                value={subtask?.title}
                 onChangeText={(text) => vm.updateSubtask(index, "title", text)}
               />
               <Row gap={isAndroid ? 5 : 6} alignItems="center">
@@ -158,7 +158,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 {Platform.OS === "ios" ? (
                   // iOS: Inline picker
                   <DateTimePicker
-                    value={subtask.dueDateTime}
+                    value={subtask?.dueDateTime}
                     mode="datetime"
                     display="default"
                     onChange={(_, date) => {
@@ -169,7 +169,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 ) : (
                   // Android: Show buttons instead of picker directly
                   <AndroidDateTimePicker
-                    dueDateTime={subtask.dueDateTime}
+                    dueDateTime={subtask?.dueDateTime}
                     onChange={(date) =>
                       vm.updateSubtask(index, "dueDateTime", date)
                     }
@@ -177,7 +177,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 )}
               </Row>
               <Row justifyContent="flex-end">
-                {vm.subtasks.length > 1 && (
+                {vm.subtasks?.length > 1 && (
                   <CustomButton
                     small
                     title="Remove"

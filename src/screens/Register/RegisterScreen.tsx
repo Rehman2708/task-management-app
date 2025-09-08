@@ -67,12 +67,7 @@ export const RegisterScreen = () => {
             onPress={handleRegister}
             loading={loading}
           />
-          <CustomButton
-            title="Login"
-            onPress={Login}
-            loading={loading}
-            outlined
-          />
+          <CustomButton title="Login" onPress={Login} outlined />
         </KeyboardAwareScrollView>
       </Column>
     </AuthBgContainer>
