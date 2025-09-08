@@ -11,7 +11,7 @@ import { useHomeScreenViewModel } from "./homeViewModel";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
-import { Column, Row } from "../../tools";
+import { Column, isAndroid, Row } from "../../tools";
 import { useHelper } from "../../utils/helper";
 import EmptyState from "../../components/emptyState";
 
@@ -33,7 +33,7 @@ export default function HomeScreen({ navigation }: any) {
           },
         ]}
       >
-        <Column gap={6}>
+        <Column gap={isAndroid ? 5 : 6}>
           <Text numberOfLines={1} style={commonStyles.subTitleText}>
             {item.title}
           </Text>
@@ -66,7 +66,7 @@ export default function HomeScreen({ navigation }: any) {
     );
 
   return (
-    <ScreenWrapper title={`Hey, ${loggedInUser?.name}!`}>
+    <ScreenWrapper title={`Hey, ${loggedInUser?.name?.trim()}!`}>
       <View style={[commonStyles.screenWrapper]}>
         {tasks.length === 0 ? (
           <EmptyState

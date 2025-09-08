@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  KeyboardTypeOptions,
+  TouchableOpacity,
   StyleSheet,
+  KeyboardTypeOptions,
 } from "react-native";
 import { theme } from "../infrastructure/theme";
 import { Column, isAndroid } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
+import { Ionicons } from "@expo/vector-icons"; // Make sure expo/vector-icons is installed
 
 export type CustomInputProps = {
   title?: string;
@@ -33,33 +35,50 @@ const CustomInput = ({
   numberOfLines = 1,
   editable = true,
   error = false,
-  secureTextEntry,
+  secureTextEntry = false,
   multiline = false,
   fullFlex = false,
 }: CustomInputProps) => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   return (
     <Column
-      gap={6}
+      gap={isAndroid ? 5 : 6}
       style={[styles.container, fullFlex ? commonStyles.fullFlex : {}]}
     >
       {title && <Text style={styles.label}>{title}</Text>}
 
-      <TextInput
-        style={[
-          styles.input,
-          error && styles.errorInput,
-          multiline && styles.multiline,
-        ]}
-        placeholder={placeholder}
-        placeholderTextColor={theme.colors.border}
-        editable={editable}
-        numberOfLines={numberOfLines}
-        keyboardType={keyboardType}
-        onChangeText={onChangeText}
-        value={value}
-        secureTextEntry={secureTextEntry}
-        multiline={multiline}
-      />
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={[
+            styles.input,
+            error && styles.errorInput,
+            multiline && styles.multiline,
+            secureTextEntry && styles.passwordInput,
+          ]}
+          placeholder={placeholder}
+          placeholderTextColor={theme.colors.border}
+          editable={editable}
+          numberOfLines={numberOfLines}
+          keyboardType={keyboardType}
+          onChangeText={onChangeText}
+          value={value}
+          secureTextEntry={secureTextEntry && !isPasswordVisible}
+          multiline={multiline}
+        />
+
+        {secureTextEntry && (
+          <TouchableOpacity
+            style={styles.iconWrapper}
+            onPress={() => setIsPasswordVisible((prev) => !prev)}
+          >
+            <Ionicons
+              name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+              size={24}
+              color={theme.colors.primary}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
     </Column>
   );
 };
@@ -73,6 +92,10 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.medium,
     color: theme.colors.text,
   },
+  inputWrapper: {
+    position: "relative",
+    justifyContent: "center",
+  },
   input: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -82,10 +105,21 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSizes.sm,
     fontFamily: theme.fonts.regular,
     color: theme.colors.text,
+    paddingRight: 40, // space for the eye icon
   },
   multiline: {
     height: 100,
     textAlignVertical: "top",
+  },
+  passwordInput: {
+    // additional styling if needed for password fields
+  },
+  iconWrapper: {
+    position: "absolute",
+    right: 12,
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   errorInput: {
     borderColor: theme.colors.error || "red",

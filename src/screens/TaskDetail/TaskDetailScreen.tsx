@@ -13,7 +13,7 @@ import { theme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { commonStyles } from "../../styles/commonstyles";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { Column, Row, Spacer } from "../../tools";
+import { Column, isAndroid, Row, Spacer } from "../../tools";
 import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../../components/customButton";
 import CustomInput from "../../components/customInput";
@@ -53,7 +53,7 @@ export default function TaskDetailScreen({ route }: any) {
 
   const renderSubtask = ({ item }: { item: any }) => (
     <Column
-      gap={8}
+      gap={isAndroid ? 6 : 8}
       style={[
         commonStyles.cardContainer,
         {
@@ -81,8 +81,8 @@ export default function TaskDetailScreen({ route }: any) {
       {/* Subtask Comments */}
       <View style={{ marginTop: theme.spacing.sm }}>
         {item.comments?.map((c: any, idx: number) => (
-          <Column>
-            <Row gap={8} alignItems="center">
+          <Column key={idx}>
+            <Row gap={isAndroid ? 6 : 8} alignItems="center">
               <Ionicons name="ellipse" size={10} />
               <Text key={idx} style={commonStyles.smallText}>
                 {c.createdBy}: {c.text}
@@ -156,7 +156,7 @@ export default function TaskDetailScreen({ route }: any) {
                 />
               }
             >
-              <Column gap={6}>
+              <Column gap={isAndroid ? 5 : 6}>
                 <Text style={commonStyles.titleText}>{task.title}</Text>
                 {task.description && (
                   <Text style={commonStyles.smallText}>{task.description}</Text>
@@ -185,7 +185,7 @@ export default function TaskDetailScreen({ route }: any) {
                     <Text style={commonStyles.basicText}>Task Comments</Text>
                     {task.comments?.map((c: any, idx: number) => (
                       <View key={idx} style={commonStyles.cardContainer}>
-                        <Row gap={8} alignItems="center">
+                        <Row gap={isAndroid ? 6 : 8} alignItems="center">
                           <Ionicons name="ellipse" size={10} />
                           <Text key={idx} style={commonStyles.smallText}>
                             {c.by}: {c.text}

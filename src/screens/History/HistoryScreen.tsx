@@ -14,7 +14,7 @@ import { styles } from "./styles";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
-import { Column, Row } from "../../tools";
+import { Column, isAndroid, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
 
 export default function HistoryScreen({ navigation }: any) {
@@ -32,7 +32,7 @@ export default function HistoryScreen({ navigation }: any) {
         }
         style={[commonStyles.cardContainer]}
       >
-        <Column gap={6}>
+        <Column gap={isAndroid ? 5 : 6}>
           <Text style={commonStyles.subTitleText} numberOfLines={1}>
             {item.title}
           </Text>

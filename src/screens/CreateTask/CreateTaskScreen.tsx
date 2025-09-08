@@ -15,7 +15,7 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import CustomButton from "../../components/customButton";
 import CustomInput from "../../components/customInput";
-import { Row, Spacer } from "../../tools";
+import { isAndroid, Row, Spacer } from "../../tools";
 import { theme } from "../../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -65,7 +65,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
           />
 
           <Text style={commonStyles.smallText}>Assigned To</Text>
-          <Row gap={16} alignItems="center">
+          <Row gap={isAndroid ? 14 : 16} alignItems="center">
             {["Me", "Partner", "Both"].map((option) => (
               <TouchableOpacity
                 key={option}
@@ -91,8 +91,8 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
             ))}
           </Row>
 
-          <Text style={commonStyles.smallText}>Frequency</Text>
-          <Row gap={16} alignItems="center">
+          {/* <Text style={commonStyles.smallText}>Frequency</Text>
+          <Row gap={isAndroid ? 14 : 16} alignItems="center">
             {["Once", "Daily", "Weekly"].map((option) => (
               <TouchableOpacity
                 key={option}
@@ -116,10 +116,10 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 </Text>
               </TouchableOpacity>
             ))}
-          </Row>
+          </Row> */}
 
           <Text style={commonStyles.smallText}>Priority</Text>
-          <Row gap={16} alignItems="center">
+          <Row gap={isAndroid ? 14 : 16} alignItems="center">
             {["Low", "High", "Urgent"].map((option) => (
               <TouchableOpacity
                 style={[
@@ -152,7 +152,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 value={subtask.title}
                 onChangeText={(text) => vm.updateSubtask(index, "title", text)}
               />
-              <Row gap={6} alignItems="center">
+              <Row gap={isAndroid ? 5 : 6} alignItems="center">
                 <Text style={commonStyles.smallText}>Due:</Text>
 
                 {Platform.OS === "ios" ? (

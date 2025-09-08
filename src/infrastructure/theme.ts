@@ -1,3 +1,5 @@
+import { isAndroid } from "../tools";
+
 export const theme = {
   colors: {
     primary: "#3F87E9",
@@ -28,9 +30,9 @@ export const theme = {
   fontSizes: {
     xs: 12,
     sm: 14,
-    md: 16,
-    lg: 18,
-    xl: 22,
+    md: 15,
+    lg: 17,
+    xl: 20,
   },
   radius: {
     sm: 4,

@@ -17,7 +17,7 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { styles } from "./styles";
 import { ROUTES } from "../../enums/routes";
-import { Column, Row, Spacer } from "../../tools";
+import { Column, isAndroid, Row, Spacer } from "../../tools";
 import EmptyState from "../../components/emptyState";
 
 export default function NotesScreen() {
@@ -52,7 +52,7 @@ export default function NotesScreen() {
         <Text numberOfLines={5} style={commonStyles.tinyText}>
           Created By: {item.createdBy}
         </Text>
-        <Row gap={8}>
+        <Row gap={isAndroid ? 6 : 8}>
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() =>

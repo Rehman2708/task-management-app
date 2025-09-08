@@ -1,5 +1,5 @@
 import { Text, Image, ImageSourcePropType, View } from "react-native";
-import { Column, Row } from "../tools";
+import { Column, isAndroid, Row } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
 import CustomButton from "./customButton";
 
@@ -17,7 +17,7 @@ const EmptyState = ({
   return (
     <Column
       style={commonStyles.fullFlex}
-      gap={16}
+      gap={isAndroid ? 14 : 16}
       justifyContent="center"
       alignItems="center"
     >

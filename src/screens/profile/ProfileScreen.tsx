@@ -43,7 +43,7 @@ export default function ProfileScreen() {
         <ScreenLoader />
       ) : (
         <>
-          <Column gap={8} style={[commonStyles.screenWrapper]}>
+          <Column gap={isAndroid ? 6 : 8} style={[commonStyles.screenWrapper]}>
             <Row justifyContent="center">
               <Row
                 justifyContent="center"
@@ -69,20 +69,20 @@ export default function ProfileScreen() {
                 </Text>
               </Row>
             </Row>
-            <Row gap={8} alignItems="flex-end">
+            <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
               <Text style={[commonStyles.smallText]}>Name:</Text>
               <Text style={[commonStyles.subTitleText]}>
                 {user?.name || "N/A"}
               </Text>
             </Row>
-            <Row gap={8} alignItems="flex-end">
+            <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
               <Text style={[commonStyles.smallText]}>UserId:</Text>
               <Text style={[commonStyles.subTitleText]}>
                 {user?.userId || "N/A"}
               </Text>
             </Row>
             {partnerId ? (
-              <Row gap={8} alignItems="flex-end">
+              <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
                 <Text style={[commonStyles.smallText]}>Partner:</Text>
                 <Text style={[commonStyles.subTitleText]}>
                   {partnerId || "N/A"}
@@ -112,6 +112,7 @@ export default function ProfileScreen() {
                 />
               </Column>
             )}
+            <Spacer size={20} />
             <TouchableOpacity onPress={changeThemeScreen}>
               <Row
                 style={commonStyles.cardContainer}
