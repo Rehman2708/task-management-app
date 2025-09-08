@@ -48,7 +48,7 @@ const CustomButton = ({
   const buttonStyles = [
     styles.button,
     {
-      backgroundColor: themeColor.dark ?? theme.colors.primary,
+      backgroundColor: themeColor?.dark ?? theme.colors.primary,
     },
     small && styles.small,
     halfWidth && commonStyles.halfWidth,
@@ -63,8 +63,8 @@ const CustomButton = ({
   const textStyles = [
     styles.text,
     small && { ...commonStyles.smallText, ...commonStyles.whiteText },
-    outlined && { color: themeColor.dark ?? theme.colors.primary },
-    secondary && { color: themeColor.light ?? theme.colors.secondary },
+    outlined && { color: themeColor?.dark ?? theme.colors.primary },
+    secondary && { color: themeColor?.light ?? theme.colors.secondary },
     (error || success) && { color: theme.colors.white },
   ];
   if (sendButton) {
@@ -76,7 +76,7 @@ const CustomButton = ({
           style={{
             padding: 12,
             borderRadius: 100,
-            backgroundColor: themeColor.dark ?? theme.colors.primary,
+            backgroundColor: themeColor?.dark ?? theme.colors.primary,
           }}
         >
           {loading ? (
@@ -84,7 +84,7 @@ const CustomButton = ({
               size="small"
               color={
                 outlined || secondary
-                  ? themeColor.dark ?? theme.colors.primary
+                  ? themeColor?.dark ?? theme.colors.primary
                   : theme.colors.white
               }
             />
@@ -111,7 +111,7 @@ const CustomButton = ({
           size="small"
           color={
             outlined || secondary
-              ? themeColor.dark ?? theme.colors.primary
+              ? themeColor?.dark ?? theme.colors.primary
               : theme.colors.white
           }
         />

@@ -10,8 +10,8 @@ const LinearHeader = () => {
     <View>
       <LinearGradient
         colors={[
-          themeColor.dark ?? theme.colors.primary,
-          themeColor.light ?? theme.colors.secondary,
+          themeColor?.dark ?? theme.colors.primary,
+          themeColor?.light ?? theme.colors.secondary,
         ]}
         style={{
           height: isAndroid ? 80 : 130,

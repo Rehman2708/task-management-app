@@ -30,19 +30,7 @@ export default function HistoryScreen({ navigation }: any) {
             readOnly: true,
           })
         }
-        style={[
-          commonStyles.cardContainer,
-          {
-            backgroundColor:
-              item.status === "Completed"
-                ? `${theme.colors.success}30`
-                : `${theme.colors.error}30`,
-            borderColor:
-              item.status === "Completed"
-                ? `${theme.colors.success}30`
-                : `${theme.colors.error}30`,
-          },
-        ]}
+        style={[commonStyles.cardContainer]}
       >
         <Column gap={6}>
           <Text style={commonStyles.subTitleText} numberOfLines={1}>

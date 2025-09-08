@@ -21,7 +21,10 @@ export function useLoginViewModel() {
     setError("");
 
     try {
-      const response = await AuthRepo.login({ userId, password });
+      const response = await AuthRepo.login({
+        userId: userId.trim(),
+        password,
+      });
 
       if (response?.user) {
         await storeDataInAsyncStorage(LocalStorageKey.USER, response.user);

@@ -14,7 +14,12 @@ export function useHelper() {
   const fetchThemeColor = async () => {
     try {
       const { data } = await getDataFromAsyncStorage(LocalStorageKey.COLOR);
-      setThemeColor(data);
+      setThemeColor(
+        data ?? {
+          light: theme.colors.secondary,
+          dark: theme.colors.primary,
+        }
+      );
       return data;
     } catch (err) {
       console.error("Error fetching color from storage:", err);

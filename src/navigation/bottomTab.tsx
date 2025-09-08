@@ -34,7 +34,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
       size={24}
       color={
         isFocused
-          ? themeColor.dark ?? theme.colors.primary
+          ? themeColor?.dark ?? theme.colors.primary
           : theme.colors.border
       }
     />
@@ -92,7 +92,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
                   styles.tabLabel,
                   isFocused && {
                     ...styles.tabLabelFocused,
-                    color: themeColor.dark ?? theme.colors.primary,
+                    color: themeColor?.dark ?? theme.colors.primary,
                   },
                 ]}
               >

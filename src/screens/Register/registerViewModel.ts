@@ -30,8 +30,12 @@ export function useRegisterViewModel() {
     setError("");
 
     try {
-      const payload: RegisterPayload = { name, userId, password };
-      if (partnerUserId) payload.partnerUserId = partnerUserId;
+      const payload: RegisterPayload = {
+        name: name.trim(),
+        userId: userId.trim(),
+        password,
+      };
+      if (partnerUserId) payload.partnerUserId = partnerUserId.trim();
 
       const response = await AuthRepo.register(payload);
       if (response?.user) {

@@ -18,6 +18,7 @@ import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
+import ScreenLoader from "../../components/screenLoader";
 
 export default function ProfileScreen() {
   const {
@@ -39,13 +40,7 @@ export default function ProfileScreen() {
   return (
     <ScreenWrapper title="Profile">
       {loading ? (
-        <>
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-          </View>
-        </>
+        <ScreenLoader />
       ) : (
         <>
           <Column gap={8} style={[commonStyles.screenWrapper]}>
@@ -67,7 +62,7 @@ export default function ProfileScreen() {
                   style={{
                     fontSize: 50,
                     fontFamily: theme.fonts.bold,
-                    color: themeColor.dark ?? theme.colors.primary,
+                    color: themeColor?.dark ?? theme.colors.primary,
                   }}
                 >
                   {getInitials(user?.name)}

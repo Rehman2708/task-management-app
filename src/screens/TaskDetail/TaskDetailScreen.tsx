@@ -7,6 +7,7 @@ import {
   Pressable,
   TextInput,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
@@ -17,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../../components/customButton";
 import CustomInput from "../../components/customInput";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import ScreenLoader from "../../components/screenLoader";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -50,7 +52,22 @@ export default function TaskDetailScreen({ route }: any) {
     );
 
   const renderSubtask = ({ item }: { item: any }) => (
-    <Column gap={8} style={[commonStyles.cardContainer, {}]}>
+    <Column
+      gap={8}
+      style={[
+        commonStyles.cardContainer,
+        {
+          backgroundColor:
+            item.status === "Completed"
+              ? `${theme.colors.success}20`
+              : `${theme.colors.error}20`,
+          borderColor:
+            item.status === "Completed"
+              ? `${theme.colors.success}20`
+              : `${theme.colors.error}20`,
+        },
+      ]}
+    >
       <Text style={commonStyles.subTitleText}>{item.title}</Text>
       <Row alignItems="flex-end" justifyContent="space-between">
         <Text style={commonStyles.smallText}>Status: {item.status}</Text>
@@ -64,12 +81,19 @@ export default function TaskDetailScreen({ route }: any) {
       {/* Subtask Comments */}
       <View style={{ marginTop: theme.spacing.sm }}>
         {item.comments?.map((c: any, idx: number) => (
-          <Row gap={8} alignItems="center">
-            <Ionicons name="ellipse" size={10} />
-            <Text key={idx} style={commonStyles.smallText}>
-              {c.createdBy}: {c.text}
-            </Text>
-          </Row>
+          <Column>
+            <Row gap={8} alignItems="center">
+              <Ionicons name="ellipse" size={10} />
+              <Text key={idx} style={commonStyles.smallText}>
+                {c.createdBy}: {c.text}
+              </Text>
+            </Row>
+            <Row justifyContent="flex-end">
+              <Text style={commonStyles.tinyText}>
+                {new Date(c.createdAt).toLocaleString()}
+              </Text>
+            </Row>
+          </Column>
         ))}
         {!readOnly && item.status !== "Completed" && (
           <View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
@@ -116,11 +140,7 @@ export default function TaskDetailScreen({ route }: any) {
       subTitle={`Tasks > Details`}
     >
       {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
+        <ScreenLoader />
       ) : (
         <View style={[commonStyles.screenWrapper]}>
           {task && (
@@ -128,6 +148,13 @@ export default function TaskDetailScreen({ route }: any) {
               style={commonStyles.fullFlex}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
+              refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={fetchTaskDetail}
+                  colors={[theme.colors.primary]}
+                />
+              }
             >
               <Column gap={6}>
                 <Text style={commonStyles.titleText}>{task.title}</Text>
@@ -164,9 +191,11 @@ export default function TaskDetailScreen({ route }: any) {
                             {c.by}: {c.text}
                           </Text>
                         </Row>
-                        <Text style={commonStyles.tinyText}>
-                          {new Date(c.date).toLocaleString()}
-                        </Text>
+                        <Row justifyContent="flex-end">
+                          <Text style={commonStyles.tinyText}>
+                            {new Date(c.date).toLocaleString()}
+                          </Text>
+                        </Row>
                       </View>
                     ))}
                   </View>

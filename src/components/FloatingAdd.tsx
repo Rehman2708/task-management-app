@@ -10,7 +10,7 @@ export default function FloatingAdd({ onPress }: { onPress: () => void }) {
       style={[
         styles.fab,
         {
-          backgroundColor: themeColor.dark ?? theme.colors.primary,
+          backgroundColor: themeColor?.dark ?? theme.colors.primary,
         },
       ]}
       onPress={onPress}

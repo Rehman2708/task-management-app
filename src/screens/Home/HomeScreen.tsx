@@ -18,7 +18,7 @@ import EmptyState from "../../components/emptyState";
 export default function HomeScreen({ navigation }: any) {
   const { tasks, loading, error, fetchTasks, userId } =
     useHomeScreenViewModel();
-  const { loggedInUser } = useHelper();
+  const { loggedInUser, themeColor } = useHelper();
   const renderItem = ({ item }: { item: any }) => {
     return (
       <TouchableOpacity
@@ -28,8 +28,8 @@ export default function HomeScreen({ navigation }: any) {
         style={[
           commonStyles.cardContainer,
           {
-            backgroundColor: `${theme.colors.secondary}40`,
-            borderColor: `${theme.colors.secondary}40`,
+            backgroundColor: `${themeColor?.light ?? theme.colors.secondary}20`,
+            borderColor: `${themeColor?.light ?? theme.colors.secondary}20`,
           },
         ]}
       >
