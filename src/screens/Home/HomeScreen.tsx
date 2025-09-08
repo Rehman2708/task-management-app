@@ -14,11 +14,18 @@ import { ROUTES } from "../../enums/routes";
 import { Column, isAndroid, Row } from "../../tools";
 import { useHelper } from "../../utils/helper";
 import EmptyState from "../../components/emptyState";
+import { useFocusEffect } from "@react-navigation/native";
+import React from "react";
 
 export default function HomeScreen({ navigation }: any) {
   const { tasks, loading, error, fetchTasks, userId } =
     useHomeScreenViewModel();
   const { loggedInUser, themeColor } = useHelper();
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchTasks();
+    }, [])
+  );
   const renderItem = ({ item }: { item: any }) => {
     return (
       <TouchableOpacity

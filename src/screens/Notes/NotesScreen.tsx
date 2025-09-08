@@ -1,23 +1,14 @@
 import React from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  Alert,
-  Pressable,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, FlatList, Alert, TouchableOpacity } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useNotesListViewModel } from "./notesViewModal";
 import FloatingAdd from "../../components/FloatingAdd";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { styles } from "./styles";
 import { ROUTES } from "../../enums/routes";
-import { Column, isAndroid, Row, Spacer } from "../../tools";
+import { Column, isAndroid, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
 
 export default function NotesScreen() {
@@ -37,6 +28,11 @@ export default function NotesScreen() {
       },
     ]);
   };
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchNotes();
+    }, [])
+  );
 
   const renderItem = ({ item }: { item: any }) => (
     <Column gap={4} style={commonStyles.cardContainer}>

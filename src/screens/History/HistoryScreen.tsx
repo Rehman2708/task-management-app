@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
-
-import { theme } from "../../infrastructure/theme";
+import { View, Text, FlatList, Pressable } from "react-native";
 import { useCompletedTasksViewModel } from "./historyViewModel";
 import { styles } from "./styles";
 import ScreenWrapper from "../../components/ScreenWrapper";
@@ -16,11 +7,16 @@ import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
 import { Column, isAndroid, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HistoryScreen({ navigation }: any) {
   const { tasks, loading, error, fetchCompletedTasks } =
     useCompletedTasksViewModel();
-
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchCompletedTasks();
+    }, [])
+  );
   const renderTaskCard = ({ item }: { item: any }) => {
     return (
       <Pressable
