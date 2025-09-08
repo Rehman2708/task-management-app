@@ -21,11 +21,11 @@ export const theme = {
     xl: 24,
   },
   fonts: {
-    light: "MontserratAlternates-Light",
-    regular: "MontserratAlternates-Regular",
-    medium: "MontserratAlternates-Medium",
-    semibold: "MontserratAlternates-SemiBold",
-    bold: "MontserratAlternates-Bold",
+    light: "MontserratLight",
+    regular: "MontserratRegular",
+    medium: "MontserratMedium",
+    semibold: "MontserratSemiBold",
+    bold: "MontserratBold",
   },
   fontSizes: {
     xs: 12,

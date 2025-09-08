@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   editText: {
-    color: theme.colors.primary,
+    color: theme.colors.success,
     fontFamily: theme.fonts.medium,
   },
 

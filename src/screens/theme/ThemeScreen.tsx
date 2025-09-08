@@ -63,15 +63,21 @@ const ThemeScreen = () => {
     <ScreenWrapper title="Theme" showBackbutton>
       <Column gap={12} style={[commonStyles.screenWrapper]}>
         {colors.map((item, index) => (
-          <TouchableOpacity key={index} onPress={() => setTheme(index)}>
+          <TouchableOpacity
+            style={{
+              borderRadius: 16,
+              overflow: "hidden",
+              borderWidth: 3,
+              borderColor: currentThemeIndex === index ? "#000" : "#fff",
+            }}
+            key={index}
+            onPress={() => setTheme(index)}
+          >
             <LinearGradient
               colors={[item.dark, item.light]}
               style={{
                 height: 100,
                 width: "100%",
-                borderWidth: currentThemeIndex === index ? 3 : 0,
-                borderColor: "#000",
-                borderRadius: 8,
               }}
             />
           </TouchableOpacity>

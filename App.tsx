@@ -10,6 +10,9 @@ export default function App() {
     MontserratRegular: require("./assets/fonts/MontserratAlternates-Regular.ttf"),
     MontserratSemiBold: require("./assets/fonts/MontserratAlternates-SemiBold.ttf"),
   });
+  if (!fontsLoaded) {
+    return null; // or a splash/loading screen
+  }
   return (
     <NavigationContainer>
       <StatusBar backgroundColor={"black"} />

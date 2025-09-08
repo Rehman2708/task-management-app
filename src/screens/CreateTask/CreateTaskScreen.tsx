@@ -1,15 +1,7 @@
-import React, { useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Button,
-  Platform,
-} from "react-native";
+import { useEffect } from "react";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import { useCreateTaskViewModel } from "./createViewModel";
-import { styles } from "./styles";
+import { createTaskStyle } from "./styles";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
@@ -20,10 +12,13 @@ import { theme } from "../../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { AndroidDateTimePicker } from "./components/subtaskItem";
+import { useHelper } from "../../utils/helper";
 // Pass `task` prop for edit mode
 export const CreateTaskScreen = ({ route, navigation }: any) => {
   const { task } = route.params || {};
   const vm = useCreateTaskViewModel(task);
+  const styles = createTaskStyle();
+  const { themeColor } = useHelper();
 
   useEffect(() => {
     if (task) {
@@ -75,6 +70,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                   vm.assignedTo === option
                     ? styles.assignButtonActive
                     : styles.assignButtonInactive,
+                  {},
                 ]}
               >
                 <Text
@@ -195,7 +191,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
               <Ionicons
                 name="add-circle-outline"
                 size={40}
-                color={theme.colors.primary}
+                color={themeColor?.dark ?? theme.colors.primary}
               />
             </TouchableOpacity>
           </Row>

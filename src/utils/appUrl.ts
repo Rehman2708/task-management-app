@@ -15,7 +15,7 @@ export class AppUrl {
   public static getCompletedTasks = `${this.BASE_URL}/tasks/history`; // completed/expired tasks
   public static createTask = `${this.BASE_URL}/tasks`;
   public static getTaskById = (taskId: string) =>
-    `${this.BASE_URL}/tasks/${taskId}`;
+    `${this.BASE_URL}/tasks/task/${taskId}`;
   public static updateTask = (taskId: string) =>
     `${this.BASE_URL}/tasks/${taskId}`;
   public static deleteTask = (taskId: string) =>
