@@ -81,18 +81,6 @@ export default function HomeScreen({ navigation }: any) {
     );
   };
 
-  if (error)
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ color: theme.colors.error }}>{error}</Text>
-        <Pressable onPress={fetchTasks}>
-          <Text style={{ color: theme.colors.primary, marginTop: 8 }}>
-            Retry
-          </Text>
-        </Pressable>
-      </View>
-    );
-
   return (
     <ScreenWrapper title={`Hey, ${loggedInUser?.name?.trim()}!`}>
       <View style={[commonStyles.screenWrapper]}>

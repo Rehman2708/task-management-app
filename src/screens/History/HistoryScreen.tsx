@@ -87,16 +87,6 @@ export default function HistoryScreen({ navigation }: any) {
     );
   };
 
-  if (error)
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>
-        <Pressable onPress={fetchCompletedTasks}>
-          <Text style={styles.retryText}>Retry</Text>
-        </Pressable>
-      </View>
-    );
-
   return (
     <ScreenWrapper title="History">
       <View style={[commonStyles.screenWrapper]}>

@@ -34,6 +34,11 @@ export const commonStyles = StyleSheet.create({
     color: theme.colors.text,
     fontFamily: theme.fonts.light,
   },
+  tTinyText: {
+    fontSize: theme.fontSizes.xxs,
+    color: theme.colors.text,
+    fontFamily: theme.fonts.light,
+  },
   whiteText: {
     color: theme.colors.white,
   },

@@ -8,7 +8,7 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { styles } from "./styles";
 import { ROUTES } from "../../enums/routes";
-import { Column, Row } from "../../tools";
+import { Column, Row, Spacer } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useHelper } from "../../utils/helper";
 
@@ -27,24 +27,23 @@ export default function NotesScreen() {
   const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate(ROUTES.VIEW_NOTE, { note: item })}
+      style={{ flex: 1, marginHorizontal: 4 }}
     >
-      <Column gap={8} style={commonStyles.cardContainer}>
+      <Column gap={6} style={commonStyles.cardContainer}>
         {item?.title && (
-          <Text numberOfLines={1} style={commonStyles.subTitleText}>
+          <Text numberOfLines={1} style={commonStyles.basicText}>
             {item.title}
           </Text>
         )}
-        <Text numberOfLines={5} style={commonStyles.smallText}>
+        <Text numberOfLines={4} style={commonStyles.tinyText}>
           {item.note}
         </Text>
-        <Row justifyContent="space-between" alignItems="center">
-          <Text numberOfLines={5} style={commonStyles.tinyText}>
-            Created By: {item.createdBy}
-          </Text>
-          <Text numberOfLines={5} style={commonStyles.tinyText}>
-            {formatDate(item?.createdAt)}
-          </Text>
-        </Row>
+        <Text numberOfLines={5} style={commonStyles.tTinyText}>
+          Created By: {item.createdBy}
+        </Text>
+        <Text numberOfLines={5} style={commonStyles.tTinyText}>
+          {formatDate(item?.createdAt)}
+        </Text>
       </Column>
     </TouchableOpacity>
   );
@@ -63,6 +62,7 @@ export default function NotesScreen() {
               onRefresh={fetchNotes}
               contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
               showsVerticalScrollIndicator={false}
+              numColumns={2}
             />
           ) : (
             <EmptyState
