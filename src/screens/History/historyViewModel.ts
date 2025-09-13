@@ -31,10 +31,25 @@ export function useCompletedTasksViewModel() {
     }
   };
 
+  // Delete a task
+  const deleteTask = async (taskId: string) => {
+    try {
+      setLoading(true);
+      await TaskRepo.deleteTask(taskId);
+      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+    } catch (err: any) {
+      console.error("Delete task error:", err);
+      setError(err.message || "Failed to delete task");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     tasks,
     loading,
     error,
     fetchCompletedTasks,
+    deleteTask,
   };
 }

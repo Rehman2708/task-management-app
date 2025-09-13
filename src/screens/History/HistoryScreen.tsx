@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, FlatList, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 import { useCompletedTasksViewModel } from "./historyViewModel";
 import { styles } from "./styles";
 import ScreenWrapper from "../../components/ScreenWrapper";
@@ -9,9 +15,10 @@ import { Column, isAndroid, Row, Spacer } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
 import { useHelper } from "../../utils/helper";
+import { theme } from "../../infrastructure/theme";
 
 export default function HistoryScreen({ navigation }: any) {
-  const { tasks, loading, error, fetchCompletedTasks } =
+  const { tasks, loading, error, fetchCompletedTasks, deleteTask } =
     useCompletedTasksViewModel();
   useFocusEffect(
     React.useCallback(() => {
@@ -19,7 +26,7 @@ export default function HistoryScreen({ navigation }: any) {
     }, [])
   );
 
-  const { formatDate } = useHelper();
+  const { formatDate, loggedInUser } = useHelper();
 
   const renderTaskCard = ({ item }: { item: any }) => {
     return (
@@ -58,6 +65,23 @@ export default function HistoryScreen({ navigation }: any) {
               Assigned To: {item.assignedTo}
             </Text>
           </Row>
+          {loggedInUser?.userId === "RehmanK" && (
+            <Row justifyContent="flex-end">
+              <TouchableOpacity
+                onPress={() => deleteTask(item._id)}
+                style={{ padding: 8, paddingBottom: 0 }}
+              >
+                <Text
+                  style={[
+                    commonStyles.basicText,
+                    { color: theme.colors.error },
+                  ]}
+                >
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </Row>
+          )}
         </Column>
       </Pressable>
     );

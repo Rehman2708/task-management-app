@@ -18,7 +18,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
 
 export default function HomeScreen({ navigation }: any) {
-  const { tasks, loading, error, fetchTasks, userId } =
+  const { tasks, loading, error, fetchTasks, deleteTask } =
     useHomeScreenViewModel();
   const { loggedInUser, themeColor, formatDate } = useHelper();
   useFocusEffect(
@@ -63,6 +63,18 @@ export default function HomeScreen({ navigation }: any) {
             <Text style={commonStyles.tinyText}>
               Assigned To: {item.assignedTo}
             </Text>
+          </Row>
+          <Row justifyContent="flex-end">
+            <TouchableOpacity
+              onPress={() => deleteTask(item._id)}
+              style={{ padding: 8, paddingBottom: 0 }}
+            >
+              <Text
+                style={[commonStyles.basicText, { color: theme.colors.error }]}
+              >
+                Delete
+              </Text>
+            </TouchableOpacity>
           </Row>
         </Column>
       </TouchableOpacity>
