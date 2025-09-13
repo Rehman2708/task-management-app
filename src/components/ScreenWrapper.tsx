@@ -3,8 +3,8 @@ import React from "react";
 import { commonStyles } from "../styles/commonstyles";
 import LinearHeader from "./LinearHeader";
 import CustomHeader from "./CustomHeader";
-import TimeDisplay from "./time";
 import { isAndroid, Spacer } from "../tools";
+import { theme } from "../infrastructure/theme";
 
 const ScreenWrapper = ({
   children,
@@ -20,7 +20,12 @@ const ScreenWrapper = ({
   onBackButtonPress?: () => void;
 }) => {
   return (
-    <View style={[commonStyles.fullFlex, { backgroundColor: "#fff" }]}>
+    <View
+      style={[
+        commonStyles.fullFlex,
+        { backgroundColor: theme.colors.background },
+      ]}
+    >
       <LinearHeader />
 
       <SafeAreaView style={[commonStyles.screenWrapper]}>

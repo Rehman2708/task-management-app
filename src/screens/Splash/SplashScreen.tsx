@@ -7,6 +7,7 @@ import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { LocalStorageKey } from "../../enums/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
+import { theme } from "../../infrastructure/theme";
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -35,7 +36,10 @@ const SplashScreen = () => {
   }, []);
   return (
     <Column
-      style={commonStyles.fullFlex}
+      style={[
+        commonStyles.fullFlex,
+        { backgroundColor: theme.colors.background },
+      ]}
       justifyContent="center"
       alignItems="center"
     >

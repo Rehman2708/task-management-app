@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ROUTES } from "../enums/routes";
-import { Row, Spacer } from "../tools";
+import { isDarkMode, Row, Spacer } from "../tools";
 import { theme } from "../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useHelper } from "../utils/helper";
@@ -109,11 +109,11 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
 const useBottomTabStyles = () => {
   return StyleSheet.create({
     container: {
-      borderTopColor: "#00000009",
+      borderTopColor: theme.colors.border,
       borderTopWidth: 1,
     },
     tabBarContainer: {
-      backgroundColor: "#FFF",
+      backgroundColor: theme.colors.background,
       paddingHorizontal: 15,
       paddingBottom: 18,
       paddingTop: 15,

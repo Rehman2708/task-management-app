@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from "react-native";
+import { View, Text } from "react-native";
 import { Note } from "../../repositories/notes";
 import { useNoteDetailViewModel } from "./createNoteViewModal";
 import { styles } from "./styles";
@@ -15,6 +8,7 @@ import { commonStyles } from "../../styles/commonstyles";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { ROUTES } from "../../enums/routes";
 
 interface NoteDetailScreenProps {
   route: {
@@ -36,26 +30,12 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     error,
     success,
     saveNote,
-    deleteNote,
   } = useNoteDetailViewModel(note);
   const navigation = useNavigation();
-  const handleDelete = () => {
-    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          await deleteNote();
-          navigation.goBack();
-        },
-      },
-    ]);
-  };
 
   const handleSave = async () => {
     await saveNote();
-    navigation.goBack();
+    navigation.navigate(ROUTES.NOTES);
   };
 
   return (
@@ -66,6 +46,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     >
       <View style={[commonStyles.screenWrapper]}>
         <KeyboardAwareScrollView
+          showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.container}
         >
@@ -90,15 +71,6 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
             onPress={handleSave}
           />
         </KeyboardAwareScrollView>
-        {note?._id && (
-          <CustomButton
-            title="Delete"
-            loading={loading}
-            onPress={handleDelete}
-            error
-            rounded
-          />
-        )}
       </View>
     </ScreenWrapper>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, FlatList, Alert, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useNotesListViewModel } from "./notesViewModal";
 import FloatingAdd from "../../components/FloatingAdd";
@@ -8,26 +8,16 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { styles } from "./styles";
 import { ROUTES } from "../../enums/routes";
-import { Column, isAndroid, Row } from "../../tools";
+import { Column, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
+import { useHelper } from "../../utils/helper";
 
 export default function NotesScreen() {
   const userId = "TestUser"; // replace with loggedInUser.userId
-  const { notes, loading, error, fetchNotes, deleteNote } =
-    useNotesListViewModel(userId);
-
+  const { notes, loading, error, fetchNotes } = useNotesListViewModel(userId);
+  const { formatDate } = useHelper();
   const navigation = useNavigation();
 
-  const handleDelete = (noteId: string) => {
-    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => deleteNote(noteId),
-      },
-    ]);
-  };
   useFocusEffect(
     React.useCallback(() => {
       fetchNotes();
@@ -35,37 +25,28 @@ export default function NotesScreen() {
   );
 
   const renderItem = ({ item }: { item: any }) => (
-    <Column gap={4} style={commonStyles.cardContainer}>
-      {item?.title && (
-        <Text numberOfLines={1} style={commonStyles.subTitleText}>
-          {item.title}
+    <TouchableOpacity
+      onPress={() => navigation.navigate(ROUTES.VIEW_NOTE, { note: item })}
+    >
+      <Column gap={8} style={commonStyles.cardContainer}>
+        {item?.title && (
+          <Text numberOfLines={1} style={commonStyles.subTitleText}>
+            {item.title}
+          </Text>
+        )}
+        <Text numberOfLines={5} style={commonStyles.smallText}>
+          {item.note}
         </Text>
-      )}
-      <Text numberOfLines={5} style={commonStyles.smallText}>
-        {item.note}
-      </Text>
-      <Row justifyContent="space-between" alignItems="center">
-        <Text numberOfLines={5} style={commonStyles.tinyText}>
-          Created By: {item.createdBy}
-        </Text>
-        <Row gap={isAndroid ? 6 : 8}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() =>
-              navigation.navigate(ROUTES.CREATE_NOTE, { note: item })
-            }
-          >
-            <Text style={styles.editText}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handleDelete(item._id)}
-          >
-            <Text style={styles.deleteText}>Delete</Text>
-          </TouchableOpacity>
+        <Row justifyContent="space-between" alignItems="center">
+          <Text numberOfLines={5} style={commonStyles.tinyText}>
+            Created By: {item.createdBy}
+          </Text>
+          <Text numberOfLines={5} style={commonStyles.tinyText}>
+            {formatDate(item?.createdAt)}
+          </Text>
         </Row>
-      </Row>
-    </Column>
+      </Column>
+    </TouchableOpacity>
   );
 
   return (
@@ -81,6 +62,7 @@ export default function NotesScreen() {
               refreshing={loading}
               onRefresh={fetchNotes}
               contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
+              showsVerticalScrollIndicator={false}
             />
           ) : (
             <EmptyState

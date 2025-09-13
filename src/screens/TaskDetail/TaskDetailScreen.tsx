@@ -1,24 +1,16 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  Pressable,
-  TextInput,
-  ScrollView,
-  RefreshControl,
-} from "react-native";
+import { useState } from "react";
+import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { commonStyles } from "../../styles/commonstyles";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { Column, isAndroid, Row, Spacer } from "../../tools";
+import { Column, isAndroid, Row } from "../../tools";
 import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../../components/customButton";
 import CustomInput from "../../components/customInput";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import ScreenLoader from "../../components/screenLoader";
+import { useHelper } from "../../utils/helper";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -33,7 +25,7 @@ export default function TaskDetailScreen({ route }: any) {
     addTaskComment,
     addSubtaskComment,
   } = useTaskDetailViewModel(taskId);
-
+  const { formatDate } = useHelper();
   const [taskComment, setTaskComment] = useState("");
   const [subtaskComments, setSubtaskComments] = useState<
     Record<string, string>
@@ -73,7 +65,7 @@ export default function TaskDetailScreen({ route }: any) {
         <Text style={commonStyles.smallText}>Status: {item.status}</Text>
         {item.dueDateTime && (
           <Text style={commonStyles.tinyText}>
-            Due: {new Date(item.dueDateTime).toLocaleString()}
+            Due: {formatDate(item.dueDateTime)}
           </Text>
         )}
       </Row>
@@ -137,7 +129,7 @@ export default function TaskDetailScreen({ route }: any) {
     <ScreenWrapper
       title={task?.title ?? "Task"}
       showBackbutton
-      subTitle={`Tasks > Details`}
+      subTitle={formatDate(task?.createdAt)}
     >
       {loading ? (
         <ScreenLoader />

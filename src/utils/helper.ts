@@ -55,11 +55,45 @@ export function useHelper() {
 
     return (first + last).toUpperCase();
   }
+  const formatDate = (date: string | Date, formatType = "both") => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sept",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const d = new Date(date);
+    const day = d.getDate(); // Day of month
+    const month = months[d.getMonth()]; // Month short name
+    const year = String(d.getFullYear()).slice(-2); // Last 2 digits of year
+    const hours = d.getHours().toString().padStart(2, "0");
+    const minutes = d.getMinutes().toString().padStart(2, "0");
+
+    const formattedDate = `${day} ${month} ${year}`;
+    const formattedTime = `${hours}:${minutes}`;
+    if (!date) return "";
+    if (formatType === "date") return formattedDate;
+    if (formatType === "time") return formattedTime;
+    if (formatType === "both") return `${formattedDate}, ${formattedTime}`;
+
+    return formattedDate; // fallback
+  };
+
   return {
     loggedInUser,
     gettingUser,
     getInitials,
     fetchThemeColor,
     themeColor,
+    formatDate,
   };
 }

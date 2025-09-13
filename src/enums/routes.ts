@@ -9,6 +9,7 @@ export enum ROUTES {
   PROFILE = "Profile",
   CREATE_TASK = "CreateTask",
   CREATE_NOTE = "CreateNote",
+  VIEW_NOTE = "ViewNote",
   TASK_DETAIL = "TaskDetail",
   THEME = "Theme",
 }

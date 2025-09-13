@@ -1,17 +1,17 @@
-import { isAndroid } from "../tools";
+import { isAndroid, isDarkMode } from "../tools";
 
 export const theme = {
   colors: {
     primary: "#3F87E9",
     secondary: "#6697D9",
-    background: "#820a0aff",
-    text: "#000000",
-    border: "#cccccc",
+    background: isDarkMode ? "#070A1B" : "#ffffff",
+    text: isDarkMode ? "#c9c7ba" : "#29292b",
+    border: isDarkMode ? "#333" : "#cccccc",
     error: "#EC5454",
     success: "#38B000",
     warning: "#ffa500",
     transparent: "transparent",
-    white: "#fff",
+    white: "#ffffff",
   },
   spacing: {
     xs: 4,

@@ -5,9 +5,10 @@ import { styles } from "./styles";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
-import { Column, isAndroid, Row } from "../../tools";
+import { Column, isAndroid, Row, Spacer } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
+import { useHelper } from "../../utils/helper";
 
 export default function HistoryScreen({ navigation }: any) {
   const { tasks, loading, error, fetchCompletedTasks } =
@@ -17,6 +18,9 @@ export default function HistoryScreen({ navigation }: any) {
       fetchCompletedTasks();
     }, [])
   );
+
+  const { formatDate } = useHelper();
+
   const renderTaskCard = ({ item }: { item: any }) => {
     return (
       <Pressable
@@ -29,9 +33,18 @@ export default function HistoryScreen({ navigation }: any) {
         style={[commonStyles.cardContainer]}
       >
         <Column gap={isAndroid ? 5 : 6}>
-          <Text style={commonStyles.subTitleText} numberOfLines={1}>
-            {item.title}
-          </Text>
+          <Row justifyContent="space-between" alignItems="center">
+            <Text
+              style={[commonStyles.subTitleText, commonStyles.fullFlex]}
+              numberOfLines={1}
+            >
+              {item.title}
+            </Text>
+            <Spacer size={20} position="right" />
+            <Text style={commonStyles.tinyText}>
+              {formatDate(item.updatedAt)}
+            </Text>
+          </Row>
           {item.description && (
             <Text numberOfLines={2} style={commonStyles.smallText}>
               {item.description}
@@ -70,6 +83,7 @@ export default function HistoryScreen({ navigation }: any) {
             renderItem={renderTaskCard}
             onRefresh={fetchCompletedTasks}
             refreshing={loading}
+            showsVerticalScrollIndicator={false}
           />
         ) : (
           <EmptyState

@@ -11,7 +11,7 @@ import { useHomeScreenViewModel } from "./homeViewModel";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
-import { Column, isAndroid, Row } from "../../tools";
+import { Column, isAndroid, Row, Spacer } from "../../tools";
 import { useHelper } from "../../utils/helper";
 import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
@@ -20,7 +20,7 @@ import React from "react";
 export default function HomeScreen({ navigation }: any) {
   const { tasks, loading, error, fetchTasks, userId } =
     useHomeScreenViewModel();
-  const { loggedInUser, themeColor } = useHelper();
+  const { loggedInUser, themeColor, formatDate } = useHelper();
   useFocusEffect(
     React.useCallback(() => {
       fetchTasks();
@@ -41,9 +41,18 @@ export default function HomeScreen({ navigation }: any) {
         ]}
       >
         <Column gap={isAndroid ? 5 : 6}>
-          <Text numberOfLines={1} style={commonStyles.subTitleText}>
-            {item.title}
-          </Text>
+          <Row justifyContent="space-between" alignItems="center">
+            <Text
+              style={[commonStyles.subTitleText, commonStyles.fullFlex]}
+              numberOfLines={1}
+            >
+              {item.title}
+            </Text>
+            <Spacer size={20} position="right" />
+            <Text style={commonStyles.tinyText}>
+              {formatDate(item.createdAt)}
+            </Text>
+          </Row>
           <Text numberOfLines={2} style={commonStyles.smallText}>
             {item.description || "No Description"}
           </Text>

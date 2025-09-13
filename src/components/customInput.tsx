@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     paddingRight: 40, // space for the eye icon
   },
   multiline: {
-    height: 100,
+    minHeight: 200,
     textAlignVertical: "top",
   },
   passwordInput: {

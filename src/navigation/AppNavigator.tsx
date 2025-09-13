@@ -10,6 +10,7 @@ import CreateNotesScreen from "../screens/CreateNote/CreateNote";
 import ThemeScreen from "../screens/theme/ThemeScreen";
 import { ROUTES } from "../enums/routes";
 import SplashScreen from "../screens/Splash/SplashScreen";
+import ViewNoteScreen from "../screens/ViewNote/ViewNoteScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ export default function AppNavigator() {
       <Stack.Screen name={ROUTES.CREATE_TASK} component={CreateTaskScreen} />
       <Stack.Screen name={ROUTES.TASK_DETAIL} component={TaskDetailScreen} />
       <Stack.Screen name={ROUTES.CREATE_NOTE} component={CreateNotesScreen} />
+      <Stack.Screen name={ROUTES.VIEW_NOTE} component={ViewNoteScreen} />
       <Stack.Screen name={ROUTES.THEME} component={ThemeScreen} />
     </Stack.Navigator>
   );

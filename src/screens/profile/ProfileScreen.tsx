@@ -37,6 +37,25 @@ export default function ProfileScreen() {
     fetchUserDetails();
   }, []);
 
+  function getTimeLeft(targetDate = "2026-04-27") {
+    const now = new Date();
+    const endDate = new Date(targetDate);
+
+    // Total difference in milliseconds
+    const diffMs = endDate - now;
+
+    if (diffMs <= 0) return "Date has already passed";
+
+    // Convert total milliseconds to total days
+    const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    // Approximate months and remaining days
+    const months = Math.floor(totalDays / 30); // approximate month as 30 days
+    const days = totalDays % 30;
+
+    return `${months} month ${days} day left, i.e: ${totalDays} days`;
+  }
+
   return (
     <ScreenWrapper title="Profile">
       {loading ? (
@@ -91,7 +110,7 @@ export default function ProfileScreen() {
             ) : (
               <Column>
                 <Spacer size={50} />
-                <Text style={[commonStyles.smallText]}>Add Partner Id:</Text>
+                <Text style={[commonStyles.basicText]}>Add Partner Id:</Text>
 
                 <CustomInput
                   value={partnerInput}
@@ -123,6 +142,7 @@ export default function ProfileScreen() {
                 <Ionicons name="chevron-forward-outline" size={20} />
               </Row>
             </TouchableOpacity>
+            <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
           </Column>
           <Row style={{ paddingHorizontal: isAndroid ? 10 : 16 }}>
             <CustomButton rounded title="Logout" onPress={logout} error />

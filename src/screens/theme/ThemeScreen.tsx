@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import { Column } from "../../tools";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
@@ -17,7 +17,10 @@ const colors = [
   { dark: "#22B08D", light: "#83C0B1" },
   { dark: "#F6454B", light: "#FFA6B5" },
   { dark: "#FF7C0A", light: "#FFB259" },
-  { dark: "#EA39E2", light: "#EA7AE4" },
+  { dark: "#6d073a", light: "#9f798a" },
+  { dark: "#620d0d", light: "#a86a27" },
+  { light: "#2e382e", dark: "#50c9ce" },
+  { light: "#50c9ce", dark: "#0b545d" },
 ];
 
 const ThemeScreen = () => {
@@ -61,28 +64,30 @@ const ThemeScreen = () => {
 
   return (
     <ScreenWrapper title="Theme" showBackbutton>
-      <Column gap={12} style={[commonStyles.screenWrapper]}>
-        {colors.map((item, index) => (
-          <TouchableOpacity
-            style={{
-              borderRadius: 16,
-              overflow: "hidden",
-              borderWidth: 3,
-              borderColor: currentThemeIndex === index ? "#000" : "#fff",
-            }}
-            key={index}
-            onPress={() => setTheme(index)}
-          >
-            <LinearGradient
-              colors={[item.dark, item.light]}
+      <ScrollView>
+        <Column gap={12} style={[commonStyles.screenWrapper]}>
+          {colors.map((item, index) => (
+            <TouchableOpacity
               style={{
-                height: 100,
-                width: "100%",
+                borderRadius: 16,
+                overflow: "hidden",
+                borderWidth: 3,
+                borderColor: currentThemeIndex === index ? "#000" : "#fff",
               }}
-            />
-          </TouchableOpacity>
-        ))}
-      </Column>
+              key={index}
+              onPress={() => setTheme(index)}
+            >
+              <LinearGradient
+                colors={[item.dark, item.light]}
+                style={{
+                  height: 100,
+                  width: "100%",
+                }}
+              />
+            </TouchableOpacity>
+          ))}
+        </Column>
+      </ScrollView>
     </ScreenWrapper>
   );
 };

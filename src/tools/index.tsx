@@ -1,5 +1,12 @@
 import React, { ReactNode } from "react";
-import { Dimensions, Platform, StatusBar, View, ViewStyle } from "react-native";
+import {
+  Appearance,
+  Dimensions,
+  Platform,
+  StatusBar,
+  View,
+  ViewStyle,
+} from "react-native";
 
 export type RowColumnProps = {
   flexDirection?: "row" | "column";
@@ -83,3 +90,5 @@ const { width, height } = Dimensions.get("window");
 const statusBarHeight = StatusBar.currentHeight || 0;
 export const dimensions = { width, height, statusBarHeight };
 export const isAndroid = Platform.OS === "android";
+const colorScheme = Appearance.getColorScheme();
+export const isDarkMode = colorScheme === "dark";

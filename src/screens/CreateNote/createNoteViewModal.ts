@@ -59,22 +59,6 @@ export function useNoteDetailViewModel(note?: Note) {
     }
   };
 
-  const deleteNote = async () => {
-    if (!note?._id) return;
-
-    try {
-      setLoading(true);
-      await NotesRepo.deleteNote(note._id);
-      setSuccess("Note deleted successfully");
-      setNoteText("");
-    } catch (err: any) {
-      console.error("Delete note error:", err);
-      setError(err.message || "Failed to delete note");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return {
     noteText,
     setNoteText,
@@ -84,6 +68,5 @@ export function useNoteDetailViewModel(note?: Note) {
     error,
     success,
     saveNote,
-    deleteNote,
   };
 }

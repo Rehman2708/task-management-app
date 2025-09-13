@@ -34,24 +34,10 @@ export function useNotesListViewModel(userId?: string) {
     }
   };
 
-  const deleteNote = async (noteId: string) => {
-    try {
-      setLoading(true);
-      await NotesRepo.deleteNote(noteId);
-      setNotes((prev) => prev.filter((n) => n._id !== noteId));
-    } catch (err: any) {
-      console.error("Delete note error:", err);
-      setError(err.message || "Failed to delete note");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return {
     notes,
     loading,
     error,
     fetchNotes,
-    deleteNote,
   };
 }
