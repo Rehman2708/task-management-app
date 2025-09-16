@@ -4,12 +4,13 @@ import { AppUrl } from "../utils/appUrl";
 
 // 🔹 Notes payloads
 export interface Note {
-  _id?: string;
+  _id: string;
   note: string;
   title: string;
   createdBy: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: string;
+  updatedAt: string;
+  pinned?: boolean;
 }
 
 export interface CreateNotePayload {
@@ -54,6 +55,14 @@ export class NotesRepo {
     return ApiService.getApiResponse(
       AppUrl.deleteNote(noteId),
       HttpMethods.DELETE
+    );
+  }
+  // 🔹 Pin or Unpin a note
+  static async pinNote(noteId: string, pinned: boolean) {
+    return ApiService.getApiResponse(
+      AppUrl.pinUnpinNote(noteId), // You need to add this in your AppUrl file
+      HttpMethods.PATCH,
+      { pinned }
     );
   }
 }

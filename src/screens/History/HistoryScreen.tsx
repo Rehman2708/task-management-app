@@ -16,10 +16,17 @@ import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
 import { useHelper } from "../../utils/helper";
 import { theme } from "../../infrastructure/theme";
+import CustomInput from "../../components/customInput";
 
 export default function HistoryScreen({ navigation }: any) {
-  const { tasks, loading, error, fetchCompletedTasks, deleteTask } =
-    useCompletedTasksViewModel();
+  const {
+    tasks,
+    loading,
+    error,
+    fetchCompletedTasks,
+    deleteTask,
+    searchTasks,
+  } = useCompletedTasksViewModel();
   useFocusEffect(
     React.useCallback(() => {
       fetchCompletedTasks();
@@ -90,6 +97,7 @@ export default function HistoryScreen({ navigation }: any) {
   return (
     <ScreenWrapper title="History">
       <View style={[commonStyles.screenWrapper]}>
+        <CustomInput placeholder="Search here..." onChangeText={searchTasks} />
         {tasks.length > 0 ? (
           <FlatList
             data={tasks}

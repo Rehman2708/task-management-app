@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useNotesListViewModel } from "./notesViewModal";
 import FloatingAdd from "../../components/FloatingAdd";
@@ -11,11 +17,15 @@ import { ROUTES } from "../../enums/routes";
 import { Column, Row, Spacer } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useHelper } from "../../utils/helper";
+import { Note } from "../../repositories/notes";
+import { Ionicons } from "@expo/vector-icons";
+import CustomInput from "../../components/customInput";
 
 export default function NotesScreen() {
-  const userId = "TestUser"; // replace with loggedInUser.userId
-  const { notes, loading, error, fetchNotes } = useNotesListViewModel(userId);
-  const { formatDate } = useHelper();
+  const { formatDate, themeColor } = useHelper();
+
+  const { notes, loading, error, fetchNotes, pinUnpinNote, searchNotes } =
+    useNotesListViewModel();
   const navigation = useNavigation();
 
   useFocusEffect(
@@ -23,18 +33,27 @@ export default function NotesScreen() {
       fetchNotes();
     }, [])
   );
-
-  const renderItem = ({ item }: { item: any }) => (
+  const renderItem = ({ item }: { item: Note }) => (
     <TouchableOpacity
+      onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
       onPress={() => navigation.navigate(ROUTES.VIEW_NOTE, { note: item })}
       style={{ flex: 1, marginHorizontal: 4 }}
     >
       <Column gap={6} style={commonStyles.cardContainer}>
-        {item?.title && (
-          <Text numberOfLines={1} style={commonStyles.basicText}>
-            {item.title}
-          </Text>
-        )}
+        <Row justifyContent="space-between" gap={8} alignItems="center">
+          {item?.title && (
+            <Text numberOfLines={1} style={commonStyles.basicText}>
+              {item.title}
+            </Text>
+          )}
+          {item.pinned && (
+            <Ionicons
+              size={16}
+              color={themeColor.dark}
+              name="pricetag-outline"
+            />
+          )}
+        </Row>
         <Text numberOfLines={4} style={commonStyles.tinyText}>
           {item.note}
         </Text>
@@ -52,7 +71,10 @@ export default function NotesScreen() {
     <>
       <ScreenWrapper title="Notes">
         <View style={[commonStyles.screenWrapper]}>
-          {error && <Text style={styles.error}>{error}</Text>}
+          <CustomInput
+            placeholder="Search here..."
+            onChangeText={searchNotes}
+          />
           {notes.length > 0 ? (
             <FlatList
               data={notes}

@@ -41,4 +41,6 @@ export class AppUrl {
     `${this.BASE_URL}/notes/${noteId}`;
   public static deleteNote = (noteId: string) =>
     `${this.BASE_URL}/notes/${noteId}`;
+  public static pinUnpinNote = (noteId: string) =>
+    `${this.BASE_URL}/notes/pin/${noteId}`;
 }
