@@ -95,8 +95,7 @@ export function useHelper() {
       [Priority.High]: "orange",
       [Priority.Urgent]: "red",
     };
-
-    return colors[priority] ?? "gray";
+    return colors[priority] ?? "green";
   };
 
   return {

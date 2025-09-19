@@ -40,7 +40,7 @@ export default function HomeScreen({ navigation }: any) {
             backgroundColor: `${themeColor?.light ?? theme.colors.secondary}20`,
             borderColor: `${themeColor?.light ?? theme.colors.secondary}20`,
             borderLeftWidth: 3,
-            borderLeftColor: getPriorityColor(item.priority),
+            borderStartColor: getPriorityColor(item.priority),
           },
         ]}
       >

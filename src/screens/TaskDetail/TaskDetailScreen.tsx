@@ -25,7 +25,7 @@ export default function TaskDetailScreen({ route }: any) {
     addTaskComment,
     addSubtaskComment,
   } = useTaskDetailViewModel(taskId);
-  const { formatDate } = useHelper();
+  const { formatDate, themeColor } = useHelper();
   const [taskComment, setTaskComment] = useState("");
   const [subtaskComments, setSubtaskComments] = useState<
     Record<string, string>
@@ -75,7 +75,7 @@ export default function TaskDetailScreen({ route }: any) {
         {item.comments?.map((c: any, idx: number) => (
           <Column key={idx}>
             <Row gap={isAndroid ? 6 : 8} alignItems="center">
-              <Ionicons name="ellipse" size={10} />
+              <Ionicons name="ellipse" color={themeColor.dark} size={10} />
               <Text key={idx} style={commonStyles.smallText}>
                 {c.createdBy}: {c.text}
               </Text>
@@ -180,7 +180,11 @@ export default function TaskDetailScreen({ route }: any) {
                     {task?.comments?.map((c: any, idx: number) => (
                       <View key={idx} style={commonStyles.cardContainer}>
                         <Row gap={isAndroid ? 6 : 8} alignItems="center">
-                          <Ionicons name="ellipse" size={10} />
+                          <Ionicons
+                            name="ellipse"
+                            color={themeColor.dark}
+                            size={10}
+                          />
                           <Text key={idx} style={commonStyles.smallText}>
                             {c.by}: {c.text}
                           </Text>

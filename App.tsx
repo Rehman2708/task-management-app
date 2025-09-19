@@ -4,15 +4,6 @@ import { useFonts } from "expo-font";
 import { StatusBar } from "react-native";
 import { useEffect } from "react";
 import { getNotificationPermission } from "./notification";
-import * as Notifications from "expo-notifications";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -25,24 +16,6 @@ export default function App() {
 
   useEffect(() => {
     getNotificationPermission();
-  }, []);
-
-  useEffect(() => {
-    const subscription = Notifications.addNotificationReceivedListener(
-      (notification) => {
-        console.log("Notification received:", notification);
-      }
-    );
-
-    const responseSubscription =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log("Notification response:", response);
-      });
-
-    return () => {
-      subscription.remove();
-      responseSubscription.remove();
-    };
   }, []);
 
   if (!fontsLoaded) {

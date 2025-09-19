@@ -36,7 +36,7 @@ export const commonStyles = StyleSheet.create({
   },
   tTinyText: {
     fontSize: theme.fontSizes.xxs,
-    color: theme.colors.text,
+    color: theme.colors.textLight,
     fontFamily: theme.fonts.light,
   },
   whiteText: {
@@ -49,7 +49,7 @@ export const commonStyles = StyleSheet.create({
     marginBottom: 8,
   },
   cardContainer: {
-    padding: isAndroid ? 10 : 16,
+    padding: isAndroid ? 12 : 16,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: isDarkMode ? "#2C2C2C99" : "#EAEAEA",
@@ -59,8 +59,8 @@ export const commonStyles = StyleSheet.create({
     borderBottomColor: isDarkMode ? "#ffffff10" : "#00000014",
     overflow: "hidden",
     marginVertical: 6,
-    borderEndEndRadius: 24,
-    borderStartStartRadius: 32,
+    borderBottomEndRadius: 24,
+    borderTopStartRadius: 32,
   },
   secondaryContainer: {
     backgroundColor: `${theme.colors.secondary}10`,

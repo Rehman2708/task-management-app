@@ -45,7 +45,7 @@ export default function HistoryScreen({ navigation }: any) {
           commonStyles.cardContainer,
           {
             borderLeftWidth: 3,
-            borderLeftColor: getPriorityColor(item.priority),
+            borderStartColor: getPriorityColor(item.priority),
           },
         ]}
       >

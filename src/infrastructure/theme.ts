@@ -6,6 +6,7 @@ export const theme = {
     secondary: "#6697D9",
     background: isDarkMode ? "#070A1B" : "#ffffff",
     text: isDarkMode ? "#c9c7ba" : "#29292b",
+    textLight: isDarkMode ? "#c9c7ba99" : "#29292b99",
     border: isDarkMode ? "#333" : "#cccccc",
     error: "#EC5454",
     success: "#38B000",
