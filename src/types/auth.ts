@@ -4,4 +4,5 @@ export interface IUser {
   partner: { name: string; userId: string };
   createdAt: Date;
   updatedAt: Date;
+  notificationToken?: string | null;
 }

@@ -89,6 +89,7 @@ export default function HomeScreen({ navigation }: any) {
             text="No active tasks"
             button={fetchTasks}
             loading={loading}
+            error={!!error?.length}
           />
         ) : (
           <FlatList

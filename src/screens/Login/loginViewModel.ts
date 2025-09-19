@@ -5,6 +5,7 @@ import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { LocalStorageKey } from "../../enums/localstorage";
 import { registerForPushNotificationsAsync } from "../../../notification";
+import * as Device from "expo-device";
 
 export function useLoginViewModel() {
   const [userId, setUserId] = useState("");
@@ -23,11 +24,17 @@ export function useLoginViewModel() {
 
     try {
       const notToken = await registerForPushNotificationsAsync();
-      const response = await AuthRepo.login({
-        userId: userId.trim(),
-        password,
-        notificationToken: notToken,
-      });
+      const payload = Device.isDevice
+        ? {
+            userId: userId.trim(),
+            password,
+            notificationToken: notToken,
+          }
+        : {
+            userId: userId.trim(),
+            password,
+          };
+      const response = await AuthRepo.login(payload);
 
       if (response?.user) {
         await storeDataInAsyncStorage(LocalStorageKey.USER, response.user);

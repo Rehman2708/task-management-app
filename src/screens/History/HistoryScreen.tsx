@@ -97,21 +97,27 @@ export default function HistoryScreen({ navigation }: any) {
   return (
     <ScreenWrapper title="History">
       <View style={[commonStyles.screenWrapper]}>
-        <CustomInput placeholder="Search here..." onChangeText={searchTasks} />
         {tasks.length > 0 ? (
-          <FlatList
-            data={tasks}
-            keyExtractor={(item) => item._id}
-            renderItem={renderTaskCard}
-            onRefresh={fetchCompletedTasks}
-            refreshing={loading}
-            showsVerticalScrollIndicator={false}
-          />
+          <>
+            <CustomInput
+              placeholder="Search here..."
+              onChangeText={searchTasks}
+            />
+            <FlatList
+              data={tasks}
+              keyExtractor={(item) => item._id}
+              renderItem={renderTaskCard}
+              onRefresh={fetchCompletedTasks}
+              refreshing={loading}
+              showsVerticalScrollIndicator={false}
+            />
+          </>
         ) : (
           <EmptyState
             text="Nothing to show"
             button={fetchCompletedTasks}
             loading={loading}
+            error={!!error?.length}
           />
         )}
       </View>

@@ -9,6 +9,7 @@ import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { IUser } from "../../types/auth";
 import { LocalStorageKey } from "../../enums/localstorage";
+import * as Device from "expo-device";
 
 export function useProfileViewModel() {
   const [user, setUser] = useState<IUser | null>(null);
@@ -56,16 +57,16 @@ export function useProfileViewModel() {
     setLoggingOut(true);
     try {
       if (user?.userId) {
-        const response = await AuthRepo.logout(user?.userId);
-        if (response.user) {
-          await clearAsyncStorage();
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: ROUTES.LOGIN }],
-            })
-          );
+        if (Device.isDevice) {
+          await AuthRepo.logout(user?.userId);
         }
+        await clearAsyncStorage();
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: ROUTES.LOGIN }],
+          })
+        );
       }
     } catch (error) {
       console.log("Something went wrong!");

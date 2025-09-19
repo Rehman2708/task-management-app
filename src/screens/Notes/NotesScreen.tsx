@@ -71,26 +71,29 @@ export default function NotesScreen() {
     <>
       <ScreenWrapper title="Notes">
         <View style={[commonStyles.screenWrapper]}>
-          <CustomInput
-            placeholder="Search here..."
-            onChangeText={searchNotes}
-          />
           {notes.length > 0 ? (
-            <FlatList
-              data={notes}
-              keyExtractor={(item) => item._id!}
-              renderItem={renderItem}
-              refreshing={loading}
-              onRefresh={fetchNotes}
-              contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
-              showsVerticalScrollIndicator={false}
-              numColumns={2}
-            />
+            <>
+              <CustomInput
+                placeholder="Search here..."
+                onChangeText={searchNotes}
+              />
+              <FlatList
+                data={notes}
+                keyExtractor={(item) => item._id!}
+                renderItem={renderItem}
+                refreshing={loading}
+                onRefresh={fetchNotes}
+                contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
+                showsVerticalScrollIndicator={false}
+                numColumns={2}
+              />
+            </>
           ) : (
             <EmptyState
               text="No notes found"
               button={fetchNotes}
               loading={loading}
+              error={!!error?.length}
             />
           )}
         </View>
