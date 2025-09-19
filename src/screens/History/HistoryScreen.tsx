@@ -28,7 +28,6 @@ export default function HistoryScreen({ navigation }: any) {
   const { formatDate, loggedInUser, getPriorityColor } = useHelper();
 
   const renderTaskCard = ({ item }: { item: any }) => {
-    console.log(item.priority);
     return (
       <Pressable
         onPress={() =>
