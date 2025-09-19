@@ -29,6 +29,7 @@ export default function ProfileScreen() {
     addPartner,
     logout,
     changeThemeScreen,
+    loggingOut,
   } = useProfileViewModel();
   const { getInitials, themeColor } = useHelper();
   const [partnerInput, setPartnerInput] = useState("");
@@ -145,7 +146,13 @@ export default function ProfileScreen() {
             <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
           </Column>
           <Row style={{ paddingHorizontal: isAndroid ? 10 : 16 }}>
-            <CustomButton rounded title="Logout" onPress={logout} error />
+            <CustomButton
+              rounded
+              title="Logout"
+              onPress={logout}
+              error
+              loading={loggingOut}
+            />
           </Row>
         </>
       )}

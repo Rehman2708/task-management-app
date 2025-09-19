@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "♥️ RMK",
-    "slug": "♥️ RMK",
+    "slug": "RMK",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
@@ -17,6 +17,8 @@
     "assetBundlePatterns": ["**/*"],
     "android": {
       "package": "com.abdul2708.tasksfrontendts",
+      "useNextNotificationsApi": true,
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/androidLogo.png",
         "backgroundColor": "#FFFFFF"
@@ -29,13 +31,26 @@
     "web": {
       "favicon": "./assets/images/logo.png"
     },
-    "extra": {},
-    "plugins": [],
+    "extra": {
+      "eas": {
+        "projectId": "e2ef6211-0ed3-421f-abf8-6cfe617079fc"
+      }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/logo.png",
+          "color": "#ffffff"
+        }
+      ]
+    ],
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "experiments": {
       "disableFontScaling": true
-    }
+    },
+    "owner": "abdul2708"
   }
 }

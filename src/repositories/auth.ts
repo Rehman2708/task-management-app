@@ -9,14 +9,16 @@ export class AuthRepo {
   static async login({
     userId,
     password,
+    notificationToken,
   }: {
     userId: string;
     password: string;
+    notificationToken?: string | null;
   }) {
     const response = await ApiService.getApiResponse(
       AppUrl.loginEndPoint,
       HttpMethods.POST,
-      { userId, password }
+      { userId, password, notificationToken }
     );
     return response;
   }
@@ -29,16 +31,18 @@ export class AuthRepo {
     userId,
     password,
     partnerUserId,
+    notificationToken,
   }: {
     name: string;
     userId: string;
     password: string;
     partnerUserId?: string;
+    notificationToken?: string | null;
   }) {
     const response = await ApiService.getApiResponse(
       AppUrl.registerEndPoint,
       HttpMethods.POST,
-      { name, userId, password, partnerUserId }
+      { name, userId, password, partnerUserId, notificationToken }
     );
     return response;
   }
@@ -69,5 +73,14 @@ export class AuthRepo {
       AppUrl.getUserEndPoint(userId),
       HttpMethods.GET
     );
+  }
+
+  /**
+   * 🔹 Logout (Clear Notification Token)
+   */
+  static async logout(userId: string) {
+    return ApiService.getApiResponse(AppUrl.logoutEndPoint, HttpMethods.POST, {
+      userId,
+    });
   }
 }

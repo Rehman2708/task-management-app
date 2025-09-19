@@ -9,6 +9,7 @@ export class AppUrl {
   public static connectPartnerEndPoint = `${this.BASE_URL}/auth/connect-partner`;
   public static getUserEndPoint = (userId: string) =>
     `${this.BASE_URL}/auth/${userId}`;
+  public static logoutEndPoint = `${this.BASE_URL}/auth/logout`;
 
   // 🔹 Task APIs
   public static getAllTasks = `${this.BASE_URL}/tasks`; // active tasks only

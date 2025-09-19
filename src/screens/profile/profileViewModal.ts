@@ -14,6 +14,7 @@ export function useProfileViewModel() {
   const [user, setUser] = useState<IUser | null>(null);
   const [partnerId, setPartnerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const fetchUserDetails = async () => {
     setLoading(true);
@@ -52,13 +53,25 @@ export function useProfileViewModel() {
   };
   const navigation = useNavigation();
   const logout = async () => {
-    await clearAsyncStorage();
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: ROUTES.LOGIN }],
-      })
-    );
+    setLoggingOut(true);
+    try {
+      if (user?.userId) {
+        const response = await AuthRepo.logout(user?.userId);
+        if (response.user) {
+          await clearAsyncStorage();
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: ROUTES.LOGIN }],
+            })
+          );
+        }
+      }
+    } catch (error) {
+      console.log("Something went wrong!");
+    } finally {
+      setLoggingOut(false);
+    }
   };
   const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
   return {
@@ -69,5 +82,6 @@ export function useProfileViewModel() {
     addPartner,
     logout,
     changeThemeScreen,
+    loggingOut,
   };
 }

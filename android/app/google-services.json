@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "701643134714",
+    "project_id": "rmk-tasks",
+    "storage_bucket": "rmk-tasks.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:701643134714:android:1fe746e28c00d180185b43",
+        "android_client_info": {
+          "package_name": "com.abdul2708.tasksfrontendts"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCP0veDkrRKY9cp6ceph1ys02bhg_-ZH-4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -43,7 +43,11 @@ export function useCreateTaskViewModel(initialTask?: any) {
       updatedBy: st.updatedBy || null,
       comments: st.comments || [],
     })) || [
-      { title: "", dueDateTime: new Date(), status: SubtaskStatus.Pending },
+      {
+        title: "",
+        dueDateTime: new Date(Date.now() + 60 * 60 * 1000),
+        status: SubtaskStatus.Pending,
+      },
     ]
   );
   const [loading, setLoading] = useState(false);
@@ -52,7 +56,11 @@ export function useCreateTaskViewModel(initialTask?: any) {
   const addSubtask = () => {
     setSubtasks((prev) => [
       ...prev,
-      { title: "", dueDateTime: new Date(), status: SubtaskStatus.Pending },
+      {
+        title: "",
+        dueDateTime: new Date(Date.now() + 60 * 60 * 1000),
+        status: SubtaskStatus.Pending,
+      },
     ]);
   };
 

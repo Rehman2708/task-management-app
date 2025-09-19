@@ -4,6 +4,7 @@ import { storeDataInAsyncStorage } from "../../utils/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { LocalStorageKey } from "../../enums/localstorage";
+import { registerForPushNotificationsAsync } from "../../../notification";
 
 export function useLoginViewModel() {
   const [userId, setUserId] = useState("");
@@ -21,9 +22,11 @@ export function useLoginViewModel() {
     setError("");
 
     try {
+      const notToken = await registerForPushNotificationsAsync();
       const response = await AuthRepo.login({
         userId: userId.trim(),
         password,
+        notificationToken: notToken,
       });
 
       if (response?.user) {
