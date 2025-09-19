@@ -41,6 +41,7 @@ export interface Task {
 // Payloads
 export interface CreateTaskPayload {
   title: string;
+  image?: string;
   description?: string;
   ownerUserId: string;
   createdBy?: string;

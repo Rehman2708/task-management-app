@@ -4,6 +4,7 @@ import {
   FlatList,
   Pressable,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import FloatingAdd from "../../components/FloatingAdd";
@@ -16,6 +17,7 @@ import { useHelper } from "../../utils/helper";
 import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
+import TasksCard from "../../components/tasksCard";
 
 export default function HomeScreen({ navigation }: any) {
   const { tasks, loading, error, fetchTasks, deleteTask } =
@@ -34,41 +36,14 @@ export default function HomeScreen({ navigation }: any) {
           navigation.navigate(ROUTES.TASK_DETAIL, { taskId: item._id })
         }
         onLongPress={() => deleteTask(item._id)}
-        style={[
-          commonStyles.cardContainer,
-          {
+      >
+        <TasksCard
+          item={item}
+          containerStyle={{
             backgroundColor: `${themeColor?.light ?? theme.colors.secondary}20`,
             borderColor: `${themeColor?.light ?? theme.colors.secondary}20`,
-            borderLeftWidth: 3,
-            borderStartColor: getPriorityColor(item.priority),
-          },
-        ]}
-      >
-        <Column gap={isAndroid ? 3 : 4}>
-          <Row justifyContent="space-between" alignItems="center">
-            <Text
-              style={[commonStyles.basicText, commonStyles.fullFlex]}
-              numberOfLines={1}
-            >
-              {item.title}
-            </Text>
-            <Spacer size={20} position="right" />
-            <Text style={commonStyles.tTinyText}>
-              {formatDate(item.createdAt)}
-            </Text>
-          </Row>
-          <Text numberOfLines={2} style={commonStyles.tinyText}>
-            {item.description || "No Description"}
-          </Text>
-          <Row justifyContent="space-between" alignItems="center">
-            <Text style={commonStyles.tTinyText}>
-              Created by: {item.createdBy}
-            </Text>
-            <Text style={commonStyles.tTinyText}>
-              Assigned To: {item.assignedTo}
-            </Text>
-          </Row>
-        </Column>
+          }}
+        />
       </TouchableOpacity>
     );
   };

@@ -33,6 +33,7 @@ export function useCreateTaskViewModel(initialTask?: any) {
   const [priority, setPriority] = useState<Priority>(
     initialTask?.priority || Priority.Low
   );
+  const [image, setImage] = useState(initialTask?.image || "");
   const [subtasks, setSubtasks] = useState<Subtask[]>(
     initialTask?.subtasks?.map((st: any) => ({
       _id: st._id,
@@ -95,6 +96,7 @@ export function useCreateTaskViewModel(initialTask?: any) {
         assignedTo,
         frequency,
         priority,
+        image,
         ownerUserId: initialTask?.ownerUserId || user.userId,
         createdBy: initialTask?.createdBy || user.userId,
         subtasks: subtasks?.map((st) => ({
@@ -140,5 +142,6 @@ export function useCreateTaskViewModel(initialTask?: any) {
     saveTask,
     loading,
     error,
+    setImage,
   };
 }

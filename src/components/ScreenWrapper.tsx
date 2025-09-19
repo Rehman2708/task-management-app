@@ -12,12 +12,14 @@ const ScreenWrapper = ({
   subTitle,
   showBackbutton,
   onBackButtonPress,
+  image,
 }: {
   children: React.ReactNode;
   title?: string;
   subTitle?: string;
   showBackbutton?: boolean;
   onBackButtonPress?: () => void;
+  image?: string;
 }) => {
   return (
     <View
@@ -26,7 +28,7 @@ const ScreenWrapper = ({
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <LinearHeader />
+      <LinearHeader image={image} />
 
       <SafeAreaView style={[commonStyles.screenWrapper]}>
         <Spacer size={isAndroid ? (subTitle ? 10 : 20) : 0} />

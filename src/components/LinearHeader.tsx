@@ -1,18 +1,23 @@
-import { View } from "react-native";
+import { ImageBackground, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../infrastructure/theme";
 import { isAndroid } from "../tools";
 import { useHelper } from "../utils/helper";
+import { commonStyles } from "../styles/commonstyles";
 
-const LinearHeader = () => {
+const LinearHeader = ({ image }: { image?: string }) => {
   const { themeColor } = useHelper();
   return (
     <View>
       <LinearGradient
-        colors={[
-          themeColor?.dark ?? theme.colors.primary,
-          themeColor?.light ?? theme.colors.secondary,
-        ]}
+        colors={
+          image
+            ? ["#000000cc", "#000000cc"]
+            : [
+                themeColor?.dark ?? theme.colors.primary,
+                themeColor?.light ?? theme.colors.secondary,
+              ]
+        }
         style={{
           height: isAndroid ? 80 : 130,
           width: "100%",
@@ -26,7 +31,12 @@ const LinearHeader = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 2 }}
         locations={[0.2, 0.65]}
-      />
+      >
+        <ImageBackground
+          source={{ uri: image }}
+          style={[commonStyles.fullFlex, { opacity: 0.7 }]}
+        />
+      </LinearGradient>
     </View>
   );
 };

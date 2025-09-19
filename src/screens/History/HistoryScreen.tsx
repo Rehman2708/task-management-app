@@ -9,6 +9,7 @@ import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
 import { useHelper } from "../../utils/helper";
 import CustomInput from "../../components/customInput";
+import TasksCard from "../../components/tasksCard";
 
 export default function HistoryScreen({ navigation }: any) {
   const {
@@ -41,41 +42,8 @@ export default function HistoryScreen({ navigation }: any) {
             ? () => deleteTask(item._id)
             : () => {}
         }
-        style={[
-          commonStyles.cardContainer,
-          {
-            borderLeftWidth: 3,
-            borderStartColor: getPriorityColor(item.priority),
-          },
-        ]}
       >
-        <Column gap={isAndroid ? 3 : 4}>
-          <Row justifyContent="space-between" alignItems="center">
-            <Text
-              style={[commonStyles.basicText, commonStyles.fullFlex]}
-              numberOfLines={1}
-            >
-              {item.title}
-            </Text>
-            <Spacer size={20} position="right" />
-            <Text style={commonStyles.tTinyText}>
-              {formatDate(item.updatedAt)}
-            </Text>
-          </Row>
-          {item.description && (
-            <Text numberOfLines={2} style={commonStyles.tinyText}>
-              {item.description}
-            </Text>
-          )}
-          <Row justifyContent="space-between">
-            <Text style={commonStyles.tTinyText}>
-              Created By: {item.createdBy}
-            </Text>
-            <Text style={commonStyles.tTinyText}>
-              Assigned To: {item.assignedTo}
-            </Text>
-          </Row>
-        </Column>
+        <TasksCard item={item} />
       </Pressable>
     );
   };

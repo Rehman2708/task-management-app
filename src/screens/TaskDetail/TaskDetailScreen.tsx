@@ -11,6 +11,7 @@ import CustomInput from "../../components/customInput";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import ScreenLoader from "../../components/screenLoader";
 import { useHelper } from "../../utils/helper";
+import ImageModal from "../../components/imageModal";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -130,11 +131,13 @@ export default function TaskDetailScreen({ route }: any) {
       title={task?.title ?? "Task"}
       showBackbutton
       subTitle={formatDate(task?.createdAt)}
+      image={task?.image}
     >
       {loading ? (
         <ScreenLoader />
       ) : (
         <View style={[commonStyles.screenWrapper]}>
+          {task?.image && <ImageModal disabled defaultImage={task.image} />}
           {task && (
             <KeyboardAwareScrollView
               style={commonStyles.fullFlex}

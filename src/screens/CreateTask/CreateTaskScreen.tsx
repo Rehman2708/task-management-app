@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { AndroidDateTimePicker } from "./components/subtaskItem";
 import { useHelper } from "../../utils/helper";
+import ImageModal from "../../components/imageModal";
 // Pass `task` prop for edit mode
 export const CreateTaskScreen = ({ route, navigation }: any) => {
   const { task } = route.params || {};
@@ -47,6 +48,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
           style={styles.container}
           showsVerticalScrollIndicator={false}
         >
+          <ImageModal onChange={vm.setImage} />
           <CustomInput
             title="Enter task title"
             value={vm.title}
