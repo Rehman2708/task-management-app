@@ -60,11 +60,11 @@ export default function TaskDetailScreen({ route }: any) {
         },
       ]}
     >
-      <Text style={commonStyles.subTitleText}>{item.title}</Text>
+      <Text style={commonStyles.basicText}>{item.title}</Text>
       <Row alignItems="flex-end" justifyContent="space-between">
-        <Text style={commonStyles.smallText}>Status: {item.status}</Text>
+        <Text style={commonStyles.tinyText}>Status: {item.status}</Text>
         {item.dueDateTime && (
-          <Text style={commonStyles.tinyText}>
+          <Text style={commonStyles.tTinyText}>
             Due: {formatDate(item.dueDateTime)}
           </Text>
         )}
@@ -81,7 +81,7 @@ export default function TaskDetailScreen({ route }: any) {
               </Text>
             </Row>
             <Row justifyContent="flex-end">
-              <Text style={commonStyles.tinyText}>
+              <Text style={commonStyles.tTinyText}>
                 {new Date(c.createdAt).toLocaleString()}
               </Text>
             </Row>
@@ -149,7 +149,7 @@ export default function TaskDetailScreen({ route }: any) {
               }
             >
               <Column gap={isAndroid ? 5 : 6}>
-                <Text style={commonStyles.titleText}>{task?.title}</Text>
+                <Text style={commonStyles.subTitleText}>{task?.title}</Text>
                 {task?.description && (
                   <Text style={commonStyles.smallText}>
                     {task?.description}
@@ -186,7 +186,7 @@ export default function TaskDetailScreen({ route }: any) {
                           </Text>
                         </Row>
                         <Row justifyContent="flex-end">
-                          <Text style={commonStyles.tinyText}>
+                          <Text style={commonStyles.tTinyText}>
                             {new Date(c.date).toLocaleString()}
                           </Text>
                         </Row>

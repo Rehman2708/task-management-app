@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { TaskRepo } from "../../repositories/task";
 import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { LocalStorageKey } from "../../enums/localstorage";
+import { Alert } from "react-native";
 
 export function useHomeScreenViewModel() {
   const [tasks, setTasks] = useState<any[]>([]);
@@ -45,7 +46,7 @@ export function useHomeScreenViewModel() {
   };
 
   // Delete a task
-  const deleteTask = async (taskId: string) => {
+  const handleDeleteTask = async (taskId: string) => {
     try {
       setLoading(true);
       await TaskRepo.deleteTask(taskId);
@@ -57,7 +58,16 @@ export function useHomeScreenViewModel() {
       setLoading(false);
     }
   };
-
+  const deleteTask = (taskId: string) => {
+    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => handleDeleteTask(taskId),
+      },
+    ]);
+  };
   return {
     tasks,
     loading,

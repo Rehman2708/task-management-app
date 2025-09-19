@@ -3,6 +3,7 @@ import { NotesRepo, Note } from "../../repositories/notes";
 import { LocalStorageKey } from "../../enums/localstorage";
 import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { useHelper } from "../../utils/helper";
+import { Alert } from "react-native";
 
 export function useNotesListViewModel(userId?: string) {
   const [allNotes, setAllNotes] = useState<Note[]>([]); // Store full list
@@ -36,7 +37,7 @@ export function useNotesListViewModel(userId?: string) {
     }
   };
 
-  const pinUnpinNote = async (noteId: string, pinned: boolean) => {
+  const handlePinUnpinNote = async (noteId: string, pinned: boolean) => {
     try {
       setLoading(true);
       setError(null);
@@ -50,7 +51,20 @@ export function useNotesListViewModel(userId?: string) {
       setLoading(false);
     }
   };
-
+  const pinUnpinNote = (noteId: string, pinned: boolean) => {
+    Alert.alert(
+      `${!pinned ? "Pin" : "Unpin"} Note?`,
+      `${!pinned ? "Pin" : "Unpin"} this note?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Confirm",
+          style: "destructive",
+          onPress: () => handlePinUnpinNote(noteId, pinned),
+        },
+      ]
+    );
+  };
   const searchNotes = (searchText: string) => {
     const filtered = allNotes.filter(
       (note) =>

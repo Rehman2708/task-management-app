@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Task, TaskRepo } from "../../repositories/task";
 import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { LocalStorageKey } from "../../enums/localstorage";
+import { Alert } from "react-native";
 
 export function useCompletedTasksViewModel() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -33,7 +34,7 @@ export function useCompletedTasksViewModel() {
     }
   };
 
-  const deleteTask = async (taskId: string) => {
+  const handleDeleteTask = async (taskId: string) => {
     try {
       setLoading(true);
       await TaskRepo.deleteTask(taskId);
@@ -45,7 +46,16 @@ export function useCompletedTasksViewModel() {
       setLoading(false);
     }
   };
-
+  const deleteTask = (taskId: string) => {
+    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => handleDeleteTask(taskId),
+      },
+    ]);
+  };
   const searchTasks = (searchText: string) => {
     if (!searchText.trim()) {
       setTasks(allTasks); // Reset to full list when search text is empty

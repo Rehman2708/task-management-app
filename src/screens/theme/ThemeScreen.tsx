@@ -1,5 +1,5 @@
-import { View, TouchableOpacity, ScrollView } from "react-native";
-import { Column } from "../../tools";
+import { TouchableOpacity, ScrollView, Text } from "react-native";
+import { Column, Row } from "../../tools";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import {
@@ -71,8 +71,6 @@ const ThemeScreen = () => {
               style={{
                 borderRadius: 16,
                 overflow: "hidden",
-                borderWidth: 3,
-                borderColor: currentThemeIndex === index ? "#000" : "#fff",
               }}
               key={index}
               onPress={() => setTheme(index)}
@@ -83,7 +81,21 @@ const ThemeScreen = () => {
                   height: 100,
                   width: "100%",
                 }}
-              />
+              >
+                {currentThemeIndex === index && (
+                  <Row
+                    justifyContent="center"
+                    alignItems="center"
+                    style={commonStyles.fullFlex}
+                  >
+                    <Text
+                      style={[commonStyles.titleText, commonStyles.whiteText]}
+                    >
+                      Selected
+                    </Text>
+                  </Row>
+                )}
+              </LinearGradient>
             </TouchableOpacity>
           ))}
         </Column>

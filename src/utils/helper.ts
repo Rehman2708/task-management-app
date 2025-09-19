@@ -3,6 +3,7 @@ import { getDataFromAsyncStorage } from "./localstorage";
 import { IUser } from "../types/auth";
 import { LocalStorageKey } from "../enums/localstorage";
 import { theme } from "../infrastructure/theme";
+import { Priority } from "../enums/tasks";
 
 export function useHelper() {
   const [loggedInUser, setLoggedInUser] = useState<IUser | null>(null);
@@ -88,6 +89,16 @@ export function useHelper() {
     return formattedDate; // fallback
   };
 
+  const getPriorityColor = (priority: Priority): string => {
+    const colors: Record<Priority, string> = {
+      [Priority.Low]: "green",
+      [Priority.High]: "orange",
+      [Priority.Urgent]: "red",
+    };
+
+    return colors[priority] ?? "gray";
+  };
+
   return {
     loggedInUser,
     gettingUser,
@@ -95,5 +106,6 @@ export function useHelper() {
     fetchThemeColor,
     themeColor,
     formatDate,
+    getPriorityColor,
   };
 }

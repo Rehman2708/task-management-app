@@ -59,6 +59,8 @@ export const commonStyles = StyleSheet.create({
     borderBottomColor: isDarkMode ? "#ffffff10" : "#00000014",
     overflow: "hidden",
     marginVertical: 6,
+    borderEndEndRadius: 24,
+    borderStartStartRadius: 32,
   },
   secondaryContainer: {
     backgroundColor: `${theme.colors.secondary}10`,
@@ -68,6 +70,6 @@ export const commonStyles = StyleSheet.create({
   },
   screenWrapper: {
     flex: 1,
-    paddingHorizontal: isAndroid ? 8 : 16,
+    paddingHorizontal: isAndroid ? 6 : 16,
   },
 });

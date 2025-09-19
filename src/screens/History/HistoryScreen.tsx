@@ -1,13 +1,6 @@
 import React from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, FlatList, Pressable } from "react-native";
 import { useCompletedTasksViewModel } from "./historyViewModel";
-import { styles } from "./styles";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
@@ -15,7 +8,6 @@ import { Column, isAndroid, Row, Spacer } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
 import { useHelper } from "../../utils/helper";
-import { theme } from "../../infrastructure/theme";
 import CustomInput from "../../components/customInput";
 
 export default function HistoryScreen({ navigation }: any) {
@@ -33,9 +25,10 @@ export default function HistoryScreen({ navigation }: any) {
     }, [])
   );
 
-  const { formatDate, loggedInUser } = useHelper();
+  const { formatDate, loggedInUser, getPriorityColor } = useHelper();
 
   const renderTaskCard = ({ item }: { item: any }) => {
+    console.log(item.priority);
     return (
       <Pressable
         onPress={() =>
@@ -44,51 +37,45 @@ export default function HistoryScreen({ navigation }: any) {
             readOnly: true,
           })
         }
-        style={[commonStyles.cardContainer]}
+        onLongPress={
+          loggedInUser?.userId === "RehmanK"
+            ? () => deleteTask(item._id)
+            : () => {}
+        }
+        style={[
+          commonStyles.cardContainer,
+          {
+            borderLeftWidth: 3,
+            borderLeftColor: getPriorityColor(item.priority),
+          },
+        ]}
       >
-        <Column gap={isAndroid ? 5 : 6}>
+        <Column gap={isAndroid ? 3 : 4}>
           <Row justifyContent="space-between" alignItems="center">
             <Text
-              style={[commonStyles.subTitleText, commonStyles.fullFlex]}
+              style={[commonStyles.basicText, commonStyles.fullFlex]}
               numberOfLines={1}
             >
               {item.title}
             </Text>
             <Spacer size={20} position="right" />
-            <Text style={commonStyles.tinyText}>
+            <Text style={commonStyles.tTinyText}>
               {formatDate(item.updatedAt)}
             </Text>
           </Row>
           {item.description && (
-            <Text numberOfLines={2} style={commonStyles.smallText}>
+            <Text numberOfLines={2} style={commonStyles.tinyText}>
               {item.description}
             </Text>
           )}
           <Row justifyContent="space-between">
-            <Text style={commonStyles.tinyText}>
+            <Text style={commonStyles.tTinyText}>
               Created By: {item.createdBy}
             </Text>
-            <Text style={commonStyles.tinyText}>
+            <Text style={commonStyles.tTinyText}>
               Assigned To: {item.assignedTo}
             </Text>
           </Row>
-          {loggedInUser?.userId === "RehmanK" && (
-            <Row justifyContent="flex-end">
-              <TouchableOpacity
-                onPress={() => deleteTask(item._id)}
-                style={{ padding: 8, paddingBottom: 0 }}
-              >
-                <Text
-                  style={[
-                    commonStyles.basicText,
-                    { color: theme.colors.error },
-                  ]}
-                >
-                  Delete
-                </Text>
-              </TouchableOpacity>
-            </Row>
-          )}
         </Column>
       </Pressable>
     );
