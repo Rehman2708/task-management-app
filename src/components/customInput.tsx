@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   KeyboardTypeOptions,
+  StyleProp,
+  TextStyle,
 } from "react-native";
 import { theme } from "../infrastructure/theme";
 import { Column, isAndroid } from "../tools";
@@ -24,6 +26,7 @@ export type CustomInputProps = {
   secureTextEntry?: boolean;
   multiline?: boolean;
   fullFlex?: boolean;
+  inputStyle?: StyleProp<TextStyle>;
 };
 
 const CustomInput = ({
@@ -38,6 +41,7 @@ const CustomInput = ({
   secureTextEntry = false,
   multiline = false,
   fullFlex = false,
+  inputStyle,
 }: CustomInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   return (
@@ -54,6 +58,7 @@ const CustomInput = ({
             error && styles.errorInput,
             multiline && styles.multiline,
             secureTextEntry && styles.passwordInput,
+            inputStyle && inputStyle,
           ]}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.border}

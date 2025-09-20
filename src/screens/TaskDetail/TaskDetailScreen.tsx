@@ -103,6 +103,11 @@ export default function TaskDetailScreen({ route }: any) {
                 setSubtaskComments({ ...subtaskComments, [item._id]: text })
               }
               fullFlex
+              multiline
+              inputStyle={{
+                minHeight: 40,
+                textAlignVertical: "center",
+              }}
             />
 
             <CustomButton
@@ -126,6 +131,7 @@ export default function TaskDetailScreen({ route }: any) {
             halfWidth
             rounded
             success
+            customStyle={{ height: 30 }}
           />
         )}
       </View>
@@ -229,10 +235,15 @@ export default function TaskDetailScreen({ route }: any) {
                     }}
                   >
                     <CustomInput
-                      placeholder="Add comment on task?..."
+                      placeholder="Add comment on task..."
                       value={taskComment}
                       onChangeText={setTaskComment}
                       fullFlex
+                      multiline
+                      inputStyle={{
+                        minHeight: 40,
+                        textAlignVertical: "center",
+                      }}
                     />
                     <CustomButton
                       title="Send"
