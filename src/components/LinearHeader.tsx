@@ -32,10 +32,12 @@ const LinearHeader = ({ image }: { image?: string }) => {
         end={{ x: 1, y: 2 }}
         locations={[0.2, 0.65]}
       >
-        <ImageBackground
-          source={{ uri: image }}
-          style={[commonStyles.fullFlex, { opacity: 0.7 }]}
-        />
+        {image && (
+          <ImageBackground
+            source={{ uri: image }}
+            style={[commonStyles.fullFlex, { opacity: 0.7 }]}
+          />
+        )}
       </LinearGradient>
     </View>
   );

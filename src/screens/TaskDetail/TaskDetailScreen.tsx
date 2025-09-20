@@ -12,6 +12,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import ScreenLoader from "../../components/screenLoader";
 import { useHelper } from "../../utils/helper";
 import ImageModal from "../../components/imageModal";
+import Avatar from "../../components/avatar";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -75,10 +76,10 @@ export default function TaskDetailScreen({ route }: any) {
       <View style={{ marginTop: theme.spacing.sm }}>
         {item.comments?.map((c: any, idx: number) => (
           <Column key={idx}>
-            <Row gap={isAndroid ? 6 : 8} alignItems="center">
-              <Ionicons name="ellipse" color={themeColor.dark} size={10} />
+            <Row gap={isAndroid ? 4 : 6} alignItems="center">
+              <Avatar name={c.createdBy} />
               <Text key={idx} style={commonStyles.smallText}>
-                {c.createdBy}: {c.text}
+                {c.text}
               </Text>
             </Row>
             <Row justifyContent="flex-end">
@@ -159,9 +160,10 @@ export default function TaskDetailScreen({ route }: any) {
                   </Text>
                 )}
                 <Row justifyContent="space-between">
-                  <Text style={commonStyles.tinyText}>
-                    Created By: {task?.createdBy}
-                  </Text>
+                  <Row alignItems="center">
+                    <Text style={commonStyles.tTinyText}>Created by: </Text>
+                    <Avatar name={task.createdBy} withName />
+                  </Row>
                   <Text style={commonStyles.tinyText}>
                     Assigned To: {task?.assignedTo}
                   </Text>
@@ -182,14 +184,10 @@ export default function TaskDetailScreen({ route }: any) {
                     <Text style={commonStyles.basicText}>Task Comments</Text>
                     {task?.comments?.map((c: any, idx: number) => (
                       <View key={idx} style={commonStyles.cardContainer}>
-                        <Row gap={isAndroid ? 6 : 8} alignItems="center">
-                          <Ionicons
-                            name="ellipse"
-                            color={themeColor.dark}
-                            size={10}
-                          />
+                        <Row gap={isAndroid ? 4 : 6} alignItems="center">
+                          <Avatar name={c.by} />
                           <Text key={idx} style={commonStyles.smallText}>
-                            {c.by}: {c.text}
+                            {c.text}
                           </Text>
                         </Row>
                         <Row justifyContent="flex-end">

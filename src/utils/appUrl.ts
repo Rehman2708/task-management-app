@@ -10,7 +10,7 @@ export class AppUrl {
   public static getUserEndPoint = (userId: string) =>
     `${this.BASE_URL}/auth/${userId}`;
   public static logoutEndPoint = `${this.BASE_URL}/auth/logout`;
-
+  public static updateProfileEndPoint = `${this.BASE_URL}/auth/update-profile`;
   // 🔹 Task APIs
   public static getAllTasks = `${this.BASE_URL}/tasks`; // active tasks only
   public static getCompletedTasks = `${this.BASE_URL}/tasks/history`; // completed/expired tasks
@@ -36,7 +36,7 @@ export class AppUrl {
   public static sendNotification = `${this.BASE_URL}/notifications`;
 
   // 🔹 Notes APIs
-  public static getAllNotes = `${this.BASE_URL}/notes`; // optional query: ?userId=<userId>
+  public static getAllNotes = `${this.BASE_URL}/notes`;
   public static createNote = `${this.BASE_URL}/notes`;
   public static updateNote = (noteId: string) =>
     `${this.BASE_URL}/notes/${noteId}`;

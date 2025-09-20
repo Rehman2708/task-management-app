@@ -8,6 +8,7 @@ import {
   Alert,
   Touchable,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useProfileViewModel } from "./profileViewModal";
@@ -19,6 +20,7 @@ import CustomButton from "../../components/customButton";
 import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
 import ScreenLoader from "../../components/screenLoader";
+import ImageModal from "../../components/imageModal";
 
 export default function ProfileScreen() {
   const {
@@ -30,32 +32,17 @@ export default function ProfileScreen() {
     logout,
     changeThemeScreen,
     loggingOut,
+    userImage,
+    getTimeLeft,
+    partnerInput,
+    setPartnerInput,
+    updateProfilePicture,
   } = useProfileViewModel();
   const { getInitials, themeColor } = useHelper();
-  const [partnerInput, setPartnerInput] = useState("");
 
   useEffect(() => {
     fetchUserDetails();
   }, []);
-
-  function getTimeLeft(targetDate = "2026-04-27") {
-    const now = new Date();
-    const endDate = new Date(targetDate);
-
-    // Total difference in milliseconds
-    const diffMs = endDate - now;
-
-    if (diffMs <= 0) return "Date has already passed";
-
-    // Convert total milliseconds to total days
-    const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    // Approximate months and remaining days
-    const months = Math.floor(totalDays / 30); // approximate month as 30 days
-    const days = totalDays % 30;
-
-    return `${months} month ${days} day left, i.e: ${totalDays} days`;
-  }
 
   return (
     <ScreenWrapper title="Profile">
@@ -65,29 +52,43 @@ export default function ProfileScreen() {
         <>
           <Column gap={isAndroid ? 6 : 8} style={[commonStyles.screenWrapper]}>
             <Row justifyContent="center">
-              <Row
-                justifyContent="center"
-                alignItems="center"
-                style={[
-                  commonStyles.cardContainer,
-                  commonStyles.secondaryContainer,
-                  {
-                    width: 150,
-                    height: 150,
-                    marginVertical: 20,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    fontSize: 50,
-                    fontFamily: theme.fonts.bold,
-                    color: themeColor?.dark ?? theme.colors.primary,
-                  }}
-                >
-                  {getInitials(user?.name)}
-                </Text>
-              </Row>
+              <ImageModal
+                onChange={updateProfilePicture}
+                button={
+                  <Row
+                    justifyContent="center"
+                    alignItems="center"
+                    style={[
+                      commonStyles.cardContainer,
+                      commonStyles.secondaryContainer,
+                      {
+                        width: 150,
+                        height: 150,
+                        marginVertical: 20,
+                      },
+                    ]}
+                  >
+                    {userImage ? (
+                      <Image
+                        style={[{ height: 150, width: 150 }]}
+                        source={{
+                          uri: userImage,
+                        }}
+                      />
+                    ) : (
+                      <Text
+                        style={{
+                          fontSize: 50,
+                          fontFamily: theme.fonts.bold,
+                          color: themeColor?.dark ?? theme.colors.primary,
+                        }}
+                      >
+                        {getInitials(user?.name)}
+                      </Text>
+                    )}
+                  </Row>
+                }
+              />
             </Row>
             <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
               <Text style={[commonStyles.smallText]}>Name:</Text>

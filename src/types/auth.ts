@@ -5,4 +5,5 @@ export interface IUser {
   createdAt: Date;
   updatedAt: Date;
   notificationToken?: string | null;
+  image?: string;
 }

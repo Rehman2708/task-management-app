@@ -83,4 +83,22 @@ export class AuthRepo {
       userId,
     });
   }
+
+  /**
+   * 🔹 Update Profile (Name & Image)
+   */
+  static async updateProfile(payload: {
+    userId: string;
+    name?: string;
+    image?: string | null;
+  }) {
+    const data = Object.fromEntries(
+      Object.entries(payload).filter(([_, v]) => v !== undefined)
+    );
+    return ApiService.getApiResponse(
+      AppUrl.updateProfileEndPoint,
+      HttpMethods.PUT,
+      data
+    );
+  }
 }

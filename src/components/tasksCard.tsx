@@ -2,6 +2,7 @@ import { Text, Image, View, ViewStyle } from "react-native";
 import { Column, isAndroid, Row, Spacer } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
 import { useHelper } from "../utils/helper";
+import Avatar from "./avatar";
 
 const TasksCard = ({
   item,
@@ -52,9 +53,11 @@ const TasksCard = ({
             {item.description || "No Description"}
           </Text>
           <Row justifyContent="space-between" alignItems="center">
-            <Text style={commonStyles.tTinyText}>
-              Created by: {item.createdBy}
-            </Text>
+            <Row alignItems="center">
+              <Text style={commonStyles.tTinyText}>Created by: </Text>
+              <Avatar name={item.createdBy} withName />
+            </Row>
+
             <Text style={commonStyles.tTinyText}>
               Assigned To: {item.assignedTo}
             </Text>

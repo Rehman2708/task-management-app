@@ -20,6 +20,7 @@ import { useHelper } from "../../utils/helper";
 import { Note } from "../../repositories/notes";
 import { Ionicons } from "@expo/vector-icons";
 import CustomInput from "../../components/customInput";
+import Avatar from "../../components/avatar";
 
 export default function NotesScreen() {
   const { formatDate, themeColor } = useHelper();
@@ -57,9 +58,10 @@ export default function NotesScreen() {
         <Text numberOfLines={4} style={commonStyles.tinyText}>
           {item.note}
         </Text>
-        <Text numberOfLines={5} style={commonStyles.tTinyText}>
-          Created By: {item.createdBy}
-        </Text>
+        <Row alignItems="center">
+          <Text style={commonStyles.tTinyText}>Created by: </Text>
+          <Avatar name={item?.createdBy} withName />
+        </Row>
         <Text numberOfLines={5} style={commonStyles.tTinyText}>
           {formatDate(item?.createdAt)}
         </Text>

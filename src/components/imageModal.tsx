@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Pressable,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import CustomInput from "./customInput";
@@ -13,39 +14,56 @@ import { Column, Row } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
 import axios from "axios";
 import CustomButton from "./customButton";
+import { theme } from "../infrastructure/theme";
 
 const ImageModal = ({
   onChange,
   defaultImage,
   disabled,
+  button,
 }: {
   onChange?: (uri: string) => void;
   defaultImage?: string;
   disabled?: boolean;
+  button?: React.ReactNode;
 }) => {
-  const [text, setText] = useState("cat");
+  const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(defaultImage ?? "");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const getImages = async () => {
     try {
-      const res = await axios.get(
-        `https://api.unsplash.com/search/photos?query=${text}&per_page=15&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`
-      );
-      setImages(res.data.results.map((img: any) => img.urls.regular));
-    } catch (error) {
-      console.log(error);
+      setLoading(true);
+      setError("");
+
+      const url = text
+        ? `https://api.unsplash.com/search/photos?query=${text}&per_page=30&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`
+        : `https://api.unsplash.com/photos/random?count=30&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`;
+
+      const res = await axios.get(url);
+
+      const images = text
+        ? res.data.results.map((img: any) => img.urls.regular) // for search
+        : res.data.map((img: any) => img.urls.regular); // for random
+
+      setImages(images);
+    } catch (err) {
+      setError("Failed to load images. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
+
   useEffect(() => {
     getImages();
   }, []);
+
   const onSelect = (url: string) => {
     setSelectedImage(url);
-    if (onChange) {
-      onChange(url);
-    }
+    onChange?.(url);
     setShowModal(false);
   };
 
@@ -55,26 +73,24 @@ const ImageModal = ({
         <Pressable
           disabled={disabled}
           onPress={() => setShowModal(true)}
-          style={[styles.imageWrapper, styles.selectedImageWrapper]}
+          style={[
+            !button && styles.imageWrapper,
+            !button && styles.selectedImageWrapper,
+          ]}
         >
-          {selectedImage ? (
-            <Image style={[styles.image]} source={{ uri: selectedImage }} />
-          ) : (
-            <Text style={commonStyles.titleText}>Add Image</Text>
-          )}
+          {button ??
+            (selectedImage ? (
+              <Image style={styles.image} source={{ uri: selectedImage }} />
+            ) : (
+              <Text style={commonStyles.titleText}>Add Image</Text>
+            ))}
         </Pressable>
       </Row>
 
       <Modal visible={showModal} transparent animationType="slide">
         <View style={styles.overlay}>
           <View style={styles.modalContent}>
-            <View
-              style={{
-                gap: 12,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
+            <Row style={styles.searchRow}>
               <CustomInput
                 onChangeText={setText}
                 placeholder="Search here"
@@ -88,29 +104,44 @@ const ImageModal = ({
                 rounded
                 customStyle={{ width: 70 }}
               />
-            </View>
+            </Row>
 
-            <FlatList
-              keyboardShouldPersistTaps="handled"
-              data={images}
-              renderItem={({ item }: { item: string }) => (
-                <Pressable
-                  onPress={() => onSelect(item)}
-                  style={styles.imageWrapper}
-                >
-                  <Image source={{ uri: item }} style={styles.image} />
-                </Pressable>
-              )}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(_, index) => index.toString()}
-              numColumns={3}
-              contentContainerStyle={styles.listContent}
-              ListEmptyComponent={
-                <Column justifyContent="center" alignItems="center">
-                  <Text style={[commonStyles.basicText]}>No Image</Text>
-                </Column>
-              }
-            />
+            {loading ? (
+              <ActivityIndicator
+                size="large"
+                color={theme.colors.primary}
+                style={styles.loader}
+              />
+            ) : error ? (
+              <Column justifyContent="center" alignItems="center">
+                <Text style={[commonStyles.errorText]}>{error}</Text>
+              </Column>
+            ) : (
+              <FlatList
+                keyboardShouldPersistTaps="handled"
+                data={images}
+                renderItem={({ item }) => (
+                  <Pressable
+                    onPress={() => onSelect(item)}
+                    style={[
+                      styles.imageWrapper,
+                      item === selectedImage && styles.selectedBorder,
+                    ]}
+                  >
+                    <Image source={{ uri: item }} style={styles.image} />
+                  </Pressable>
+                )}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(_, index) => index.toString()}
+                numColumns={3}
+                contentContainerStyle={styles.listContent}
+                ListEmptyComponent={
+                  <Column justifyContent="center" alignItems="center">
+                    <Text style={commonStyles.basicText}>No Image</Text>
+                  </Column>
+                }
+              />
+            )}
 
             <CustomButton
               title="Close"
@@ -131,7 +162,7 @@ export default ImageModal;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)", // dark background
+    backgroundColor: "#00000066",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -142,6 +173,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
   },
+  searchRow: {
+    gap: 12,
+    alignItems: "center",
+  },
   listContent: {
     marginTop: 16,
     paddingBottom: 30,
@@ -151,17 +186,26 @@ const styles = StyleSheet.create({
     height: 100,
     margin: 4,
     borderRadius: 12,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: theme.colors.background,
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   selectedImageWrapper: {
     width: 200,
     height: 200,
   },
+  selectedBorder: {
+    borderWidth: 3,
+    borderColor: theme.colors.primary,
+  },
   image: {
     height: "100%",
     width: "100%",
+  },
+  loader: {
+    marginTop: 20,
   },
 });

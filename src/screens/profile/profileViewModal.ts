@@ -16,14 +16,19 @@ export function useProfileViewModel() {
   const [partnerId, setPartnerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-
+  const [partnerInput, setPartnerInput] = useState("");
+  const [userImage, setUserImage] = useState(user?.image ?? "");
   const fetchUserDetails = async () => {
     setLoading(true);
     try {
       const stored = await getDataFromAsyncStorage<IUser>(LocalStorageKey.USER);
       if (stored.data) {
-        setUser(stored.data);
-        setPartnerId(stored?.data?.partner?.name || null);
+        const data = await AuthRepo.getUserDetails(stored.data?.userId);
+        if (data?.user) {
+          setUser(data.user);
+          setUserImage(data.user?.image ?? "");
+          setPartnerId(data.user.partner?.name || null);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -52,7 +57,7 @@ export function useProfileViewModel() {
       setLoading(false);
     }
   };
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
   const logout = async () => {
     setLoggingOut(true);
     try {
@@ -75,6 +80,40 @@ export function useProfileViewModel() {
     }
   };
   const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
+
+  function getTimeLeft(targetDate = "2026-04-27") {
+    const now = new Date();
+    const endDate = new Date(targetDate);
+
+    // Total difference in milliseconds
+    const diffMs = endDate - now;
+
+    if (diffMs <= 0) return "Date has already passed";
+
+    // Convert total milliseconds to total days
+    const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    // Approximate months and remaining days
+    const months = Math.floor(totalDays / 30); // approximate month as 30 days
+    const days = totalDays % 30;
+
+    return `${months} month ${days} day left, i.e: ${totalDays} days`;
+  }
+
+  const updateProfilePicture = async (image: string) => {
+    try {
+      setUserImage(image);
+      if (user?.userId) {
+        await AuthRepo.updateProfile({
+          userId: user?.userId,
+          image,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return {
     user,
     partnerId,
@@ -84,5 +123,10 @@ export function useProfileViewModel() {
     logout,
     changeThemeScreen,
     loggingOut,
+    userImage,
+    getTimeLeft,
+    partnerInput,
+    setPartnerInput,
+    updateProfilePicture,
   };
 }
