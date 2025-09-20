@@ -18,7 +18,7 @@ const Avatar: React.FC<AvatarProps> = ({
   size = 16,
 }) => {
   const { getInitials, themeColor, loggedInUser } = useHelper();
-  const inverted = loggedInUser?.userId === name;
+  const inverted = loggedInUser?.userId === name || loggedInUser?.name === name;
   return (
     <Row alignItems="center" gap={size / 3}>
       {image ? (

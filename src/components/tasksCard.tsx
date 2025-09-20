@@ -55,7 +55,15 @@ const TasksCard = ({
           <Row justifyContent="space-between" alignItems="center">
             <Row alignItems="center">
               <Text style={commonStyles.tTinyText}>Created by: </Text>
-              <Avatar name={item.createdBy} withName />
+              <Avatar
+                name={
+                  item?.createdByDetails
+                    ? item?.createdByDetails?.name.split(" ")[0]
+                    : item?.createdBy
+                }
+                image={item?.createdByDetails?.image}
+                withName
+              />
             </Row>
 
             <Text style={commonStyles.tTinyText}>

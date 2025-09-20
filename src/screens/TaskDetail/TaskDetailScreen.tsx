@@ -77,7 +77,12 @@ export default function TaskDetailScreen({ route }: any) {
         {item.comments?.map((c: any, idx: number) => (
           <Column key={idx}>
             <Row gap={isAndroid ? 4 : 6} alignItems="center">
-              <Avatar name={c.createdBy} />
+              <Avatar
+                name={
+                  c?.createdByDetails ? c?.createdByDetails?.name : c.createdBy
+                }
+                image={c?.createdByDetails?.image}
+              />
               <Text key={idx} style={commonStyles.smallText}>
                 {c.text}
               </Text>
@@ -162,7 +167,15 @@ export default function TaskDetailScreen({ route }: any) {
                 <Row justifyContent="space-between">
                   <Row alignItems="center">
                     <Text style={commonStyles.tTinyText}>Created by: </Text>
-                    <Avatar name={task.createdBy} withName />
+                    <Avatar
+                      name={
+                        task?.createdByDetails
+                          ? task.createdByDetails.name.split(" ")[0]
+                          : task?.createdBy
+                      }
+                      image={task?.createdByDetails?.image}
+                      withName
+                    />
                   </Row>
                   <Text style={commonStyles.tinyText}>
                     Assigned To: {task?.assignedTo}
@@ -185,7 +198,14 @@ export default function TaskDetailScreen({ route }: any) {
                     {task?.comments?.map((c: any, idx: number) => (
                       <View key={idx} style={commonStyles.cardContainer}>
                         <Row gap={isAndroid ? 4 : 6} alignItems="center">
-                          <Avatar name={c.by} />
+                          <Avatar
+                            name={
+                              c?.createdByDetails
+                                ? c?.createdByDetails?.name
+                                : c?.by
+                            }
+                            image={c?.createdByDetails?.image}
+                          />
                           <Text key={idx} style={commonStyles.smallText}>
                             {c.text}
                           </Text>

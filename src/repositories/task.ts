@@ -1,77 +1,12 @@
 import { ApiService } from "../data/network/apiservices";
 import { HttpMethods } from "../data/network/httpMethods";
+import {
+  AddCommentPayload,
+  CreateTaskPayload,
+  UpdateSubtaskStatusPayload,
+  UpdateTaskPayload,
+} from "../types/task";
 import { AppUrl } from "../utils/appUrl";
-
-// Enums/types from backend
-export type AssignedTo = "Me" | "Other" | "Both";
-export type Priority = "Low" | "Medium" | "High";
-export type Frequency = "Once" | "Daily" | "Weekly" | "Monthly";
-export type TaskStatus = "Active" | "Completed" | "Expired";
-export type SubtaskStatus = "Pending" | "Completed";
-
-export interface Subtask {
-  _id?: string;
-  title: string;
-  status?: SubtaskStatus;
-  dueDateTime: string | Date;
-  completedAt?: string | Date | null;
-  updatedBy?: string | null;
-  comments?: { text: string; createdBy: string; createdAt?: Date }[];
-}
-
-export interface Task {
-  _id?: string;
-  title: string;
-  description?: string;
-  ownerUserId: string;
-  createdBy?: string;
-  assignedTo?: AssignedTo;
-  priority?: Priority;
-  status?: TaskStatus;
-  frequency?: Frequency;
-  subtasks?: Subtask[];
-  comments?: { by: string; text: string; date?: Date }[];
-  template?: any; // optional for templates
-  instances?: any[];
-  nextDue?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-// Payloads
-export interface CreateTaskPayload {
-  title: string;
-  image?: string;
-  description?: string;
-  ownerUserId: string;
-  createdBy?: string;
-  assignedTo?: AssignedTo;
-  priority?: Priority;
-  frequency?: Frequency;
-  subtasks?: Subtask[];
-}
-
-export interface UpdateTaskPayload {
-  title?: string;
-  description?: string;
-  assignedTo?: AssignedTo;
-  priority?: Priority;
-  frequency?: Frequency;
-  status?: TaskStatus;
-  subtasks?: Subtask[];
-  comments?: { by: string; text: string }[];
-}
-
-export interface UpdateSubtaskStatusPayload {
-  userId: string;
-  status: "Pending" | "Completed";
-}
-
-export interface AddCommentPayload {
-  userId?: string;
-  by?: string; // for task-level comments
-  text: string;
-}
 
 export class TaskRepo {
   static async getActiveTasks(params: { ownerUserId: string }) {

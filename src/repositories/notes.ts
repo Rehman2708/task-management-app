@@ -8,6 +8,10 @@ export interface Note {
   note: string;
   title: string;
   createdBy: string;
+  createdByDetails?: {
+    name: string;
+    image?: string;
+  };
   createdAt: string;
   updatedAt: string;
   pinned?: boolean;

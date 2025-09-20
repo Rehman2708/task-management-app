@@ -1,4 +1,4 @@
-import { ImageBackground, View } from "react-native";
+import { Image, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { theme } from "../infrastructure/theme";
 import { isAndroid } from "../tools";
@@ -33,9 +33,16 @@ const LinearHeader = ({ image }: { image?: string }) => {
         locations={[0.2, 0.65]}
       >
         {image && (
-          <ImageBackground
+          <Image
             source={{ uri: image }}
-            style={[commonStyles.fullFlex, { opacity: 0.7 }]}
+            style={[
+              commonStyles.fullFlex,
+              {
+                borderBottomLeftRadius: 40,
+                borderBottomRightRadius: 40,
+                opacity: 0.3,
+              },
+            ]}
           />
         )}
       </LinearGradient>

@@ -60,7 +60,15 @@ export default function NotesScreen() {
         </Text>
         <Row alignItems="center">
           <Text style={commonStyles.tTinyText}>Created by: </Text>
-          <Avatar name={item?.createdBy} withName />
+          <Avatar
+            name={
+              item?.createdByDetails
+                ? item?.createdByDetails?.name.split(" ")[0]
+                : item?.createdBy
+            }
+            image={item?.createdByDetails?.image}
+            withName
+          />
         </Row>
         <Text numberOfLines={5} style={commonStyles.tTinyText}>
           {formatDate(item?.createdAt)}

@@ -140,8 +140,12 @@ export default function ProfileScreen() {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Text style={[commonStyles.basicText]}>Change Theme</Text>
-                <Ionicons name="chevron-forward-outline" size={20} />
+                <Text style={[commonStyles.basicText]}>Change theme</Text>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={20}
+                  color={theme.colors.text}
+                />
               </Row>
             </TouchableOpacity>
             <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
