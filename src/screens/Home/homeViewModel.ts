@@ -83,12 +83,7 @@ export function useHomeScreenViewModel() {
 
   useEffect(() => {
     const subscription = Notifications.addNotificationReceivedListener(
-      (notification) => {
-        console.log(
-          "Notification received:",
-          notification.request.content.data
-        );
-      }
+      (notification) => {}
     );
 
     const responseSubscription =
@@ -113,10 +108,6 @@ export function useHomeScreenViewModel() {
           }
           return;
         }
-        console.log(
-          "Notification response:",
-          response.notification.request.content.data
-        );
       });
 
     return () => {

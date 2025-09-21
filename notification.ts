@@ -43,8 +43,6 @@ export async function registerForPushNotificationsAsync() {
     })
   ).data;
 
-  console.log("Expo Push Token:", token);
-
   await setupAndroidChannel();
   return token;
 }
