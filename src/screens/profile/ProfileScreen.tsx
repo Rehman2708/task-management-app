@@ -89,41 +89,43 @@ export default function ProfileScreen() {
                 }
               />
               {partnerId && <Ionicons name="heart" size={40} color={"red"} />}
-              <Row
-                justifyContent="center"
-                alignItems="center"
-                style={[
-                  commonStyles.cardContainer,
-                  commonStyles.secondaryContainer,
-                  styles.imageContainer,
-                  {
-                    backgroundColor: `${themeColor.light}20`,
-                  },
-                ]}
-              >
-                {partnerId ? (
-                  <Pressable
-                    onPress={() => {
-                      setCurrentImage({ uri: partnerImage });
-                      setIsVisible(true);
-                    }}
-                  >
-                    <Image
-                      style={styles.image}
-                      source={{ uri: partnerImage }}
-                    />
-                  </Pressable>
-                ) : (
-                  <Text
-                    style={[
-                      styles.nameText,
-                      { color: themeColor?.dark ?? theme.colors.primary },
-                    ]}
-                  >
-                    {getInitials(partnerId ?? "")}
-                  </Text>
-                )}
-              </Row>
+              {partnerId && (
+                <Row
+                  justifyContent="center"
+                  alignItems="center"
+                  style={[
+                    commonStyles.cardContainer,
+                    commonStyles.secondaryContainer,
+                    styles.imageContainer,
+                    {
+                      backgroundColor: `${themeColor.light}20`,
+                    },
+                  ]}
+                >
+                  {partnerImage ? (
+                    <Pressable
+                      onPress={() => {
+                        setCurrentImage({ uri: partnerImage });
+                        setIsVisible(true);
+                      }}
+                    >
+                      <Image
+                        style={styles.image}
+                        source={{ uri: partnerImage }}
+                      />
+                    </Pressable>
+                  ) : (
+                    <Text
+                      style={[
+                        styles.nameText,
+                        { color: themeColor?.dark ?? theme.colors.primary },
+                      ]}
+                    >
+                      {getInitials(partnerId ?? "")}
+                    </Text>
+                  )}
+                </Row>
+              )}
             </Row>
 
             <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">

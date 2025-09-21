@@ -52,9 +52,9 @@ export default function NotesScreen() {
           },
         ]}
       >
-        {item.image && (
+        {item?.image && (
           <BlurView
-            intensity={80}
+            intensity={120}
             tint={isDarkMode ? "dark" : "light"}
             style={[styles.blurView]}
           />

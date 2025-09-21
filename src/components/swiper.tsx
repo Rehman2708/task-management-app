@@ -20,7 +20,7 @@ const Swiper: React.FC<SwiperProps> = ({
   const handleSwipeOpen = useCallback(() => {
     const timer = setTimeout(() => {
       swipeableRef.current?.close();
-    }, 2000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);

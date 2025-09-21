@@ -12,7 +12,7 @@ export function useLoginViewModel() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
   const loginUser = async () => {
     if (!userId || !password) {
       setError("Please enter both User ID and Password");
@@ -24,6 +24,7 @@ export function useLoginViewModel() {
 
     try {
       const notToken = await registerForPushNotificationsAsync();
+
       const payload = Device.isDevice
         ? {
             userId: userId.trim(),

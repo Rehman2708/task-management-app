@@ -49,11 +49,7 @@ export function useProfileViewModel() {
         partnerUserId: partner,
       });
       if (response.success) {
-        const updatedUser = { ...user, partnerId: partner };
-        setUser(updatedUser);
-        setPartnerId(partner);
-        setPartnerImage(partnerImage);
-        await storeDataInAsyncStorage(LocalStorageKey.USER, updatedUser);
+        fetchUserDetails();
       }
     } catch (err) {
       console.error(err);
