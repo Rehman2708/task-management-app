@@ -84,7 +84,7 @@ const TasksCard = ({
             </Text>
             <Row justifyContent="space-between" alignItems="center">
               <Row alignItems="center">
-                <Text style={commonStyles.tTinyText}>Created by: </Text>
+                <Text style={commonStyles.tTinyText}>Creator: </Text>
                 <Avatar
                   name={
                     item?.createdByDetails

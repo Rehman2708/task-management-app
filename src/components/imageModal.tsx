@@ -15,6 +15,8 @@ import { commonStyles } from "../styles/commonstyles";
 import axios from "axios";
 import CustomButton from "./customButton";
 import { theme } from "../infrastructure/theme";
+import ImageView from "react-native-image-viewing";
+import { useHelper } from "../utils/helper";
 
 const ImageModal = ({
   onChange,
@@ -27,12 +29,15 @@ const ImageModal = ({
   disabled?: boolean;
   button?: React.ReactNode;
 }) => {
+  const {} = useHelper();
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(defaultImage ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [visible, setIsVisible] = useState(false);
+  const [currentImage, setCurrentImage] = useState({});
 
   const getImages = async () => {
     try {
@@ -40,8 +45,8 @@ const ImageModal = ({
       setError("");
 
       const url = text
-        ? `https://api.unsplash.com/search/photos?query=${text}&per_page=18&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`
-        : `https://api.unsplash.com/photos/random?count=18&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`;
+        ? `https://api.unsplash.com/search/photos?query=${text}&per_page=9&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`
+        : `https://api.unsplash.com/photos/random?count=9&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`;
 
       const res = await axios.get(url);
 
@@ -61,9 +66,9 @@ const ImageModal = ({
     getImages();
   }, []);
 
-  const onSelect = (url: string) => {
-    setSelectedImage(url);
-    onChange?.(url);
+  const onSelect = () => {
+    setSelectedImage(currentImage.uri);
+    onChange?.(currentImage.uri);
     setShowModal(false);
   };
 
@@ -122,7 +127,10 @@ const ImageModal = ({
                 data={images}
                 renderItem={({ item }) => (
                   <Pressable
-                    onPress={() => onSelect(item)}
+                    onPress={() => {
+                      setCurrentImage({ uri: item });
+                      setIsVisible(true);
+                    }}
                     style={[
                       styles.imageWrapper,
                       item === selectedImage && styles.selectedBorder,
@@ -152,6 +160,21 @@ const ImageModal = ({
             />
           </View>
         </View>
+        <ImageView
+          images={[currentImage]}
+          imageIndex={0}
+          visible={visible}
+          onRequestClose={() => setIsVisible(false)}
+          FooterComponent={
+            onChange
+              ? () => (
+                  <Row style={{ margin: 16 }}>
+                    <CustomButton title="Set" rounded onPress={onSelect} />
+                  </Row>
+                )
+              : undefined
+          }
+        />
       </Modal>
     </>
   );

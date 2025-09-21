@@ -164,7 +164,7 @@ export default function TaskDetailScreen({ route }: any) {
                 )}
                 <Row justifyContent="space-between">
                   <Row alignItems="center">
-                    <Text style={commonStyles.tTinyText}>Created by: </Text>
+                    <Text style={commonStyles.tTinyText}>Creator: </Text>
                     <Avatar
                       name={
                         task?.createdByDetails
@@ -180,7 +180,14 @@ export default function TaskDetailScreen({ route }: any) {
                   </Text>
                 </Row>
                 {task?.subtasks?.length > 0 && (
-                  <View style={commonStyles.secondaryContainer}>
+                  <View
+                    style={[
+                      commonStyles.secondaryContainer,
+                      {
+                        backgroundColor: `${themeColor.light}20`,
+                      },
+                    ]}
+                  >
                     <Text style={commonStyles.basicText}>Subtasks</Text>
                     <FlatList
                       data={task?.subtasks}
@@ -191,7 +198,14 @@ export default function TaskDetailScreen({ route }: any) {
                   </View>
                 )}
                 {task?.comments?.length > 0 && (
-                  <View style={commonStyles.secondaryContainer}>
+                  <View
+                    style={[
+                      commonStyles.secondaryContainer,
+                      {
+                        backgroundColor: `${themeColor.light}20`,
+                      },
+                    ]}
+                  >
                     <Text style={commonStyles.basicText}>Task Comments</Text>
                     <Spacer size={16} />
                     {task?.comments?.map((c: any, idx: number) => (

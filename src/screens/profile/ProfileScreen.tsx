@@ -62,6 +62,9 @@ export default function ProfileScreen() {
                       commonStyles.cardContainer,
                       commonStyles.secondaryContainer,
                       styles.imageContainer,
+                      {
+                        backgroundColor: `${themeColor.light}20`,
+                      },
                     ]}
                   >
                     {userImage ? (
@@ -76,6 +79,12 @@ export default function ProfileScreen() {
                         {getInitials(user?.name)}
                       </Text>
                     )}
+                    <Pressable
+                      style={styles.deleteIcon}
+                      onPress={() => updateProfilePicture("")}
+                    >
+                      <Ionicons name="trash" color={"#fff"} size={20} />
+                    </Pressable>
                   </Row>
                 }
               />
@@ -87,6 +96,9 @@ export default function ProfileScreen() {
                   commonStyles.cardContainer,
                   commonStyles.secondaryContainer,
                   styles.imageContainer,
+                  {
+                    backgroundColor: `${themeColor.light}20`,
+                  },
                 ]}
               >
                 {partnerId ? (
@@ -200,6 +212,15 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     marginVertical: 20,
+    position: "relative",
+  },
+  deleteIcon: {
+    position: "absolute",
+    right: -3,
+    top: -3,
+    borderRadius: 100,
+    backgroundColor: theme.colors.error,
+    padding: 8,
   },
   image: {
     height: 120,

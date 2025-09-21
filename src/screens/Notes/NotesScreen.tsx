@@ -85,7 +85,7 @@ export default function NotesScreen() {
           </Column>
           <Column gap={6}>
             <Row alignItems="center">
-              <Text style={commonStyles.tTinyText}>Created by: </Text>
+              <Text style={commonStyles.tTinyText}>Creator: </Text>
               <Avatar
                 name={
                   item?.createdByDetails
