@@ -6,7 +6,7 @@ import { commonStyles } from "../styles/commonstyles";
 
 interface AvatarProps {
   image?: string | null;
-  name: string;
+  name?: string;
   withName?: boolean;
   size?: number;
 }

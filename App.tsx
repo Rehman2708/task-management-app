@@ -4,6 +4,8 @@ import { useFonts } from "expo-font";
 import { StatusBar } from "react-native";
 import { useEffect } from "react";
 import { getNotificationPermission } from "./notification";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { commonStyles } from "./src/styles/commonstyles";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -23,9 +25,11 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar backgroundColor={"black"} />
-      <AppNavigator />
-    </NavigationContainer>
+    <GestureHandlerRootView style={commonStyles.fullFlex}>
+      <NavigationContainer>
+        <StatusBar backgroundColor={"black"} />
+        <AppNavigator />
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }

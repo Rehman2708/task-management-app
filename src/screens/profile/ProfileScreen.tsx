@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
-  View,
   Text,
-  TextInput,
   Pressable,
-  ActivityIndicator,
   Alert,
-  Touchable,
   TouchableOpacity,
   Image,
   StyleSheet,

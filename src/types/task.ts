@@ -18,6 +18,7 @@ export interface Subtask {
 
 export interface Task {
   _id?: string;
+  image?: string;
   title: string;
   description?: string;
   ownerUserId: string;
@@ -30,9 +31,13 @@ export interface Task {
   comments?: { by: string; text: string; date?: Date }[];
   template?: any; // optional for templates
   instances?: any[];
-  nextDue?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
+  nextDue?: string;
+  createdAt: string;
+  updatedAt: Date;
+  createdByDetails?: {
+    image?: string;
+    name?: string;
+  };
 }
 
 // Payloads

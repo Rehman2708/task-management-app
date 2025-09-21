@@ -114,9 +114,9 @@ export function useProfileViewModel() {
     return `${months} month ${days} day left, i.e: ${totalDays} days`;
   }
 
-  const updateProfilePicture = async (image: string) => {
+  const updateProfilePicture = async (image: string | null) => {
     try {
-      setUserImage(image);
+      setUserImage(image ?? "");
       if (user?.userId) {
         await AuthRepo.updateProfile({
           userId: user?.userId,

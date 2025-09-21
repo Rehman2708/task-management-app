@@ -93,7 +93,7 @@ export default function TaskDetailScreen({ route }: any) {
               c?.createdByDetails ? c?.createdByDetails?.name : c?.createdBy
             }
             userId={c?.createdBy}
-            time={formatDate(c.date)}
+            time={formatDate(c.createdAt)}
           />
         ))}
         {!readOnly && item.status !== "Completed" && (

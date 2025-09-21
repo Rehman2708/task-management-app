@@ -1,18 +1,10 @@
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { View, FlatList } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import FloatingAdd from "../../components/FloatingAdd";
 import { useHomeScreenViewModel } from "./homeViewModel";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
-import { Column, isAndroid, Row, Spacer } from "../../tools";
 import { useHelper } from "../../utils/helper";
 import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
@@ -22,31 +14,12 @@ import TasksCard from "../../components/tasksCard";
 export default function HomeScreen({ navigation }: any) {
   const { tasks, loading, error, fetchTasks, deleteTask } =
     useHomeScreenViewModel();
-  const { loggedInUser, themeColor, formatDate, getPriorityColor } =
-    useHelper();
+  const { loggedInUser, themeColor } = useHelper();
   useFocusEffect(
     React.useCallback(() => {
       fetchTasks();
     }, [])
   );
-  const renderItem = ({ item }: { item: any }) => {
-    return (
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate(ROUTES.TASK_DETAIL, { taskId: item._id })
-        }
-        onLongPress={() => deleteTask(item._id)}
-      >
-        <TasksCard
-          item={item}
-          containerStyle={{
-            backgroundColor: `${themeColor?.light ?? theme.colors.secondary}20`,
-            borderColor: `${themeColor?.light ?? theme.colors.secondary}20`,
-          }}
-        />
-      </TouchableOpacity>
-    );
-  };
 
   return (
     <ScreenWrapper title={`Hey, ${loggedInUser?.name?.trim()}!`}>
@@ -62,7 +35,18 @@ export default function HomeScreen({ navigation }: any) {
           <FlatList
             data={tasks}
             keyExtractor={(item) => item._id}
-            renderItem={renderItem}
+            renderItem={({ item }) => (
+              <TasksCard
+                item={item}
+                containerStyle={{
+                  backgroundColor: `${theme.colors.background}`,
+                  borderColor: `${
+                    themeColor?.light ?? theme.colors.secondary
+                  }20`,
+                }}
+                handleDelete={() => deleteTask(item._id!)}
+              />
+            )}
             refreshing={loading}
             onRefresh={fetchTasks}
           />
