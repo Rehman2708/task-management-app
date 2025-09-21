@@ -16,6 +16,7 @@ import Avatar from "../../components/avatar";
 import EmptyState from "../../components/emptyState";
 import { SubtaskStatus, TaskStatus } from "../../enums/tasks";
 import CommentCard from "../../components/commentCard";
+import TimeLeftProgress from "../../components/timeLeftProgress";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -38,7 +39,13 @@ export default function TaskDetailScreen({ route }: any) {
 
   if (error) return <EmptyState text="Retry" button={fetchTaskDetail} error />;
 
-  const renderSubtask = ({ item }: { item: any }) => (
+  const renderSubtask = ({
+    item,
+    createdAt,
+  }: {
+    item: any;
+    createdAt: string;
+  }) => (
     <Column
       gap={isAndroid ? 6 : 8}
       style={[
@@ -78,6 +85,13 @@ export default function TaskDetailScreen({ route }: any) {
           </>
         )}
       </Row>
+      {!readOnly && item.status === SubtaskStatus.Pending && createdAt && (
+        <Row alignItems="center" style={commonStyles.fullFlex}>
+          <Text style={commonStyles.tTinyText}>Time left: {} </Text>
+
+          <TimeLeftProgress startTime={createdAt} endTime={item?.dueDateTime} />
+        </Row>
+      )}
       {/* <Row alignItems="flex-end" justifyContent="space-between">
         <Text style={commonStyles.tinyText}>Status: {item.status}</Text>
       </Row> */}
@@ -192,7 +206,9 @@ export default function TaskDetailScreen({ route }: any) {
                     <FlatList
                       data={task?.subtasks}
                       keyExtractor={(item) => item._id}
-                      renderItem={renderSubtask}
+                      renderItem={({ item }) =>
+                        renderSubtask({ item, createdAt: task?.createdAt })
+                      }
                       scrollEnabled={false}
                     />
                   </View>

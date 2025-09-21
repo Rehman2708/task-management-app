@@ -14,12 +14,13 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { AndroidDateTimePicker } from "./components/subtaskItem";
 import { useHelper } from "../../utils/helper";
 import ImageModal from "../../components/imageModal";
+import { Priority } from "../../enums/tasks";
 // Pass `task` prop for edit mode
 export const CreateTaskScreen = ({ route, navigation }: any) => {
   const { task } = route.params || {};
   const vm = useCreateTaskViewModel(task);
   const styles = createTaskStyle();
-  const { themeColor } = useHelper();
+  const { themeColor, getPriorityColor } = useHelper();
 
   useEffect(() => {
     if (task) {
@@ -123,8 +124,13 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 style={[
                   styles.assignButton,
                   vm.priority === option
-                    ? styles.assignButtonActive
-                    : styles.assignButtonInactive,
+                    ? {
+                        backgroundColor: getPriorityColor(option as Priority),
+                        borderColor: getPriorityColor(option as Priority),
+                      }
+                    : {
+                        borderColor: getPriorityColor(option as Priority),
+                      },
                 ]}
                 key={option}
                 onPress={() => vm.setPriority(option as any)}
@@ -133,8 +139,10 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                   style={[
                     commonStyles.smallText,
                     vm.priority === option
-                      ? styles.assignTextActive
-                      : styles.assignTextInactive,
+                      ? { color: "#fff" }
+                      : {
+                          color: getPriorityColor(option as Priority),
+                        },
                   ]}
                 >
                   {option}
