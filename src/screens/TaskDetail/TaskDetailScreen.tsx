@@ -4,7 +4,7 @@ import { theme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { commonStyles } from "../../styles/commonstyles";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { Column, isAndroid, Row } from "../../tools";
+import { Column, isAndroid, Row, Spacer } from "../../tools";
 import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../../components/customButton";
 import CustomInput from "../../components/customInput";
@@ -13,6 +13,9 @@ import ScreenLoader from "../../components/screenLoader";
 import { useHelper } from "../../utils/helper";
 import ImageModal from "../../components/imageModal";
 import Avatar from "../../components/avatar";
+import EmptyState from "../../components/emptyState";
+import { SubtaskStatus, TaskStatus } from "../../enums/tasks";
+import CommentCard from "../../components/commentCard";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -33,17 +36,7 @@ export default function TaskDetailScreen({ route }: any) {
     Record<string, string>
   >({});
 
-  if (error)
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={commonStyles.errorText}>{error}</Text>
-        <Pressable onPress={fetchTaskDetail}>
-          <Text style={{ color: theme.colors.primary, marginTop: 8 }}>
-            Retry
-          </Text>
-        </Pressable>
-      </View>
-    );
+  if (error) return <EmptyState text="Retry" button={fetchTaskDetail} error />;
 
   const renderSubtask = ({ item }: { item: any }) => (
     <Column
@@ -62,37 +55,46 @@ export default function TaskDetailScreen({ route }: any) {
         },
       ]}
     >
-      <Text style={commonStyles.basicText}>{item.title}</Text>
-      <Row alignItems="flex-end" justifyContent="space-between">
-        <Text style={commonStyles.tinyText}>Status: {item.status}</Text>
-        {item.dueDateTime && (
-          <Text style={commonStyles.tTinyText}>
-            Due: {formatDate(item.dueDateTime)}
-          </Text>
+      <Row justifyContent="space-between" alignItems="center">
+        <Column gap={6} justifyContent="center" style={commonStyles.fullFlex}>
+          <Text style={[commonStyles.basicText]}>{item.title}</Text>
+          {item.dueDateTime && (
+            <Text style={commonStyles.tTinyText}>
+              Due: {formatDate(item.dueDateTime)}
+            </Text>
+          )}
+        </Column>
+        {!readOnly && item.status === SubtaskStatus.Pending && (
+          <>
+            <Spacer size={4} position="right" />
+            <Ionicons
+              onPress={() =>
+                updateSubtaskStatus(item._id, SubtaskStatus.Completed)
+              }
+              name="checkmark-done-circle"
+              size={50}
+              color={theme.colors.success}
+            />
+          </>
         )}
       </Row>
+      {/* <Row alignItems="flex-end" justifyContent="space-between">
+        <Text style={commonStyles.tinyText}>Status: {item.status}</Text>
+      </Row> */}
 
       {/* Subtask Comments */}
       <View style={{ marginTop: theme.spacing.sm }}>
         {item.comments?.map((c: any, idx: number) => (
-          <Column key={idx}>
-            <Row gap={isAndroid ? 4 : 6} alignItems="center">
-              <Avatar
-                name={
-                  c?.createdByDetails ? c?.createdByDetails?.name : c.createdBy
-                }
-                image={c?.createdByDetails?.image}
-              />
-              <Text key={idx} style={commonStyles.smallText}>
-                {c.text}
-              </Text>
-            </Row>
-            <Row justifyContent="flex-end">
-              <Text style={commonStyles.tTinyText}>
-                {new Date(c.createdAt).toLocaleString()}
-              </Text>
-            </Row>
-          </Column>
+          <CommentCard
+            key={idx}
+            image={c?.createdByDetails?.image}
+            text={c.text}
+            name={
+              c?.createdByDetails ? c?.createdByDetails?.name : c?.createdBy
+            }
+            userId={c?.createdBy}
+            time={formatDate(c.date)}
+          />
         ))}
         {!readOnly && item.status !== "Completed" && (
           <View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
@@ -104,6 +106,7 @@ export default function TaskDetailScreen({ route }: any) {
               }
               fullFlex
               multiline
+              rounded
               inputStyle={{
                 minHeight: 40,
                 textAlignVertical: "center",
@@ -122,17 +125,6 @@ export default function TaskDetailScreen({ route }: any) {
               loading={subtaskCommentLoading}
             />
           </View>
-        )}
-        {!readOnly && item.status === "Pending" && (
-          <CustomButton
-            onPress={() => updateSubtaskStatus(item._id, "Completed")}
-            title="Mark Complete"
-            small
-            halfWidth
-            rounded
-            success
-            customStyle={{ height: 30 }}
-          />
         )}
       </View>
     </Column>
@@ -201,63 +193,57 @@ export default function TaskDetailScreen({ route }: any) {
                 {task?.comments?.length > 0 && (
                   <View style={commonStyles.secondaryContainer}>
                     <Text style={commonStyles.basicText}>Task Comments</Text>
+                    <Spacer size={16} />
                     {task?.comments?.map((c: any, idx: number) => (
-                      <View key={idx} style={commonStyles.cardContainer}>
-                        <Row gap={isAndroid ? 4 : 6} alignItems="center">
-                          <Avatar
-                            name={
-                              c?.createdByDetails
-                                ? c?.createdByDetails?.name
-                                : c?.createdBy ?? c?.by
-                            }
-                            image={c?.createdByDetails?.image}
-                          />
-                          <Text key={idx} style={commonStyles.smallText}>
-                            {c.text}
-                          </Text>
-                        </Row>
-                        <Row justifyContent="flex-end">
-                          <Text style={commonStyles.tTinyText}>
-                            {new Date(c.date).toLocaleString()}
-                          </Text>
-                        </Row>
-                      </View>
+                      <CommentCard
+                        key={idx}
+                        image={c?.createdByDetails?.image}
+                        text={c.text}
+                        name={
+                          c?.createdByDetails
+                            ? c?.createdByDetails?.name
+                            : c?.createdBy ?? c?.by
+                        }
+                        userId={c?.createdBy ?? c?.by}
+                        time={formatDate(c.date)}
+                      />
                     ))}
                   </View>
                 )}
-                {!readOnly && (
-                  <View
-                    style={{
-                      marginTop: theme.spacing.md,
-                      gap: 8,
-                      flexDirection: "row",
-                      alignItems: "center",
+                {/* {!readOnly && ( */}
+                <View
+                  style={{
+                    marginTop: theme.spacing.md,
+                    gap: 8,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <CustomInput
+                    placeholder="Add comment on task..."
+                    value={taskComment}
+                    onChangeText={setTaskComment}
+                    fullFlex
+                    multiline
+                    inputStyle={{
+                      minHeight: 40,
+                      textAlignVertical: "center",
                     }}
-                  >
-                    <CustomInput
-                      placeholder="Add comment on task..."
-                      value={taskComment}
-                      onChangeText={setTaskComment}
-                      fullFlex
-                      multiline
-                      inputStyle={{
-                        minHeight: 40,
-                        textAlignVertical: "center",
-                      }}
-                    />
-                    <CustomButton
-                      title="Send"
-                      loading={taskCommentLoading}
-                      sendButton
-                      onPress={() => {
-                        if (taskComment) {
-                          addTaskComment(taskComment);
-                          setTaskComment("");
-                        }
-                      }}
-                    />
-                  </View>
-                )}
+                    rounded
+                  />
+                  <CustomButton
+                    title="Send"
+                    loading={taskCommentLoading}
+                    sendButton
+                    onPress={() => {
+                      if (taskComment) {
+                        addTaskComment(taskComment);
+                        setTaskComment("");
+                      }
+                    }}
+                  />
+                </View>
+                {/* // )} */}
               </Column>
             </KeyboardAwareScrollView>
           )}

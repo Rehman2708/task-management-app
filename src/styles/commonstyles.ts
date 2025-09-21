@@ -22,7 +22,7 @@ export const commonStyles = StyleSheet.create({
   basicText: {
     fontSize: theme.fontSizes.md,
     color: theme.colors.text,
-    fontFamily: theme.fonts.regular,
+    fontFamily: theme.fonts.medium,
   },
   smallText: {
     fontSize: theme.fontSizes.sm,
@@ -49,12 +49,12 @@ export const commonStyles = StyleSheet.create({
     marginBottom: 8,
   },
   cardContainer: {
-    padding: isAndroid ? 12 : 16,
+    padding: 12,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: isDarkMode ? "#2C2C2C99" : "#EAEAEA",
-    borderRightWidth: 5,
-    borderBottomWidth: 5,
+    borderRightWidth: 3,
+    borderBottomWidth: 3,
     borderRightColor: isDarkMode ? "#ffffff10" : "#00000014",
     borderBottomColor: isDarkMode ? "#ffffff10" : "#00000014",
     overflow: "hidden",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -26,6 +26,7 @@ export type CustomInputProps = {
   secureTextEntry?: boolean;
   multiline?: boolean;
   fullFlex?: boolean;
+  rounded?: boolean;
   inputStyle?: StyleProp<TextStyle>;
 };
 
@@ -41,6 +42,7 @@ const CustomInput = ({
   secureTextEntry = false,
   multiline = false,
   fullFlex = false,
+  rounded,
   inputStyle,
 }: CustomInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -58,6 +60,7 @@ const CustomInput = ({
             error && styles.errorInput,
             multiline && styles.multiline,
             secureTextEntry && styles.passwordInput,
+            rounded && styles.rounded,
             inputStyle && inputStyle,
           ]}
           placeholder={placeholder}
@@ -119,6 +122,7 @@ const styles = StyleSheet.create({
   passwordInput: {
     // additional styling if needed for password fields
   },
+  rounded: { borderRadius: 100 },
   iconWrapper: {
     position: "absolute",
     right: 12,

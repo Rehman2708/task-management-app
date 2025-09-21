@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, Image } from "react-native";
 import { useHelper } from "../utils/helper";
-import { Row } from "../tools";
+import { Row, Spacer } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
 
 interface AvatarProps {
@@ -20,12 +20,19 @@ const Avatar: React.FC<AvatarProps> = ({
   const { getInitials, themeColor, loggedInUser } = useHelper();
   const inverted = loggedInUser?.userId === name || loggedInUser?.name === name;
   return (
-    <Row alignItems="center" gap={size / 3}>
+    <Row alignItems="center">
       {image ? (
         <Image
           source={{ uri: image }}
           resizeMode="cover"
-          style={[{ width: size, height: size, borderRadius: size / 2 }]}
+          style={[
+            {
+              width: size,
+              height: size,
+              borderRadius: size / 2,
+              backgroundColor: themeColor.light,
+            },
+          ]}
         />
       ) : (
         <Row
@@ -57,12 +64,15 @@ const Avatar: React.FC<AvatarProps> = ({
       )}
 
       {withName && (
-        <Text
-          style={[commonStyles.tTinyText, { fontSize: size * 0.6 }]}
-          numberOfLines={1}
-        >
-          {name}
-        </Text>
+        <>
+          <Spacer size={size / 3} position="right" />
+          <Text
+            style={[commonStyles.tTinyText, { fontSize: size * 0.6 }]}
+            numberOfLines={1}
+          >
+            {name}
+          </Text>
+        </>
       )}
     </Row>
   );

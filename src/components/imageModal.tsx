@@ -40,8 +40,8 @@ const ImageModal = ({
       setError("");
 
       const url = text
-        ? `https://api.unsplash.com/search/photos?query=${text}&per_page=30&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`
-        : `https://api.unsplash.com/photos/random?count=30&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`;
+        ? `https://api.unsplash.com/search/photos?query=${text}&per_page=18&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`
+        : `https://api.unsplash.com/photos/random?count=18&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`;
 
       const res = await axios.get(url);
 

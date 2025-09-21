@@ -9,6 +9,7 @@ import {
   Touchable,
   TouchableOpacity,
   Image,
+  StyleSheet,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useProfileViewModel } from "./profileViewModal";
@@ -21,6 +22,7 @@ import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
 import ScreenLoader from "../../components/screenLoader";
 import ImageModal from "../../components/imageModal";
+import ImageView from "react-native-image-viewing";
 
 export default function ProfileScreen() {
   const {
@@ -37,9 +39,11 @@ export default function ProfileScreen() {
     partnerInput,
     setPartnerInput,
     updateProfilePicture,
+    partnerImage,
   } = useProfileViewModel();
   const { getInitials, themeColor } = useHelper();
-
+  const [visible, setIsVisible] = useState(false);
+  const [currentImage, setCurrentImage] = useState({});
   useEffect(() => {
     fetchUserDetails();
   }, []);
@@ -51,7 +55,7 @@ export default function ProfileScreen() {
       ) : (
         <>
           <Column gap={isAndroid ? 6 : 8} style={[commonStyles.screenWrapper]}>
-            <Row justifyContent="center">
+            <Row justifyContent="center" alignItems="center" gap={8}>
               <ImageModal
                 onChange={updateProfilePicture}
                 button={
@@ -61,27 +65,17 @@ export default function ProfileScreen() {
                     style={[
                       commonStyles.cardContainer,
                       commonStyles.secondaryContainer,
-                      {
-                        width: 150,
-                        height: 150,
-                        marginVertical: 20,
-                      },
+                      styles.imageContainer,
                     ]}
                   >
                     {userImage ? (
-                      <Image
-                        style={[{ height: 150, width: 150 }]}
-                        source={{
-                          uri: userImage,
-                        }}
-                      />
+                      <Image style={styles.image} source={{ uri: userImage }} />
                     ) : (
                       <Text
-                        style={{
-                          fontSize: 50,
-                          fontFamily: theme.fonts.bold,
-                          color: themeColor?.dark ?? theme.colors.primary,
-                        }}
+                        style={[
+                          styles.nameText,
+                          { color: themeColor?.dark ?? theme.colors.primary },
+                        ]}
                       >
                         {getInitials(user?.name)}
                       </Text>
@@ -89,7 +83,41 @@ export default function ProfileScreen() {
                   </Row>
                 }
               />
+              {partnerId && <Ionicons name="heart" size={40} color={"red"} />}
+              <Row
+                justifyContent="center"
+                alignItems="center"
+                style={[
+                  commonStyles.cardContainer,
+                  commonStyles.secondaryContainer,
+                  styles.imageContainer,
+                ]}
+              >
+                {partnerId ? (
+                  <Pressable
+                    onPress={() => {
+                      setCurrentImage({ uri: partnerImage });
+                      setIsVisible(true);
+                    }}
+                  >
+                    <Image
+                      style={styles.image}
+                      source={{ uri: partnerImage }}
+                    />
+                  </Pressable>
+                ) : (
+                  <Text
+                    style={[
+                      styles.nameText,
+                      { color: themeColor?.dark ?? theme.colors.primary },
+                    ]}
+                  >
+                    {getInitials(partnerId ?? "")}
+                  </Text>
+                )}
+              </Row>
             </Row>
+
             <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
               <Text style={[commonStyles.smallText]}>Name:</Text>
               <Text style={[commonStyles.subTitleText]}>
@@ -161,6 +189,28 @@ export default function ProfileScreen() {
           </Row>
         </>
       )}
+      <ImageView
+        images={[currentImage]}
+        imageIndex={0}
+        visible={visible}
+        onRequestClose={() => setIsVisible(false)}
+      />
     </ScreenWrapper>
   );
 }
+
+const styles = StyleSheet.create({
+  imageContainer: {
+    width: 120,
+    height: 120,
+    marginVertical: 20,
+  },
+  image: {
+    height: 120,
+    width: 120,
+  },
+  nameText: {
+    fontSize: 50,
+    fontFamily: theme.fonts.bold,
+  },
+});

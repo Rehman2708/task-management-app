@@ -18,6 +18,7 @@ export function useProfileViewModel() {
   const [loading, setLoading] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [partnerInput, setPartnerInput] = useState("");
+  const [partnerImage, setPartnerImage] = useState("");
   const [userImage, setUserImage] = useState(user?.image ?? "");
   const fetchUserDetails = async () => {
     setLoading(true);
@@ -28,6 +29,7 @@ export function useProfileViewModel() {
         if (data?.user) {
           setUser(data.user);
           setUserImage(data.user?.image ?? "");
+          setPartnerImage(data.user.partner?.image ?? "");
           setPartnerId(data.user.partner?.name || null);
         }
       }
@@ -50,6 +52,7 @@ export function useProfileViewModel() {
         const updatedUser = { ...user, partnerId: partner };
         setUser(updatedUser);
         setPartnerId(partner);
+        setPartnerImage(partnerImage);
         await storeDataInAsyncStorage(LocalStorageKey.USER, updatedUser);
       }
     } catch (err) {
@@ -80,7 +83,7 @@ export function useProfileViewModel() {
       setLoggingOut(false);
     }
   };
-  const logout = (taskId: string) => {
+  const logout = () => {
     Alert.alert("Logout", "Are you sure you want to Logout?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -139,5 +142,6 @@ export function useProfileViewModel() {
     partnerInput,
     setPartnerInput,
     updateProfilePicture,
+    partnerImage,
   };
 }
