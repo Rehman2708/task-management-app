@@ -9,6 +9,7 @@ import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { ROUTES } from "../../enums/routes";
+import ImageModal from "../../components/imageModal";
 
 interface NoteDetailScreenProps {
   route: {
@@ -30,6 +31,8 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     error,
     success,
     saveNote,
+    setNoteImage,
+    noteImage,
   } = useNoteDetailViewModel(note);
   const navigation = useNavigation();
 
@@ -50,6 +53,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.container}
         >
+          <ImageModal defaultImage={noteImage} onChange={setNoteImage} />
           <CustomInput
             title="Title"
             value={noteTitle}

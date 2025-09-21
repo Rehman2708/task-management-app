@@ -56,7 +56,7 @@ export interface UpdateTaskPayload {
   frequency?: Frequency;
   status?: TaskStatus;
   subtasks?: Subtask[];
-  comments?: { by: string; text: string }[];
+  comments?: { createdBy: string; text: string }[];
 }
 
 export interface UpdateSubtaskStatusPayload {
@@ -66,6 +66,6 @@ export interface UpdateSubtaskStatusPayload {
 
 export interface AddCommentPayload {
   userId?: string;
-  by?: string; // for task-level comments
+  createdBy?: string; // for task-level comments
   text: string;
 }

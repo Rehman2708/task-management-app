@@ -10,6 +10,7 @@ import { useHelper } from "../../utils/helper";
 export function useNoteDetailViewModel(note?: Note) {
   const [noteTitle, setNoteTitle] = useState<string>(note?.title || "");
   const [noteText, setNoteText] = useState<string>(note?.note || "");
+  const [noteImage, setNoteImage] = useState<string>(note?.image || "");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -19,6 +20,7 @@ export function useNoteDetailViewModel(note?: Note) {
     if (note) {
       setNoteText(note.note);
       setNoteTitle(note.title);
+      setNoteImage(note?.image ?? "");
     }
   }, [note]);
 
@@ -35,16 +37,22 @@ export function useNoteDetailViewModel(note?: Note) {
 
       if (note?._id) {
         // Edit existing note
-        const payload: UpdateNotePayload = { title: noteTitle, note: noteText };
+        const payload: UpdateNotePayload = {
+          title: noteTitle,
+          note: noteText,
+          image: noteImage,
+        };
         const updatedNote = await NotesRepo.updateNote(note._id, payload);
         setSuccess("Note updated successfully");
         setNoteText(updatedNote.note);
         setNoteTitle(updatedNote.title);
+        setNoteImage(updatedNote.image);
       } else {
         // Create new note
         const payload: CreateNotePayload = {
           note: noteText,
           title: noteTitle,
+          image: noteImage,
           createdBy: loggedInUser?.userId!,
         };
         const createdNote = await NotesRepo.createNote(payload);
@@ -68,5 +76,7 @@ export function useNoteDetailViewModel(note?: Note) {
     error,
     success,
     saveNote,
+    setNoteImage,
+    noteImage,
   };
 }

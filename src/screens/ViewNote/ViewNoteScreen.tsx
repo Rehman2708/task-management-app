@@ -8,6 +8,7 @@ import CustomButton from "../../components/customButton";
 import { isAndroid, Row } from "../../tools";
 import { ROUTES } from "../../enums/routes";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import ImageModal from "../../components/imageModal";
 interface NoteDetailScreenProps {
   route: {
     params?: {
@@ -50,11 +51,13 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
       title={note?.title}
       subTitle={formatDate(note?.createdAt!) ?? ""}
       showBackbutton
+      image={note?.image}
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={commonStyles.screenWrapper}
       >
+        {note?.image && <ImageModal defaultImage={note?.image} disabled />}
         <Text style={commonStyles.basicText}>{note?.note}</Text>
       </ScrollView>
       <Row

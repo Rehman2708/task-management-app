@@ -5,6 +5,7 @@ import { AppUrl } from "../utils/appUrl";
 // 🔹 Notes payloads
 export interface Note {
   _id: string;
+  image?: string;
   note: string;
   title: string;
   createdBy: string;
@@ -21,11 +22,13 @@ export interface CreateNotePayload {
   note: string;
   title: string;
   createdBy: string;
+  image?: string | null;
 }
 
 export interface UpdateNotePayload {
   note: string;
   title: string;
+  image?: string | null;
 }
 
 export class NotesRepo {

@@ -10,6 +10,7 @@ import { ROUTES } from "../../enums/routes";
 import { IUser } from "../../types/auth";
 import { LocalStorageKey } from "../../enums/localstorage";
 import * as Device from "expo-device";
+import { Alert } from "react-native";
 
 export function useProfileViewModel() {
   const [user, setUser] = useState<IUser | null>(null);
@@ -58,7 +59,7 @@ export function useProfileViewModel() {
     }
   };
   const navigation: any = useNavigation();
-  const logout = async () => {
+  const handleLogout = async () => {
     setLoggingOut(true);
     try {
       if (user?.userId) {
@@ -78,6 +79,16 @@ export function useProfileViewModel() {
     } finally {
       setLoggingOut(false);
     }
+  };
+  const logout = (taskId: string) => {
+    Alert.alert("Logout", "Are you sure you want to Logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: handleLogout,
+      },
+    ]);
   };
   const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
 

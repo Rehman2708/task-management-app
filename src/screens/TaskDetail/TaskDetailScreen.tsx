@@ -208,7 +208,7 @@ export default function TaskDetailScreen({ route }: any) {
                             name={
                               c?.createdByDetails
                                 ? c?.createdByDetails?.name
-                                : c?.by
+                                : c?.createdBy ?? c?.by
                             }
                             image={c?.createdByDetails?.image}
                           />

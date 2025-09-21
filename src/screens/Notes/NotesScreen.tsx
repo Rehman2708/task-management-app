@@ -4,7 +4,7 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  TextInput,
+  ImageBackground,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useNotesListViewModel } from "./notesViewModal";
@@ -14,20 +14,20 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { styles } from "./styles";
 import { ROUTES } from "../../enums/routes";
-import { Column, Row, Spacer } from "../../tools";
+import { Column, isDarkMode, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useHelper } from "../../utils/helper";
 import { Note } from "../../repositories/notes";
 import { Ionicons } from "@expo/vector-icons";
 import CustomInput from "../../components/customInput";
 import Avatar from "../../components/avatar";
-
+import { BlurView } from "expo-blur";
 export default function NotesScreen() {
   const { formatDate, themeColor } = useHelper();
 
   const { notes, loading, error, fetchNotes, pinUnpinNote, searchNotes } =
     useNotesListViewModel();
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -40,40 +40,68 @@ export default function NotesScreen() {
       onPress={() => navigation.navigate(ROUTES.VIEW_NOTE, { note: item })}
       style={{ flex: 1, marginHorizontal: 4 }}
     >
-      <Column gap={6} style={commonStyles.cardContainer}>
-        <Row justifyContent="space-between" gap={8} alignItems="center">
-          {item?.title && (
-            <Text numberOfLines={1} style={commonStyles.basicText}>
-              {item.title}
-            </Text>
-          )}
-          {item.pinned && (
-            <Ionicons
-              size={16}
-              color={themeColor.dark}
-              name="pricetag-outline"
-            />
-          )}
-        </Row>
-        <Text numberOfLines={4} style={commonStyles.tinyText}>
-          {item.note}
-        </Text>
-        <Row alignItems="center">
-          <Text style={commonStyles.tTinyText}>Created by: </Text>
-          <Avatar
-            name={
-              item?.createdByDetails
-                ? item?.createdByDetails?.name.split(" ")[0]
-                : item?.createdBy
-            }
-            image={item?.createdByDetails?.image}
-            withName
+      <ImageBackground
+        source={{ uri: item?.image }}
+        style={[
+          commonStyles.cardContainer,
+          commonStyles.fullFlex,
+          {
+            borderRightWidth: 1,
+            borderBottomWidth: 1,
+            position: "relative",
+          },
+        ]}
+      >
+        {item.image && (
+          <BlurView
+            intensity={80}
+            tint={isDarkMode ? "dark" : "light"}
+            style={[styles.blurView]}
           />
-        </Row>
-        <Text numberOfLines={5} style={commonStyles.tTinyText}>
-          {formatDate(item?.createdAt)}
-        </Text>
-      </Column>
+        )}
+        <Column
+          gap={6}
+          style={commonStyles.fullFlex}
+          justifyContent="space-between"
+        >
+          <Column gap={6}>
+            <Row justifyContent="space-between" gap={8} alignItems="center">
+              {item?.title && (
+                <Text numberOfLines={1} style={commonStyles.basicText}>
+                  {item.title}
+                </Text>
+              )}
+              {item.pinned && (
+                <Ionicons
+                  size={16}
+                  color={themeColor.dark}
+                  name="pricetag-outline"
+                />
+              )}
+            </Row>
+            <Text numberOfLines={4} style={[commonStyles.tinyText]}>
+              {item.note}
+            </Text>
+          </Column>
+          <Column gap={6}>
+            <Row alignItems="center">
+              <Text style={commonStyles.tTinyText}>Created by: </Text>
+              <Avatar
+                name={
+                  item?.createdByDetails
+                    ? item?.createdByDetails?.name.split(" ")[0]
+                    : item?.createdBy
+                }
+                image={item?.createdByDetails?.image}
+                withName
+              />
+            </Row>
+            <Text numberOfLines={5} style={commonStyles.tTinyText}>
+              {formatDate(item?.createdAt)}
+            </Text>
+          </Column>
+        </Column>
+      </ImageBackground>
     </TouchableOpacity>
   );
 
