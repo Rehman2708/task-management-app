@@ -22,7 +22,7 @@ export default function HomeScreen({ navigation }: any) {
   );
 
   return (
-    <ScreenWrapper title={`Hey, ${loggedInUser?.name?.trim()}!`}>
+    <ScreenWrapper showImage title={`Hey, ${loggedInUser?.name?.trim()}!`}>
       <View style={[commonStyles.screenWrapper]}>
         {tasks.length === 0 ? (
           <EmptyState

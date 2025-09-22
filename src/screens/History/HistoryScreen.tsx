@@ -46,6 +46,7 @@ export default function HistoryScreen({ navigation }: any) {
                     backgroundColor: `${theme.colors.background}`,
                   }}
                   handleDelete={() => deleteTask(item._id!)}
+                  isCompleted
                 />
               )}
               onRefresh={fetchCompletedTasks}

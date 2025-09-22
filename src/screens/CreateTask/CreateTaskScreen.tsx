@@ -39,9 +39,9 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
 
   return (
     <ScreenWrapper
-      title="Create Task"
+      title={task ? "Edit Task" : "Create Task"}
       showBackbutton
-      subTitle="Home > Create Task"
+      subTitle={task ? "Edit" : "Home > Create Task"}
     >
       <View style={[commonStyles.screenWrapper]}>
         <KeyboardAwareScrollView
@@ -49,7 +49,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
           style={styles.container}
           showsVerticalScrollIndicator={false}
         >
-          <ImageModal onChange={vm.setImage} />
+          <ImageModal onChange={vm.setImage} defaultImage={vm.image} />
           <CustomInput
             title="Enter task title"
             value={vm.title}

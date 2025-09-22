@@ -108,6 +108,10 @@ export function useHomeScreenViewModel() {
           }
           return;
         }
+        if (notData?.type === "profile") {
+          navigation.navigate(ROUTES.PROFILE);
+          return;
+        }
       });
 
     return () => {

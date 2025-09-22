@@ -29,6 +29,7 @@ async function setupAndroidChannel() {
     await Notifications.setNotificationChannelAsync("default", {
       name: "default",
       importance: Notifications.AndroidImportance.MAX,
+      sound: "notification.wav",
     });
   }
 }

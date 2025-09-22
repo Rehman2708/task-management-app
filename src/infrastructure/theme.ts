@@ -4,7 +4,7 @@ export const theme = {
   colors: {
     primary: "#3F87E9",
     secondary: "#6697D9",
-    background: isDarkMode ? "#070A1B" : "#ffffff",
+    background: isDarkMode ? "#0e0e0e" : "#ffffff",
     text: isDarkMode ? "#c9c7ba" : "#29292b",
     textLight: isDarkMode ? "#c9c7ba99" : "#29292b99",
     border: isDarkMode ? "#333" : "#cccccc",

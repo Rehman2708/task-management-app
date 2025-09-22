@@ -15,18 +15,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { Task } from "../types/task";
 import { ROUTES } from "../enums/routes";
 import { useNavigation } from "@react-navigation/native";
+import CardWrapper from "./cardWrapper";
 
 const TasksCard = ({
   item,
   containerStyle,
   handleDelete,
+  isCompleted,
 }: {
   item: Task;
   containerStyle?: ViewStyle;
   handleDelete?: () => void;
+  isCompleted?: boolean;
 }) => {
   const navigation: any = useNavigation();
-  const { formatDate, getPriorityColor } = useHelper();
+  const { formatDate, getPriorityColor, themeColor } = useHelper();
   const rightAction = () => (
     <Pressable onPress={handleDelete} style={{ width: 80 }}>
       <Row
@@ -38,70 +41,93 @@ const TasksCard = ({
       </Row>
     </Pressable>
   );
+  const leftAction = () => {
+    return isCompleted ? (
+      <View />
+    ) : (
+      <Pressable
+        onPress={() => navigation.navigate(ROUTES.CREATE_TASK, { task: item })}
+        style={{ width: 80 }}
+      >
+        <Row
+          justifyContent="center"
+          alignItems="center"
+          style={commonStyles.fullFlex}
+        >
+          <Ionicons name="create-outline" size={30} color={themeColor.light} />
+        </Row>
+      </Pressable>
+    );
+  };
+
   return (
-    <Swiper rightAction={rightAction}>
+    <Swiper rightAction={rightAction} leftAction={leftAction}>
       <TouchableOpacity
         onPress={() =>
           navigation.navigate(ROUTES.TASK_DETAIL, { taskId: item._id })
         }
-        style={[
-          commonStyles.cardContainer,
-          {
-            borderLeftWidth: 3,
-            borderStartColor: getPriorityColor(item?.priority!),
-            ...containerStyle,
-          },
-        ]}
       >
-        <Row alignItems="center">
-          {item?.image && (
-            <Image
-              source={{ uri: item.image }}
-              style={{
-                height: 60,
-                width: 60,
-                borderRadius: 100,
-                backgroundColor: "#c0c0c0",
-              }}
-            />
-          )}
-          <Spacer size={8} position="right" />
-          <Column gap={isAndroid ? 3 : 4} style={commonStyles.fullFlex}>
-            <Row justifyContent="space-between" alignItems="center">
-              <Text
-                style={[commonStyles.basicText, commonStyles.fullFlex]}
-                numberOfLines={1}
-              >
-                {item.title}
-              </Text>
-              <Spacer size={20} position="right" />
-              <Text style={commonStyles.tTinyText}>
-                {formatDate(item.createdAt)}
-              </Text>
-            </Row>
-            <Text numberOfLines={2} style={commonStyles.tinyText}>
-              {item.description || "No Description"}
-            </Text>
-            <Row justifyContent="space-between" alignItems="center">
-              <Row alignItems="center">
-                <Text style={commonStyles.tTinyText}>Creator: </Text>
-                <Avatar
-                  name={
-                    item?.createdByDetails
-                      ? item?.createdByDetails?.name?.split(" ")[0]
-                      : item?.createdBy
-                  }
-                  image={item?.createdByDetails?.image}
-                  withName
-                />
+        <CardWrapper
+          style={[
+            commonStyles.cardContainer,
+            {
+              borderLeftWidth: 3,
+              borderStartColor: getPriorityColor(item?.priority!),
+              ...containerStyle,
+            },
+          ]}
+          image={item?.image}
+        >
+          <Row alignItems="center">
+            {item?.image && (
+              <Image
+                source={{ uri: item.image }}
+                style={{
+                  height: 60,
+                  width: 60,
+                  borderRadius: 100,
+                  backgroundColor: "#c0c0c0",
+                }}
+              />
+            )}
+            <Spacer size={8} position="right" />
+            <Column gap={isAndroid ? 3 : 4} style={commonStyles.fullFlex}>
+              <Row justifyContent="space-between" alignItems="center">
+                <Text
+                  style={[commonStyles.basicText, commonStyles.fullFlex]}
+                  numberOfLines={1}
+                >
+                  {item.title}
+                </Text>
+                <Spacer size={20} position="right" />
+                <Text style={commonStyles.tTinyText}>
+                  {formatDate(item.createdAt)}
+                </Text>
               </Row>
-
-              <Text style={commonStyles.tTinyText}>
-                Assigned To: {item.assignedTo}
+              <Text numberOfLines={2} style={commonStyles.tinyText}>
+                {item.description || "No Description"}
               </Text>
-            </Row>
-          </Column>
-        </Row>
+              <Row justifyContent="space-between" alignItems="center">
+                <Row alignItems="center">
+                  <Text style={commonStyles.tTinyText}>Creator: </Text>
+                  <Avatar
+                    name={
+                      item?.createdByDetails
+                        ? item?.createdByDetails?.name?.split(" ")[0]
+                        : item?.createdBy
+                    }
+                    image={item?.createdByDetails?.image}
+                    withName
+                  />
+                </Row>
+
+                <Text style={commonStyles.tTinyText}>
+                  Assigned To: {item.assignedTo}
+                </Text>
+              </Row>
+            </Column>
+          </Row>
+        </CardWrapper>
       </TouchableOpacity>
     </Swiper>
   );

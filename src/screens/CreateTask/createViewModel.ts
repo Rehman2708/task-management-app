@@ -1,15 +1,6 @@
 import { useState } from "react";
 import { getDataFromAsyncStorage } from "../../utils/localstorage";
-import {
-  TaskRepo,
-  CreateTaskPayload,
-  UpdateTaskPayload,
-  Subtask,
-  //   SubtaskStatus,
-  //   AssignedTo,
-  //   Priority,
-  //   Frequency,
-} from "../../repositories/task";
+import { TaskRepo } from "../../repositories/task";
 import {
   AssignedTo,
   Frequency,
@@ -18,6 +9,11 @@ import {
 } from "../../enums/tasks";
 import { LocalStorageKey } from "../../enums/localstorage";
 import { IUser } from "../../types/auth";
+import {
+  CreateTaskPayload,
+  Subtask,
+  UpdateTaskPayload,
+} from "../../types/task";
 
 export function useCreateTaskViewModel(initialTask?: any) {
   const [title, setTitle] = useState(initialTask?.title || "");
@@ -143,5 +139,6 @@ export function useCreateTaskViewModel(initialTask?: any) {
     loading,
     error,
     setImage,
+    image,
   };
 }

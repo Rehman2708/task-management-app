@@ -21,6 +21,7 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomInput from "../../components/customInput";
 import Avatar from "../../components/avatar";
 import { BlurView } from "expo-blur";
+import CardWrapper from "../../components/cardWrapper";
 export default function NotesScreen() {
   const { formatDate, themeColor } = useHelper();
 
@@ -33,35 +34,24 @@ export default function NotesScreen() {
       fetchNotes();
     }, [])
   );
-  const MemoBlur = React.memo(() => (
-    <BlurView
-      intensity={isAndroid ? 700 : 40}
-      tint={isDarkMode ? "dark" : "light"}
-      style={commonStyles.blurView}
-    />
-  ));
 
   const renderItem = ({ item }: { item: Note }) => (
     <TouchableOpacity
       onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
       onPress={() => navigation.navigate(ROUTES.VIEW_NOTE, { note: item })}
       style={{ flex: 1, marginHorizontal: 4 }}
-      activeOpacity={0.9}
     >
-      <ImageBackground
-        source={{ uri: item?.image }}
+      <CardWrapper
+        image={item?.image}
         style={[
           commonStyles.cardContainer,
           commonStyles.fullFlex,
           {
             borderRightWidth: 1,
             borderBottomWidth: 1,
-            position: "relative",
-            backgroundColor: "#000000",
           },
         ]}
       >
-        {item?.image && <MemoBlur />}
         <Column
           gap={6}
           style={[commonStyles.fullFlex]}
@@ -100,7 +90,7 @@ export default function NotesScreen() {
             </Text>
           </Column>
         </Column>
-      </ImageBackground>
+      </CardWrapper>
     </TouchableOpacity>
   );
 
