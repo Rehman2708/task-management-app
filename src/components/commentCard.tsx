@@ -1,10 +1,8 @@
 import { Text, View } from "react-native";
-import { dimensions, Row } from "../tools";
+import { dimensions, Row, Spacer } from "../tools";
 import { useHelper } from "../utils/helper";
 import Avatar from "./avatar";
 import { commonStyles } from "../styles/commonstyles";
-import { Swipeable } from "react-native-gesture-handler";
-import { useRef } from "react";
 import Swiper from "./swiper";
 
 const CommentCard = ({
@@ -13,17 +11,17 @@ const CommentCard = ({
   name,
   time,
   userId,
+  repeated,
 }: {
   text: string;
   image?: string;
   name: string;
   userId: string;
   time: string;
+  repeated?: boolean;
 }) => {
   const { loggedInUser, themeColor } = useHelper();
   const isMyChat = loggedInUser?.userId === userId;
-  const swipeableRef = useRef<Swipeable>(null);
-
   const renderAction = () => (
     <View
       style={{
@@ -37,38 +35,48 @@ const CommentCard = ({
     </View>
   );
 
-  const handleSwipeOpen = () => {
-    setTimeout(() => {
-      if (swipeableRef.current) {
-        swipeableRef.current.close();
-      }
-    }, 2000);
-  };
-
   return (
     <Swiper
       rightAction={isMyChat ? renderAction : undefined}
       leftAction={!isMyChat ? renderAction : undefined}
-      containerStyle={{ marginVertical: 6 }}
+      containerStyle={{ marginTop: repeated ? 3 : 10 }}
     >
       <Row gap={8} justifyContent={isMyChat ? "flex-end" : "flex-start"}>
-        {!isMyChat && <Avatar size={26} name={name} image={image} />}
+        {!isMyChat && (
+          <>
+            {repeated ? (
+              <Spacer size={26} position="right" />
+            ) : (
+              <Avatar size={26} name={name} image={image} />
+            )}
+          </>
+        )}
         <View
           style={{
             backgroundColor: isMyChat
-              ? `${themeColor.light}60`
-              : `${themeColor.light}30`,
-            paddingHorizontal: 10,
+              ? `${themeColor.light}`
+              : `${themeColor.dark}`,
+            paddingHorizontal: 14,
             paddingVertical: 6,
             borderRadius: 100,
             maxWidth: dimensions.width - 120,
-            borderTopLeftRadius: isMyChat ? 100 : 50,
-            borderTopRightRadius: !isMyChat ? 100 : 50,
+            borderTopLeftRadius: isMyChat ? 100 : 70,
+            borderTopRightRadius: !isMyChat ? 100 : 70,
           }}
         >
-          <Text style={[commonStyles.smallText]}>{text}</Text>
+          <Text style={[commonStyles.smallText, { color: "#fff" }]}>
+            {text}
+          </Text>
         </View>
-        {isMyChat && <Avatar size={26} name={name} image={image} />}
+        {isMyChat && (
+          <>
+            {repeated ? (
+              <Spacer size={26} position="right" />
+            ) : (
+              <Avatar size={26} name={name} image={image} />
+            )}
+          </>
+        )}
       </Row>
     </Swiper>
   );

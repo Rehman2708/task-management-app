@@ -5,7 +5,15 @@ import {
   SubtaskStatus,
   TaskStatus,
 } from "../enums/tasks";
-
+export interface SubtaskComment {
+  text: string;
+  createdBy: string;
+  createdAt?: string;
+  createdByDetails?: {
+    name: string;
+    image?: string;
+  };
+}
 export interface Subtask {
   _id?: string;
   title: string;
@@ -13,7 +21,7 @@ export interface Subtask {
   dueDateTime: string | Date;
   completedAt?: string | Date | null;
   updatedBy?: string | null;
-  comments?: { text: string; createdBy: string; createdAt?: Date }[];
+  comments?: SubtaskComment[];
 }
 
 export interface Task {

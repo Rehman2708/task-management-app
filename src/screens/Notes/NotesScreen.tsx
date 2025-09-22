@@ -12,9 +12,8 @@ import FloatingAdd from "../../components/FloatingAdd";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
-import { styles } from "./styles";
 import { ROUTES } from "../../enums/routes";
-import { Column, isDarkMode, Row } from "../../tools";
+import { Column, isAndroid, isDarkMode, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useHelper } from "../../utils/helper";
 import { Note } from "../../repositories/notes";
@@ -34,11 +33,20 @@ export default function NotesScreen() {
       fetchNotes();
     }, [])
   );
+  const MemoBlur = React.memo(() => (
+    <BlurView
+      intensity={isAndroid ? 700 : 40}
+      tint={isDarkMode ? "dark" : "light"}
+      style={commonStyles.blurView}
+    />
+  ));
+
   const renderItem = ({ item }: { item: Note }) => (
     <TouchableOpacity
       onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
       onPress={() => navigation.navigate(ROUTES.VIEW_NOTE, { note: item })}
       style={{ flex: 1, marginHorizontal: 4 }}
+      activeOpacity={0.9}
     >
       <ImageBackground
         source={{ uri: item?.image }}
@@ -49,19 +57,14 @@ export default function NotesScreen() {
             borderRightWidth: 1,
             borderBottomWidth: 1,
             position: "relative",
+            backgroundColor: "#000000",
           },
         ]}
       >
-        {item?.image && (
-          <BlurView
-            intensity={120}
-            tint={isDarkMode ? "dark" : "light"}
-            style={[styles.blurView]}
-          />
-        )}
+        {item?.image && <MemoBlur />}
         <Column
           gap={6}
-          style={commonStyles.fullFlex}
+          style={[commonStyles.fullFlex]}
           justifyContent="space-between"
         >
           <Column gap={6}>
@@ -72,11 +75,7 @@ export default function NotesScreen() {
                 </Text>
               )}
               {item.pinned && (
-                <Ionicons
-                  size={16}
-                  color={themeColor.dark}
-                  name="pricetag-outline"
-                />
+                <Ionicons size={16} color={themeColor.dark} name="pricetag" />
               )}
             </Row>
             <Text numberOfLines={4} style={[commonStyles.tinyText]}>

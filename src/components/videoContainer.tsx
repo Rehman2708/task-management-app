@@ -1,18 +1,10 @@
 import React from "react";
 import { View, StyleSheet, SafeAreaView, StatusBar } from "react-native";
-import Video from "react-native-video";
+import { theme } from "../infrastructure/theme";
 
 const AuthBgContainer = ({ children }: { children: React.ReactNode }) => {
   return (
     <View style={styles.container}>
-      <Video
-        source={require("../../assets/video/authBgVideo.mp4")}
-        muted
-        resizeMode="cover"
-        repeat
-        controls={false}
-        style={styles.video}
-      />
       <SafeAreaView style={styles.content}>{children}</SafeAreaView>
     </View>
   );
@@ -30,5 +22,6 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
+    backgroundColor: theme.colors.background,
   },
 });

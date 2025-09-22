@@ -19,7 +19,7 @@ const colors = [
   { dark: "#FF7C0A", light: "#FFB259" },
   { dark: "#6d073a", light: "#9f798a" },
   { dark: "#620d0d", light: "#a86a27" },
-  { light: "#555555", dark: "#333333" },
+  { light: "#999999", dark: "#333333" },
   { light: "#50c9ce", dark: "#0b545d" },
 ];
 

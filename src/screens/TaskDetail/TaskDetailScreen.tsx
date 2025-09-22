@@ -17,6 +17,7 @@ import EmptyState from "../../components/emptyState";
 import { SubtaskStatus, TaskStatus } from "../../enums/tasks";
 import CommentCard from "../../components/commentCard";
 import TimeLeftProgress from "../../components/timeLeftProgress";
+import { SubtaskComment } from "../../types/task";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -92,24 +93,25 @@ export default function TaskDetailScreen({ route }: any) {
           <TimeLeftProgress startTime={createdAt} endTime={item?.dueDateTime} />
         </Row>
       )}
-      {/* <Row alignItems="flex-end" justifyContent="space-between">
-        <Text style={commonStyles.tinyText}>Status: {item.status}</Text>
-      </Row> */}
-
       {/* Subtask Comments */}
       <View style={{ marginTop: theme.spacing.sm }}>
-        {item.comments?.map((c: any, idx: number) => (
-          <CommentCard
-            key={idx}
-            image={c?.createdByDetails?.image}
-            text={c.text}
-            name={
-              c?.createdByDetails ? c?.createdByDetails?.name : c?.createdBy
-            }
-            userId={c?.createdBy}
-            time={formatDate(c.createdAt)}
-          />
-        ))}
+        {item?.comments?.map((c: SubtaskComment, idx: number) => {
+          const prev = item?.comments?.[idx - 1];
+          const sameUser = idx > 0 && c?.createdBy === prev?.createdBy;
+
+          return (
+            <CommentCard
+              key={idx}
+              image={c?.createdByDetails?.image}
+              text={c?.text}
+              name={c?.createdByDetails?.name ?? c?.createdBy}
+              userId={c?.createdBy}
+              time={formatDate(c?.createdAt!)}
+              repeated={sameUser}
+            />
+          );
+        })}
+
         {!readOnly && item.status !== "Completed" && (
           <View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
             <CustomInput
@@ -224,20 +226,26 @@ export default function TaskDetailScreen({ route }: any) {
                   >
                     <Text style={commonStyles.basicText}>Task Comments</Text>
                     <Spacer size={16} />
-                    {task?.comments?.map((c: any, idx: number) => (
-                      <CommentCard
-                        key={idx}
-                        image={c?.createdByDetails?.image}
-                        text={c.text}
-                        name={
-                          c?.createdByDetails
-                            ? c?.createdByDetails?.name
-                            : c?.createdBy ?? c?.by
-                        }
-                        userId={c?.createdBy ?? c?.by}
-                        time={formatDate(c.date)}
-                      />
-                    ))}
+                    {task?.comments?.map((c: any, idx: number) => {
+                      const prev = task?.comments?.[idx - 1];
+                      const sameUser =
+                        idx > 0 &&
+                        (c?.createdBy ?? c?.by) ===
+                          (prev?.createdBy ?? prev?.by);
+                      return (
+                        <CommentCard
+                          key={c._id ?? idx}
+                          image={c?.createdByDetails?.image}
+                          text={c?.text}
+                          name={
+                            c?.createdByDetails?.name ?? c?.createdBy ?? c?.by
+                          }
+                          userId={c?.createdBy ?? c?.by}
+                          time={formatDate(c?.date)}
+                          repeated={sameUser}
+                        />
+                      );
+                    })}
                   </View>
                 )}
                 {/* {!readOnly && ( */}
