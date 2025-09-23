@@ -7,7 +7,7 @@ export const commonStyles = StyleSheet.create({
   fullWidth: { width: "100%" },
   fullHeight: { height: "100%" },
   halfWidth: {
-    width: "46%",
+    width: "48%",
   },
   titleText: {
     fontSize: theme.fontSizes.xl,

@@ -157,7 +157,6 @@ export default function TaskDetailScreen({ route }: any) {
         <ScreenLoader />
       ) : (
         <View style={[commonStyles.screenWrapper]}>
-          {task?.image && <ImageModal disabled defaultImage={task.image} />}
           {task && (
             <KeyboardAwareScrollView
               style={commonStyles.fullFlex}
@@ -171,6 +170,7 @@ export default function TaskDetailScreen({ route }: any) {
                 />
               }
             >
+              {task?.image && <ImageModal disabled defaultImage={task.image} />}
               <Column gap={isAndroid ? 5 : 6}>
                 <Text style={commonStyles.subTitleText}>{task?.title}</Text>
                 {task?.description && (

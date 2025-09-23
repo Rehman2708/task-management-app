@@ -5,7 +5,7 @@ import { Note, NotesRepo } from "../../repositories/notes";
 import { useHelper } from "../../utils/helper";
 import { commonStyles } from "../../styles/commonstyles";
 import CustomButton from "../../components/customButton";
-import { isAndroid, Row } from "../../tools";
+import { isAndroid, Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import ImageModal from "../../components/imageModal";
@@ -21,7 +21,7 @@ interface NoteDetailScreenProps {
 const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   const { note } = route.params || {};
   const { formatDate } = useHelper();
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
   const [loading, setLoading] = useState(false);
   const deleteNote = async () => {
     try {
@@ -59,6 +59,7 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
       >
         {note?.image && <ImageModal defaultImage={note?.image} disabled />}
         <Text style={commonStyles.basicText}>{note?.note}</Text>
+        <Spacer size={50} />
       </ScrollView>
       <Row
         justifyContent="space-between"

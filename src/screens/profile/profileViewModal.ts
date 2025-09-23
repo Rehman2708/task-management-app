@@ -27,6 +27,7 @@ export function useProfileViewModel() {
       if (stored.data) {
         const data = await AuthRepo.getUserDetails(stored.data?.userId);
         if (data?.user) {
+          await storeDataInAsyncStorage(LocalStorageKey.USER, data.user);
           setUser(data.user);
           setUserImage(data.user?.image ?? "");
           setPartnerImage(data.user.partner?.image ?? "");
@@ -114,10 +115,13 @@ export function useProfileViewModel() {
     try {
       setUserImage(image ?? "");
       if (user?.userId) {
-        await AuthRepo.updateProfile({
+        const res = await AuthRepo.updateProfile({
           userId: user?.userId,
           image,
         });
+        if (res?.user) {
+          await storeDataInAsyncStorage(LocalStorageKey.USER, res.user);
+        }
       }
     } catch (error) {
       console.log(error);

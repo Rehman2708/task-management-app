@@ -24,8 +24,8 @@ export function useNoteDetailViewModel(note?: Note) {
     }
   }, [note]);
 
-  const saveNote = async () => {
-    if (!noteText.trim()) {
+  const saveNote = async (append: boolean = false) => {
+    if (!noteText.trim() && !(append && note?._id)) {
       setError("Note cannot be empty");
       return;
     }
@@ -39,11 +39,13 @@ export function useNoteDetailViewModel(note?: Note) {
         // Edit existing note
         const payload: UpdateNotePayload = {
           title: noteTitle,
-          note: noteText,
+          note: append ? `${note.note}\n${noteText}` : noteText,
           image: noteImage,
         };
         const updatedNote = await NotesRepo.updateNote(note._id, payload);
-        setSuccess("Note updated successfully");
+        setSuccess(
+          append ? "Text appended successfully" : "Note updated successfully"
+        );
         setNoteText(updatedNote.note);
         setNoteTitle(updatedNote.title);
         setNoteImage(updatedNote.image);

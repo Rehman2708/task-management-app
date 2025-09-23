@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Switch } from "react-native";
 import { Note } from "../../repositories/notes";
 import { useNoteDetailViewModel } from "./createNoteViewModal";
 import { styles } from "./styles";
@@ -10,12 +10,14 @@ import CustomButton from "../../components/customButton";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { ROUTES } from "../../enums/routes";
 import ImageModal from "../../components/imageModal";
+import { useState } from "react";
+import { Row } from "../../tools";
 
 interface NoteDetailScreenProps {
   route: {
     params?: {
-      note?: Note; // if editing
-      userId: string; // logged-in user
+      note?: Note;
+      userId: string;
     };
   };
 }
@@ -34,10 +36,12 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     setNoteImage,
     noteImage,
   } = useNoteDetailViewModel(note);
-  const navigation = useNavigation();
+
+  const navigation: any = useNavigation();
+  const [appendMode, setAppendMode] = useState(false); // ⬅️ new state
 
   const handleSave = async () => {
-    await saveNote();
+    await saveNote(appendMode); // pass appendMode flag
     navigation.navigate(ROUTES.NOTES);
   };
 
@@ -47,23 +51,43 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
       showBackbutton
       subTitle={`Notes > ${note ? "Edit Note" : "Create Note"}`}
     >
-      <View style={[commonStyles.screenWrapper]}>
+      <View style={commonStyles.screenWrapper}>
         <KeyboardAwareScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.container}
         >
           <ImageModal defaultImage={noteImage} onChange={setNoteImage} />
+
           <CustomInput
             title="Title"
             value={noteTitle}
             onChangeText={setNoteTitle}
+            editable={!appendMode}
           />
+          {note && (
+            <Row alignItems="center" justifyContent="center" gap={8}>
+              <Text style={commonStyles.smallText}>
+                Append to existing note
+              </Text>
+              <Switch
+                value={appendMode}
+                onValueChange={(v) => {
+                  setAppendMode(v);
+                  if (v) setNoteText("");
+                  else setNoteText(note.note);
+                }}
+              />
+            </Row>
+          )}
           <CustomInput
             title="Note"
             value={noteText}
             onChangeText={setNoteText}
             multiline
+            placeholder={
+              appendMode ? "Enter text to append…" : "Enter full note…"
+            }
           />
 
           {error && <Text style={styles.error}>{error}</Text>}
