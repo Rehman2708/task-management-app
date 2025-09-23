@@ -135,6 +135,7 @@ export default function CreateVideoScreen() {
           {videosList.map((item: IVideo, index) => {
             return (
               <CommentCard
+                key={index}
                 text={item.title}
                 image={item?.createdByDetails?.image}
                 name={item?.createdByDetails?.name!}
