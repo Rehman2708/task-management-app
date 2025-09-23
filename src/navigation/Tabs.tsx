@@ -5,8 +5,8 @@ import HistoryScreen from "../screens/History/HistoryScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import NotesScreen from "../screens/Notes/NotesScreen";
 import { ROUTES } from "../enums/routes";
-import { Ionicons } from "@expo/vector-icons";
 import BottomTab from "./bottomTab";
+import ReelsScreen from "../screens/Reels/ReelsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,6 +18,7 @@ export default function Tabs() {
     >
       <Tab.Screen name={ROUTES.TASKS} component={HomeScreen} />
       <Tab.Screen name={ROUTES.HISTORY} component={HistoryScreen} />
+      <Tab.Screen name={ROUTES.REELS} component={ReelsScreen} />
       <Tab.Screen name={ROUTES.NOTES} component={NotesScreen} />
       <Tab.Screen name={ROUTES.PROFILE} component={ProfileScreen} />
     </Tab.Navigator>

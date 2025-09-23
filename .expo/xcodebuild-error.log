@@ -1,0 +1,7 @@
+** BUILD FAILED **
+
+
+The following build commands failed:
+	PhaseScriptExecution [CP-User]\ [RN]Check\ rncore /Users/apple/Library/Developer/Xcode/DerivedData/RMK-ctcphbrzozykrxauuqsuutcfiywx/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/React-Fabric.build/Script-46EB2E00019160.sh (in target 'React-Fabric' from project 'Pods')
+	Building workspace RMK with scheme RMK and configuration Debug
+(2 failures)

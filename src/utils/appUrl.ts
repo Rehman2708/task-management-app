@@ -44,4 +44,9 @@ export class AppUrl {
     `${this.BASE_URL}/notes/${noteId}`;
   public static pinUnpinNote = (noteId: string) =>
     `${this.BASE_URL}/notes/pin/${noteId}`;
+
+  // 🔹 Videos APIs
+  public static getAllVideos = `${this.BASE_URL}/videos`; // e.g., GET /videos/user/:ownerUserId
+  public static createVideo = `${this.BASE_URL}/videos`; // POST /videos
+  public static deleteVideo = (id: string) => `${this.BASE_URL}/videos/${id}`; // DELETE /videos/:id
 }

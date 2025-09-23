@@ -29,6 +29,7 @@ export default function ProfileScreen() {
     addPartner,
     logout,
     changeThemeScreen,
+    createVideoScreen,
     loggingOut,
     userImage,
     getTimeLeft,
@@ -179,6 +180,20 @@ export default function ProfileScreen() {
                 alignItems="center"
               >
                 <Text style={[commonStyles.basicText]}>Change theme</Text>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={20}
+                  color={theme.colors.text}
+                />
+              </Row>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={createVideoScreen}>
+              <Row
+                style={commonStyles.cardContainer}
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Text style={[commonStyles.basicText]}>Add Video</Text>
                 <Ionicons
                   name="chevron-forward-outline"
                   size={20}

@@ -91,6 +91,7 @@ export function useProfileViewModel() {
     ]);
   };
   const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
+  const createVideoScreen = () => navigation.navigate(ROUTES.CREATE_VIDEO);
 
   function getTimeLeft(targetDate = "2026-04-27") {
     const now = new Date();
@@ -136,6 +137,7 @@ export function useProfileViewModel() {
     addPartner,
     logout,
     changeThemeScreen,
+    createVideoScreen,
     loggingOut,
     userImage,
     getTimeLeft,

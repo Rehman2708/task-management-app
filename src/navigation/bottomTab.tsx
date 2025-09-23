@@ -15,6 +15,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
   const icons: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "book-outline",
     [ROUTES.HISTORY]: "time-outline",
+    [ROUTES.REELS]: "heart-outline",
     [ROUTES.NOTES]: "document-text-outline",
     [ROUTES.PROFILE]: "person-outline",
   };
@@ -22,6 +23,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
   const activeIcons: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "book",
     [ROUTES.HISTORY]: "time",
+    [ROUTES.REELS]: "heart",
     [ROUTES.NOTES]: "document-text",
     [ROUTES.PROFILE]: "person",
   };
@@ -33,7 +35,9 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
       name={iconName}
       size={24}
       color={
-        isFocused
+        iconName === "heart"
+          ? "red"
+          : isFocused
           ? themeColor?.dark ?? theme.colors.primary
           : theme.colors.border
       }
@@ -46,6 +50,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
   const routeTitles: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "Tasks",
     [ROUTES.HISTORY]: "History",
+    [ROUTES.REELS]: "Reels",
     [ROUTES.NOTES]: "Notes",
     [ROUTES.PROFILE]: "Profile",
   };
@@ -124,7 +129,7 @@ const useBottomTabStyles = () => {
     tabLabel: {
       fontSize: theme.fontSizes.sm,
       color: theme.colors.border,
-      width: 85,
+      // width: 85,
       textAlign: "center",
       fontFamily: theme.fonts.regular,
     },
