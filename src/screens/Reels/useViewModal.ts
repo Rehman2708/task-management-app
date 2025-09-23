@@ -5,6 +5,7 @@ import { VideoRepo } from "../../repositories/videos";
 import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { dimensions } from "../../tools";
 import { IVideo } from "../../types/videos";
+import { Alert } from "react-native";
 
 export const useReelsViewModal = () => {
   const [videos, setVideos] = useState<IVideo[]>([]);
@@ -14,12 +15,16 @@ export const useReelsViewModal = () => {
   const [muted, setMuted] = useState(false);
   const [mutedIcon, setMutedIcon] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
   const insets = useSafeAreaInsets();
   const windowHeight = dimensions.height - 90;
 
-  const fetchVideos = useCallback(async () => {
+  const fetchVideos = useCallback(async (page: number = 1, append = false) => {
     try {
-      setLoading(true);
+      page === 1 ? setLoading(true) : setIsFetchingMore(true);
       setError(null);
 
       const { data } = await getDataFromAsyncStorage<{ userId: string }>(
@@ -27,19 +32,55 @@ export const useReelsViewModal = () => {
       );
       if (!data?.userId) return;
 
-      const response: any = await VideoRepo.getAllVideos({
+      const response = await VideoRepo.getAllVideos({
         ownerUserId: data.userId,
-        page: 1,
+        page,
         pageSize: 10,
       });
-      setVideos(response.videos || []);
+
+      setCurrentPage(response.currentPage);
+      setTotalPages(response.totalPages);
+      setVideos((prev) =>
+        append ? [...prev, ...response.videos] : response.videos
+      );
     } catch (err: any) {
       console.error("Fetch videos error:", err);
       setError(err.message || "Failed to fetch videos");
     } finally {
       setLoading(false);
+      setIsFetchingMore(false);
     }
   }, []);
+
+  const handleDelete = useCallback(async (id: string) => {
+    try {
+      const success = await VideoRepo.deleteVideo(id);
+      if (success) {
+        setVideos((prev) => prev.filter((video) => video._id !== id));
+      }
+    } catch (err) {
+      console.error("Delete video error:", err);
+      Alert.alert("Error", "Failed to delete the video. Please try again.");
+    }
+  }, []);
+
+  const deleteVideo = useCallback(
+    (id: string) => {
+      Alert.alert(
+        "Delete Video",
+        "Are you sure you want to delete this video?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => handleDelete(id),
+          },
+        ]
+      );
+    },
+    [handleDelete]
+  );
 
   return {
     insets,
@@ -54,5 +95,9 @@ export const useReelsViewModal = () => {
     setMuted,
     mutedIcon,
     setMutedIcon,
+    currentPage,
+    totalPages,
+    isFetchingMore,
+    deleteVideo,
   };
 };

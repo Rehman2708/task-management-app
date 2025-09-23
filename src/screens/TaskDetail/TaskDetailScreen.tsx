@@ -31,6 +31,7 @@ export default function TaskDetailScreen({ route }: any) {
     updateSubtaskStatus,
     addTaskComment,
     addSubtaskComment,
+    subtaskStatusLoading,
   } = useTaskDetailViewModel(taskId);
   const { formatDate, themeColor } = useHelper();
   const [taskComment, setTaskComment] = useState("");
@@ -79,6 +80,7 @@ export default function TaskDetailScreen({ route }: any) {
               onPress={() =>
                 updateSubtaskStatus(item._id, SubtaskStatus.Completed)
               }
+              disabled={subtaskStatusLoading}
               name="checkmark-done-circle"
               size={50}
               color={theme.colors.success}

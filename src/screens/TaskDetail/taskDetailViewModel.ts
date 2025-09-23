@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { SubtaskStatus, TaskRepo } from "../../repositories/task";
+import { TaskRepo } from "../../repositories/task";
 import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { LocalStorageKey } from "../../enums/localstorage";
+import { SubtaskStatus } from "../../enums/tasks";
 
 export function useTaskDetailViewModel(taskId: string) {
   const [task, setTask] = useState<any>(null);

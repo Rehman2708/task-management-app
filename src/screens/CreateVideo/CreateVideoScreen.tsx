@@ -8,9 +8,13 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { commonStyles } from "../../styles/commonstyles";
-import { CreateVideoPayload } from "../../types/videos";
+import { CreateVideoPayload, IVideo } from "../../types/videos";
 import { VideoRepo } from "../../repositories/videos";
 import { theme } from "../../infrastructure/theme";
+import { useHelper } from "../../utils/helper";
+import { useCreateVideoViewModal } from "./useViewModal";
+import CommentCard from "../../components/commentCard";
+import { Spacer } from "../../tools";
 
 export default function CreateVideoScreen() {
   const navigation: any = useNavigation();
@@ -21,8 +25,8 @@ export default function CreateVideoScreen() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isTested, setIsTested] = useState<boolean>(false);
   const [isPlayable, setIsPlayable] = useState<boolean>(false);
-
-  const { loggedInUser } = { loggedInUser: { userId: "123" } }; // replace with auth hook
+  const { videosList } = useCreateVideoViewModal();
+  const { loggedInUser, formatDate } = useHelper();
 
   // Reset preview if URL changes after being tested
   useEffect(() => {
@@ -40,7 +44,7 @@ export default function CreateVideoScreen() {
     const payload: CreateVideoPayload = {
       title,
       url: videoUrl,
-      createdBy: loggedInUser.userId,
+      createdBy: loggedInUser?.userId ?? "RehmanK",
     };
 
     try {
@@ -124,6 +128,21 @@ export default function CreateVideoScreen() {
               onPress={handleSave}
             />
           )}
+          <Spacer size={50} />
+          <Text style={commonStyles.titleText}>Added songs</Text>
+          <Spacer size={16} />
+
+          {videosList.map((item: IVideo, index) => {
+            return (
+              <CommentCard
+                text={item.title}
+                image={item?.createdByDetails?.image}
+                name={item?.createdByDetails?.name!}
+                time={formatDate(item.createdAt)}
+                userId=""
+              />
+            );
+          })}
         </KeyboardAwareScrollView>
       </View>
     </ScreenWrapper>

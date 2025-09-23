@@ -14,9 +14,11 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { theme } from "../../infrastructure/theme";
 import { useReelsViewModal } from "./useViewModal";
-import { Column } from "../../tools";
+import { Column, Row } from "../../tools";
 import { commonStyles } from "../../styles/commonstyles";
 import { IVideo } from "../../types/videos";
+import Avatar from "../../components/avatar";
+import { useHelper } from "../../utils/helper";
 
 export default function ReelsScreen() {
   const {
@@ -32,17 +34,20 @@ export default function ReelsScreen() {
     setMuted,
     mutedIcon,
     setMutedIcon,
+    currentPage,
+    totalPages,
+    isFetchingMore,
+    deleteVideo,
   } = useReelsViewModal();
-
+  const { formatDate } = useHelper();
   const flatListRef = useRef<FlatList<IVideo>>(null);
   const isFocused = useIsFocused();
   const [longPressedIndex, setLongPressedIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchVideos();
+    fetchVideos(1, false); // initial load
   }, [fetchVideos]);
 
-  // Resume from last index when screen gains focus
   useFocusEffect(
     useCallback(() => {
       if (currentIndex >= 0) {
@@ -54,14 +59,12 @@ export default function ReelsScreen() {
     }, [currentIndex])
   );
 
-  // Auto-hide mute icon after 2s
   useEffect(() => {
     if (!mutedIcon) return;
     const timer = setTimeout(() => setMutedIcon(false), 2000);
     return () => clearTimeout(timer);
   }, [mutedIcon, setMutedIcon]);
 
-  // Track visible item
   const onViewRef = useCallback(
     ({ viewableItems }: { viewableItems: any[] }) => {
       if (viewableItems.length > 0) {
@@ -99,6 +102,13 @@ export default function ReelsScreen() {
           onLongPress={() => setLongPressedIndex(index)}
           onPressOut={() => setLongPressedIndex(null)}
         >
+          <Row alignItems="center" gap={8} style={{ padding: 12 }}>
+            <Column gap={2}>
+              <Text style={[commonStyles.titleText, { color: "#fff" }]}>
+                {item.title}
+              </Text>
+            </Column>
+          </Row>
           <Column
             style={commonStyles.fullFlex}
             justifyContent="center"
@@ -112,6 +122,33 @@ export default function ReelsScreen() {
               />
             )}
           </Column>
+          <Row
+            justifyContent="space-between"
+            alignItems="center"
+            style={{ padding: 12 }}
+          >
+            <Row alignItems="center" gap={8}>
+              <Avatar
+                size={50}
+                name={item.createdByDetails?.name}
+                image={item.createdByDetails?.image}
+              />
+              <Column gap={2}>
+                <Text style={[commonStyles.titleText, { color: "#fff" }]}>
+                  {item.createdByDetails?.name}
+                </Text>
+                <Text style={[commonStyles.smallText, { color: "#fff" }]}>
+                  {formatDate(item.createdAt)}
+                </Text>
+              </Column>
+            </Row>
+            <Ionicons
+              onPress={() => deleteVideo(item._id)}
+              name="trash"
+              color={"red"}
+              size={40}
+            />
+          </Row>
         </Pressable>
       </View>
     ),
@@ -127,7 +164,13 @@ export default function ReelsScreen() {
     ]
   );
 
-  if (loading) {
+  const handleLoadMore = () => {
+    if (!isFetchingMore && currentPage < totalPages) {
+      fetchVideos(currentPage + 1, true);
+    }
+  };
+
+  if (loading && videos.length === 0) {
     return (
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.loaderOverlay}>
@@ -137,11 +180,11 @@ export default function ReelsScreen() {
     );
   }
 
-  if (error) {
+  if (error && videos.length === 0) {
     return (
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.loaderOverlay}>
-          <Pressable onPress={fetchVideos}>
+          <Pressable onPress={() => fetchVideos(1, false)}>
             <Text style={commonStyles.errorText}>
               Failed to load videos. Tap to retry.
             </Text>
@@ -168,6 +211,13 @@ export default function ReelsScreen() {
         maxToRenderPerBatch={2}
         onViewableItemsChanged={onViewRef}
         viewabilityConfig={viewConfig}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.6}
+        ListFooterComponent={
+          isFetchingMore ? (
+            <ActivityIndicator size="large" color="#fff" />
+          ) : null
+        }
       />
     </View>
   );
@@ -177,7 +227,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   videoContainer: {
     width: "100%",
-    backgroundColor: "black",
   },
   video: { ...StyleSheet.absoluteFillObject },
   overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
