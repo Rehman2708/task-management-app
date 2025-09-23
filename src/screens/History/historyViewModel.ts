@@ -8,6 +8,7 @@ import { Task } from "../../types/task";
 export function useCompletedTasksViewModel() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [allTasks, setAllTasks] = useState<Task[]>([]); // For search filtering
+  const [showSearch, setShowSearch] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,6 +16,8 @@ export function useCompletedTasksViewModel() {
   const [page, setPage] = useState<number>(1);
   const [pageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
+
+  const toggleSearch = () => setShowSearch((prev) => !prev);
 
   useEffect(() => {
     fetchCompletedTasks(1); // Initial load of first page
@@ -117,5 +120,7 @@ export function useCompletedTasksViewModel() {
     searchTasks,
     page,
     totalPages,
+    toggleSearch,
+    showSearch,
   };
 }

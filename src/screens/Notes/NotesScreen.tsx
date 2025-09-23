@@ -35,6 +35,8 @@ export default function NotesScreen() {
     loadMoreNotes,
     page,
     totalPages,
+    showSearch,
+    toggleSearch,
   } = useNotesListViewModel();
 
   const navigation: any = useNavigation();
@@ -116,14 +118,16 @@ export default function NotesScreen() {
     ) : null;
 
   return (
-    <ScreenWrapper title="Notes">
+    <ScreenWrapper title="Notes" onSearchPress={toggleSearch}>
       <View style={commonStyles.screenWrapper}>
-        {notes.length > 0 ? (
+        {notes?.length > 0 ? (
           <>
-            <CustomInput
-              placeholder="Search here..."
-              onChangeText={searchNotes}
-            />
+            {showSearch && (
+              <CustomInput
+                placeholder="Search here..."
+                onChangeText={searchNotes}
+              />
+            )}
             <FlatList
               data={notes}
               keyExtractor={(item) => item._id!}

@@ -8,6 +8,7 @@ import { Alert } from "react-native";
 export function useNotesListViewModel(userId?: string) {
   const [allNotes, setAllNotes] = useState<Note[]>([]); // All fetched notes
   const [notes, setNotes] = useState<Note[]>([]); // Filtered (search) notes
+  const [showSearch, setShowSearch] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,6 +18,8 @@ export function useNotesListViewModel(userId?: string) {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const { loggedInUser } = useHelper();
+
+  const toggleSearch = () => setShowSearch((prev) => !prev);
 
   useEffect(() => {
     // Reset to first page whenever user changes
@@ -122,5 +125,7 @@ export function useNotesListViewModel(userId?: string) {
     searchNotes,
     page,
     totalPages,
+    showSearch,
+    toggleSearch,
   };
 }

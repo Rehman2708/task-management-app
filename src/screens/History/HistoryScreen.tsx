@@ -21,6 +21,8 @@ export default function HistoryScreen({ navigation }: any) {
     loadMoreTasks,
     page,
     totalPages,
+    toggleSearch,
+    showSearch,
   } = useCompletedTasksViewModel();
 
   useFocusEffect(
@@ -43,14 +45,16 @@ export default function HistoryScreen({ navigation }: any) {
     ) : null;
 
   return (
-    <ScreenWrapper title="History">
+    <ScreenWrapper title="History" onSearchPress={toggleSearch}>
       <View style={commonStyles.screenWrapper}>
-        {tasks.length > 0 ? (
+        {tasks?.length > 0 ? (
           <>
-            <CustomInput
-              placeholder="Search here..."
-              onChangeText={searchTasks}
-            />
+            {showSearch && (
+              <CustomInput
+                placeholder="Search here..."
+                onChangeText={searchTasks}
+              />
+            )}
             <FlatList
               data={tasks}
               keyExtractor={({ _id }) => _id?.toString()!}

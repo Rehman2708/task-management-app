@@ -24,7 +24,7 @@ export default function HomeScreen({ navigation }: any) {
   return (
     <ScreenWrapper showImage title={`Hey, ${loggedInUser?.name?.trim()}!`}>
       <View style={[commonStyles.screenWrapper]}>
-        {tasks.length === 0 ? (
+        {tasks?.length === 0 ? (
           <EmptyState
             text="No active tasks"
             button={fetchTasks}

@@ -39,7 +39,7 @@ const CommentCard = ({
     <Swiper
       rightAction={isMyChat ? renderAction : undefined}
       leftAction={!isMyChat ? renderAction : undefined}
-      containerStyle={{ marginTop: repeated ? 3 : 10 }}
+      containerStyle={{ marginTop: repeated ? 2 : 8 }}
     >
       <Row gap={8} justifyContent={isMyChat ? "flex-end" : "flex-start"}>
         {!isMyChat && (
@@ -58,10 +58,10 @@ const CommentCard = ({
               : `${themeColor.dark}`,
             paddingHorizontal: 14,
             paddingVertical: 6,
-            borderRadius: 100,
+            borderRadius: 26,
             maxWidth: dimensions.width - 120,
-            borderTopLeftRadius: isMyChat ? 100 : 70,
-            borderTopRightRadius: !isMyChat ? 100 : 70,
+            borderBottomLeftRadius: isMyChat ? 26 : repeated ? 26 : 16,
+            borderBottomRightRadius: !isMyChat ? 26 : repeated ? 26 : 16,
           }}
         >
           <Text style={[commonStyles.smallText, { color: "#fff" }]}>

@@ -14,6 +14,7 @@ const ScreenWrapper = ({
   onBackButtonPress,
   image,
   showImage,
+  onSearchPress,
 }: {
   children: React.ReactNode;
   title?: string;
@@ -21,6 +22,7 @@ const ScreenWrapper = ({
   showImage?: boolean;
   showBackbutton?: boolean;
   onBackButtonPress?: () => void;
+  onSearchPress?: () => void;
   image?: string;
 }) => {
   return (
@@ -42,6 +44,7 @@ const ScreenWrapper = ({
             subTitle={subTitle}
             onBackButtonPress={onBackButtonPress}
             showImage={showImage}
+            onSearchPress={onSearchPress}
           />
           {/* {!subTitle && <TimeDisplay />} */}
         </View>

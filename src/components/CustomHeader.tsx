@@ -14,6 +14,7 @@ interface HeaderProps {
   showBackbutton?: boolean;
   showImage?: boolean;
   onBackButtonPress?: () => void;
+  onSearchPress?: () => void;
 }
 const CustomHeader = ({
   title,
@@ -21,6 +22,7 @@ const CustomHeader = ({
   showBackbutton,
   showImage,
   onBackButtonPress,
+  onSearchPress,
 }: HeaderProps) => {
   const navigation: any = useNavigation();
   const { loggedInUser } = useHelper();
@@ -66,7 +68,13 @@ const CustomHeader = ({
           )}
         </Column>
       </Row>
-      <TimeDisplay />
+      {onSearchPress ? (
+        <TouchableOpacity onPress={onSearchPress}>
+          <Ionicons name="search" size={30} color={theme.colors.white} />
+        </TouchableOpacity>
+      ) : (
+        <TimeDisplay />
+      )}
     </Row>
   );
 };
