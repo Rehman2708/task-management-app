@@ -29,7 +29,7 @@ const ImageModal = ({
   disabled?: boolean;
   button?: React.ReactNode;
 }) => {
-  const {} = useHelper();
+  const { themeColor } = useHelper();
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -114,7 +114,7 @@ const ImageModal = ({
             {loading ? (
               <ActivityIndicator
                 size="large"
-                color={theme.colors.primary}
+                color={themeColor.dark ?? theme.colors.primary}
                 style={styles.loader}
               />
             ) : error ? (

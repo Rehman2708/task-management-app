@@ -32,10 +32,21 @@ export interface UpdateNotePayload {
 }
 
 export class NotesRepo {
-  // 🔹 Get all notes (optional filter by userId)
-  static async getAllNotes(params: { ownerUserId: string }) {
-    const { ownerUserId } = params;
-    const url = `${AppUrl.getAllNotes}/${ownerUserId}`;
+  // 🔹 Get all notes (with optional pagination)
+  static async getAllNotes(params: {
+    ownerUserId: string;
+    page?: number;
+    pageSize?: number;
+  }) {
+    const { ownerUserId, page, pageSize } = params;
+
+    // Build query string if pagination values exist
+    const queryParts: string[] = [];
+    if (page !== undefined) queryParts.push(`page=${page}`);
+    if (pageSize !== undefined) queryParts.push(`pageSize=${pageSize}`);
+    const query = queryParts.length ? `?${queryParts.join("&")}` : "";
+
+    const url = `${AppUrl.getAllNotes}/${ownerUserId}${query}`;
     return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 

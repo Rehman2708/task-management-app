@@ -1,36 +1,66 @@
 import { useState, useEffect } from "react";
-import { Task, TaskRepo } from "../../repositories/task";
+import { TaskRepo } from "../../repositories/task";
 import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { LocalStorageKey } from "../../enums/localstorage";
 import { Alert } from "react-native";
+import { Task } from "../../types/task";
 
 export function useCompletedTasksViewModel() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [allTasks, setAllTasks] = useState<Task[]>([]); // For search filtering
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [allTasks, setAllTasks] = useState<Task[]>([]);
+
+  // 🔹 Pagination states
+  const [page, setPage] = useState<number>(1);
+  const [pageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
   useEffect(() => {
-    fetchCompletedTasks();
+    fetchCompletedTasks(1); // Initial load of first page
   }, []);
 
-  const fetchCompletedTasks = async () => {
+  const fetchCompletedTasks = async (requestedPage = page) => {
     const { data } = await getDataFromAsyncStorage<{ userId: string }>(
       LocalStorageKey.USER
     );
-    if (data?.userId) {
-      try {
-        setLoading(true);
-        const response = await TaskRepo.getCompletedTasks({
-          ownerUserId: data?.userId,
-        });
-        setAllTasks(response);
-        setTasks(response);
-      } catch (err: any) {
-        console.error("Fetch completed tasks error:", err);
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
+    if (!data?.userId) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await TaskRepo.getCompletedTasks({
+        ownerUserId: data.userId,
+        page: requestedPage,
+        pageSize,
+      });
+
+      // The API returns { tasks, totalPages, currentPage }
+      const { tasks: fetchedTasks, totalPages: total } = response;
+
+      if (requestedPage === 1) {
+        setTasks(fetchedTasks);
+        setAllTasks(fetchedTasks);
+      } else {
+        setTasks((prev) => [...prev, ...fetchedTasks]);
+        setAllTasks((prev) => [...prev, ...fetchedTasks]);
       }
+
+      setTotalPages(total);
+      setPage(requestedPage);
+    } catch (err: any) {
+      console.error("Fetch completed tasks error:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔹 Load next page for infinite scroll
+  const loadMoreTasks = () => {
+    if (page < totalPages && !loading) {
+      fetchCompletedTasks(page + 1);
     }
   };
 
@@ -38,7 +68,8 @@ export function useCompletedTasksViewModel() {
     try {
       setLoading(true);
       await TaskRepo.deleteTask(taskId);
-      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+      setTasks((prev) => prev.filter((task) => task._id !== taskId));
+      setAllTasks((prev) => prev.filter((task) => task._id !== taskId));
     } catch (err: any) {
       console.error("Delete task error:", err);
       setError(err.message || "Failed to delete task");
@@ -46,8 +77,9 @@ export function useCompletedTasksViewModel() {
       setLoading(false);
     }
   };
+
   const deleteTask = (taskId: string) => {
-    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
+    Alert.alert("Delete Task", "Are you sure you want to delete this task?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
@@ -56,21 +88,20 @@ export function useCompletedTasksViewModel() {
       },
     ]);
   };
+
   const searchTasks = (searchText: string) => {
     if (!searchText.trim()) {
-      setTasks(allTasks); // Reset to full list when search text is empty
+      setTasks(allTasks);
       return;
     }
 
-    const lowercasedText = searchText.toLowerCase();
-
+    const lower = searchText.toLowerCase();
     const filtered = allTasks.filter((task) => {
-      const titleMatch = task.title.toLowerCase().includes(lowercasedText);
-      const descriptionMatch = task.description
-        ? task.description.toLowerCase().includes(lowercasedText)
+      const titleMatch = task.title.toLowerCase().includes(lower);
+      const descMatch = task.description
+        ? task.description.toLowerCase().includes(lower)
         : false;
-
-      return titleMatch || descriptionMatch;
+      return titleMatch || descMatch;
     });
 
     setTasks(filtered);
@@ -80,8 +111,11 @@ export function useCompletedTasksViewModel() {
     tasks,
     loading,
     error,
-    fetchCompletedTasks,
+    fetchCompletedTasks, // Refresh from page 1
+    loadMoreTasks, // Load next page for infinite scroll
     deleteTask,
     searchTasks,
+    page,
+    totalPages,
   };
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, FlatList } from "react-native";
+import { View, FlatList, ActivityIndicator } from "react-native";
 import { useCompletedTasksViewModel } from "./historyViewModel";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
@@ -18,18 +18,33 @@ export default function HistoryScreen({ navigation }: any) {
     fetchCompletedTasks,
     deleteTask,
     searchTasks,
+    loadMoreTasks,
+    page,
+    totalPages,
   } = useCompletedTasksViewModel();
+
   useFocusEffect(
     React.useCallback(() => {
-      fetchCompletedTasks();
+      // Refresh from page 1 whenever screen gains focus
+      fetchCompletedTasks(1);
     }, [])
   );
 
-  const {} = useHelper();
+  const { themeColor } = useHelper();
+
+  const renderFooter = () =>
+    page < totalPages ? (
+      <View style={{ paddingVertical: theme.spacing.md }}>
+        <ActivityIndicator
+          size="small"
+          color={themeColor.dark ?? theme.colors.primary}
+        />
+      </View>
+    ) : null;
 
   return (
     <ScreenWrapper title="History">
-      <View style={[commonStyles.screenWrapper]}>
+      <View style={commonStyles.screenWrapper}>
         {tasks.length > 0 ? (
           <>
             <CustomInput
@@ -38,26 +53,27 @@ export default function HistoryScreen({ navigation }: any) {
             />
             <FlatList
               data={tasks}
-              keyExtractor={(item) => item._id}
+              keyExtractor={({ _id }) => _id?.toString()!}
               renderItem={({ item }) => (
                 <TasksCard
                   item={item}
-                  containerStyle={{
-                    backgroundColor: `${theme.colors.background}`,
-                  }}
+                  containerStyle={{ backgroundColor: theme.colors.background }}
                   handleDelete={() => deleteTask(item._id!)}
                   isCompleted
                 />
               )}
-              onRefresh={fetchCompletedTasks}
               refreshing={loading}
+              onRefresh={() => fetchCompletedTasks(1)}
+              onEndReached={loadMoreTasks}
+              onEndReachedThreshold={0.4}
+              ListFooterComponent={renderFooter}
               showsVerticalScrollIndicator={false}
             />
           </>
         ) : (
           <EmptyState
             text="Nothing to show"
-            button={fetchCompletedTasks}
+            button={() => fetchCompletedTasks(1)}
             loading={loading}
             error={!!error?.length}
           />

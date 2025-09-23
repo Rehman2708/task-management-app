@@ -4,7 +4,7 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  ImageBackground,
+  ActivityIndicator,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useNotesListViewModel } from "./notesViewModal";
@@ -13,25 +13,36 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
-import { Column, isAndroid, isDarkMode, Row } from "../../tools";
+import { Column, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useHelper } from "../../utils/helper";
 import { Note } from "../../repositories/notes";
 import { Ionicons } from "@expo/vector-icons";
 import CustomInput from "../../components/customInput";
 import Avatar from "../../components/avatar";
-import { BlurView } from "expo-blur";
 import CardWrapper from "../../components/cardWrapper";
+
 export default function NotesScreen() {
   const { formatDate, themeColor } = useHelper();
 
-  const { notes, loading, error, fetchNotes, pinUnpinNote, searchNotes } =
-    useNotesListViewModel();
+  const {
+    notes,
+    loading,
+    error,
+    fetchNotes,
+    pinUnpinNote,
+    searchNotes,
+    loadMoreNotes,
+    page,
+    totalPages,
+  } = useNotesListViewModel();
+
   const navigation: any = useNavigation();
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchNotes();
+      // refresh first page when screen gains focus
+      fetchNotes(1);
     }, [])
   );
 
@@ -54,7 +65,7 @@ export default function NotesScreen() {
       >
         <Column
           gap={6}
-          style={[commonStyles.fullFlex]}
+          style={commonStyles.fullFlex}
           justifyContent="space-between"
         >
           <Column gap={6}>
@@ -68,7 +79,7 @@ export default function NotesScreen() {
                 <Ionicons size={16} color={themeColor.dark} name="pricetag" />
               )}
             </Row>
-            <Text numberOfLines={4} style={[commonStyles.tinyText]}>
+            <Text numberOfLines={4} style={commonStyles.tinyText}>
               {item.note}
             </Text>
           </Column>
@@ -78,8 +89,8 @@ export default function NotesScreen() {
               <Avatar
                 name={
                   item?.createdByDetails
-                    ? item?.createdByDetails?.name.split(" ")[0]
-                    : item?.createdBy
+                    ? item.createdByDetails.name.split(" ")[0]
+                    : item.createdBy
                 }
                 image={item?.createdByDetails?.image}
                 withName
@@ -94,38 +105,49 @@ export default function NotesScreen() {
     </TouchableOpacity>
   );
 
+  const renderFooter = () =>
+    page < totalPages ? (
+      <View style={{ paddingVertical: theme.spacing.md }}>
+        <ActivityIndicator
+          size="small"
+          color={themeColor.dark ?? theme.colors.primary}
+        />
+      </View>
+    ) : null;
+
   return (
-    <>
-      <ScreenWrapper title="Notes">
-        <View style={[commonStyles.screenWrapper]}>
-          {notes.length > 0 ? (
-            <>
-              <CustomInput
-                placeholder="Search here..."
-                onChangeText={searchNotes}
-              />
-              <FlatList
-                data={notes}
-                keyExtractor={(item) => item._id!}
-                renderItem={renderItem}
-                refreshing={loading}
-                onRefresh={fetchNotes}
-                contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
-                showsVerticalScrollIndicator={false}
-                numColumns={2}
-              />
-            </>
-          ) : (
-            <EmptyState
-              text="No notes found"
-              button={fetchNotes}
-              loading={loading}
-              error={!!error?.length}
+    <ScreenWrapper title="Notes">
+      <View style={commonStyles.screenWrapper}>
+        {notes.length > 0 ? (
+          <>
+            <CustomInput
+              placeholder="Search here..."
+              onChangeText={searchNotes}
             />
-          )}
-        </View>
-        <FloatingAdd onPress={() => navigation.navigate(ROUTES.CREATE_NOTE)} />
-      </ScreenWrapper>
-    </>
+            <FlatList
+              data={notes}
+              keyExtractor={(item) => item._id!}
+              renderItem={renderItem}
+              refreshing={loading}
+              onRefresh={() => fetchNotes(1)}
+              onEndReached={loadMoreNotes}
+              onEndReachedThreshold={0.4}
+              ListFooterComponent={renderFooter}
+              contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
+              showsVerticalScrollIndicator={false}
+              numColumns={2}
+            />
+          </>
+        ) : (
+          <EmptyState
+            text="No notes found"
+            button={() => fetchNotes(1)}
+            loading={loading}
+            error={!!error?.length}
+          />
+        )}
+      </View>
+      <FloatingAdd onPress={() => navigation.navigate(ROUTES.CREATE_NOTE)} />
+    </ScreenWrapper>
   );
 }

@@ -16,11 +16,21 @@ export class TaskRepo {
   }
 
   // 🔹 Get completed/expired tasks
-  static async getCompletedTasks(params: { ownerUserId: string }) {
-    const { ownerUserId } = params;
+  // 🔹 Get completed/expired tasks (history) with optional pagination
+  static async getCompletedTasks(params: {
+    ownerUserId: string;
+    page?: number;
+    pageSize?: number;
+  }) {
+    const { ownerUserId, page, pageSize } = params;
 
-    const url = `${AppUrl.getCompletedTasks}/${ownerUserId}`;
+    // Build query string only if pagination values exist
+    const queryParts: string[] = [];
+    if (page !== undefined) queryParts.push(`page=${page}`);
+    if (pageSize !== undefined) queryParts.push(`pageSize=${pageSize}`);
+    const query = queryParts.length ? `?${queryParts.join("&")}` : "";
 
+    const url = `${AppUrl.getCompletedTasks}/${ownerUserId}${query}`;
     return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 

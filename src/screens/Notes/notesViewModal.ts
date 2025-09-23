@@ -6,34 +6,68 @@ import { useHelper } from "../../utils/helper";
 import { Alert } from "react-native";
 
 export function useNotesListViewModel(userId?: string) {
-  const [allNotes, setAllNotes] = useState<Note[]>([]); // Store full list
-  const [notes, setNotes] = useState<Note[]>([]); // Store filtered list
+  const [allNotes, setAllNotes] = useState<Note[]>([]); // All fetched notes
+  const [notes, setNotes] = useState<Note[]>([]); // Filtered (search) notes
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 🔹 Pagination states
+  const [page, setPage] = useState<number>(1);
+  const [pageSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
   const { loggedInUser } = useHelper();
+
   useEffect(() => {
-    fetchNotes();
+    // Reset to first page whenever user changes
+    setPage(1);
+    setAllNotes([]);
+    setNotes([]);
+    fetchNotes(1);
   }, [loggedInUser?.userId]);
 
-  const fetchNotes = async () => {
+  const fetchNotes = async (requestedPage = page) => {
     const { data } = await getDataFromAsyncStorage<{ userId: string }>(
       LocalStorageKey.USER
     );
-    if (data?.userId) {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await NotesRepo.getAllNotes({
-          ownerUserId: data?.userId,
-        });
-        setAllNotes(response);
-        setNotes(response);
-      } catch (err: any) {
-        console.error("Fetch notes error:", err);
-        setError(err.message || "Failed to fetch notes");
-      } finally {
-        setLoading(false);
+    if (!data?.userId) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await NotesRepo.getAllNotes({
+        ownerUserId: data.userId,
+        page: requestedPage,
+        pageSize,
+      });
+
+      // API now returns { notes, totalPages, currentPage }
+      const { notes: fetchedNotes, totalPages: total } = response;
+
+      // If requesting page 1, replace; otherwise append
+      if (requestedPage === 1) {
+        setAllNotes(fetchedNotes);
+        setNotes(fetchedNotes);
+      } else {
+        setAllNotes((prev) => [...prev, ...fetchedNotes]);
+        setNotes((prev) => [...prev, ...fetchedNotes]);
       }
+
+      setTotalPages(total);
+      setPage(requestedPage);
+    } catch (err: any) {
+      console.error("Fetch notes error:", err);
+      setError(err.message || "Failed to fetch notes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔹 Load next page if available
+  const loadMoreNotes = () => {
+    if (page < totalPages && !loading) {
+      fetchNotes(page + 1);
     }
   };
 
@@ -41,9 +75,10 @@ export function useNotesListViewModel(userId?: string) {
     try {
       setLoading(true);
       setError(null);
-
       await NotesRepo.pinNote(noteId, !pinned);
-      fetchNotes();
+
+      // Refresh all notes from page 1 after pin/unpin
+      fetchNotes(1);
     } catch (err: any) {
       console.error("Pin/unpin note error:", err);
       setError(err.message || "Failed to pin/unpin note");
@@ -51,6 +86,7 @@ export function useNotesListViewModel(userId?: string) {
       setLoading(false);
     }
   };
+
   const pinUnpinNote = (noteId: string, pinned: boolean) => {
     Alert.alert(
       `${!pinned ? "Pin" : "Unpin"} Note?`,
@@ -65,11 +101,13 @@ export function useNotesListViewModel(userId?: string) {
       ]
     );
   };
+
   const searchNotes = (searchText: string) => {
+    const lower = searchText.toLowerCase();
     const filtered = allNotes.filter(
       (note) =>
-        note.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        note.note.toLowerCase().includes(searchText.toLowerCase())
+        note.title.toLowerCase().includes(lower) ||
+        note.note.toLowerCase().includes(lower)
     );
     setNotes(filtered);
   };
@@ -78,8 +116,11 @@ export function useNotesListViewModel(userId?: string) {
     notes,
     loading,
     error,
-    fetchNotes,
+    fetchNotes, // Manual refresh
+    loadMoreNotes, // Load next page for infinite scroll
     pinUnpinNote,
     searchNotes,
+    page,
+    totalPages,
   };
 }
