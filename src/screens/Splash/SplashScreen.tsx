@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import React, { useEffect } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Column } from "../../tools";
 import Logo from "../../components/logo";
 import { commonStyles } from "../../styles/commonstyles";
@@ -14,11 +14,13 @@ import { useAuthStore } from "../../store/authStore";
 
 const SplashScreen = () => {
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
   const { updateUser } = useAuthStore();
   // Check if user already logged in
 
   const fetchUserDetails = async (id: string) => {
     try {
+      setLoading(true);
       if (id) {
         const data = await AuthRepo.getUserDetails(id);
         if (data?.user) {
@@ -28,6 +30,8 @@ const SplashScreen = () => {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,7 +40,8 @@ const SplashScreen = () => {
       const { data: user, success } = await getDataFromAsyncStorage(
         LocalStorageKey.USER
       );
-      const data = await fetchUserDetails(user?.userId!);
+      updateUser(user);
+      fetchUserDetails(user?.userId!);
       if (success && user) {
         navigation.dispatch(
           CommonActions.reset({
@@ -64,6 +69,9 @@ const SplashScreen = () => {
       alignItems="center"
     >
       <Logo />
+      {loading && (
+        <ActivityIndicator size={"large"} color={theme.colors.primary} />
+      )}
     </Column>
   );
 };
