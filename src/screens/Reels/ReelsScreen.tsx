@@ -7,6 +7,7 @@ import {
   Pressable,
   Text,
   ListRenderItem,
+  RefreshControl,
 } from "react-native";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { useReelsViewModal } from "./useViewModal";
@@ -33,6 +34,8 @@ export default function ReelsScreen() {
     totalPages,
     isFetchingMore,
     deleteVideo,
+    refreshing,
+    onRefresh,
   } = useReelsViewModal();
   const { formatDate } = useHelper();
   const flatListRef = useRef<FlatList<IVideo>>(null);
@@ -157,7 +160,7 @@ export default function ReelsScreen() {
         snapToInterval={windowHeight}
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
-        windowSize={5} // slightly higher, but controlled
+        windowSize={5}
         removeClippedSubviews
         initialNumToRender={1}
         maxToRenderPerBatch={2}
@@ -174,6 +177,14 @@ export default function ReelsScreen() {
           isFetchingMore ? (
             <ActivityIndicator size="large" color="#fff" />
           ) : null
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#fff"
+            colors={["#fff"]}
+          />
         }
       />
     </View>

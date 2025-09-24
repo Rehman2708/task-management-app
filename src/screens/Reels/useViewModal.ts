@@ -21,6 +21,8 @@ export const useReelsViewModal = () => {
 
   const insets = useSafeAreaInsets();
   const windowHeight = dimensions.height - 86;
+  // inside your component
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchVideos = useCallback(async (page: number = 1, append = false) => {
     try {
@@ -76,7 +78,13 @@ export const useReelsViewModal = () => {
     },
     [handleDelete]
   );
+  const onRefresh = async () => {
+    if (videos.length === 0) return;
 
+    setRefreshing(true);
+    await fetchVideos(1, false); // reset and fetch first page
+    setRefreshing(false);
+  };
   return {
     insets,
     fetchVideos,
@@ -94,5 +102,7 @@ export const useReelsViewModal = () => {
     totalPages,
     isFetchingMore,
     deleteVideo,
+    refreshing,
+    onRefresh,
   };
 };

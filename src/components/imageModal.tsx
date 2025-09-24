@@ -44,8 +44,11 @@ const ImageModal = ({
       setLoading(true);
       setError("");
 
+      // Generate a random number between 1 and 15
+      const randomPage = Math.floor(Math.random() * 15) + 1;
+
       const url = text
-        ? `https://api.unsplash.com/search/photos?query=${text}&per_page=9&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`
+        ? `https://api.unsplash.com/search/photos?query=${text}&per_page=9&page=${randomPage}&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`
         : `https://api.unsplash.com/photos/random?count=9&client_id=61NdYaS5S5HVnY7_fhiy2ryzbdOM0Mbyw83ltXUU2fg`;
 
       const res = await axios.get(url);
@@ -148,6 +151,9 @@ const ImageModal = ({
                     <Text style={commonStyles.basicText}>No Image</Text>
                   </Column>
                 }
+                columnWrapperStyle={{
+                  justifyContent: "center",
+                }}
               />
             )}
 
