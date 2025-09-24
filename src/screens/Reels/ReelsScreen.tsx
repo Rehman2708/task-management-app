@@ -67,11 +67,20 @@ export default function ReelsScreen() {
   const onViewRef = useCallback(
     ({ viewableItems }: { viewableItems: any[] }) => {
       if (viewableItems.length > 0) {
-        setCurrentIndex(viewableItems[0].index ?? 0);
+        // Only update currentIndex when the visible item changes
+        const newIndex = viewableItems[0].index ?? 0;
+        if (newIndex !== currentIndex) setCurrentIndex(newIndex);
       }
     },
-    [setCurrentIndex]
+    [currentIndex, setCurrentIndex]
   );
+
+  const handleLoadMore = () => {
+    if (!isFetchingMore && currentPage < totalPages) {
+      // Append new videos without resetting FlatList or currentIndex
+      fetchVideos(currentPage + 1, true);
+    }
+  };
 
   const viewConfig = useMemo(
     () => ({ viewAreaCoveragePercentThreshold: 80 }),
@@ -109,12 +118,6 @@ export default function ReelsScreen() {
       deleteVideo,
     ]
   );
-
-  const handleLoadMore = () => {
-    if (!isFetchingMore && currentPage < totalPages) {
-      fetchVideos(currentPage + 1, true);
-    }
-  };
 
   // Cleanup all refs when component unmounts
   useEffect(() => {

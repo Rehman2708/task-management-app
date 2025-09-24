@@ -47,13 +47,14 @@ export default function VideoItem({
   singleScreen,
 }: Props) {
   const videoRef = useRef<IVideo | null>(null);
-  const { formatDate } = useHelper();
   const navigation: any = useNavigation();
-  // Only render video if in focus or always playing
-  const shouldRenderVideo =
-    playAlways || (Math.abs(currentIndex - index) <= 1 && isFocused);
   const { user } = useAuthStore();
-  const isMe = user?.userId === item.createdBy;
+  const { formatDate } = useHelper();
+  // Only play the visible video (currentIndex), or always if playAlways
+  const shouldPlay =
+    playAlways || (Math.abs(currentIndex - index) <= 0 && isFocused);
+  const paused = !shouldPlay || longPressedIndex === index;
+
   useEffect(() => {
     return () => {
       videoRef.current = null;
@@ -62,26 +63,17 @@ export default function VideoItem({
 
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
-      {shouldRenderVideo && (
+      {shouldPlay && (
         <Video
-          ref={(ref) => {
-            videoRef.current = ref;
-          }}
+          ref={(ref) => (videoRef.current = ref)}
           source={{ uri: item.url }}
           style={styles.video}
           resizeMode="cover"
           repeat
           muted={muted}
           controls={false}
-          paused={
-            playAlways
-              ? false
-              : index !== currentIndex || longPressedIndex === index
-          }
-          onError={(err) => {
-            console.warn("Video error:", item._id, err);
-            videoRef.current = null;
-          }}
+          paused={paused}
+          onError={(err) => console.warn("Video error:", item._id, err)}
           onEnd={() => {
             videoRef.current = null;
           }}
@@ -97,6 +89,7 @@ export default function VideoItem({
         onLongPress={() => setLongPressedIndex?.(index)}
         onPressOut={() => setLongPressedIndex?.(null)}
       >
+        {/* Existing UI overlay elements remain */}
         <Row alignItems="center" gap={8} style={{ padding: 12 }}>
           {singleScreen && (
             <Ionicons
@@ -148,7 +141,7 @@ export default function VideoItem({
             </Column>
           </Row>
 
-          {isMe && (
+          {user?.userId === item.createdBy && showDelete && (
             <Ionicons
               onPress={() => deleteVideo?.(item._id)}
               name="trash"

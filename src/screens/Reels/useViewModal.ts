@@ -20,7 +20,7 @@ export const useReelsViewModal = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const insets = useSafeAreaInsets();
-  const windowHeight = dimensions.height - 86;
+  const windowHeight = dimensions.height - 80;
   // inside your component
   const [refreshing, setRefreshing] = useState(false);
 
