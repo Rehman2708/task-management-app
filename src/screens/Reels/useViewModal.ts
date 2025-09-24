@@ -33,7 +33,6 @@ export const useReelsViewModal = () => {
         page,
         pageSize: 20,
       });
-
       setCurrentPage(response.currentPage);
       setTotalPages(response.totalPages);
       setVideos((prev) =>

@@ -6,6 +6,7 @@ import {
   Modal,
   ActivityIndicator,
   FlatList,
+  Pressable,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -23,6 +24,7 @@ import { useCreateVideoViewModal } from "./useViewModal";
 import CommentCard from "../../components/commentCard";
 import { Column, Row, Spacer } from "../../tools";
 import { styles } from "./styles";
+import { ROUTES } from "../../enums/routes";
 
 export default function CreateVideoScreen() {
   const navigation: any = useNavigation();
@@ -37,7 +39,8 @@ export default function CreateVideoScreen() {
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState("");
-  const { videosList, loadingVideos } = useCreateVideoViewModal();
+  const { videosList, loadingVideos, isFetchingMore, handleLoadMore } =
+    useCreateVideoViewModal();
 
   const { loggedInUser, themeColor, formatDate } = useHelper();
 
@@ -100,7 +103,7 @@ export default function CreateVideoScreen() {
           ]}
           onPress={() => setModalVisible(true)}
         >
-          Show Added Songs
+          Show Added Videos
         </Text>
       </Row>
       <View style={commonStyles.screenWrapper}>
@@ -172,7 +175,7 @@ export default function CreateVideoScreen() {
       >
         <View style={styles.modalContainer}>
           <Text style={commonStyles.titleText}>
-            Added Songs({filteredVideos.length})
+            Added Videos({filteredVideos.length})
           </Text>
           <Spacer size={12} />
 
@@ -187,24 +190,39 @@ export default function CreateVideoScreen() {
           {loadingVideos ? (
             <ActivityIndicator size="large" color={theme.colors.primary} />
           ) : (
-            <FlatList
-              data={filteredVideos}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(_, index) => index.toString()}
-              renderItem={({ item }: { item: IVideo }) => (
-                <CommentCard
-                  text={item.title}
-                  image={item?.createdByDetails?.image}
-                  name={item?.createdByDetails?.name!}
-                  time={formatDate(item.createdAt)}
-                  userId=""
-                  repeated
-                />
-              )}
-              ListEmptyComponent={
-                <Text style={commonStyles.errorText}>No songs found</Text>
-              }
-            />
+            <>
+              <FlatList
+                data={filteredVideos}
+                keyExtractor={(_, index) => index.toString()}
+                renderItem={({ item }: { item: IVideo }) => (
+                  <Pressable
+                    onPress={() =>
+                      navigation.navigate(ROUTES.SINGLE_VIDEO, { video: item })
+                    }
+                  >
+                    <CommentCard
+                      text={item.title}
+                      image={item?.createdByDetails?.image}
+                      name={item?.createdByDetails?.name!}
+                      time={formatDate(item.createdAt)}
+                      userId=""
+                      repeated
+                    />
+                  </Pressable>
+                )}
+                showsVerticalScrollIndicator={false}
+                onEndReached={handleLoadMore}
+                onEndReachedThreshold={0.6}
+                ListEmptyComponent={
+                  <Text style={commonStyles.errorText}>No songs found</Text>
+                }
+                ListFooterComponent={
+                  isFetchingMore ? (
+                    <ActivityIndicator size="large" color={themeColor?.dark} />
+                  ) : null
+                }
+              />
+            </>
           )}
 
           <Spacer size={20} />

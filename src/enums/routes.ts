@@ -14,4 +14,5 @@ export enum ROUTES {
   VIEW_NOTE = "ViewNote",
   TASK_DETAIL = "TaskDetail",
   THEME = "Theme",
+  SINGLE_VIDEO = "SingleVideo",
 }

@@ -8,15 +8,12 @@ import {
   Text,
   ListRenderItem,
 } from "react-native";
-import Video from "react-native-video";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
 import { useReelsViewModal } from "./useViewModal";
-import { Column, Row } from "../../tools";
 import { commonStyles } from "../../styles/commonstyles";
 import { IVideo } from "../../types/videos";
-import Avatar from "../../components/avatar";
 import { useHelper } from "../../utils/helper";
+import VideoItem from "../../components/VideoItem";
 
 export default function ReelsScreen() {
   const {
@@ -79,95 +76,23 @@ export default function ReelsScreen() {
   );
 
   const renderItem: ListRenderItem<IVideo> = useCallback(
-    ({ item, index }) => {
-      // Only render video if within 1 step of currentIndex (active, prev, next)
-      const shouldRenderVideo =
-        Math.abs(currentIndex - index) <= 1 && isFocused;
-
-      return (
-        <View style={[styles.videoContainer, { height: windowHeight }]}>
-          {shouldRenderVideo && (
-            <Video
-              ref={(ref) => {
-                videoRefs.current[item._id] = ref;
-              }}
-              source={{ uri: item.url }}
-              style={styles.video}
-              resizeMode="cover"
-              repeat
-              muted={muted}
-              controls={false}
-              paused={index !== currentIndex || longPressedIndex === index}
-              onError={(err) => {
-                console.warn("Video error:", item._id, err);
-                videoRefs.current[item._id] = null;
-              }}
-              onEnd={() => {
-                // Release finished video from memory
-                videoRefs.current[item._id] = null;
-              }}
-            />
-          )}
-          <Pressable
-            style={styles.overlay}
-            onPress={() => {
-              setMuted((m) => !m);
-              setMutedIcon(true);
-            }}
-            onLongPress={() => setLongPressedIndex(index)}
-            onPressOut={() => setLongPressedIndex(null)}
-          >
-            <Row alignItems="center" gap={8} style={{ padding: 12 }}>
-              <Column gap={2}>
-                <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
-                  {item.title}
-                </Text>
-              </Column>
-            </Row>
-            <Column
-              style={commonStyles.fullFlex}
-              justifyContent="center"
-              alignItems="center"
-            >
-              {mutedIcon && (
-                <Ionicons
-                  name={muted ? "volume-mute-outline" : "volume-high-outline"}
-                  size={50}
-                  color={"#fff"}
-                />
-              )}
-            </Column>
-            <Row
-              justifyContent="space-between"
-              alignItems="center"
-              style={{ padding: 12 }}
-            >
-              <Row alignItems="center" gap={8}>
-                <Avatar
-                  size={45}
-                  name={item.createdByDetails?.name}
-                  image={item.createdByDetails?.image}
-                />
-                <Column gap={2}>
-                  <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
-                    {item.createdByDetails?.name}
-                  </Text>
-                  <Text style={[commonStyles.smallText, { color: "#fff" }]}>
-                    {formatDate(item.createdAt)}
-                  </Text>
-                </Column>
-              </Row>
-              <Ionicons
-                onPress={() => deleteVideo(item._id)}
-                name="trash"
-                color={"red"}
-                size={35}
-              />
-            </Row>
-          </Pressable>
-        </View>
-      );
-    },
+    ({ item, index }) => (
+      <VideoItem
+        item={item}
+        index={index}
+        currentIndex={currentIndex}
+        isFocused={isFocused}
+        muted={muted}
+        mutedIcon={mutedIcon}
+        windowHeight={windowHeight}
+        longPressedIndex={longPressedIndex}
+        setMuted={setMuted}
+        setMutedIcon={setMutedIcon}
+        setLongPressedIndex={setLongPressedIndex}
+        deleteVideo={deleteVideo}
+        showDelete
+      />
+    ),
     [
       windowHeight,
       muted,
@@ -177,6 +102,8 @@ export default function ReelsScreen() {
       longPressedIndex,
       setMuted,
       setMutedIcon,
+      setLongPressedIndex,
+      deleteVideo,
     ]
   );
 

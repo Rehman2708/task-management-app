@@ -22,6 +22,8 @@ export class VideoRepo {
     const url = `${AppUrl.getAllVideos}/${ownerUserId}${query}`;
     return ApiService.getApiResponse(url, HttpMethods.GET);
   }
+
+  // get all videos list
   static async getAllVideosList(ownerUserId: string) {
     const url = `${AppUrl.getAllVideos}/all/${ownerUserId}`;
     return ApiService.getApiResponse(url, HttpMethods.GET);
