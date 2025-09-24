@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { getDataFromAsyncStorage } from "./localstorage";
-import { IUser } from "../types/auth";
 import { LocalStorageKey } from "../enums/localstorage";
 import { theme } from "../infrastructure/theme";
 import { Priority } from "../enums/tasks";
+import { useAuthStore } from "../store/authStore";
 
 export function useHelper() {
-  const [loggedInUser, setLoggedInUser] = useState<IUser | null>(null);
-  const [gettingUser, setGettingUser] = useState<boolean>(true);
+  const { user } = useAuthStore();
   const [themeColor, setThemeColor] = useState({
     light: theme.colors.secondary,
     dark: theme.colors.primary,
@@ -27,22 +26,9 @@ export function useHelper() {
     } finally {
     }
   };
+  const loggedInUser = user;
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { data } = await getDataFromAsyncStorage<IUser>(
-          LocalStorageKey.USER
-        );
-        setLoggedInUser(data);
-      } catch (err) {
-        console.error("Error fetching user from storage:", err);
-      } finally {
-        setGettingUser(false);
-      }
-    };
-
     fetchThemeColor();
-    fetchUser();
   }, []);
   function getInitials(name = "") {
     if (!name || typeof name !== "string") return "";
@@ -100,7 +86,6 @@ export function useHelper() {
 
   return {
     loggedInUser,
-    gettingUser,
     getInitials,
     fetchThemeColor,
     themeColor,

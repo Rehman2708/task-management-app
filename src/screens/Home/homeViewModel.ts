@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { TaskRepo } from "../../repositories/task";
-import { getDataFromAsyncStorage } from "../../utils/localstorage";
-import { LocalStorageKey } from "../../enums/localstorage";
 import { Alert } from "react-native";
 import * as Notifications from "expo-notifications";
 import { useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
+import { useAuthStore } from "../../store/authStore";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -16,19 +15,15 @@ Notifications.setNotificationHandler({
 });
 
 export function useHomeScreenViewModel() {
+  const { user } = useAuthStore();
   const navigation: any = useNavigation();
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string>("");
   // Fetch user from local storage
   useEffect(() => {
     (async () => {
-      const { data } = await getDataFromAsyncStorage<{ userId: string }>(
-        LocalStorageKey.USER
-      );
-      if (data?.userId) {
-        setUserId(data.userId);
+      if (user?.userId) {
         fetchTasks();
       } else {
         setLoading(false);
@@ -38,14 +33,11 @@ export function useHomeScreenViewModel() {
 
   // Fetch active tasks
   const fetchTasks = async () => {
-    const { data } = await getDataFromAsyncStorage<{ userId: string }>(
-      LocalStorageKey.USER
-    );
-    if (data?.userId) {
+    if (user?.userId) {
       try {
         setLoading(true);
         const response = await TaskRepo.getActiveTasks({
-          ownerUserId: data.userId,
+          ownerUserId: user.userId,
         });
         setTasks(response || []);
       } catch (err: any) {
@@ -125,7 +117,6 @@ export function useHomeScreenViewModel() {
     loading,
     error,
     fetchTasks,
-    userId,
     deleteTask,
   };
 }

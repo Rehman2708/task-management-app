@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Video from "react-native-video";
@@ -14,19 +21,25 @@ import { theme } from "../../infrastructure/theme";
 import { useHelper } from "../../utils/helper";
 import { useCreateVideoViewModal } from "./useViewModal";
 import CommentCard from "../../components/commentCard";
-import { Spacer } from "../../tools";
+import { Column, Row, Spacer } from "../../tools";
+import { styles } from "./styles";
 
 export default function CreateVideoScreen() {
   const navigation: any = useNavigation();
-  const [title, setTitle] = useState<string>("");
-  const [videoUrl, setVideoUrl] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [title, setTitle] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [isTested, setIsTested] = useState<boolean>(false);
-  const [isPlayable, setIsPlayable] = useState<boolean>(false);
-  const { videosList } = useCreateVideoViewModal();
-  const { loggedInUser, formatDate } = useHelper();
+  const [isTested, setIsTested] = useState(false);
+  const [isPlayable, setIsPlayable] = useState(false);
+
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [search, setSearch] = useState("");
+  const { videosList, loadingVideos } = useCreateVideoViewModal();
+
+  const { loggedInUser, themeColor, formatDate } = useHelper();
 
   // Reset preview if URL changes after being tested
   useEffect(() => {
@@ -68,12 +81,28 @@ export default function CreateVideoScreen() {
     setIsPlayable(false);
   };
 
+  // Filter songs by title
+  const filteredVideos = videosList.filter((item: IVideo) =>
+    item.title.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <ScreenWrapper
       title="Add Video"
       showBackbutton
       subTitle="Videos > Add Video"
     >
+      <Row justifyContent="flex-end">
+        <Text
+          style={[
+            commonStyles.basicText,
+            { padding: 8, color: themeColor.dark },
+          ]}
+          onPress={() => setModalVisible(true)}
+        >
+          Show Added Songs
+        </Text>
+      </Row>
       <View style={commonStyles.screenWrapper}>
         <KeyboardAwareScrollView
           showsVerticalScrollIndicator={false}
@@ -85,6 +114,8 @@ export default function CreateVideoScreen() {
             value={videoUrl}
             onChangeText={setVideoUrl}
             placeholder="Enter video URL"
+            multiline
+            inputStyle={{ maxHeight: 200 }}
           />
 
           <CustomButton
@@ -128,35 +159,56 @@ export default function CreateVideoScreen() {
               onPress={handleSave}
             />
           )}
-          <Spacer size={50} />
-          <Text style={commonStyles.titleText}>Added songs</Text>
-          <Spacer size={16} />
 
-          {videosList.map((item: IVideo, index) => {
-            return (
-              <CommentCard
-                key={index}
-                text={item.title}
-                image={item?.createdByDetails?.image}
-                name={item?.createdByDetails?.name!}
-                time={formatDate(item.createdAt)}
-                userId=""
-              />
-            );
-          })}
+          <Spacer size={30} />
         </KeyboardAwareScrollView>
       </View>
+
+      {/* Modal for History */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={commonStyles.titleText}>Added Songs</Text>
+          <Spacer size={12} />
+
+          <CustomInput
+            placeholder="Search by title"
+            value={search}
+            onChangeText={setSearch}
+          />
+
+          <Spacer size={12} />
+
+          {loadingVideos ? (
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+          ) : (
+            <FlatList
+              data={filteredVideos}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(_, index) => index.toString()}
+              renderItem={({ item }: { item: IVideo }) => (
+                <CommentCard
+                  text={item.title}
+                  image={item?.createdByDetails?.image}
+                  name={item?.createdByDetails?.name!}
+                  time={formatDate(item.createdAt)}
+                  userId=""
+                  repeated
+                />
+              )}
+              ListEmptyComponent={
+                <Text style={commonStyles.errorText}>No songs found</Text>
+              }
+            />
+          )}
+
+          <Spacer size={20} />
+          <CustomButton title="Close" onPress={() => setModalVisible(false)} />
+        </View>
+      </Modal>
     </ScreenWrapper>
   );
 }
-
-const styles = StyleSheet.create({
-  videoContainer: {
-    height: 300,
-    marginVertical: 10,
-  },
-  videoPlayer: {
-    flex: 1,
-    borderRadius: 8,
-  },
-});

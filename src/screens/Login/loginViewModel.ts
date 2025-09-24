@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { AuthRepo } from "../../repositories/auth";
-import { storeDataInAsyncStorage } from "../../utils/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
-import { LocalStorageKey } from "../../enums/localstorage";
 import { registerForPushNotificationsAsync } from "../../../notification";
 import * as Device from "expo-device";
+import { useAuthStore } from "../../store/authStore";
 
 export function useLoginViewModel() {
+  const { updateUser } = useAuthStore();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ export function useLoginViewModel() {
       const response = await AuthRepo.login(payload);
 
       if (response?.user) {
-        await storeDataInAsyncStorage(LocalStorageKey.USER, response.user);
+        updateUser(response.user);
         navigation.dispatch(
           CommonActions.reset({
             index: 0,

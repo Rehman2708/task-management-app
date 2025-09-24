@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { TaskRepo } from "../../repositories/task";
-import { getDataFromAsyncStorage } from "../../utils/localstorage";
-import { LocalStorageKey } from "../../enums/localstorage";
 import { Alert } from "react-native";
 import { Task } from "../../types/task";
+import { useAuthStore } from "../../store/authStore";
 
 export function useCompletedTasksViewModel() {
+  const { user } = useAuthStore();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [allTasks, setAllTasks] = useState<Task[]>([]); // For search filtering
   const [showSearch, setShowSearch] = useState<boolean>(false);
@@ -24,17 +24,14 @@ export function useCompletedTasksViewModel() {
   }, []);
 
   const fetchCompletedTasks = async (requestedPage = page) => {
-    const { data } = await getDataFromAsyncStorage<{ userId: string }>(
-      LocalStorageKey.USER
-    );
-    if (!data?.userId) return;
+    if (!user?.userId) return;
 
     try {
       setLoading(true);
       setError(null);
 
       const response = await TaskRepo.getCompletedTasks({
-        ownerUserId: data.userId,
+        ownerUserId: user?.userId!,
         page: requestedPage,
         pageSize,
       });

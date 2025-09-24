@@ -104,7 +104,7 @@ export default function ReelsScreen() {
         >
           <Row alignItems="center" gap={8} style={{ padding: 12 }}>
             <Column gap={2}>
-              <Text style={[commonStyles.titleText, { color: "#fff" }]}>
+              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
                 {item.title}
               </Text>
             </Column>
@@ -117,8 +117,8 @@ export default function ReelsScreen() {
             {mutedIcon && (
               <Ionicons
                 name={muted ? "volume-mute-outline" : "volume-high-outline"}
-                size={70}
-                color={theme.colors.border}
+                size={50}
+                color={"#fff"}
               />
             )}
           </Column>
@@ -129,12 +129,12 @@ export default function ReelsScreen() {
           >
             <Row alignItems="center" gap={8}>
               <Avatar
-                size={50}
+                size={45}
                 name={item.createdByDetails?.name}
                 image={item.createdByDetails?.image}
               />
               <Column gap={2}>
-                <Text style={[commonStyles.titleText, { color: "#fff" }]}>
+                <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
                   {item.createdByDetails?.name}
                 </Text>
                 <Text style={[commonStyles.smallText, { color: "#fff" }]}>
@@ -146,7 +146,7 @@ export default function ReelsScreen() {
               onPress={() => deleteVideo(item._id)}
               name="trash"
               color={"red"}
-              size={40}
+              size={35}
             />
           </Row>
         </Pressable>

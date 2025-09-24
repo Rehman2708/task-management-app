@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { AuthRepo } from "../../repositories/auth";
-import { storeDataInAsyncStorage } from "../../utils/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
-import { LocalStorageKey } from "../../enums/localstorage";
+import { useAuthStore } from "../../store/authStore";
 
 interface RegisterPayload {
   name: string;
@@ -13,6 +12,7 @@ interface RegisterPayload {
 }
 
 export function useRegisterViewModel() {
+  const { updateUser } = useAuthStore();
   const [name, setName] = useState("");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +39,7 @@ export function useRegisterViewModel() {
 
       const response = await AuthRepo.register(payload);
       if (response?.user) {
-        await storeDataInAsyncStorage(LocalStorageKey.USER, response.user);
+        updateUser(response.user);
       }
       navigation.dispatch(
         CommonActions.reset({

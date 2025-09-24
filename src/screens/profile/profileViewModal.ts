@@ -1,18 +1,15 @@
 import { useState } from "react";
 import { AuthRepo } from "../../repositories/auth";
-import {
-  clearAsyncStorage,
-  getDataFromAsyncStorage,
-  storeDataInAsyncStorage,
-} from "../../utils/localstorage";
+import { clearAsyncStorage } from "../../utils/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { IUser } from "../../types/auth";
-import { LocalStorageKey } from "../../enums/localstorage";
 import * as Device from "expo-device";
 import { Alert } from "react-native";
+import { useAuthStore } from "../../store/authStore";
 
 export function useProfileViewModel() {
+  const { updateUser, user: loggedInUser } = useAuthStore();
   const [user, setUser] = useState<IUser | null>(null);
   const [partnerId, setPartnerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,11 +20,10 @@ export function useProfileViewModel() {
   const fetchUserDetails = async () => {
     setLoading(true);
     try {
-      const stored = await getDataFromAsyncStorage<IUser>(LocalStorageKey.USER);
-      if (stored.data) {
-        const data = await AuthRepo.getUserDetails(stored.data?.userId);
+      if (loggedInUser) {
+        const data = await AuthRepo.getUserDetails(loggedInUser?.userId);
         if (data?.user) {
-          await storeDataInAsyncStorage(LocalStorageKey.USER, data.user);
+          updateUser(data.user);
           setUser(data.user);
           setUserImage(data.user?.image ?? "");
           setPartnerImage(data.user.partner?.image ?? "");
@@ -121,7 +117,7 @@ export function useProfileViewModel() {
           image,
         });
         if (res?.user) {
-          await storeDataInAsyncStorage(LocalStorageKey.USER, res.user);
+          updateUser(res.user);
         }
       }
     } catch (error) {

@@ -1,13 +1,13 @@
 import { useState, useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { LocalStorageKey } from "../../enums/localstorage";
 import { VideoRepo } from "../../repositories/videos";
-import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { dimensions } from "../../tools";
 import { IVideo } from "../../types/videos";
 import { Alert } from "react-native";
+import { useAuthStore } from "../../store/authStore";
 
 export const useReelsViewModal = () => {
+  const { user } = useAuthStore();
   const [videos, setVideos] = useState<IVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,22 +20,18 @@ export const useReelsViewModal = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const insets = useSafeAreaInsets();
-  const windowHeight = dimensions.height - 90;
+  const windowHeight = dimensions.height - 85;
 
   const fetchVideos = useCallback(async (page: number = 1, append = false) => {
     try {
       page === 1 ? setLoading(true) : setIsFetchingMore(true);
       setError(null);
-
-      const { data } = await getDataFromAsyncStorage<{ userId: string }>(
-        LocalStorageKey.USER
-      );
-      if (!data?.userId) return;
+      if (!user?.userId) return;
 
       const response = await VideoRepo.getAllVideos({
-        ownerUserId: data.userId,
+        ownerUserId: user.userId,
         page,
-        pageSize: 10,
+        pageSize: 20,
       });
 
       setCurrentPage(response.currentPage);

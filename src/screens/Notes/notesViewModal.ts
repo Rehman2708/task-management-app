@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { NotesRepo, Note } from "../../repositories/notes";
-import { LocalStorageKey } from "../../enums/localstorage";
-import { getDataFromAsyncStorage } from "../../utils/localstorage";
-import { useHelper } from "../../utils/helper";
 import { Alert } from "react-native";
+import { useAuthStore } from "../../store/authStore";
 
 export function useNotesListViewModel(userId?: string) {
+  const { user } = useAuthStore();
   const [allNotes, setAllNotes] = useState<Note[]>([]); // All fetched notes
   const [notes, setNotes] = useState<Note[]>([]); // Filtered (search) notes
   const [showSearch, setShowSearch] = useState<boolean>(false);
@@ -17,8 +16,6 @@ export function useNotesListViewModel(userId?: string) {
   const [pageSize] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const { loggedInUser } = useHelper();
-
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
   useEffect(() => {
@@ -27,20 +24,17 @@ export function useNotesListViewModel(userId?: string) {
     setAllNotes([]);
     setNotes([]);
     fetchNotes(1);
-  }, [loggedInUser?.userId]);
+  }, [user?.userId]);
 
   const fetchNotes = async (requestedPage = page) => {
-    const { data } = await getDataFromAsyncStorage<{ userId: string }>(
-      LocalStorageKey.USER
-    );
-    if (!data?.userId) return;
+    if (!user?.userId) return;
 
     try {
       setLoading(true);
       setError(null);
 
       const response = await NotesRepo.getAllNotes({
-        ownerUserId: data.userId,
+        ownerUserId: user.userId,
         page: requestedPage,
         pageSize,
       });

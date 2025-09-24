@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { TaskRepo } from "../../repositories/task";
 import {
   AssignedTo,
@@ -7,15 +6,15 @@ import {
   Priority,
   SubtaskStatus,
 } from "../../enums/tasks";
-import { LocalStorageKey } from "../../enums/localstorage";
-import { IUser } from "../../types/auth";
 import {
   CreateTaskPayload,
   Subtask,
   UpdateTaskPayload,
 } from "../../types/task";
+import { useAuthStore } from "../../store/authStore";
 
 export function useCreateTaskViewModel(initialTask?: any) {
+  const { user } = useAuthStore();
   const [title, setTitle] = useState(initialTask?.title || "");
   const [description, setDescription] = useState(
     initialTask?.description || ""
@@ -81,9 +80,6 @@ export function useCreateTaskViewModel(initialTask?: any) {
     setError(null);
 
     try {
-      const { data: user, success } = await getDataFromAsyncStorage<IUser>(
-        LocalStorageKey.USER
-      );
       if (!user?.userId) throw new Error("User not found");
 
       const payload: CreateTaskPayload | UpdateTaskPayload = {
@@ -93,8 +89,8 @@ export function useCreateTaskViewModel(initialTask?: any) {
         frequency,
         priority,
         image,
-        ownerUserId: initialTask?.ownerUserId || user.userId,
-        createdBy: initialTask?.createdBy || user.userId,
+        ownerUserId: initialTask?.ownerUserId || user?.userId,
+        createdBy: initialTask?.createdBy || user?.userId,
         subtasks: subtasks?.map((st) => ({
           title: st.title,
           dueDateTime: st.dueDateTime,

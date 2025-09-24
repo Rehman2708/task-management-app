@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { TaskRepo } from "../../repositories/task";
-import { getDataFromAsyncStorage } from "../../utils/localstorage";
-import { LocalStorageKey } from "../../enums/localstorage";
 import { SubtaskStatus } from "../../enums/tasks";
+import { useAuthStore } from "../../store/authStore";
 
 export function useTaskDetailViewModel(taskId: string) {
+  const { user } = useAuthStore();
   const [task, setTask] = useState<any>(null);
   const [taskDetailLoading, setTaskDetailLoading] = useState<boolean>(true);
   const [taskCommentLoading, setTaskCommentLoading] = useState<boolean>(false);
@@ -17,10 +17,7 @@ export function useTaskDetailViewModel(taskId: string) {
 
   useEffect(() => {
     (async () => {
-      const { data } = await getDataFromAsyncStorage<{ userId: string }>(
-        LocalStorageKey.USER
-      );
-      if (data?.userId) setUserId(data.userId);
+      if (user?.userId) setUserId(user.userId);
       fetchTaskDetail();
     })();
   }, [taskId]);
