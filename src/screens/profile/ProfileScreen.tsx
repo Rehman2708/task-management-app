@@ -25,26 +25,20 @@ export default function ProfileScreen() {
     user,
     loading,
     partnerId,
-    fetchUserDetails,
     addPartner,
     logout,
     changeThemeScreen,
     createVideoScreen,
+    updateProfileScreen,
     loggingOut,
-    userImage,
     getTimeLeft,
     partnerInput,
     setPartnerInput,
-    updateProfilePicture,
     partnerImage,
   } = useProfileViewModel();
   const { getInitials, themeColor } = useHelper();
   const [visible, setIsVisible] = useState(false);
   const [currentImage, setCurrentImage] = useState({});
-  useEffect(() => {
-    fetchUserDetails();
-  }, []);
-
   return (
     <ScreenWrapper title="Profile">
       {loading ? (
@@ -53,42 +47,41 @@ export default function ProfileScreen() {
         <>
           <Column gap={isAndroid ? 6 : 8} style={[commonStyles.screenWrapper]}>
             <Row justifyContent="center" alignItems="center" gap={8}>
-              <ImageModal
-                onChange={updateProfilePicture}
-                button={
-                  <Row
-                    justifyContent="center"
-                    alignItems="center"
+              <Row
+                justifyContent="center"
+                alignItems="center"
+                style={[
+                  commonStyles.cardContainer,
+                  commonStyles.secondaryContainer,
+                  ProfileScreenStyles.imageContainer,
+                  {
+                    backgroundColor: `${themeColor.light}20`,
+                  },
+                ]}
+              >
+                {user?.image ? (
+                  <Pressable
+                    onPress={() => {
+                      setCurrentImage({ uri: user.image });
+                      setIsVisible(true);
+                    }}
+                  >
+                    <Image
+                      style={ProfileScreenStyles.image}
+                      source={{ uri: user.image }}
+                    />
+                  </Pressable>
+                ) : (
+                  <Text
                     style={[
-                      commonStyles.cardContainer,
-                      commonStyles.secondaryContainer,
-                      styles.imageContainer,
-                      {
-                        backgroundColor: `${themeColor.light}20`,
-                      },
+                      ProfileScreenStyles.nameText,
+                      { color: themeColor?.dark ?? theme.colors.primary },
                     ]}
                   >
-                    {userImage ? (
-                      <Image style={styles.image} source={{ uri: userImage }} />
-                    ) : (
-                      <Text
-                        style={[
-                          styles.nameText,
-                          { color: themeColor?.dark ?? theme.colors.primary },
-                        ]}
-                      >
-                        {getInitials(user?.name)}
-                      </Text>
-                    )}
-                    <Pressable
-                      style={styles.deleteIcon}
-                      onPress={() => updateProfilePicture("")}
-                    >
-                      <Ionicons name="trash" color={"#fff"} size={20} />
-                    </Pressable>
-                  </Row>
-                }
-              />
+                    {getInitials(user?.name ?? "")}
+                  </Text>
+                )}
+              </Row>
               {partnerId && <Ionicons name="heart" size={40} color={"red"} />}
               {partnerId && (
                 <Row
@@ -97,7 +90,7 @@ export default function ProfileScreen() {
                   style={[
                     commonStyles.cardContainer,
                     commonStyles.secondaryContainer,
-                    styles.imageContainer,
+                    ProfileScreenStyles.imageContainer,
                     {
                       backgroundColor: `${themeColor.light}20`,
                     },
@@ -111,14 +104,14 @@ export default function ProfileScreen() {
                       }}
                     >
                       <Image
-                        style={styles.image}
+                        style={ProfileScreenStyles.image}
                         source={{ uri: partnerImage }}
                       />
                     </Pressable>
                   ) : (
                     <Text
                       style={[
-                        styles.nameText,
+                        ProfileScreenStyles.nameText,
                         { color: themeColor?.dark ?? theme.colors.primary },
                       ]}
                     >
@@ -173,6 +166,20 @@ export default function ProfileScreen() {
               </Column>
             )}
             <Spacer size={20} />
+            <TouchableOpacity onPress={updateProfileScreen}>
+              <Row
+                style={commonStyles.cardContainer}
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Text style={[commonStyles.basicText]}>Update profile</Text>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={20}
+                  color={theme.colors.text}
+                />
+              </Row>
+            </TouchableOpacity>
             <TouchableOpacity onPress={changeThemeScreen}>
               <Row
                 style={commonStyles.cardContainer}
@@ -224,7 +231,7 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+export const ProfileScreenStyles = StyleSheet.create({
   imageContainer: {
     width: 120,
     height: 120,

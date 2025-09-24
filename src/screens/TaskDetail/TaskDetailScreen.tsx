@@ -80,7 +80,7 @@ export default function TaskDetailScreen({ route }: any) {
               onPress={() =>
                 updateSubtaskStatus(item._id, SubtaskStatus.Completed)
               }
-              disabled={subtaskStatusLoading}
+              disabled={subtaskStatusLoading === item._id}
               name="checkmark-done-circle"
               size={50}
               color={theme.colors.success}
@@ -140,7 +140,7 @@ export default function TaskDetailScreen({ route }: any) {
               }}
               title="Send"
               sendButton
-              loading={subtaskCommentLoading}
+              loading={subtaskCommentLoading === item._id}
             />
           </View>
         )}

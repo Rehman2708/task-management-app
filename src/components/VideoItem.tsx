@@ -9,6 +9,7 @@ import { Column, Row } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
 import { useHelper } from "../utils/helper";
 import { useNavigation } from "@react-navigation/native";
+import { useAuthStore } from "../store/authStore";
 
 type Props = {
   item: IVideo;
@@ -51,7 +52,8 @@ export default function VideoItem({
   // Only render video if in focus or always playing
   const shouldRenderVideo =
     playAlways || (Math.abs(currentIndex - index) <= 1 && isFocused);
-
+  const { user } = useAuthStore();
+  const isMe = user?.userId === item.createdBy;
   useEffect(() => {
     return () => {
       videoRef.current = null;
@@ -146,7 +148,7 @@ export default function VideoItem({
             </Column>
           </Row>
 
-          {showDelete && (
+          {isMe && (
             <Ionicons
               onPress={() => deleteVideo?.(item._id)}
               name="trash"

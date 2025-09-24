@@ -15,4 +15,5 @@ export enum ROUTES {
   TASK_DETAIL = "TaskDetail",
   THEME = "Theme",
   SINGLE_VIDEO = "SingleVideo",
+  UPDATE_PROFILE = "UpdateProfile",
 }

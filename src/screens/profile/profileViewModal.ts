@@ -8,37 +8,10 @@ import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 
 export function useProfileViewModel() {
-  const {
-    updateUser,
-    user: loggedInUser,
-    logout: storeLogout,
-  } = useAuthStore();
-  const [user, setUser] = useState<IUser | null>(null);
-  const [partnerId, setPartnerId] = useState<string | null>(null);
+  const { updateUser, user, logout: storeLogout } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [partnerInput, setPartnerInput] = useState("");
-  const [partnerImage, setPartnerImage] = useState("");
-  const [userImage, setUserImage] = useState(user?.image ?? "");
-  const fetchUserDetails = async () => {
-    setLoading(true);
-    try {
-      if (loggedInUser) {
-        const data = await AuthRepo.getUserDetails(loggedInUser?.userId);
-        if (data?.user) {
-          updateUser(data.user);
-          setUser(data.user);
-          setUserImage(data.user?.image ?? "");
-          setPartnerImage(data.user.partner?.image ?? "");
-          setPartnerId(data.user.partner?.name || null);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const addPartner = async (partner: string) => {
     setLoading(true);
@@ -49,7 +22,7 @@ export function useProfileViewModel() {
         partnerUserId: partner,
       });
       if (response.success) {
-        fetchUserDetails();
+        updateUser(response.user);
       }
     } catch (err) {
       console.error(err);
@@ -91,7 +64,7 @@ export function useProfileViewModel() {
   };
   const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
   const createVideoScreen = () => navigation.navigate(ROUTES.CREATE_VIDEO);
-
+  const updateProfileScreen = () => navigation.navigate(ROUTES.UPDATE_PROFILE);
   function getTimeLeft(targetDate = "2026-04-27") {
     const now = new Date();
     const endDate = new Date(targetDate);
@@ -110,39 +83,21 @@ export function useProfileViewModel() {
 
     return `${months} month ${days} day left, i.e: ${totalDays} days`;
   }
-
-  const updateProfilePicture = async (image: string | null) => {
-    try {
-      setUserImage(image ?? "");
-      if (user?.userId) {
-        const res = await AuthRepo.updateProfile({
-          userId: user?.userId,
-          image,
-        });
-        if (res?.user) {
-          updateUser(res.user);
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+  const partnerId = user?.partner?.userId;
+  const partnerImage = user?.partner?.image;
   return {
     user,
-    partnerId,
     loading,
-    fetchUserDetails,
+    partnerId,
     addPartner,
     logout,
     changeThemeScreen,
     createVideoScreen,
+    updateProfileScreen,
     loggingOut,
-    userImage,
     getTimeLeft,
     partnerInput,
     setPartnerInput,
-    updateProfilePicture,
     partnerImage,
   };
 }

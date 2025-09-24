@@ -6,20 +6,20 @@ import { useAuthStore } from "../../store/authStore";
 export function useTaskDetailViewModel(taskId: string) {
   const { user } = useAuthStore();
   const [task, setTask] = useState<any>(null);
-  const [taskDetailLoading, setTaskDetailLoading] = useState<boolean>(true);
-  const [taskCommentLoading, setTaskCommentLoading] = useState<boolean>(false);
-  const [subtaskCommentLoading, setSubtaskCommentLoading] =
-    useState<boolean>(false);
-  const [subtaskStatusLoading, setSubtaskStatusLoading] =
-    useState<boolean>(false);
+  const [taskDetailLoading, setTaskDetailLoading] = useState(true);
+  const [taskCommentLoading, setTaskCommentLoading] = useState(false);
+  const [subtaskCommentLoading, setSubtaskCommentLoading] = useState<
+    string | null
+  >(null);
+  const [subtaskStatusLoading, setSubtaskStatusLoading] = useState<
+    string | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string>("");
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
-    (async () => {
-      if (user?.userId) setUserId(user.userId);
-      fetchTaskDetail();
-    })();
+    if (user?.userId) setUserId(user.userId);
+    fetchTaskDetail();
   }, [taskId]);
 
   const fetchTaskDetail = async () => {
@@ -40,21 +40,51 @@ export function useTaskDetailViewModel(taskId: string) {
     status: SubtaskStatus
   ) => {
     try {
-      setSubtaskStatusLoading(true);
+      setSubtaskStatusLoading(subtaskId);
       await TaskRepo.updateSubtaskStatus(taskId, subtaskId, { userId, status });
-      fetchTaskDetail();
+
+      // Update locally instead of refetching
+      setTask((prev: any) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          subtasks: prev.subtasks.map((s: any) =>
+            s._id === subtaskId ? { ...s, status } : s
+          ),
+        };
+      });
     } catch (err: any) {
       console.error("Update subtask status error:", err);
     } finally {
-      setSubtaskStatusLoading(false);
+      setSubtaskStatusLoading(null);
     }
   };
 
   const addTaskComment = async (text: string) => {
     try {
       setTaskCommentLoading(true);
+
+      // Call API (don’t rely on return for UI)
       await TaskRepo.addTaskComment(taskId, { by: userId, text });
-      fetchTaskDetail();
+
+      // Create local comment object
+      const newComment = {
+        _id: Date.now().toString(), // temporary ID
+        text,
+        createdBy: userId,
+        createdByDetails: {
+          name: user?.name || "You",
+          image: user?.image || null,
+        },
+        date: new Date().toISOString(),
+      };
+
+      // Append to state
+      setTask((prev: any) =>
+        prev
+          ? { ...prev, comments: [...(prev.comments || []), newComment] }
+          : prev
+      );
     } catch (err: any) {
       console.error("Add task comment error:", err);
     } finally {
@@ -64,13 +94,38 @@ export function useTaskDetailViewModel(taskId: string) {
 
   const addSubtaskComment = async (subtaskId: string, text: string) => {
     try {
-      setSubtaskCommentLoading(true);
+      setSubtaskCommentLoading(subtaskId);
+
       await TaskRepo.addSubtaskComment(taskId, subtaskId, { userId, text });
-      fetchTaskDetail();
+
+      // Create local comment object
+      const newComment = {
+        _id: Date.now().toString(),
+        text,
+        createdBy: userId,
+        createdByDetails: {
+          name: user?.name || "You",
+          image: user?.image || null,
+        },
+        createdAt: new Date().toISOString(),
+      };
+
+      // Append to correct subtask
+      setTask((prev: any) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          subtasks: prev.subtasks.map((s: any) =>
+            s._id === subtaskId
+              ? { ...s, comments: [...(s.comments || []), newComment] }
+              : s
+          ),
+        };
+      });
     } catch (err: any) {
       console.error("Add subtask comment error:", err);
     } finally {
-      setSubtaskCommentLoading(false);
+      setSubtaskCommentLoading(null);
     }
   };
 
@@ -78,8 +133,8 @@ export function useTaskDetailViewModel(taskId: string) {
     task,
     taskDetailLoading,
     taskCommentLoading,
-    subtaskCommentLoading,
-    subtaskStatusLoading,
+    subtaskCommentLoading, // holds subtaskId when loading
+    subtaskStatusLoading, // holds subtaskId when loading
     error,
     userId,
     fetchTaskDetail,

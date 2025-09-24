@@ -13,6 +13,7 @@ import SplashScreen from "../screens/Splash/SplashScreen";
 import ViewNoteScreen from "../screens/ViewNote/ViewNoteScreen";
 import CreateVideoScreen from "../screens/CreateVideo/CreateVideoScreen";
 import SingleVideoScreen from "../screens/SingleVideo/singleVideoScreen";
+import UpdateProfileScreen from "../screens/updateProfile/UpdateProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,10 @@ export default function AppNavigator() {
       <Stack.Screen name={ROUTES.VIEW_NOTE} component={ViewNoteScreen} />
       <Stack.Screen name={ROUTES.THEME} component={ThemeScreen} />
       <Stack.Screen name={ROUTES.SINGLE_VIDEO} component={SingleVideoScreen} />
+      <Stack.Screen
+        name={ROUTES.UPDATE_PROFILE}
+        component={UpdateProfileScreen}
+      />
     </Stack.Navigator>
   );
 }
