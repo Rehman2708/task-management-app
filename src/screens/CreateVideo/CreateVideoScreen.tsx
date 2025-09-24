@@ -171,7 +171,9 @@ export default function CreateVideoScreen() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <Text style={commonStyles.titleText}>Added Songs</Text>
+          <Text style={commonStyles.titleText}>
+            Added Songs({filteredVideos.length})
+          </Text>
           <Spacer size={12} />
 
           <CustomInput

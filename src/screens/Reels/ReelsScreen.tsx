@@ -11,8 +11,6 @@ import {
 import Video from "react-native-video";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-
-import { theme } from "../../infrastructure/theme";
 import { useReelsViewModal } from "./useViewModal";
 import { Column, Row } from "../../tools";
 import { commonStyles } from "../../styles/commonstyles";
@@ -43,6 +41,7 @@ export default function ReelsScreen() {
   const flatListRef = useRef<FlatList<IVideo>>(null);
   const isFocused = useIsFocused();
   const [longPressedIndex, setLongPressedIndex] = useState<number | null>(null);
+  const videoRefs = useRef<Record<string, IVideo | null>>({});
 
   useEffect(() => {
     fetchVideos(1, false); // initial load
@@ -80,78 +79,95 @@ export default function ReelsScreen() {
   );
 
   const renderItem: ListRenderItem<IVideo> = useCallback(
-    ({ item, index }) => (
-      <View style={[styles.videoContainer, { height: windowHeight }]}>
-        <Video
-          source={{ uri: item.url }}
-          style={styles.video}
-          resizeMode="cover"
-          repeat
-          muted={muted}
-          controls={false}
-          paused={
-            index !== currentIndex || !isFocused || longPressedIndex === index
-          }
-        />
-        <Pressable
-          style={styles.overlay}
-          onPress={() => {
-            setMuted((m) => !m);
-            setMutedIcon(true);
-          }}
-          onLongPress={() => setLongPressedIndex(index)}
-          onPressOut={() => setLongPressedIndex(null)}
-        >
-          <Row alignItems="center" gap={8} style={{ padding: 12 }}>
-            <Column gap={2}>
-              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
-                {item.title}
-              </Text>
-            </Column>
-          </Row>
-          <Column
-            style={commonStyles.fullFlex}
-            justifyContent="center"
-            alignItems="center"
+    ({ item, index }) => {
+      // Only render video if within 1 step of currentIndex (active, prev, next)
+      const shouldRenderVideo =
+        Math.abs(currentIndex - index) <= 1 && isFocused;
+
+      return (
+        <View style={[styles.videoContainer, { height: windowHeight }]}>
+          {shouldRenderVideo && (
+            <Video
+              ref={(ref) => {
+                videoRefs.current[item._id] = ref;
+              }}
+              source={{ uri: item.url }}
+              style={styles.video}
+              resizeMode="cover"
+              repeat
+              muted={muted}
+              controls={false}
+              paused={index !== currentIndex || longPressedIndex === index}
+              onError={(err) => {
+                console.warn("Video error:", item._id, err);
+                videoRefs.current[item._id] = null;
+              }}
+              onEnd={() => {
+                // Release finished video from memory
+                videoRefs.current[item._id] = null;
+              }}
+            />
+          )}
+          <Pressable
+            style={styles.overlay}
+            onPress={() => {
+              setMuted((m) => !m);
+              setMutedIcon(true);
+            }}
+            onLongPress={() => setLongPressedIndex(index)}
+            onPressOut={() => setLongPressedIndex(null)}
           >
-            {mutedIcon && (
-              <Ionicons
-                name={muted ? "volume-mute-outline" : "volume-high-outline"}
-                size={50}
-                color={"#fff"}
-              />
-            )}
-          </Column>
-          <Row
-            justifyContent="space-between"
-            alignItems="center"
-            style={{ padding: 12 }}
-          >
-            <Row alignItems="center" gap={8}>
-              <Avatar
-                size={45}
-                name={item.createdByDetails?.name}
-                image={item.createdByDetails?.image}
-              />
+            <Row alignItems="center" gap={8} style={{ padding: 12 }}>
               <Column gap={2}>
                 <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
-                  {item.createdByDetails?.name}
-                </Text>
-                <Text style={[commonStyles.smallText, { color: "#fff" }]}>
-                  {formatDate(item.createdAt)}
+                  {item.title}
                 </Text>
               </Column>
             </Row>
-            <Ionicons
-              onPress={() => deleteVideo(item._id)}
-              name="trash"
-              color={"red"}
-              size={35}
-            />
-          </Row>
-        </Pressable>
-      </View>
-    ),
+            <Column
+              style={commonStyles.fullFlex}
+              justifyContent="center"
+              alignItems="center"
+            >
+              {mutedIcon && (
+                <Ionicons
+                  name={muted ? "volume-mute-outline" : "volume-high-outline"}
+                  size={50}
+                  color={"#fff"}
+                />
+              )}
+            </Column>
+            <Row
+              justifyContent="space-between"
+              alignItems="center"
+              style={{ padding: 12 }}
+            >
+              <Row alignItems="center" gap={8}>
+                <Avatar
+                  size={45}
+                  name={item.createdByDetails?.name}
+                  image={item.createdByDetails?.image}
+                />
+                <Column gap={2}>
+                  <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
+                    {item.createdByDetails?.name}
+                  </Text>
+                  <Text style={[commonStyles.smallText, { color: "#fff" }]}>
+                    {formatDate(item.createdAt)}
+                  </Text>
+                </Column>
+              </Row>
+              <Ionicons
+                onPress={() => deleteVideo(item._id)}
+                name="trash"
+                color={"red"}
+                size={35}
+              />
+            </Row>
+          </Pressable>
+        </View>
+      );
+    },
     [
       windowHeight,
       muted,
@@ -169,6 +185,15 @@ export default function ReelsScreen() {
       fetchVideos(currentPage + 1, true);
     }
   };
+
+  // Cleanup all refs when component unmounts
+  useEffect(() => {
+    return () => {
+      Object.keys(videoRefs.current).forEach((key) => {
+        videoRefs.current[key] = null;
+      });
+    };
+  }, []);
 
   if (loading && videos.length === 0) {
     return (
@@ -188,7 +213,7 @@ export default function ReelsScreen() {
             <Text style={commonStyles.errorText}>
               Failed to load videos. Tap to retry.
             </Text>
-            <ActivityIndicator size="large" color="red" />
+            <ActivityIndicator size="large" color="#fff" />
           </Pressable>
         </View>
       </View>
@@ -200,19 +225,24 @@ export default function ReelsScreen() {
       <FlatList
         ref={flatListRef}
         data={videos}
-        keyExtractor={(item) => item._id.toString()}
+        keyExtractor={(item) => item._id.toString() + item.createdAt}
         renderItem={renderItem}
         snapToInterval={windowHeight}
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
-        windowSize={3}
+        windowSize={5} // slightly higher, but controlled
         removeClippedSubviews
-        initialNumToRender={2}
+        initialNumToRender={1}
         maxToRenderPerBatch={2}
         onViewableItemsChanged={onViewRef}
         viewabilityConfig={viewConfig}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.6}
+        getItemLayout={(_, index) => ({
+          length: windowHeight,
+          offset: windowHeight * index,
+          index,
+        })}
         ListFooterComponent={
           isFetchingMore ? (
             <ActivityIndicator size="large" color="#fff" />
@@ -224,7 +254,7 @@ export default function ReelsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
+  container: { flex: 1, backgroundColor: "#000" },
   videoContainer: {
     width: "100%",
   },
@@ -234,6 +264,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "black",
+    backgroundColor: "#000",
   },
 });

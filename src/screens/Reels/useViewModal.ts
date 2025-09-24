@@ -20,7 +20,7 @@ export const useReelsViewModal = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const insets = useSafeAreaInsets();
-  const windowHeight = dimensions.height - 85;
+  const windowHeight = dimensions.height - 86;
 
   const fetchVideos = useCallback(async (page: number = 1, append = false) => {
     try {
