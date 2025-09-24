@@ -196,9 +196,10 @@ export default function CreateVideoScreen() {
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item }: { item: IVideo }) => (
                   <Pressable
-                    onPress={() =>
-                      navigation.navigate(ROUTES.SINGLE_VIDEO, { video: item })
-                    }
+                    onPress={() => {
+                      navigation.navigate(ROUTES.SINGLE_VIDEO, { video: item });
+                      setModalVisible(false);
+                    }}
                   >
                     <CommentCard
                       text={item.title}

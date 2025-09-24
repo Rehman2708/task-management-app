@@ -20,6 +20,7 @@ const SingleVideoScreen = () => {
         setMutedIcon={() => {}}
         playAlways
         showDelete={false}
+        singleScreen
       />
     </View>
   );

@@ -96,12 +96,14 @@ export default function VideoItem({
         onPressOut={() => setLongPressedIndex?.(null)}
       >
         <Row alignItems="center" gap={8} style={{ padding: 12 }}>
-          <Ionicons
-            onPress={() => navigation.goBack()}
-            name="chevron-back-outline"
-            color={"#fff"}
-            size={30}
-          />
+          {singleScreen && (
+            <Ionicons
+              onPress={() => navigation.goBack()}
+              name="chevron-back-outline"
+              color={"#fff"}
+              size={30}
+            />
+          )}
           <Column gap={2}>
             <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
               {item.title}

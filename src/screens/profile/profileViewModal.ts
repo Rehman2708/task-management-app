@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { AuthRepo } from "../../repositories/auth";
-import { clearAsyncStorage } from "../../utils/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { IUser } from "../../types/auth";
@@ -9,7 +8,11 @@ import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 
 export function useProfileViewModel() {
-  const { updateUser, user: loggedInUser } = useAuthStore();
+  const {
+    updateUser,
+    user: loggedInUser,
+    logout: storeLogout,
+  } = useAuthStore();
   const [user, setUser] = useState<IUser | null>(null);
   const [partnerId, setPartnerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,7 +65,7 @@ export function useProfileViewModel() {
         if (Device.isDevice) {
           await AuthRepo.logout(user?.userId);
         }
-        await clearAsyncStorage();
+        await storeLogout();
         navigation.dispatch(
           CommonActions.reset({
             index: 0,

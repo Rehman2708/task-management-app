@@ -104,6 +104,16 @@ export function useHomeScreenViewModel() {
           navigation.navigate(ROUTES.PROFILE);
           return;
         }
+        if (notData?.type === "video") {
+          if (notData?.videoData) {
+            navigation.navigate(ROUTES.SINGLE_VIDEO, {
+              video: notData.videoData,
+            });
+          } else {
+            navigation.navigate(ROUTES.REELS);
+          }
+          return;
+        }
       });
 
     return () => {
