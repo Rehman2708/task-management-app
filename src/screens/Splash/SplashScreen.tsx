@@ -1,5 +1,5 @@
-import { View, Text, ActivityIndicator } from "react-native";
-import React, { useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
+import { useEffect, useState } from "react";
 import { Column } from "../../tools";
 import Logo from "../../components/logo";
 import { commonStyles } from "../../styles/commonstyles";
@@ -8,7 +8,6 @@ import { LocalStorageKey } from "../../enums/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { theme } from "../../infrastructure/theme";
-import { IUser } from "../../types/auth";
 import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
 
