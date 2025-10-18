@@ -4,6 +4,8 @@ import { LocalStorageKey } from "../enums/localstorage";
 import { theme } from "../infrastructure/theme";
 import { Priority } from "../enums/tasks";
 import { useAuthStore } from "../store/authStore";
+import { useNavigation } from "@react-navigation/native";
+import { ROUTES } from "../enums/routes";
 
 export function useHelper() {
   const { user } = useAuthStore();
@@ -84,6 +86,50 @@ export function useHelper() {
     return colors[priority] ?? "green";
   };
 
+  // notificationHelper.js
+  const navigation: any = useNavigation();
+  const handleNotificationNavigation = (notData: any) => {
+    if (!notData) return;
+
+    switch (notData.type) {
+      case "note":
+        if (notData.noteData) {
+          navigation.navigate(ROUTES.VIEW_NOTE, { note: notData.noteData });
+        } else {
+          navigation.navigate(ROUTES.NOTES);
+        }
+        break;
+
+      case "task":
+        if (notData.taskId) {
+          navigation.navigate(ROUTES.TASK_DETAIL, {
+            taskId: notData.taskId,
+            readOnly: !notData?.isActive,
+          });
+        } else {
+          navigation.navigate(ROUTES.TASKS);
+        }
+        break;
+
+      case "profile":
+        navigation.navigate(ROUTES.PROFILE);
+        break;
+
+      case "video":
+        if (notData.videoData) {
+          navigation.navigate(ROUTES.SINGLE_VIDEO, {
+            video: notData.videoData,
+          });
+        } else {
+          navigation.navigate(ROUTES.REELS);
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
   return {
     loggedInUser,
     getInitials,
@@ -91,5 +137,6 @@ export function useHelper() {
     themeColor,
     formatDate,
     getPriorityColor,
+    handleNotificationNavigation,
   };
 }

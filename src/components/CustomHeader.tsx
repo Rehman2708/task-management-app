@@ -68,13 +68,22 @@ const CustomHeader = ({
           )}
         </Column>
       </Row>
-      {onSearchPress ? (
-        <TouchableOpacity onPress={onSearchPress}>
-          <Ionicons name="search" size={30} color={theme.colors.white} />
+      <Row gap={20}>
+        {onSearchPress && (
+          <TouchableOpacity onPress={onSearchPress}>
+            <Ionicons name="search" size={30} color={theme.colors.white} />
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          onPress={() => navigation.navigate(ROUTES.NOTIFICATION)}
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={30}
+            color={theme.colors.white}
+          />
         </TouchableOpacity>
-      ) : (
-        <TimeDisplay />
-      )}
+      </Row>
     </Row>
   );
 };

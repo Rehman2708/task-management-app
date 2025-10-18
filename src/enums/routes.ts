@@ -16,4 +16,5 @@ export enum ROUTES {
   THEME = "Theme",
   SINGLE_VIDEO = "SingleVideo",
   UPDATE_PROFILE = "UpdateProfile",
+  NOTIFICATION = "Notification",
 }
