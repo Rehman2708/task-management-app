@@ -27,7 +27,8 @@ export default function NotesScreen() {
 
   const {
     notes,
-    loading,
+    initialLoading,
+    loadingMore,
     error,
     fetchNotes,
     pinUnpinNote,
@@ -43,8 +44,7 @@ export default function NotesScreen() {
 
   useFocusEffect(
     React.useCallback(() => {
-      // refresh first page when screen gains focus
-      fetchNotes(1);
+      fetchNotes(1, true);
     }, [])
   );
 
@@ -59,10 +59,7 @@ export default function NotesScreen() {
         style={[
           commonStyles.cardContainer,
           commonStyles.fullFlex,
-          {
-            borderRightWidth: 1,
-            borderBottomWidth: 1,
-          },
+          { borderRightWidth: 1, borderBottomWidth: 1 },
         ]}
       >
         <Column
@@ -108,7 +105,7 @@ export default function NotesScreen() {
   );
 
   const renderFooter = () =>
-    page < totalPages ? (
+    loadingMore && page < totalPages ? (
       <View style={{ paddingVertical: theme.spacing.md }}>
         <ActivityIndicator
           size="small"
@@ -132,8 +129,8 @@ export default function NotesScreen() {
               data={notes}
               keyExtractor={(item) => item._id!}
               renderItem={renderItem}
-              refreshing={loading}
-              onRefresh={() => fetchNotes(1)}
+              refreshing={initialLoading}
+              onRefresh={() => fetchNotes(1, true)}
               onEndReached={loadMoreNotes}
               onEndReachedThreshold={0.4}
               ListFooterComponent={renderFooter}
@@ -145,8 +142,8 @@ export default function NotesScreen() {
         ) : (
           <EmptyState
             text="No notes found"
-            button={() => fetchNotes(1)}
-            loading={loading}
+            button={() => fetchNotes(1, true)}
+            loading={initialLoading}
             error={!!error?.length}
           />
         )}

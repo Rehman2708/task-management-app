@@ -10,6 +10,7 @@ import EmptyState from "../../components/emptyState";
 import { useFocusEffect } from "@react-navigation/native";
 import React from "react";
 import TasksCard from "../../components/tasksCard";
+import { Images } from "../../../assets/images/images";
 
 export default function HomeScreen({ navigation }: any) {
   const { tasks, loading, error, fetchTasks, deleteTask } =
@@ -30,6 +31,7 @@ export default function HomeScreen({ navigation }: any) {
             button={fetchTasks}
             loading={loading}
             error={!!error?.length}
+            image={Images.noTask}
           />
         ) : (
           <FlatList

@@ -17,7 +17,7 @@ const CardWrapper: React.FC<CardWrapperProps> = ({
 }) => {
   const MemoBlur = React.memo(() => (
     <BlurView
-      intensity={isAndroid ? 700 : 40}
+      intensity={isAndroid ? 100 : 40}
       tint={isDarkMode ? "dark" : "light"}
       style={commonStyles.blurView}
     />

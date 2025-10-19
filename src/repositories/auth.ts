@@ -101,4 +101,25 @@ export class AuthRepo {
       data
     );
   }
+
+  /**
+   * 🔹 Update Theme (Light & Dark)
+   */
+  static async updateTheme(payload: {
+    userId: string;
+    theme: {
+      light?: string;
+      dark?: string;
+    };
+  }) {
+    const data = Object.fromEntries(
+      Object.entries(payload).filter(([_, v]) => v !== undefined)
+    );
+
+    return ApiService.getApiResponse(
+      AppUrl.updateThemeEndPoint,
+      HttpMethods.PUT,
+      data
+    );
+  }
 }

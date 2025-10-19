@@ -9,11 +9,13 @@ import { useHelper } from "../../utils/helper";
 import CustomInput from "../../components/customInput";
 import TasksCard from "../../components/tasksCard";
 import { theme } from "../../infrastructure/theme";
+import { Images } from "../../../assets/images/images";
 
 export default function HistoryScreen({ navigation }: any) {
   const {
     tasks,
-    loading,
+    initialLoading,
+    loadingMore,
     error,
     fetchCompletedTasks,
     deleteTask,
@@ -27,15 +29,14 @@ export default function HistoryScreen({ navigation }: any) {
 
   useFocusEffect(
     React.useCallback(() => {
-      // Refresh from page 1 whenever screen gains focus
-      fetchCompletedTasks(1);
+      fetchCompletedTasks(1, true);
     }, [])
   );
 
   const { themeColor } = useHelper();
 
   const renderFooter = () =>
-    page < totalPages ? (
+    loadingMore && page < totalPages ? (
       <View style={{ paddingVertical: theme.spacing.md }}>
         <ActivityIndicator
           size="small"
@@ -66,8 +67,8 @@ export default function HistoryScreen({ navigation }: any) {
                   isCompleted
                 />
               )}
-              refreshing={loading}
-              onRefresh={() => fetchCompletedTasks(1)}
+              refreshing={initialLoading}
+              onRefresh={() => fetchCompletedTasks(1, true)}
               onEndReached={loadMoreTasks}
               onEndReachedThreshold={0.4}
               ListFooterComponent={renderFooter}
@@ -77,9 +78,10 @@ export default function HistoryScreen({ navigation }: any) {
         ) : (
           <EmptyState
             text="Nothing to show"
-            button={() => fetchCompletedTasks(1)}
-            loading={loading}
+            button={() => fetchCompletedTasks(1, true)}
+            loading={initialLoading}
             error={!!error?.length}
+            image={Images.noTask}
           />
         )}
       </View>

@@ -6,4 +6,5 @@ export interface IUser {
   updatedAt: Date;
   notificationToken?: string | null;
   image?: string;
+  theme: { light: string; dark: string };
 }

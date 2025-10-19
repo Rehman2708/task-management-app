@@ -114,7 +114,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
 const useBottomTabStyles = () => {
   return StyleSheet.create({
     container: {
-      borderTopColor: theme.colors.border,
+      borderTopColor: isDarkMode ? "#000" : `${theme.colors.border}`,
       borderTopWidth: 1,
     },
     tabBarContainer: {

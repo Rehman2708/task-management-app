@@ -5,32 +5,33 @@ import { useAuthStore } from "../../store/authStore";
 
 export function useNotesListViewModel(userId?: string) {
   const { user } = useAuthStore();
-  const [allNotes, setAllNotes] = useState<Note[]>([]); // All fetched notes
-  const [notes, setNotes] = useState<Note[]>([]); // Filtered (search) notes
-  const [showSearch, setShowSearch] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [allNotes, setAllNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true); // 🟢 First load or refresh
+  const [loadingMore, setLoadingMore] = useState(false); // 🟢 Pagination
   const [error, setError] = useState<string | null>(null);
 
-  // 🔹 Pagination states
-  const [page, setPage] = useState<number>(1);
-  const [pageSize] = useState<number>(10);
-  const [totalPages, setTotalPages] = useState<number>(1);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
   useEffect(() => {
-    // Reset to first page whenever user changes
     setPage(1);
     setAllNotes([]);
     setNotes([]);
-    fetchNotes(1);
+    fetchNotes(1, true);
   }, [user?.userId]);
 
-  const fetchNotes = async (requestedPage = page) => {
+  const fetchNotes = async (requestedPage = page, isInitial = false) => {
     if (!user?.userId) return;
 
     try {
-      setLoading(true);
+      if (isInitial) setInitialLoading(true);
+      else setLoadingMore(true);
+
       setError(null);
 
       const response = await NotesRepo.getAllNotes({
@@ -39,10 +40,8 @@ export function useNotesListViewModel(userId?: string) {
         pageSize,
       });
 
-      // API now returns { notes, totalPages, currentPage }
       const { notes: fetchedNotes, totalPages: total } = response;
 
-      // If requesting page 1, replace; otherwise append
       if (requestedPage === 1) {
         setAllNotes(fetchedNotes);
         setNotes(fetchedNotes);
@@ -57,30 +56,27 @@ export function useNotesListViewModel(userId?: string) {
       console.error("Fetch notes error:", err);
       setError(err.message || "Failed to fetch notes");
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  // 🔹 Load next page if available
   const loadMoreNotes = () => {
-    if (page < totalPages && !loading) {
+    if (page < totalPages && !loadingMore) {
       fetchNotes(page + 1);
     }
   };
 
   const handlePinUnpinNote = async (noteId: string, pinned: boolean) => {
     try {
-      setLoading(true);
-      setError(null);
+      setInitialLoading(true);
       await NotesRepo.pinNote(noteId, !pinned);
-
-      // Refresh all notes from page 1 after pin/unpin
-      fetchNotes(1);
+      fetchNotes(1, true);
     } catch (err: any) {
       console.error("Pin/unpin note error:", err);
       setError(err.message || "Failed to pin/unpin note");
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   };
 
@@ -100,6 +96,10 @@ export function useNotesListViewModel(userId?: string) {
   };
 
   const searchNotes = (searchText: string) => {
+    if (!searchText.trim()) {
+      setNotes(allNotes);
+      return;
+    }
     const lower = searchText.toLowerCase();
     const filtered = allNotes.filter(
       (note) =>
@@ -111,10 +111,11 @@ export function useNotesListViewModel(userId?: string) {
 
   return {
     notes,
-    loading,
+    initialLoading,
+    loadingMore,
     error,
-    fetchNotes, // Manual refresh
-    loadMoreNotes, // Load next page for infinite scroll
+    fetchNotes,
+    loadMoreNotes,
     pinUnpinNote,
     searchNotes,
     page,

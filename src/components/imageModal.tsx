@@ -23,8 +23,10 @@ const ImageModal = ({
   defaultImage,
   disabled,
   button,
+  onPress,
 }: {
   onChange?: (uri: string) => void;
+  onPress?: () => void;
   defaultImage?: string;
   disabled?: boolean;
   button?: React.ReactNode;
@@ -80,7 +82,7 @@ const ImageModal = ({
       <Row justifyContent="center">
         <Pressable
           disabled={disabled}
-          onPress={() => setShowModal(true)}
+          onPress={() => (onPress ? onPress() : setShowModal(true))}
           style={[
             !button && styles.imageWrapper,
             !button && styles.selectedImageWrapper,

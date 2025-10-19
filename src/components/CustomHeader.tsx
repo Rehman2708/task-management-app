@@ -1,10 +1,9 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import { Column, Row } from "../tools";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { commonStyles } from "../styles/commonstyles";
 import { theme } from "../infrastructure/theme";
-import TimeDisplay from "./time";
 import Avatar from "./avatar";
 import { useHelper } from "../utils/helper";
 import { ROUTES } from "../enums/routes";

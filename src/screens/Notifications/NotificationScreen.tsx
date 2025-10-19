@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import { useHelper } from "../../utils/helper";
 import { commonStyles } from "../../styles/commonstyles";
 import { Column } from "../../tools";
 import { theme } from "../../infrastructure/theme";
+import { Images } from "../../../assets/images/images";
 
 interface NotificationItem {
   _id: string;
@@ -114,26 +115,33 @@ const NotificationScreen = () => {
   };
 
   // ------------------ Render notification item ------------------ //
-  const renderItem = ({ item }: { item: NotificationItem }) => (
-    <TouchableOpacity
-      style={[
-        commonStyles.cardContainer,
-        { backgroundColor: item.isRead ? "" : `${themeColor.light}30` },
-      ]}
-      onPress={() => handleNotification(item._id, item?.data)}
-    >
-      <Column gap={3} style={commonStyles.fullFlex}>
-        <Text style={commonStyles.basicText}>{item.title}</Text>
-        <Text style={commonStyles.tinyText}>{item.body}</Text>
-        <Text style={commonStyles.tTinyText}>{formatDate(item.createdAt)}</Text>
-      </Column>
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item }: { item: NotificationItem }) => {
+    const bgColor = item.isRead ? "transparent" : `${themeColor.light}30`;
+
+    return (
+      <TouchableOpacity
+        style={[commonStyles.cardContainer, { backgroundColor: bgColor }]}
+        onPress={() => handleNotification(item._id, item?.data)}
+      >
+        <Column gap={3} style={commonStyles.fullFlex}>
+          <Text style={commonStyles.basicText}>{item.title}</Text>
+          <Text style={commonStyles.tinyText}>{item.body}</Text>
+          <Text style={commonStyles.tTinyText}>
+            {formatDate(item.createdAt)}
+          </Text>
+        </Column>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <ScreenWrapper title="Notifications" showBackbutton>
       {notifications.length === 0 && !loading ? (
-        <EmptyState text="No notifications!" loading={loading} />
+        <EmptyState
+          text="No notifications!"
+          loading={loading}
+          image={Images.noNotification}
+        />
       ) : (
         <FlatList
           showsVerticalScrollIndicator={false}

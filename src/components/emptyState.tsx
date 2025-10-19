@@ -2,9 +2,10 @@ import { Text, Image, ImageSourcePropType, View } from "react-native";
 import { Column, isAndroid, Row } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
 import CustomButton from "./customButton";
+import { Images } from "../../assets/images/images";
 
 const EmptyState = ({
-  image = require("../../assets/images/noData.png"),
+  image = Images.noData,
   text,
   button,
   loading,
@@ -16,7 +17,7 @@ const EmptyState = ({
   loading?: boolean;
   error?: boolean;
 }) => {
-  const errorImage = require("../../assets/images/error.png");
+  const errorImage = Images.error;
   return (
     <Column
       style={commonStyles.fullFlex}

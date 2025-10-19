@@ -6,12 +6,14 @@ import { useHelper } from "../utils/helper";
 import { commonStyles } from "../styles/commonstyles";
 
 const LinearHeader = ({ image }: { image?: string }) => {
-  const { themeColor } = useHelper();
+  const { themeColor, loggedInUser } = useHelper();
+  const imageUri = image ?? loggedInUser?.image;
+
   return (
     <View>
       <LinearGradient
         colors={
-          image
+          imageUri
             ? ["#000000cc", "#000000cc"]
             : [
                 themeColor?.dark ?? theme.colors.primary,
@@ -32,9 +34,9 @@ const LinearHeader = ({ image }: { image?: string }) => {
         end={{ x: 1, y: 2 }}
         locations={[0.2, 0.65]}
       >
-        {image && (
+        {imageUri?.trim() !== "" && (
           <Image
-            source={{ uri: image }}
+            source={{ uri: imageUri }}
             style={[
               commonStyles.fullFlex,
               {

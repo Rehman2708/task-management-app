@@ -15,6 +15,7 @@ import { commonStyles } from "../../styles/commonstyles";
 import { IVideo } from "../../types/videos";
 import { useHelper } from "../../utils/helper";
 import VideoItem from "../../components/VideoItem";
+import EmptyState from "../../components/emptyState";
 
 export default function ReelsScreen() {
   const {
@@ -128,31 +129,30 @@ export default function ReelsScreen() {
     };
   }, []);
 
-  if (loading && videos.length === 0) {
+  // if (loading && videos.length === 0) {
+  //   return (
+  //     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+  //       <View style={styles.loaderOverlay}>
+  //         <EmptyState text={""} />
+  //         <ActivityIndicator size="large" color="#fff" />
+  //       </View>
+  //     </View>
+  //   );
+  // }
+
+  if (error || loading || videos.length === 0) {
     return (
-      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-        <View style={styles.loaderOverlay}>
-          <ActivityIndicator size="large" color="#fff" />
-        </View>
+      <View style={[styles.container]}>
+        <EmptyState
+          text={"No videos found"}
+          loading={loading}
+          error={error?.trim()?.length > 0 && false}
+          button={() => fetchVideos(1, false)}
+        />
       </View>
     );
   }
-
-  if (error && videos.length === 0) {
-    return (
-      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-        <View style={styles.loaderOverlay}>
-          <Pressable onPress={() => fetchVideos(1, false)}>
-            <Text style={commonStyles.errorText}>
-              Failed to load videos. Tap to retry.
-            </Text>
-            <ActivityIndicator size="large" color="#fff" />
-          </Pressable>
-        </View>
-      </View>
-    );
-  }
-
+  console.log(videos, error, loading);
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <FlatList

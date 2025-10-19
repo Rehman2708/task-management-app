@@ -18,6 +18,7 @@ import { SubtaskStatus, TaskStatus } from "../../enums/tasks";
 import CommentCard from "../../components/commentCard";
 import TimeLeftProgress from "../../components/timeLeftProgress";
 import { SubtaskComment } from "../../types/task";
+import ImageView from "react-native-image-viewing";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -35,6 +36,7 @@ export default function TaskDetailScreen({ route }: any) {
   } = useTaskDetailViewModel(taskId);
   const { formatDate, themeColor } = useHelper();
   const [taskComment, setTaskComment] = useState("");
+  const [showImage, setShowImage] = useState(false);
   const [subtaskComments, setSubtaskComments] = useState<
     Record<string, string>
   >({});
@@ -172,7 +174,21 @@ export default function TaskDetailScreen({ route }: any) {
                 />
               }
             >
-              {task?.image && <ImageModal disabled defaultImage={task.image} />}
+              {task?.image && (
+                <>
+                  <ImageModal
+                    onPress={() => setShowImage(true)}
+                    defaultImage={task.image}
+                  />
+                  <ImageView
+                    images={[{ uri: task.image }]}
+                    imageIndex={0}
+                    visible={showImage}
+                    onRequestClose={() => setShowImage(false)}
+                  />
+                </>
+              )}
+
               <Column gap={isAndroid ? 5 : 6}>
                 <Text style={commonStyles.subTitleText}>{task?.title}</Text>
                 {task?.description && (

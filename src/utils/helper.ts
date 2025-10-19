@@ -9,29 +9,13 @@ import { ROUTES } from "../enums/routes";
 
 export function useHelper() {
   const { user } = useAuthStore();
-  const [themeColor, setThemeColor] = useState({
-    light: theme.colors.secondary,
-    dark: theme.colors.primary,
+  const [themeColor] = useState({
+    light: user?.theme?.light ?? theme.colors.secondary,
+    dark: user?.theme?.dark ?? theme.colors.primary,
   });
-  const fetchThemeColor = async () => {
-    try {
-      const { data } = await getDataFromAsyncStorage(LocalStorageKey.COLOR);
-      setThemeColor(
-        data ?? {
-          light: theme.colors.secondary,
-          dark: theme.colors.primary,
-        }
-      );
-      return data;
-    } catch (err) {
-      console.error("Error fetching color from storage:", err);
-    } finally {
-    }
-  };
+
   const loggedInUser = user;
-  useEffect(() => {
-    fetchThemeColor();
-  }, []);
+
   function getInitials(name = "") {
     if (!name || typeof name !== "string") return "";
     const parts = name.trim().split(" ").filter(Boolean);
@@ -133,7 +117,6 @@ export function useHelper() {
   return {
     loggedInUser,
     getInitials,
-    fetchThemeColor,
     themeColor,
     formatDate,
     getPriorityColor,

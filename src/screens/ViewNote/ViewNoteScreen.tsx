@@ -9,6 +9,8 @@ import { isAndroid, Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import ImageModal from "../../components/imageModal";
+import ImageView from "react-native-image-viewing";
+
 interface NoteDetailScreenProps {
   route: {
     params?: {
@@ -23,6 +25,7 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   const { formatDate } = useHelper();
   const navigation: any = useNavigation();
   const [loading, setLoading] = useState(false);
+  const [showImage, setShowImage] = useState(false);
   const deleteNote = async () => {
     try {
       setLoading(true);
@@ -57,7 +60,20 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
         showsVerticalScrollIndicator={false}
         style={commonStyles.screenWrapper}
       >
-        {note?.image && <ImageModal defaultImage={note?.image} disabled />}
+        {note?.image && (
+          <>
+            <ImageModal
+              defaultImage={note?.image}
+              onPress={() => setShowImage(true)}
+            />
+            <ImageView
+              images={[{ uri: note.image }]}
+              imageIndex={0}
+              visible={showImage}
+              onRequestClose={() => setShowImage(false)}
+            />
+          </>
+        )}
         <Text style={commonStyles.basicText}>{note?.note}</Text>
         <Spacer size={50} />
       </ScrollView>

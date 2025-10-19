@@ -7,36 +7,40 @@ import { useAuthStore } from "../../store/authStore";
 export function useCompletedTasksViewModel() {
   const { user } = useAuthStore();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [allTasks, setAllTasks] = useState<Task[]>([]); // For search filtering
-  const [showSearch, setShowSearch] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 🔹 Pagination states
-  const [page, setPage] = useState<number>(1);
-  const [pageSize] = useState<number>(10);
-  const [totalPages, setTotalPages] = useState<number>(1);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
 
   useEffect(() => {
-    fetchCompletedTasks(1); // Initial load of first page
+    fetchCompletedTasks(1, true);
   }, []);
 
-  const fetchCompletedTasks = async (requestedPage = page) => {
+  const fetchCompletedTasks = async (
+    requestedPage = page,
+    isInitial = false
+  ) => {
     if (!user?.userId) return;
 
     try {
-      setLoading(true);
+      if (isInitial) setInitialLoading(true);
+      else setLoadingMore(true);
+
       setError(null);
 
       const response = await TaskRepo.getCompletedTasks({
-        ownerUserId: user?.userId!,
+        ownerUserId: user.userId!,
         page: requestedPage,
         pageSize,
       });
 
-      // The API returns { tasks, totalPages, currentPage }
       const { tasks: fetchedTasks, totalPages: total } = response;
 
       if (requestedPage === 1) {
@@ -53,20 +57,20 @@ export function useCompletedTasksViewModel() {
       console.error("Fetch completed tasks error:", err);
       setError(err.message || "Something went wrong");
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  // 🔹 Load next page for infinite scroll
   const loadMoreTasks = () => {
-    if (page < totalPages && !loading) {
+    if (page < totalPages && !loadingMore) {
       fetchCompletedTasks(page + 1);
     }
   };
 
   const handleDeleteTask = async (taskId: string) => {
     try {
-      setLoading(true);
+      setInitialLoading(true);
       await TaskRepo.deleteTask(taskId);
       setTasks((prev) => prev.filter((task) => task._id !== taskId));
       setAllTasks((prev) => prev.filter((task) => task._id !== taskId));
@@ -74,7 +78,7 @@ export function useCompletedTasksViewModel() {
       console.error("Delete task error:", err);
       setError(err.message || "Failed to delete task");
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   };
 
@@ -109,10 +113,11 @@ export function useCompletedTasksViewModel() {
 
   return {
     tasks,
-    loading,
+    initialLoading,
+    loadingMore,
     error,
-    fetchCompletedTasks, // Refresh from page 1
-    loadMoreTasks, // Load next page for infinite scroll
+    fetchCompletedTasks,
+    loadMoreTasks,
     deleteTask,
     searchTasks,
     page,

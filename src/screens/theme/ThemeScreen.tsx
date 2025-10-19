@@ -2,15 +2,12 @@ import { TouchableOpacity, ScrollView, Text } from "react-native";
 import { Column, Row } from "../../tools";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
-import {
-  getDataFromAsyncStorage,
-  storeDataInAsyncStorage,
-} from "../../utils/localstorage";
-import { LocalStorageKey } from "../../enums/localstorage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
+import { AuthRepo } from "../../repositories/auth"; // ensure this path matches your structure
+import { useAuthStore } from "../../store/authStore";
 
 const colors = [
   { dark: "#3F87E9", light: "#6697D9" },
@@ -24,43 +21,48 @@ const colors = [
 ];
 
 const ThemeScreen = () => {
-  const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
   const navigation = useNavigation();
-  const setTheme = async (index: number) => {
+  const { user, updateUser } = useAuthStore();
+  const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const handleThemeChange = async (index: number) => {
+    if (!user?.userId) return;
+
     const selectedTheme = colors[index];
     setCurrentThemeIndex(index);
+    setLoading(true);
 
     try {
-      await storeDataInAsyncStorage(LocalStorageKey.COLOR, selectedTheme);
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: ROUTES.SPLASH }],
-        })
-      );
+      const res = await AuthRepo.updateTheme({
+        userId: user.userId,
+        theme: selectedTheme,
+      });
+      if (res?.user) {
+        updateUser(res.user);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: ROUTES.SPLASH }],
+          })
+        );
+      }
     } catch (error) {
-      console.error("Failed to save theme:", error);
+      console.error("Update theme error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const loadTheme = async () => {
-      const { data } = await getDataFromAsyncStorage(LocalStorageKey.COLOR);
-
-      if (data?.dark && data?.light) {
-        // Find the index of the saved theme in the colors array
-        const index = colors.findIndex(
-          (theme) => theme.dark === data.dark && theme.light === data.light
-        );
-
-        if (index !== -1) {
-          setCurrentThemeIndex(index);
-        }
-      }
-    };
-
-    loadTheme();
-  }, []);
+    if (user?.theme) {
+      const index = colors.findIndex(
+        (theme) =>
+          theme.dark === user.theme.dark && theme.light === user.theme.light
+      );
+      if (index !== -1) setCurrentThemeIndex(index);
+    }
+  }, [user]);
 
   return (
     <ScreenWrapper title="Theme" showBackbutton>
@@ -68,12 +70,13 @@ const ThemeScreen = () => {
         <Column gap={12} style={[commonStyles.screenWrapper]}>
           {colors.map((item, index) => (
             <TouchableOpacity
+              key={index}
+              onPress={() => !loading && handleThemeChange(index)}
               style={{
                 borderRadius: 16,
                 overflow: "hidden",
+                opacity: loading ? 0.6 : 1,
               }}
-              key={index}
-              onPress={() => setTheme(index)}
             >
               <LinearGradient
                 colors={[item.dark, item.light]}

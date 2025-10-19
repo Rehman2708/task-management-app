@@ -14,6 +14,8 @@ export default function App() {
     MontserratMedium: require("./assets/fonts/MontserratAlternates-Medium.ttf"),
     MontserratRegular: require("./assets/fonts/MontserratAlternates-Regular.ttf"),
     MontserratSemiBold: require("./assets/fonts/MontserratAlternates-SemiBold.ttf"),
+    TangerineRegular: require("./assets/fonts/Tangerine-Regular.ttf"),
+    TangerineBold: require("./assets/fonts/Tangerine-Bold.ttf"),
   });
 
   useEffect(() => {
