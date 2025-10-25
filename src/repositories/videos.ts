@@ -51,4 +51,19 @@ export class VideoRepo {
     const url = `${AppUrl.markVideoAsViewed(videoId)}`;
     return ApiService.getApiResponse(url, HttpMethods.PATCH);
   }
+
+  // Add a comment to a video
+  static async addVideoComment(
+    videoId: string,
+    payload: { createdBy: string; text: string }
+  ) {
+    const url = `${AppUrl.addVideoComment(videoId)}`;
+    return ApiService.getApiResponse(url, HttpMethods.POST, payload);
+  }
+
+  // Get all comments for a video
+  static async getVideoComments(videoId: string) {
+    const url = `${AppUrl.getVideoComments(videoId)}`;
+    return ApiService.getApiResponse(url, HttpMethods.GET);
+  }
 }
