@@ -45,4 +45,10 @@ export class VideoRepo {
       HttpMethods.DELETE
     );
   }
+
+  // Mark video as viewed
+  static async markVideoAsViewed(videoId: string) {
+    const url = `${AppUrl.markVideoAsViewed(videoId)}`;
+    return ApiService.getApiResponse(url, HttpMethods.PATCH);
+  }
 }

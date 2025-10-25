@@ -52,6 +52,8 @@ export class AppUrl {
   public static getAllVideos = `${this.BASE_URL}/videos`; // e.g., GET /videos/user/:ownerUserId
   public static createVideo = `${this.BASE_URL}/videos`; // POST /videos
   public static deleteVideo = (id: string) => `${this.BASE_URL}/videos/${id}`; // DELETE /videos/:id
+  public static markVideoAsViewed = (videoId: string) =>
+    `${this.BASE_URL}/videos/${videoId}/viewed`;
 
   // 🔹 Notification APIs
   public static getNotifications = `${this.BASE_URL}/notifications`; // plural to match your router

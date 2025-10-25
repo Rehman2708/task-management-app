@@ -37,6 +37,7 @@ export function useHomeScreenViewModel() {
 
   // Fetch active tasks
   const fetchTasks = async () => {
+    setError(null);
     if (user?.userId) {
       try {
         setLoading(true);

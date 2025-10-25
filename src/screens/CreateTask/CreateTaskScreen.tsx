@@ -212,7 +212,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
         <CustomButton
           loading={vm.loading}
           onPress={handleSave}
-          title={task ? "Update Task" : "Create Task"}
+          title={task && !repeat ? "Update Task" : "Create Task"}
         />
       </View>
     </ScreenWrapper>

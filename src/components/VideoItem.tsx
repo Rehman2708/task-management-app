@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { View, Pressable, Text, StyleSheet } from "react-native";
 import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,6 +10,7 @@ import { commonStyles } from "../styles/commonstyles";
 import { useHelper } from "../utils/helper";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../store/authStore";
+import { VideoRepo } from "../repositories/videos";
 
 type Props = {
   item: IVideo;
@@ -47,6 +48,7 @@ export default function VideoItem({
   singleScreen,
 }: Props) {
   const videoRef = useRef<IVideo | null>(null);
+  const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
   const navigation: any = useNavigation();
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
@@ -60,7 +62,14 @@ export default function VideoItem({
       videoRef.current = null;
     };
   }, []);
-
+  const handleViewed = useCallback(async () => {
+    try {
+      setIsViewed(true);
+      await VideoRepo.markVideoAsViewed(item._id);
+    } catch (err) {
+      console.error("markRead video error:", err);
+    }
+  }, []);
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
       {shouldPlay && (
@@ -122,7 +131,7 @@ export default function VideoItem({
 
         <Row
           justifyContent="space-between"
-          alignItems="center"
+          alignItems="flex-end"
           style={{ padding: 12 }}
         >
           <Row alignItems="center" gap={8}>
@@ -140,15 +149,24 @@ export default function VideoItem({
               </Text>
             </Column>
           </Row>
-
-          {user?.userId === item.createdBy && showDelete && (
-            <Ionicons
-              onPress={() => deleteVideo?.(item._id)}
-              name="trash"
-              color={"red"}
-              size={35}
-            />
-          )}
+          <Column gap={20}>
+            {user?.userId !== item.createdBy && !isViewed && (
+              <Ionicons
+                onPress={handleViewed}
+                name="eye-outline"
+                color={"white"}
+                size={35}
+              />
+            )}
+            {user?.userId === item.createdBy && showDelete && (
+              <Ionicons
+                onPress={() => deleteVideo?.(item._id)}
+                name="trash"
+                color={"red"}
+                size={35}
+              />
+            )}
+          </Column>
         </Row>
       </Pressable>
     </View>

@@ -107,7 +107,7 @@ export function useCreateTaskViewModel(initialTask?: any, repeat: boolean) {
       };
 
       let response;
-      if (initialTask?._id) {
+      if (initialTask?._id && !repeat) {
         response = await TaskRepo.updateTask(initialTask._id, payload);
       } else {
         response = await TaskRepo.createTask(payload);

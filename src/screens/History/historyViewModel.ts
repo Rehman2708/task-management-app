@@ -27,6 +27,7 @@ export function useCompletedTasksViewModel() {
     requestedPage = page,
     isInitial = false
   ) => {
+    setError(null);
     if (!user?.userId) return;
 
     try {

@@ -25,6 +25,7 @@ export const useReelsViewModal = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchVideos = useCallback(async (page: number = 1, append = false) => {
+    setError(null);
     try {
       page === 1 ? setLoading(true) : setIsFetchingMore(true);
       setError(null);
