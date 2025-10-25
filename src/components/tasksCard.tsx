@@ -42,11 +42,14 @@ const TasksCard = ({
     </Pressable>
   );
   const leftAction = () => {
-    return isCompleted ? (
-      <View />
-    ) : (
+    return (
       <Pressable
-        onPress={() => navigation.navigate(ROUTES.CREATE_TASK, { task: item })}
+        onPress={() =>
+          navigation.navigate(ROUTES.CREATE_TASK, {
+            task: item,
+            repeat: isCompleted,
+          })
+        }
         style={{ width: 80 }}
       >
         <Row
@@ -54,7 +57,11 @@ const TasksCard = ({
           alignItems="center"
           style={commonStyles.fullFlex}
         >
-          <Ionicons name="create-outline" size={30} color={themeColor.light} />
+          <Ionicons
+            name={isCompleted ? "reload-outline" : "create-outline"}
+            size={30}
+            color={themeColor.light}
+          />
         </Row>
       </Pressable>
     );

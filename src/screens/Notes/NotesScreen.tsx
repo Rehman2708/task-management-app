@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
 import { theme } from "../../infrastructure/theme";
 import { useNotesListViewModel } from "./notesViewModal";
 import FloatingAdd from "../../components/FloatingAdd";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
@@ -21,10 +21,11 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomInput from "../../components/customInput";
 import Avatar from "../../components/avatar";
 import CardWrapper from "../../components/cardWrapper";
+import { useUtilStore } from "../../store/utils";
 
 export default function NotesScreen() {
   const { formatDate, themeColor } = useHelper();
-
+  const { fetchingNotes } = useUtilStore();
   const {
     notes,
     initialLoading,
@@ -42,16 +43,16 @@ export default function NotesScreen() {
 
   const navigation: any = useNavigation();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchNotes(1, true);
-    }, [])
-  );
+  useEffect(() => {
+    fetchNotes(1, true);
+  }, [fetchingNotes]);
 
   const renderItem = ({ item }: { item: Note }) => (
     <TouchableOpacity
       onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
-      onPress={() => navigation.navigate(ROUTES.VIEW_NOTE, { note: item })}
+      onPress={() =>
+        navigation.navigate(ROUTES.VIEW_NOTE, { noteId: item._id })
+      }
       style={{ flex: 1, marginHorizontal: 4 }}
     >
       <CardWrapper

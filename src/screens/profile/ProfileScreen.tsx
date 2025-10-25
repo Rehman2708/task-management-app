@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useProfileViewModel } from "./profileViewModal";
@@ -35,16 +37,27 @@ export default function ProfileScreen() {
     partnerInput,
     setPartnerInput,
     partnerImage,
+    loadingUserDetail,
+    fetchUserDetails,
   } = useProfileViewModel();
   const { getInitials, themeColor } = useHelper();
   const [visible, setIsVisible] = useState(false);
   const [currentImage, setCurrentImage] = useState({});
+
   return (
     <ScreenWrapper title="Profile">
       {loading ? (
         <ScreenLoader />
       ) : (
-        <>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={loadingUserDetail}
+              onRefresh={fetchUserDetails}
+              colors={[theme.colors.primary]}
+            />
+          }
+        >
           <Column gap={isAndroid ? 6 : 8} style={[commonStyles.screenWrapper]}>
             <Row justifyContent="center" alignItems="center" gap={8}>
               <Row
@@ -56,31 +69,34 @@ export default function ProfileScreen() {
                   ProfileScreenStyles.imageContainer,
                   {
                     backgroundColor: `${themeColor.light}20`,
+                    borderColor: user?.theme.dark,
                   },
                 ]}
               >
-                {user?.image ? (
-                  <Pressable
-                    onPress={() => {
+                <Pressable
+                  onPress={() => {
+                    if (user?.image) {
                       setCurrentImage({ uri: user.image });
-                      setIsVisible(true);
-                    }}
-                  >
+                    }
+                    setIsVisible(true);
+                  }}
+                >
+                  {user?.image ? (
                     <Image
                       style={ProfileScreenStyles.image}
                       source={{ uri: user.image }}
                     />
-                  </Pressable>
-                ) : (
-                  <Text
-                    style={[
-                      ProfileScreenStyles.nameText,
-                      { color: themeColor?.dark ?? theme.colors.primary },
-                    ]}
-                  >
-                    {getInitials(user?.name ?? "")}
-                  </Text>
-                )}
+                  ) : (
+                    <Text
+                      style={[
+                        ProfileScreenStyles.nameText,
+                        { color: themeColor?.dark ?? theme.colors.primary },
+                      ]}
+                    >
+                      {getInitials(user?.name ?? "")}
+                    </Text>
+                  )}
+                </Pressable>
               </Row>
               {partnerId && <Ionicons name="heart" size={40} color={"red"} />}
               {partnerId && (
@@ -92,7 +108,8 @@ export default function ProfileScreen() {
                     commonStyles.secondaryContainer,
                     ProfileScreenStyles.imageContainer,
                     {
-                      backgroundColor: `${themeColor.light}20`,
+                      backgroundColor: `${user?.partner?.theme?.light}20`,
+                      borderColor: user?.partner?.theme?.light,
                     },
                   ]}
                 >
@@ -219,7 +236,7 @@ export default function ProfileScreen() {
               loading={loggingOut}
             />
           </Row>
-        </>
+        </ScrollView>
       )}
       <ImageView
         images={[currentImage]}

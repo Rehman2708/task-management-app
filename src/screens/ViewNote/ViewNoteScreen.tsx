@@ -7,29 +7,49 @@ import { commonStyles } from "../../styles/commonstyles";
 import CustomButton from "../../components/customButton";
 import { isAndroid, Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import ImageModal from "../../components/imageModal";
 import ImageView from "react-native-image-viewing";
+import ScreenLoader from "../../components/screenLoader";
+import { useUtilStore } from "../../store/utils";
 
 interface NoteDetailScreenProps {
   route: {
     params?: {
-      note: Note;
+      noteId: string;
       userId: string;
     };
   };
 }
 
 const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
-  const { note } = route.params || {};
+  const { refetchNotes } = useUtilStore();
+  const { noteId } = route.params || {};
   const { formatDate } = useHelper();
   const navigation: any = useNavigation();
   const [loading, setLoading] = useState(false);
+  const [note, setNote] = useState<Note>();
+  const [gettingNote, setGettingNote] = useState(false);
   const [showImage, setShowImage] = useState(false);
+  const getNote = async () => {
+    try {
+      setGettingNote(true);
+      if (noteId) {
+        const data = await NotesRepo.getSingleNote(noteId);
+        setNote(data);
+      }
+    } catch (err: any) {
+      console.error("get note error:", err);
+    } finally {
+      setGettingNote(false);
+    }
+  };
+
   const deleteNote = async () => {
     try {
       setLoading(true);
       await NotesRepo.deleteNote(note?._id!);
+      refetchNotes();
       navigation.goBack();
     } catch (err: any) {
       console.error("Delete note error:", err);
@@ -48,7 +68,10 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
       },
     ]);
   };
-  useFocusEffect(() => {});
+  useEffect(() => {});
+  useEffect(() => {
+    getNote();
+  }, []);
   return (
     <ScreenWrapper
       title={note?.title}
@@ -56,47 +79,53 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
       showBackbutton
       image={note?.image}
     >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={commonStyles.screenWrapper}
-      >
-        {note?.image && (
-          <>
-            <ImageModal
-              defaultImage={note?.image}
-              onPress={() => setShowImage(true)}
+      {gettingNote ? (
+        <ScreenLoader />
+      ) : (
+        <>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={commonStyles.screenWrapper}
+          >
+            {note?.image && (
+              <>
+                <ImageModal
+                  defaultImage={note?.image}
+                  onPress={() => setShowImage(true)}
+                />
+                <ImageView
+                  images={[{ uri: note.image }]}
+                  imageIndex={0}
+                  visible={showImage}
+                  onRequestClose={() => setShowImage(false)}
+                />
+              </>
+            )}
+            <Text style={commonStyles.basicText}>{note?.note}</Text>
+            <Spacer size={50} />
+          </ScrollView>
+          <Row
+            justifyContent="space-between"
+            style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
+            alignItems="center"
+          >
+            <CustomButton
+              title="Edit"
+              onPress={() => navigation.navigate(ROUTES.CREATE_NOTE, { note })}
+              rounded
+              halfWidth
             />
-            <ImageView
-              images={[{ uri: note.image }]}
-              imageIndex={0}
-              visible={showImage}
-              onRequestClose={() => setShowImage(false)}
+            <CustomButton
+              title="Delete"
+              onPress={handleDelete}
+              halfWidth
+              rounded
+              error
+              loading={loading}
             />
-          </>
-        )}
-        <Text style={commonStyles.basicText}>{note?.note}</Text>
-        <Spacer size={50} />
-      </ScrollView>
-      <Row
-        justifyContent="space-between"
-        style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
-        alignItems="center"
-      >
-        <CustomButton
-          title="Edit"
-          onPress={() => navigation.navigate(ROUTES.CREATE_NOTE, { note })}
-          rounded
-          halfWidth
-        />
-        <CustomButton
-          title="Delete"
-          onPress={handleDelete}
-          halfWidth
-          rounded
-          error
-          loading={loading}
-        />
-      </Row>
+          </Row>
+        </>
+      )}
     </ScreenWrapper>
   );
 };

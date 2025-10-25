@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-
 import ScreenWrapper from "../../components/ScreenWrapper";
 import EmptyState from "../../components/emptyState";
 import { NotificationRepo } from "../../repositories/notification";
@@ -75,7 +73,7 @@ const NotificationScreen = () => {
   );
 
   // ------------------ Refetch on screen focus ------------------ //
-  useFocusEffect(
+  useEffect(
     useCallback(() => {
       if (notifications.length === 0) {
         fetchNotifications(1, true);

@@ -12,9 +12,11 @@ import {
   UpdateTaskPayload,
 } from "../../types/task";
 import { useAuthStore } from "../../store/authStore";
+import { useUtilStore } from "../../store/utils";
 
-export function useCreateTaskViewModel(initialTask?: any) {
+export function useCreateTaskViewModel(initialTask?: any, repeat: boolean) {
   const { user } = useAuthStore();
+  const { refetchTask } = useUtilStore();
   const [title, setTitle] = useState(initialTask?.title || "");
   const [description, setDescription] = useState(
     initialTask?.description || ""
@@ -33,7 +35,9 @@ export function useCreateTaskViewModel(initialTask?: any) {
     initialTask?.subtasks?.map((st: any) => ({
       _id: st._id,
       title: st.title,
-      dueDateTime: new Date(st.dueDateTime),
+      dueDateTime: repeat
+        ? new Date(Date.now() + 60 * 60 * 1000)
+        : new Date(st.dueDateTime),
       status: st.status || SubtaskStatus.Pending,
       completedAt: st.completedAt || null,
       updatedBy: st.updatedBy || null,
@@ -46,6 +50,7 @@ export function useCreateTaskViewModel(initialTask?: any) {
       },
     ]
   );
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,6 +112,7 @@ export function useCreateTaskViewModel(initialTask?: any) {
       } else {
         response = await TaskRepo.createTask(payload);
       }
+      refetchTask();
       setLoading(false);
       return response;
     } catch (err: any) {

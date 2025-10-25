@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, FlatList, ActivityIndicator } from "react-native";
 import { useCompletedTasksViewModel } from "./historyViewModel";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { commonStyles } from "../../styles/commonstyles";
 import EmptyState from "../../components/emptyState";
-import { useFocusEffect } from "@react-navigation/native";
 import { useHelper } from "../../utils/helper";
 import CustomInput from "../../components/customInput";
 import TasksCard from "../../components/tasksCard";
 import { theme } from "../../infrastructure/theme";
 import { Images } from "../../../assets/images/images";
+import { useUtilStore } from "../../store/utils";
 
 export default function HistoryScreen({ navigation }: any) {
   const {
@@ -26,12 +26,11 @@ export default function HistoryScreen({ navigation }: any) {
     toggleSearch,
     showSearch,
   } = useCompletedTasksViewModel();
+  const { fetchingHistory } = useUtilStore();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchCompletedTasks(1, true);
-    }, [])
-  );
+  useEffect(() => {
+    fetchCompletedTasks(1, true);
+  }, [fetchingHistory]);
 
   const { themeColor } = useHelper();
 

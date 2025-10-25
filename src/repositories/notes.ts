@@ -50,6 +50,12 @@ export class NotesRepo {
     return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 
+  // 🔹 Get single note by ID
+  static async getSingleNote(noteId: string) {
+    const url = AppUrl.getSingleNote(noteId);
+    return ApiService.getApiResponse(url, HttpMethods.GET);
+  }
+
   // 🔹 Create a new note
   static async createNote(payload: CreateNotePayload) {
     return ApiService.getApiResponse(

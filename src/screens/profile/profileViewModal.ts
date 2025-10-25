@@ -9,6 +9,7 @@ import { useAuthStore } from "../../store/authStore";
 
 export function useProfileViewModel() {
   const { updateUser, user, logout: storeLogout } = useAuthStore();
+  const [loadingUserDetail, setLoadingUserDetail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [partnerInput, setPartnerInput] = useState("");
@@ -85,6 +86,24 @@ export function useProfileViewModel() {
   }
   const partnerId = user?.partner?.userId;
   const partnerImage = user?.partner?.image;
+
+  const fetchUserDetails = async () => {
+    try {
+      setLoadingUserDetail(true);
+      if (user?.userId) {
+        const data = await AuthRepo.getUserDetails(user.userId);
+        if (data?.user) {
+          updateUser(data.user);
+          return data.user;
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingUserDetail(false);
+    }
+  };
+
   return {
     user,
     loading,
@@ -99,5 +118,7 @@ export function useProfileViewModel() {
     partnerInput,
     setPartnerInput,
     partnerImage,
+    loadingUserDetail,
+    fetchUserDetails,
   };
 }

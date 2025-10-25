@@ -57,7 +57,6 @@ export class ApiService {
     if (response.ok) {
       return body;
     }
-    console.log(body);
     // Handle your backend error structure
     const message =
       typeof body.message === "string"

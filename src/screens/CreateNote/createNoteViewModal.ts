@@ -6,8 +6,10 @@ import {
   UpdateNotePayload,
 } from "../../repositories/notes";
 import { useHelper } from "../../utils/helper";
+import { useUtilStore } from "../../store/utils";
 
 export function useNoteDetailViewModel(note?: Note) {
+  const { refetchNotes } = useUtilStore();
   const [noteTitle, setNoteTitle] = useState<string>(note?.title || "");
   const [noteText, setNoteText] = useState<string>(note?.note || "");
   const [noteImage, setNoteImage] = useState<string>(note?.image || "");
@@ -65,6 +67,7 @@ export function useNoteDetailViewModel(note?: Note) {
       console.error("Save note error:", err);
       setError(err.message || "Failed to save note");
     } finally {
+      refetchNotes();
       setLoading(false);
     }
   };

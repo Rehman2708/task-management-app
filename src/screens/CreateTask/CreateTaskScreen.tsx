@@ -17,8 +17,8 @@ import ImageModal from "../../components/imageModal";
 import { Priority } from "../../enums/tasks";
 // Pass `task` prop for edit mode
 export const CreateTaskScreen = ({ route, navigation }: any) => {
-  const { task } = route.params || {};
-  const vm = useCreateTaskViewModel(task);
+  const { task, repeat } = route.params || {};
+  const vm = useCreateTaskViewModel(task, repeat);
   const styles = createTaskStyle();
   const { themeColor, getPriorityColor } = useHelper();
 

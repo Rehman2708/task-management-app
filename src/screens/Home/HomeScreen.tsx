@@ -7,20 +7,19 @@ import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
 import { useHelper } from "../../utils/helper";
 import EmptyState from "../../components/emptyState";
-import { useFocusEffect } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect } from "react";
 import TasksCard from "../../components/tasksCard";
 import { Images } from "../../../assets/images/images";
+import { useUtilStore } from "../../store/utils";
 
 export default function HomeScreen({ navigation }: any) {
   const { tasks, loading, error, fetchTasks, deleteTask } =
     useHomeScreenViewModel();
   const { loggedInUser, themeColor } = useHelper();
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchTasks();
-    }, [])
-  );
+  const { fetchingTask } = useUtilStore();
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchingTask]);
 
   return (
     <ScreenWrapper showImage title={`Hey, ${loggedInUser?.name?.trim()}!`}>

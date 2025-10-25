@@ -152,7 +152,6 @@ export default function ReelsScreen() {
       </View>
     );
   }
-  console.log(videos, error, loading);
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <FlatList

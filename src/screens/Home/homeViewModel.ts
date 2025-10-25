@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { useAuthStore } from "../../store/authStore";
 import { useHelper } from "../../utils/helper";
+import { useUtilStore } from "../../store/utils";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -17,6 +18,7 @@ Notifications.setNotificationHandler({
 
 export function useHomeScreenViewModel() {
   const { user } = useAuthStore();
+  const { refetchTask } = useUtilStore();
   const { handleNotificationNavigation } = useHelper();
   const navigation: any = useNavigation();
   const [tasks, setTasks] = useState<any[]>([]);

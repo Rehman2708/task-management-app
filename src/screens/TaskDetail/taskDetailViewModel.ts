@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { TaskRepo } from "../../repositories/task";
 import { SubtaskStatus } from "../../enums/tasks";
 import { useAuthStore } from "../../store/authStore";
+import { useUtilStore } from "../../store/utils";
 
 export function useTaskDetailViewModel(taskId: string) {
   const { user } = useAuthStore();
+  const { refetchTask, refetchHistory } = useUtilStore();
   const [task, setTask] = useState<any>(null);
   const [taskDetailLoading, setTaskDetailLoading] = useState(true);
   const [taskCommentLoading, setTaskCommentLoading] = useState(false);
@@ -56,6 +58,8 @@ export function useTaskDetailViewModel(taskId: string) {
     } catch (err: any) {
       console.error("Update subtask status error:", err);
     } finally {
+      refetchTask();
+      refetchHistory();
       setSubtaskStatusLoading(null);
     }
   };

@@ -118,7 +118,7 @@ export default function CreateVideoScreen() {
             onChangeText={setVideoUrl}
             placeholder="Enter video URL"
             multiline
-            inputStyle={{ maxHeight: 200 }}
+            inputStyle={{ maxHeight: 100, minHeight: 100 }}
           />
 
           <CustomButton

@@ -77,8 +77,8 @@ export function useHelper() {
 
     switch (notData.type) {
       case "note":
-        if (notData.noteData) {
-          navigation.navigate(ROUTES.VIEW_NOTE, { note: notData.noteData });
+        if (notData.noteId) {
+          navigation.navigate(ROUTES.VIEW_NOTE, { noteId: notData.noteId });
         } else {
           navigation.navigate(ROUTES.NOTES);
         }
