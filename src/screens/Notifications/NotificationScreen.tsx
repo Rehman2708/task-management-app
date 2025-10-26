@@ -15,6 +15,7 @@ import { commonStyles } from "../../styles/commonstyles";
 import { Column } from "../../tools";
 import { theme } from "../../infrastructure/theme";
 import { Images } from "../../../assets/images/images";
+import ScreenLoader from "../../components/screenLoader";
 
 interface NotificationItem {
   _id: string;
@@ -134,6 +135,7 @@ const NotificationScreen = () => {
 
   return (
     <ScreenWrapper title="Notifications" showBackbutton>
+      {loading && notifications.length === 0 && <ScreenLoader />}
       {notifications.length === 0 && !loading ? (
         <EmptyState
           text="No notifications!"
