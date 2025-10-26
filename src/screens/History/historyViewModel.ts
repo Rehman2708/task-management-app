@@ -72,7 +72,7 @@ export function useCompletedTasksViewModel() {
   const handleDeleteTask = async (taskId: string) => {
     try {
       setInitialLoading(true);
-      await TaskRepo.deleteTask(taskId);
+      await TaskRepo.deleteTask(taskId, user?.userId);
       setTasks((prev) => prev.filter((task) => task._id !== taskId));
       setAllTasks((prev) => prev.filter((task) => task._id !== taskId));
     } catch (err: any) {

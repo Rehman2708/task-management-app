@@ -129,17 +129,6 @@ export default function ReelsScreen() {
     };
   }, []);
 
-  // if (loading && videos.length === 0) {
-  //   return (
-  //     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-  //       <View style={styles.loaderOverlay}>
-  //         <EmptyState text={""} />
-  //         <ActivityIndicator size="large" color="#fff" />
-  //       </View>
-  //     </View>
-  //   );
-  // }
-
   if (error || loading || videos.length === 0) {
     return (
       <View style={[styles.container]}>

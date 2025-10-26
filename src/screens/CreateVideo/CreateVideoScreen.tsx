@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -79,6 +80,9 @@ export default function CreateVideoScreen() {
   };
 
   const handleTest = () => {
+    if (Keyboard.isVisible()) {
+      Keyboard.dismiss();
+    }
     setError(null);
     setIsTested(true);
     setIsPlayable(false);

@@ -1,19 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  View,
-  Pressable,
-  Text,
-  StyleSheet,
-  Modal,
-  FlatList,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { View, Pressable, Text, StyleSheet } from "react-native";
 import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
 
-import { IVideo, IVideoComment } from "../types/videos";
+import { IVideo } from "../types/videos";
 import Avatar from "./avatar";
 import { Column, Row } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
@@ -21,11 +11,8 @@ import { useHelper } from "../utils/helper";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../store/authStore";
 import { VideoRepo } from "../repositories/videos";
-import CommentCard from "./commentCard";
-import CustomButton from "./customButton";
-import CustomInput from "./customInput";
 import { theme } from "../infrastructure/theme";
-import EmptyState from "./emptyState";
+import VideoCommentsModal from "../screens/Reels/VideoCommentsModal";
 
 type Props = {
   item: IVideo;
@@ -65,9 +52,6 @@ export default function VideoItem({
   const videoRef = useRef<IVideo | null>(null);
   const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
   const [commentsModalVisible, setCommentsModalVisible] = useState(false);
-  const [comments, setComments] = useState<IVideoComment[]>([]);
-  const [newComment, setNewComment] = useState("");
-  const [addingComment, setAddingComment] = useState(false);
   const navigation: any = useNavigation();
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
@@ -75,19 +59,6 @@ export default function VideoItem({
   const shouldPlay =
     playAlways || (Math.abs(currentIndex - index) <= 0 && isFocused);
   const paused = !shouldPlay || longPressedIndex === index;
-
-  useEffect(() => {
-    if (commentsModalVisible) fetchComments();
-  }, [commentsModalVisible]);
-
-  const fetchComments = async () => {
-    try {
-      const res: any = await VideoRepo.getVideoComments(item._id);
-      if (res?.comments) setComments(res.comments);
-    } catch (err) {
-      console.error("fetchComments error:", err);
-    }
-  };
 
   const handleViewed = useCallback(async () => {
     try {
@@ -97,26 +68,6 @@ export default function VideoItem({
       console.error("markRead video error:", err);
     }
   }, []);
-
-  const handleAddComment = async () => {
-    if (!newComment.trim() || !user?.userId) return;
-    setAddingComment(true);
-    try {
-      const res: any = await VideoRepo.addVideoComment(item._id, {
-        createdBy: user.userId,
-        text: newComment.trim(),
-      });
-
-      if (res?.comments) {
-        setComments(res.comments);
-        setNewComment("");
-      }
-    } catch (err) {
-      console.error("add comment error:", err);
-    } finally {
-      setAddingComment(false);
-    }
-  };
 
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
@@ -203,10 +154,16 @@ export default function VideoItem({
               color={"white"}
               size={35}
             />
-            {user?.userId !== item.createdBy && !isViewed && (
+            {user?.userId !== item.createdBy && !isViewed ? (
               <Ionicons
                 onPress={handleViewed}
                 name="eye-outline"
+                color={"white"}
+                size={35}
+              />
+            ) : (
+              <Ionicons
+                name={isViewed ? "eye" : "eye-off"}
                 color={"white"}
                 size={35}
               />
@@ -224,80 +181,11 @@ export default function VideoItem({
       </Pressable>
 
       {/* Comments Modal */}
-      <Modal
+      <VideoCommentsModal
+        videoId={item._id}
         visible={commentsModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setCommentsModalVisible(false)}
-      >
-        <View
-          // onPress={() => setCommentsModalVisible(false)}
-          style={styles.modalOverlay}
-        >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.modalContent}
-          >
-            <Row
-              justifyContent="space-between"
-              style={{ paddingHorizontal: 6, paddingVertical: 20 }}
-            >
-              <Text style={[commonStyles.subTitleText]}>Comments</Text>
-              <Ionicons
-                name="close"
-                size={30}
-                color={theme.colors.text}
-                onPress={() => setCommentsModalVisible(false)}
-              />
-            </Row>
-            <FlatList
-              data={comments}
-              keyExtractor={(item, idx) => item._id || idx.toString()}
-              contentContainerStyle={{ paddingHorizontal: 12 }}
-              renderItem={({ item: c, index }) => {
-                const prev = comments?.[index - 1];
-                const sameUser = index > 0 && c?.createdBy === prev?.createdBy;
-                return (
-                  <>
-                    <CommentCard
-                      image={c?.createdByDetails?.image}
-                      text={c?.text}
-                      name={c?.createdByDetails?.name ?? c?.createdBy}
-                      userId={c?.createdBy}
-                      time={formatDate(c?.createdAt!)}
-                      repeated={sameUser}
-                    />
-                  </>
-                );
-              }}
-              ListEmptyComponent={<EmptyState text="No Comments" />}
-            />
-            <View
-              style={{ gap: 8, flexDirection: "row", alignItems: "center" }}
-            >
-              <CustomInput
-                placeholder="Add comment..."
-                value={newComment}
-                onChangeText={setNewComment}
-                fullFlex
-                multiline
-                rounded
-                inputStyle={{
-                  minHeight: 40,
-                  textAlignVertical: "center",
-                }}
-              />
-
-              <CustomButton
-                onPress={handleAddComment}
-                title="Send"
-                sendButton
-                loading={addingComment}
-              />
-            </View>
-          </KeyboardAvoidingView>
-        </View>
-      </Modal>
+        onClose={() => setCommentsModalVisible(false)}
+      />
     </View>
   );
 }
@@ -306,16 +194,4 @@ const styles = StyleSheet.create({
   videoContainer: { width: "100%" },
   video: { ...StyleSheet.absoluteFillObject },
   overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    backgroundColor: theme.colors.background,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 6,
-    height: "70%",
-  },
 });

@@ -61,10 +61,13 @@ export class TaskRepo {
   }
 
   // 🔹 Delete a task
-  static async deleteTask(taskId: string) {
+  static async deleteTask(taskId: string, userId: string) {
     return ApiService.getApiResponse(
       AppUrl.deleteTask(taskId),
-      HttpMethods.DELETE
+      HttpMethods.DELETE,
+      {
+        userId,
+      }
     );
   }
 

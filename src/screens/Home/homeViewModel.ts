@@ -58,7 +58,7 @@ export function useHomeScreenViewModel() {
   const handleDeleteTask = async (taskId: string) => {
     try {
       setLoading(true);
-      await TaskRepo.deleteTask(taskId);
+      await TaskRepo.deleteTask(taskId, user?.userId ?? "");
       setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
     } catch (err: any) {
       console.error("Delete task error:", err);

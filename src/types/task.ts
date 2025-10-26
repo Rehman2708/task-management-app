@@ -74,11 +74,12 @@ export interface UpdateTaskPayload {
 
 export interface UpdateSubtaskStatusPayload {
   userId: string;
-  status: "Pending" | "Completed";
+  status: SubtaskStatus;
 }
 
 export interface AddCommentPayload {
   userId?: string;
   createdBy?: string; // for task-level comments
+  by?: string; // for task-level comments
   text: string;
 }

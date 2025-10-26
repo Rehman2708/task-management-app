@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TaskRepo } from "../../repositories/task";
 import { SubtaskStatus } from "../../enums/tasks";
 import { useAuthStore } from "../../store/authStore";
@@ -19,11 +19,20 @@ export function useTaskDetailViewModel(taskId: string) {
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState("");
 
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (user?.userId) setUserId(user.userId);
     fetchTaskDetail();
+
+    // Start background polling (real-time like updates)
+    pollingRef.current = setInterval(fetchNewComments, 3000); // every 3s
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
   }, [taskId]);
 
+  // ---------- Fetch Task Details ----------
   const fetchTaskDetail = async () => {
     try {
       setTaskDetailLoading(true);
@@ -37,6 +46,48 @@ export function useTaskDetailViewModel(taskId: string) {
     }
   };
 
+  // ---------- Polling Helper: merge only new comments ----------
+  const fetchNewComments = async () => {
+    try {
+      const response = await TaskRepo.getTaskById(taskId);
+
+      setTask((prev: any) => {
+        if (!prev) return response;
+
+        // Merge new task comments
+        const oldComments = prev.comments || [];
+        const newComments = response.comments || [];
+        const mergedComments =
+          newComments.length > oldComments.length ? newComments : oldComments;
+
+        // Merge new subtask comments individually
+        const mergedSubtasks = prev.subtasks?.map((oldSubtask: any) => {
+          const newSubtask = response.subtasks?.find(
+            (s: any) => s._id === oldSubtask._id
+          );
+          if (!newSubtask) return oldSubtask;
+
+          const oldC = oldSubtask.comments || [];
+          const newC = newSubtask.comments || [];
+
+          return {
+            ...oldSubtask,
+            comments: newC.length > oldC.length ? newC : oldC,
+          };
+        });
+
+        return {
+          ...prev,
+          comments: mergedComments,
+          subtasks: mergedSubtasks || prev.subtasks,
+        };
+      });
+    } catch (err) {
+      console.error("Polling fetch error:", err);
+    }
+  };
+
+  // ---------- Update Subtask Status ----------
   const updateSubtaskStatus = async (
     subtaskId: string,
     status: SubtaskStatus
@@ -45,17 +96,17 @@ export function useTaskDetailViewModel(taskId: string) {
       setSubtaskStatusLoading(subtaskId);
       await TaskRepo.updateSubtaskStatus(taskId, subtaskId, { userId, status });
 
-      // Update locally instead of refetching
-      setTask((prev: any) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          subtasks: prev.subtasks.map((s: any) =>
-            s._id === subtaskId ? { ...s, status } : s
-          ),
-        };
-      });
-    } catch (err: any) {
+      setTask((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              subtasks: prev.subtasks.map((s: any) =>
+                s._id === subtaskId ? { ...s, status } : s
+              ),
+            }
+          : prev
+      );
+    } catch (err) {
       console.error("Update subtask status error:", err);
     } finally {
       refetchTask();
@@ -64,16 +115,14 @@ export function useTaskDetailViewModel(taskId: string) {
     }
   };
 
+  // ---------- Add Task Comment ----------
   const addTaskComment = async (text: string) => {
     try {
       setTaskCommentLoading(true);
-
-      // Call API (don’t rely on return for UI)
       await TaskRepo.addTaskComment(taskId, { by: userId, text });
 
-      // Create local comment object
       const newComment = {
-        _id: Date.now().toString(), // temporary ID
+        _id: Date.now().toString(),
         text,
         createdBy: userId,
         createdByDetails: {
@@ -83,26 +132,24 @@ export function useTaskDetailViewModel(taskId: string) {
         date: new Date().toISOString(),
       };
 
-      // Append to state
       setTask((prev: any) =>
         prev
           ? { ...prev, comments: [...(prev.comments || []), newComment] }
           : prev
       );
-    } catch (err: any) {
+    } catch (err) {
       console.error("Add task comment error:", err);
     } finally {
       setTaskCommentLoading(false);
     }
   };
 
+  // ---------- Add Subtask Comment ----------
   const addSubtaskComment = async (subtaskId: string, text: string) => {
     try {
       setSubtaskCommentLoading(subtaskId);
-
       await TaskRepo.addSubtaskComment(taskId, subtaskId, { userId, text });
 
-      // Create local comment object
       const newComment = {
         _id: Date.now().toString(),
         text,
@@ -114,7 +161,6 @@ export function useTaskDetailViewModel(taskId: string) {
         createdAt: new Date().toISOString(),
       };
 
-      // Append to correct subtask
       setTask((prev: any) => {
         if (!prev) return prev;
         return {
@@ -126,7 +172,7 @@ export function useTaskDetailViewModel(taskId: string) {
           ),
         };
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error("Add subtask comment error:", err);
     } finally {
       setSubtaskCommentLoading(null);
@@ -137,8 +183,8 @@ export function useTaskDetailViewModel(taskId: string) {
     task,
     taskDetailLoading,
     taskCommentLoading,
-    subtaskCommentLoading, // holds subtaskId when loading
-    subtaskStatusLoading, // holds subtaskId when loading
+    subtaskCommentLoading,
+    subtaskStatusLoading,
     error,
     userId,
     fetchTaskDetail,

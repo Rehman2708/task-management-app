@@ -27,6 +27,7 @@ interface ICustomButton {
   error?: boolean;
   success?: boolean;
   sendButton?: boolean;
+  iconName?: string;
 }
 
 const CustomButton = ({
@@ -43,6 +44,7 @@ const CustomButton = ({
   error = false,
   success = false,
   sendButton,
+  iconName,
 }: ICustomButton) => {
   const { themeColor } = useHelper();
   const buttonStyles = [
@@ -73,11 +75,14 @@ const CustomButton = ({
         <Row
           justifyContent="center"
           alignItems="center"
-          style={{
-            padding: 12,
-            borderRadius: 100,
-            backgroundColor: themeColor?.dark ?? theme.colors.primary,
-          }}
+          style={[
+            {
+              padding: 12,
+              borderRadius: 100,
+              backgroundColor: themeColor?.dark ?? theme.colors.primary,
+            },
+            success && styles.success,
+          ]}
         >
           {loading ? (
             <ActivityIndicator
@@ -90,7 +95,7 @@ const CustomButton = ({
             />
           ) : (
             <Ionicons
-              name="send-outline"
+              name={iconName ?? "send-outline"}
               size={20}
               color={theme.colors.white}
             />
