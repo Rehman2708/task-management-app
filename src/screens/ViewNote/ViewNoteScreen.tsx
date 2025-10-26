@@ -12,6 +12,7 @@ import ImageModal from "../../components/imageModal";
 import ImageView from "react-native-image-viewing";
 import ScreenLoader from "../../components/screenLoader";
 import { useUtilStore } from "../../store/utils";
+import { useAuthStore } from "../../store/authStore";
 
 interface NoteDetailScreenProps {
   route: {
@@ -23,6 +24,7 @@ interface NoteDetailScreenProps {
 }
 
 const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
+  const { user } = useAuthStore();
   const { refetchNotes } = useUtilStore();
   const { noteId } = route.params || {};
   const { formatDate } = useHelper();
@@ -48,7 +50,7 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   const deleteNote = async () => {
     try {
       setLoading(true);
-      await NotesRepo.deleteNote(note?._id!);
+      await NotesRepo.deleteNote(note?._id!, user?.userId ?? "");
       refetchNotes();
       navigation.goBack();
     } catch (err: any) {

@@ -29,6 +29,7 @@ export interface UpdateNotePayload {
   note: string;
   title: string;
   image?: string | null;
+  userId: string;
 }
 
 export class NotesRepo {
@@ -75,18 +76,21 @@ export class NotesRepo {
   }
 
   // 🔹 Delete a note
-  static async deleteNote(noteId: string) {
+  static async deleteNote(noteId: string, userId: string) {
     return ApiService.getApiResponse(
       AppUrl.deleteNote(noteId),
-      HttpMethods.DELETE
+      HttpMethods.DELETE,
+      {
+        userId,
+      }
     );
   }
   // 🔹 Pin or Unpin a note
-  static async pinNote(noteId: string, pinned: boolean) {
+  static async pinNote(noteId: string, pinned: boolean, userId: string) {
     return ApiService.getApiResponse(
       AppUrl.pinUnpinNote(noteId), // You need to add this in your AppUrl file
       HttpMethods.PATCH,
-      { pinned }
+      { pinned, userId }
     );
   }
 }

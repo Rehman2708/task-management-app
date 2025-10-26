@@ -70,7 +70,7 @@ export function useNotesListViewModel(userId?: string) {
   const handlePinUnpinNote = async (noteId: string, pinned: boolean) => {
     try {
       setInitialLoading(true);
-      await NotesRepo.pinNote(noteId, !pinned);
+      await NotesRepo.pinNote(noteId, !pinned, user?.userId ?? "");
       fetchNotes(1, true);
     } catch (err: any) {
       console.error("Pin/unpin note error:", err);

@@ -5,8 +5,8 @@ import {
   CreateNotePayload,
   UpdateNotePayload,
 } from "../../repositories/notes";
-import { useHelper } from "../../utils/helper";
 import { useUtilStore } from "../../store/utils";
+import { useAuthStore } from "../../store/authStore";
 
 export function useNoteDetailViewModel(note?: Note) {
   const { refetchNotes } = useUtilStore();
@@ -16,7 +16,7 @@ export function useNoteDetailViewModel(note?: Note) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const { loggedInUser } = useHelper();
+  const { user: loggedInUser } = useAuthStore();
 
   useEffect(() => {
     if (note) {
@@ -43,6 +43,7 @@ export function useNoteDetailViewModel(note?: Note) {
           title: noteTitle,
           note: append ? `${note.note}\n${noteText}` : noteText,
           image: noteImage,
+          userId: loggedInUser?.userId ?? "",
         };
         const updatedNote = await NotesRepo.updateNote(note._id, payload);
         setSuccess(

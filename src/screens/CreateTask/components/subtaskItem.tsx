@@ -42,7 +42,7 @@ export const AndroidDateTimePicker = ({
         title={dueDateTime ? dueDateTime.toLocaleString() : "No date selected"}
         rounded
         onPress={() => setShowDatePicker(true)}
-        customStyle={{ height: 30, width: 200 }}
+        customStyle={{ height: 30, width: 210 }}
       />
 
       {showDatePicker && (

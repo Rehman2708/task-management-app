@@ -36,7 +36,20 @@ export function useCreateTaskViewModel(initialTask?: any, repeat: boolean) {
       _id: st._id,
       title: st.title,
       dueDateTime: repeat
-        ? new Date(Date.now() + 60 * 60 * 1000)
+        ? (() => {
+            const original = new Date(st.dueDateTime);
+            const now = new Date();
+            // Use today's date but original time (hours/minutes/seconds)
+            const adjusted = new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+              original.getHours(),
+              original.getMinutes(),
+              original.getSeconds()
+            );
+            return adjusted;
+          })()
         : new Date(st.dueDateTime),
       status: st.status || SubtaskStatus.Pending,
       completedAt: st.completedAt || null,

@@ -67,6 +67,7 @@ export default function VideoItem({
   const [commentsModalVisible, setCommentsModalVisible] = useState(false);
   const [comments, setComments] = useState<IVideoComment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [addingComment, setAddingComment] = useState(false);
   const navigation: any = useNavigation();
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
@@ -99,7 +100,7 @@ export default function VideoItem({
 
   const handleAddComment = async () => {
     if (!newComment.trim() || !user?.userId) return;
-
+    setAddingComment(true);
     try {
       const res: any = await VideoRepo.addVideoComment(item._id, {
         createdBy: user.userId,
@@ -112,6 +113,8 @@ export default function VideoItem({
       }
     } catch (err) {
       console.error("add comment error:", err);
+    } finally {
+      setAddingComment(false);
     }
   };
 
@@ -227,8 +230,8 @@ export default function VideoItem({
         transparent={true}
         onRequestClose={() => setCommentsModalVisible(false)}
       >
-        <Pressable
-          onPress={() => setCommentsModalVisible(false)}
+        <View
+          // onPress={() => setCommentsModalVisible(false)}
           style={styles.modalOverlay}
         >
           <KeyboardAvoidingView
@@ -289,10 +292,11 @@ export default function VideoItem({
                 onPress={handleAddComment}
                 title="Send"
                 sendButton
+                loading={addingComment}
               />
             </View>
           </KeyboardAvoidingView>
-        </Pressable>
+        </View>
       </Modal>
     </View>
   );
