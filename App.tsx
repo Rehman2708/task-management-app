@@ -14,6 +14,11 @@ export default function App() {
     MontserratMedium: require("./assets/fonts/MontserratAlternates-Medium.ttf"),
     MontserratRegular: require("./assets/fonts/MontserratAlternates-Regular.ttf"),
     MontserratSemiBold: require("./assets/fonts/MontserratAlternates-SemiBold.ttf"),
+    SourGummyBold: require("./assets/fonts/SourGummy-Bold.ttf"),
+    SourGummyLight: require("./assets/fonts/SourGummy-Light.ttf"),
+    SourGummyMedium: require("./assets/fonts/SourGummy-Medium.ttf"),
+    SourGummyRegular: require("./assets/fonts/SourGummy-Regular.ttf"),
+    SourGummySemiBold: require("./assets/fonts/SourGummy-SemiBold.ttf"),
     TangerineRegular: require("./assets/fonts/Tangerine-Regular.ttf"),
     TangerineBold: require("./assets/fonts/Tangerine-Bold.ttf"),
   });

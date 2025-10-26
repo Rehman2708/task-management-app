@@ -21,13 +21,21 @@ export const theme = {
     lg: 16,
     xl: 24,
   },
-  fonts: {
-    light: "MontserratLight",
-    regular: "MontserratRegular",
-    medium: "MontserratMedium",
-    semibold: "MontserratSemiBold",
-    bold: "MontserratBold",
-  },
+  fonts: true
+    ? {
+        light: "SourGummyLight",
+        regular: "SourGummyRegular",
+        medium: "SourGummyMedium",
+        semibold: "SourGummySemiBold",
+        bold: "SourGummyBold",
+      }
+    : {
+        light: "MontserratLight",
+        regular: "MontserratRegular",
+        medium: "MontserratMedium",
+        semibold: "MontserratSemiBold",
+        bold: "MontserratBold",
+      },
   fontSizes: {
     xxs: 10,
     xs: 12,
