@@ -58,9 +58,9 @@ export const commonStyles = StyleSheet.create({
     borderRightColor: isDarkMode ? "#ffffff10" : "#00000014",
     borderBottomColor: isDarkMode ? "#ffffff10" : "#00000014",
     overflow: "hidden",
-    marginVertical: 6,
-    borderBottomEndRadius: 24,
-    borderTopStartRadius: 32,
+    marginVertical: 4,
+    // borderBottomEndRadius: 24,
+    // borderTopStartRadius: 32,
   },
   secondaryContainer: {
     backgroundColor: `${theme.colors.secondary}10`,

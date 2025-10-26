@@ -14,7 +14,7 @@ export function useCompletedTasksViewModel() {
   const [error, setError] = useState<string | null>(null);
 
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);

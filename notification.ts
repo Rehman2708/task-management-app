@@ -25,13 +25,47 @@ async function ensurePermission() {
 }
 
 async function setupAndroidChannel() {
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.MAX,
+  if (Platform.OS !== "android") return;
+
+  // Define your channels
+  const channels = [
+    {
+      id: "note",
+      name: "Notes",
+      sound: "notification.wav", // must exist in your assets folder (if used)
+      importance: Notifications.AndroidImportance.DEFAULT,
+    },
+    {
+      id: "task",
+      name: "Tasks",
       sound: "notification.wav",
+      importance: Notifications.AndroidImportance.HIGH,
+    },
+    {
+      id: "video",
+      name: "Videos",
+      sound: "notification.wav",
+      importance: Notifications.AndroidImportance.HIGH,
+    },
+    {
+      id: "profile",
+      name: "Profile Updates",
+      sound: "notification.wav",
+      importance: Notifications.AndroidImportance.DEFAULT,
+    },
+  ];
+
+  // Create each channel
+  for (const channel of channels) {
+    await Notifications.setNotificationChannelAsync(channel.id, {
+      name: channel.name,
+      importance: channel.importance,
+      sound: channel.sound,
+      vibrationPattern: [0, 250, 250, 250],
     });
   }
+
+  console.log("✅ Android notification channels set up");
 }
 
 export async function registerForPushNotificationsAsync() {

@@ -213,7 +213,7 @@ export default function CreateVideoScreen() {
                 )}
                 showsVerticalScrollIndicator={false}
                 onEndReached={handleLoadMore}
-                onEndReachedThreshold={0.6}
+                onEndReachedThreshold={0.5}
                 ListEmptyComponent={
                   <Text style={commonStyles.errorText}>No songs found</Text>
                 }

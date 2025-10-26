@@ -69,7 +69,7 @@ export default function HistoryScreen({ navigation }: any) {
               refreshing={initialLoading}
               onRefresh={() => fetchCompletedTasks(1, true)}
               onEndReached={loadMoreTasks}
-              onEndReachedThreshold={0.4}
+              onEndReachedThreshold={0.5}
               ListFooterComponent={renderFooter}
               showsVerticalScrollIndicator={false}
             />

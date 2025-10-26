@@ -147,7 +147,7 @@ const NotificationScreen = () => {
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
           onEndReached={loadMore}
-          onEndReachedThreshold={0.1}
+          onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }

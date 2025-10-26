@@ -26,7 +26,7 @@ const EmptyState = ({
       alignItems="center"
     >
       <Image
-        style={{ height: 200, width: 250 }}
+        style={{ height: 150, width: 250 }}
         resizeMode="contain"
         source={error ? errorImage : image}
       />

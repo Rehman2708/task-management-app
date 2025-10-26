@@ -133,7 +133,7 @@ export default function NotesScreen() {
               refreshing={initialLoading}
               onRefresh={() => fetchNotes(1, true)}
               onEndReached={loadMoreNotes}
-              onEndReachedThreshold={0.4}
+              onEndReachedThreshold={0.5}
               ListFooterComponent={renderFooter}
               contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
               showsVerticalScrollIndicator={false}

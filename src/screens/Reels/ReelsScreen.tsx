@@ -169,7 +169,7 @@ export default function ReelsScreen() {
         onViewableItemsChanged={onViewRef}
         viewabilityConfig={viewConfig}
         onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.6}
+        onEndReachedThreshold={0.5}
         getItemLayout={(_, index) => ({
           length: windowHeight,
           offset: windowHeight * index,
