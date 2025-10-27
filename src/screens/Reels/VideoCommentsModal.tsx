@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { IVideoComment } from "../../types/videos";
@@ -36,8 +38,9 @@ export default function VideoCommentsModal({
   const [addingComment, setAddingComment] = useState(false);
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
+  const flatListRef = useRef<FlatList<IVideoComment>>(null);
 
-  // Fetch comments initially and poll every 5 seconds
+  // Fetch comments initially and poll every 3 seconds
   useEffect(() => {
     let interval: NodeJS.Timer;
     if (visible) {
@@ -50,15 +53,28 @@ export default function VideoCommentsModal({
   const fetchComments = async () => {
     try {
       const res: any = await VideoRepo.getVideoComments(videoId);
-      if (res?.comments) setComments(res.comments);
+      if (res?.comments) {
+        const prevLength = comments.length;
+        setComments(res.comments);
+
+        // Scroll to bottom if new comment appears
+        if (res.comments.length > prevLength) {
+          setTimeout(() => {
+            flatListRef.current?.scrollToEnd({ animated: true });
+          }, 150);
+        }
+      }
     } catch (err) {
       console.error("fetchComments error:", err);
     }
   };
 
   const handleAddComment = async () => {
-    if (!newComment.trim() || !user?.userId) return;
+    if (!newComment.trim() || !user?.userId || addingComment) return;
+
+    Keyboard.dismiss();
     setAddingComment(true);
+
     try {
       const res: any = await VideoRepo.addVideoComment(videoId, {
         createdBy: user.userId,
@@ -68,6 +84,9 @@ export default function VideoCommentsModal({
       if (res?.comments) {
         setComments(res.comments);
         setNewComment("");
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 300);
       }
     } catch (err) {
       console.error("add comment error:", err);
@@ -83,76 +102,104 @@ export default function VideoCommentsModal({
       transparent
       onRequestClose={onClose}
     >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.7)",
-          justifyContent: "flex-end",
-        }}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View
           style={{
-            backgroundColor: theme.colors.background,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            paddingHorizontal: 6,
-            height: "70%",
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            justifyContent: "flex-end",
           }}
         >
-          <Row
-            justifyContent="space-between"
-            style={{ paddingHorizontal: 6, paddingVertical: 20 }}
-          >
-            <Text style={commonStyles.subTitleText}>Comments</Text>
-            <Ionicons
-              name="close"
-              size={30}
-              color={theme.colors.text}
-              onPress={onClose}
-            />
-          </Row>
-
-          <FlatList
-            data={comments}
-            keyExtractor={(item, idx) => item._id || idx.toString()}
-            contentContainerStyle={{ paddingHorizontal: 12 }}
-            renderItem={({ item: c, index }) => {
-              const prev = comments?.[index - 1];
-              const sameUser = index > 0 && c?.createdBy === prev?.createdBy;
-              return (
-                <CommentCard
-                  image={c?.createdByDetails?.image}
-                  text={c?.text}
-                  name={c?.createdByDetails?.name ?? c?.createdBy}
-                  userId={c?.createdBy}
-                  time={formatDate(c?.createdAt!)}
-                  repeated={sameUser}
-                />
-              );
+          <View
+            style={{
+              backgroundColor: theme.colors.background,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              height: "70%",
+              paddingHorizontal: 10,
+              paddingTop: 10,
             }}
-            ListEmptyComponent={<EmptyState text="No Comments" />}
-          />
+          >
+            <Row
+              justifyContent="space-between"
+              style={{ paddingHorizontal: 6, paddingVertical: 20 }}
+            >
+              <Text style={commonStyles.subTitleText}>Comments</Text>
+              <Ionicons
+                name="close"
+                size={30}
+                color={theme.colors.text}
+                onPress={onClose}
+              />
+            </Row>
 
-          <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-            <CustomInput
-              placeholder="Add comment..."
-              value={newComment}
-              onChangeText={setNewComment}
-              fullFlex
-              multiline
-              rounded
-              inputStyle={{ minHeight: 40, textAlignVertical: "center" }}
-            />
-            <CustomButton
-              onPress={handleAddComment}
-              title="Send"
-              sendButton
-              loading={addingComment}
-            />
+            <KeyboardAvoidingView
+              style={{ flex: 1 }}
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
+              keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
+            >
+              <FlatList
+                ref={flatListRef}
+                data={comments}
+                keyExtractor={(item, idx) => item._id || idx.toString()}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{
+                  paddingHorizontal: 12,
+                  paddingBottom: 10,
+                  flexGrow: 1,
+                }}
+                renderItem={({ item: c, index }) => {
+                  const prev = comments?.[index - 1];
+                  const sameUser =
+                    index > 0 && c?.createdBy === prev?.createdBy;
+                  return (
+                    <CommentCard
+                      image={c?.createdByDetails?.image}
+                      text={c?.text}
+                      name={c?.createdByDetails?.name ?? c?.createdBy}
+                      userId={c?.createdBy}
+                      time={formatDate(c?.createdAt!)}
+                      repeated={sameUser}
+                    />
+                  );
+                }}
+                ListEmptyComponent={<EmptyState text="No Comments" />}
+                onContentSizeChange={() =>
+                  flatListRef.current?.scrollToEnd({ animated: true })
+                }
+              />
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 8,
+                  alignItems: "center",
+                  marginBottom: Platform.OS === "ios" ? 20 : 10,
+                }}
+              >
+                <CustomInput
+                  placeholder="Add comment..."
+                  value={newComment}
+                  onChangeText={setNewComment}
+                  fullFlex
+                  multiline
+                  rounded
+                  inputStyle={{
+                    minHeight: 40,
+                    textAlignVertical: "center",
+                  }}
+                />
+                <CustomButton
+                  onPress={handleAddComment}
+                  title="Send"
+                  sendButton
+                  loading={addingComment}
+                />
+              </View>
+            </KeyboardAvoidingView>
           </View>
-        </KeyboardAvoidingView>
-      </View>
+        </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }

@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useNotesListViewModel } from "./notesViewModal";
@@ -56,16 +57,25 @@ export default function NotesScreen() {
       style={{ flex: 1, marginHorizontal: 4 }}
     >
       <CardWrapper
-        image={item?.image}
+        // image={item?.image}
         style={[
           commonStyles.cardContainer,
           commonStyles.fullFlex,
-          { borderRightWidth: 1, borderBottomWidth: 1 },
+          { borderRightWidth: 1, borderBottomWidth: 1, padding: 0 },
         ]}
       >
+        <Image
+          source={{ uri: item?.image }}
+          style={{ width: "100%", height: 80 }}
+        />
         <Column
           gap={6}
-          style={commonStyles.fullFlex}
+          style={[
+            commonStyles.fullFlex,
+            {
+              padding: 12,
+            },
+          ]}
           justifyContent="space-between"
         >
           <Column gap={6}>

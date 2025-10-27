@@ -107,7 +107,9 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
         frequency,
         priority,
         image,
-        ownerUserId: initialTask?.ownerUserId || user?.userId,
+        ownerUserId: repeat
+          ? user?.userId
+          : initialTask?.ownerUserId || user?.userId,
         createdBy: repeat
           ? user?.userId
           : initialTask?.createdBy || user?.userId,

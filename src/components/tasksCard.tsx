@@ -78,27 +78,35 @@ const TasksCard = ({
           style={[
             commonStyles.cardContainer,
             {
+              padding: 0,
               borderLeftWidth: 3,
               borderStartColor: getPriorityColor(item?.priority!),
+              marginBottom: 6,
               ...containerStyle,
             },
           ]}
-          image={item?.image}
+          // image={item?.image}
         >
           <Row alignItems="center">
             {item?.image && (
               <Image
                 source={{ uri: item.image }}
                 style={{
-                  height: 60,
-                  width: 60,
-                  borderRadius: 100,
+                  height: 90,
+                  width: 110,
+                  // borderRadius: 100,
                   backgroundColor: "#c0c0c0",
                 }}
               />
             )}
-            <Spacer size={8} position="right" />
-            <Column gap={isAndroid ? 3 : 4} style={commonStyles.fullFlex}>
+            <Column
+              gap={isAndroid ? 3 : 4}
+              justifyContent="space-evenly"
+              style={[
+                commonStyles.fullFlex,
+                { paddingHorizontal: 12, paddingVertical: 4, height: 90 },
+              ]}
+            >
               <Row justifyContent="space-between" alignItems="center">
                 <Text
                   style={[commonStyles.basicText, commonStyles.fullFlex]}

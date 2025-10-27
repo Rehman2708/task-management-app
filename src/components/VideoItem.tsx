@@ -13,6 +13,7 @@ import { useAuthStore } from "../store/authStore";
 import { VideoRepo } from "../repositories/videos";
 import { theme } from "../infrastructure/theme";
 import VideoCommentsModal from "../screens/Reels/VideoCommentsModal";
+import ProgressBar from "./timeLeftProgress";
 
 type Props = {
   item: IVideo;
@@ -52,6 +53,9 @@ export default function VideoItem({
   const videoRef = useRef<IVideo | null>(null);
   const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
   const [commentsModalVisible, setCommentsModalVisible] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+
   const navigation: any = useNavigation();
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
@@ -67,7 +71,13 @@ export default function VideoItem({
     } catch (err) {
       console.error("markRead video error:", err);
     }
-  }, []);
+  }, [item._id]);
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+  };
 
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
@@ -85,6 +95,8 @@ export default function VideoItem({
           onEnd={() => {
             videoRef.current = null;
           }}
+          onLoad={(data) => setDuration(data.duration)}
+          onProgress={(data) => setCurrentTime(data.currentTime)}
         />
       )}
 
@@ -97,22 +109,37 @@ export default function VideoItem({
         onLongPress={() => setLongPressedIndex?.(index)}
         onPressOut={() => setLongPressedIndex?.(null)}
       >
-        <Row alignItems="center" gap={8} style={{ padding: 12 }}>
-          {singleScreen && (
-            <Ionicons
-              onPress={() => navigation.goBack()}
-              name="chevron-back-outline"
-              color={"#fff"}
-              size={30}
-            />
-          )}
-          <Column gap={2}>
-            <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
-              {item.title}
+        {/* Top Row: Back + Title + Duration */}
+        <Row
+          alignItems="center"
+          justifyContent="space-between"
+          style={{ padding: 12 }}
+        >
+          <Row alignItems="center" gap={8}>
+            {singleScreen && (
+              <Ionicons
+                onPress={() => navigation.goBack()}
+                name="chevron-back-outline"
+                color={"#fff"}
+                size={30}
+              />
+            )}
+            <Column gap={2}>
+              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
+                {item.title}
+              </Text>
+            </Column>
+          </Row>
+
+          {/* Duration Display */}
+          {/* {duration > 0 && (
+            <Text style={[commonStyles.smallText, { color: "#fff" }]}>
+              {formatTime(currentTime)} / {formatTime(duration)}
             </Text>
-          </Column>
+          )} */}
         </Row>
 
+        {/* Center Mute Icon */}
         <Column
           style={commonStyles.fullFlex}
           justifyContent="center"
@@ -127,6 +154,7 @@ export default function VideoItem({
           )}
         </Column>
 
+        {/* Bottom Row */}
         <Row
           justifyContent="space-between"
           alignItems="flex-end"
@@ -178,6 +206,9 @@ export default function VideoItem({
             )}
           </Column>
         </Row>
+        <View style={{ height: 5 }}>
+          <ProgressBar currentTime={currentTime} duration={duration} />
+        </View>
       </Pressable>
 
       {/* Comments Modal */}

@@ -239,6 +239,7 @@ export default function TaskDetailScreen({ route }: any) {
                             renderSubtask({ item, createdAt: task?.createdAt })
                           }
                           scrollEnabled={false}
+                          keyboardShouldPersistTaps="always"
                         />
                       </View>
                     )}

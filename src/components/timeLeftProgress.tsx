@@ -1,18 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, Animated } from "react-native";
+import { View, StyleSheet, Animated, Text } from "react-native";
 import { theme } from "../infrastructure/theme";
 import { useHelper } from "../utils/helper";
 
 interface ProgressBarProps {
-  startTime: string; // e.g. "2025-09-19T16:03:49.050Z"
-  endTime: string; // e.g. "2025-09-21T15:30:00.000Z"
+  startTime?: string; // e.g. "2025-09-19T16:03:49.050Z"
+  endTime?: string; // e.g. "2025-09-21T15:30:00.000Z"
+  duration?: number; // in seconds
+  currentTime?: number; // in seconds
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ startTime, endTime }) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({
+  startTime,
+  endTime,
+  duration,
+  currentTime,
+}) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [percentage, setPercentage] = useState(0);
   const { themeColor } = useHelper();
+
   useEffect(() => {
+    // 🟢 CASE 1: When duration & currentTime are provided (e.g., video progress)
+    if (typeof duration === "number" && typeof currentTime === "number") {
+      const progress = duration > 0 ? currentTime / duration : 0;
+      setPercentage(Math.min(Math.round(progress * 100), 100));
+      animatedValue.setValue(progress);
+      return;
+    }
+
+    // 🟢 CASE 2: Default time-based progress (startTime → endTime)
+    if (!startTime || !endTime) return;
+
     const start = new Date(startTime).getTime();
     const end = new Date(endTime).getTime();
     const now = new Date().getTime();
@@ -22,19 +41,18 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startTime, endTime }) => {
     const updatePercentage = () => {
       const now = new Date().getTime();
       let progress = 0;
-
       if (now <= start) progress = 0;
       else if (now >= end) progress = 1;
       else progress = (now - start) / (end - start);
 
       setPercentage(Math.min(Math.round(progress * 100), 100));
+      animatedValue.setValue(progress);
     };
 
-    // initial progress
+    // Initial set
     updatePercentage();
 
     if (now <= start) {
-      // hasn't started yet → wait until start
       const delay = start - now;
       setTimeout(() => {
         Animated.timing(animatedValue, {
@@ -55,10 +73,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ startTime, endTime }) => {
       }).start();
     }
 
-    // update percentage every second
     const interval = setInterval(updatePercentage, 1000);
     return () => clearInterval(interval);
-  }, [startTime, endTime]);
+  }, [startTime, endTime, duration, currentTime]);
 
   const widthInterpolated = animatedValue.interpolate({
     inputRange: [0, 1],

@@ -1,8 +1,10 @@
 import React from "react";
-import { Text, Image } from "react-native";
+import { Text, Image, Pressable } from "react-native";
 import { useHelper } from "../utils/helper";
 import { Row, Spacer } from "../tools";
 import { commonStyles } from "../styles/commonstyles";
+import { useNavigation } from "@react-navigation/native";
+import { ROUTES } from "../enums/routes";
 
 interface AvatarProps {
   image?: string | null;
@@ -19,62 +21,65 @@ const Avatar: React.FC<AvatarProps> = ({
 }) => {
   const { getInitials, themeColor, loggedInUser } = useHelper();
   const inverted = loggedInUser?.userId === name || loggedInUser?.name === name;
+  const navigation: any = useNavigation();
   return (
-    <Row alignItems="center">
-      {image ? (
-        <Image
-          source={{ uri: image }}
-          resizeMode="cover"
-          style={[
-            {
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              backgroundColor: themeColor.light,
-            },
-          ]}
-        />
-      ) : (
-        <Row
-          justifyContent="center"
-          alignItems="center"
-          style={[
-            {
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              backgroundColor: inverted
-                ? themeColor.dark
-                : `${themeColor?.light}`,
-            },
-          ]}
-        >
-          <Text
+    <Pressable onPress={() => navigation.navigate(ROUTES.PROFILE)}>
+      <Row alignItems="center">
+        {image ? (
+          <Image
+            source={{ uri: image }}
+            resizeMode="cover"
             style={[
-              commonStyles.titleText,
               {
-                fontSize: size / 2,
-                color: "#fff",
+                width: size,
+                height: size,
+                borderRadius: size / 2,
+                backgroundColor: themeColor.light,
+              },
+            ]}
+          />
+        ) : (
+          <Row
+            justifyContent="center"
+            alignItems="center"
+            style={[
+              {
+                width: size,
+                height: size,
+                borderRadius: size / 2,
+                backgroundColor: inverted
+                  ? themeColor.dark
+                  : `${themeColor?.light}`,
               },
             ]}
           >
-            {getInitials(name)}
-          </Text>
-        </Row>
-      )}
+            <Text
+              style={[
+                commonStyles.titleText,
+                {
+                  fontSize: size / 2,
+                  color: "#fff",
+                },
+              ]}
+            >
+              {getInitials(name)}
+            </Text>
+          </Row>
+        )}
 
-      {withName && (
-        <>
-          <Spacer size={size / 3} position="right" />
-          <Text
-            style={[commonStyles.tTinyText, { fontSize: size * 0.6 }]}
-            numberOfLines={1}
-          >
-            {name}
-          </Text>
-        </>
-      )}
-    </Row>
+        {withName && (
+          <>
+            <Spacer size={size / 3} position="right" />
+            <Text
+              style={[commonStyles.tTinyText, { fontSize: size * 0.6 }]}
+              numberOfLines={1}
+            >
+              {name}
+            </Text>
+          </>
+        )}
+      </Row>
+    </Pressable>
   );
 };
 
