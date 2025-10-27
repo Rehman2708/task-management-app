@@ -18,7 +18,7 @@ export interface Subtask {
   _id?: string;
   title: string;
   status?: SubtaskStatus;
-  dueDateTime: string | Date;
+  dueDateTime: Date;
   completedAt?: string | Date | null;
   updatedBy?: string | null;
   comments?: SubtaskComment[];

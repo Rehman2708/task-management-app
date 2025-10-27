@@ -14,7 +14,7 @@ import {
 import { useAuthStore } from "../../store/authStore";
 import { useUtilStore } from "../../store/utils";
 
-export function useCreateTaskViewModel(initialTask?: any, repeat: boolean) {
+export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
   const { user } = useAuthStore();
   const { refetchTask } = useUtilStore();
   const [title, setTitle] = useState(initialTask?.title || "");
@@ -108,7 +108,9 @@ export function useCreateTaskViewModel(initialTask?: any, repeat: boolean) {
         priority,
         image,
         ownerUserId: initialTask?.ownerUserId || user?.userId,
-        createdBy: initialTask?.createdBy || user?.userId,
+        createdBy: repeat
+          ? user?.userId
+          : initialTask?.createdBy || user?.userId,
         subtasks: subtasks?.map((st) => ({
           title: st.title,
           dueDateTime: st.dueDateTime,
