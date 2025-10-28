@@ -14,9 +14,10 @@ import { AuthRepo } from "../../repositories/auth";
 import { useHelper } from "../../utils/helper";
 import { useTheme } from "../../infrastructure/theme";
 import { fontMap, FontName } from "../../../assets/fonts";
+import { ROUTES } from "../../enums/routes";
 
 const FontScreen = () => {
-  const navigation = useNavigation();
+  const navigation: any = useNavigation();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
   const { user, updateUser } = useAuthStore();
@@ -38,7 +39,7 @@ const FontScreen = () => {
         const res = await AuthRepo.updateFont({ userId: user.userId, font });
         if (res?.user) {
           updateUser(res.user);
-          navigation.goBack();
+          navigation.navigate(ROUTES.SPLASH);
         }
       } catch (error) {
         console.error("Update font error:", error);

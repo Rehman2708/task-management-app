@@ -163,7 +163,12 @@ export default function ProfileScreen() {
                 <>
                   <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
                     <Text style={[commonStyles.smallText]}>Partner:</Text>
-                    <Text style={[commonStyles.subTitleText]}>
+                    <Text
+                      style={[
+                        commonStyles.subTitleText,
+                        // { fontFamily: `${user?.partner?.font}SemiBold` },
+                      ]}
+                    >
                       {user?.partner?.name || "N/A"}
                     </Text>
                   </Row>
@@ -172,7 +177,12 @@ export default function ProfileScreen() {
                       <Text style={[commonStyles.smallText]}>
                         About partner:
                       </Text>
-                      <Text style={[commonStyles.subTitleText]}>
+                      <Text
+                        style={[
+                          commonStyles.subTitleText,
+                          { fontFamily: `${user.partner.font}SemiBold` },
+                        ]}
+                      >
                         {user.partner.about}
                       </Text>
                     </Row>

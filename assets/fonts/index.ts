@@ -14,8 +14,23 @@ export const FontAsset = {
   SourGummyMedium: require("./SourGummy-Medium.ttf"),
   SourGummyRegular: require("./SourGummy-Regular.ttf"),
   SourGummySemiBold: require("./SourGummy-SemiBold.ttf"),
+  PoppinsBold: require("./Poppins-Bold.ttf"),
+  PoppinsLight: require("./Poppins-Light.ttf"),
+  PoppinsMedium: require("./Poppins-Medium.ttf"),
+  PoppinsRegular: require("./Poppins-Regular.ttf"),
+  PoppinsSemiBold: require("./Poppins-SemiBold.ttf"),
   TangerineRegular: require("./Tangerine-Regular.ttf"),
   TangerineBold: require("./Tangerine-Bold.ttf"),
+  RobotoBold: require("./Roboto-Bold.ttf"),
+  RobotoLight: require("./Roboto-Light.ttf"),
+  RobotoMedium: require("./Roboto-Medium.ttf"),
+  RobotoRegular: require("./Roboto-Regular.ttf"),
+  RobotoSemiBold: require("./Roboto-SemiBold.ttf"),
+  CaveatBold: require("./Caveat-Bold.ttf"),
+  CaveatLight: require("./Caveat-Regular.ttf"),
+  CaveatMedium: require("./Caveat-Medium.ttf"),
+  CaveatRegular: require("./Caveat-Regular.ttf"),
+  CaveatSemiBold: require("./Caveat-SemiBold.ttf"),
 };
 
 export const fontMap = {
@@ -39,6 +54,35 @@ export const fontMap = {
     medium: "SourGummyMedium",
     semibold: "SourGummySemiBold",
     bold: "SourGummyBold",
+  },
+  Poppins: {
+    light: "PoppinsLight",
+    regular: "PoppinsRegular",
+    medium: "PoppinsMedium",
+    semibold: "PoppinsBold",
+    bold: "PoppinsBold",
+  },
+
+  Roboto: {
+    light: "RobotoLight",
+    regular: "RobotoRegular",
+    medium: "RobotoMedium",
+    semibold: "RobotoSemiBold",
+    bold: "RobotoBold",
+  },
+  Caveat: {
+    light: "CaveatLight",
+    regular: "CaveatRegular",
+    medium: "CaveatMedium",
+    semibold: "CaveatSemiBold",
+    bold: "CaveatBold",
+  },
+  Tangerine: {
+    light: "TangerineRegular",
+    regular: "TangerineRegular",
+    medium: "TangerineRegular",
+    semibold: "TangerineBold",
+    bold: "TangerineBold",
   },
 } as const;
 
