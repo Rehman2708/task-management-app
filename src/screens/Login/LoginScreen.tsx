@@ -56,7 +56,12 @@ export const LoginScreen = () => {
               onPress={handleLogin}
               loading={loading}
             />
-            <CustomButton title="Register" outlined onPress={Register} />
+            <CustomButton
+              customStyle={{ borderWidth: 0 }}
+              title="Register"
+              outlined
+              onPress={Register}
+            />
           </KeyboardAwareScrollView>
         </>
       </Column>
