@@ -6,11 +6,12 @@ import { useCommonStyles } from "../../styles/commonstyles";
 import CustomButton from "../../components/customButton";
 import { isAndroid, Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import ScreenLoader from "../../components/screenLoader";
 import { useUtilStore } from "../../store/utils";
 import { useAuthStore } from "../../store/authStore";
 import CollapsibleHeader from "../../components/collapsibleHeader";
+import { useTheme } from "../../infrastructure/theme";
 
 interface NoteDetailScreenProps {
   route: {

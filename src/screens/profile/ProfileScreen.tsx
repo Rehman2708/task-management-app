@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
+  View,
 } from "react-native";
 import { useTheme } from "../../infrastructure/theme";
 import { useProfileViewModel } from "./profileViewModal";
@@ -20,6 +21,7 @@ import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
 import ScreenLoader from "../../components/screenLoader";
 import ImageView from "react-native-image-viewing";
+import TextTicker from "react-native-text-ticker";
 
 export default function ProfileScreen() {
   const {
@@ -152,19 +154,30 @@ export default function ProfileScreen() {
                   {user?.name || "N/A"}
                 </Text>
               </Row>
-              {/* <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-              <Text style={[commonStyles.smallText]}>UserId:</Text>
-              <Text style={[commonStyles.subTitleText]}>
-                {user?.userId || "N/A"}
-              </Text>
-            </Row> */}
+
+              <Row gap={isAndroid ? 6 : 8}>
+                <Text style={[commonStyles.smallText]}>About me:</Text>
+                <Text style={[commonStyles.subTitleText]}>{user?.about}</Text>
+              </Row>
               {partnerId ? (
-                <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-                  <Text style={[commonStyles.smallText]}>Partner:</Text>
-                  <Text style={[commonStyles.subTitleText]}>
-                    {partnerId || "N/A"}
-                  </Text>
-                </Row>
+                <>
+                  <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
+                    <Text style={[commonStyles.smallText]}>Partner:</Text>
+                    <Text style={[commonStyles.subTitleText]}>
+                      {user?.partner?.name || "N/A"}
+                    </Text>
+                  </Row>
+                  {user?.partner?.about && (
+                    <Row gap={isAndroid ? 6 : 8}>
+                      <Text style={[commonStyles.smallText]}>
+                        About partner:
+                      </Text>
+                      <Text style={[commonStyles.subTitleText]}>
+                        {user.partner.about}
+                      </Text>
+                    </Row>
+                  )}
+                </>
               ) : (
                 <Column>
                   <Spacer size={50} />

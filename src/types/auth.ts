@@ -7,6 +7,8 @@ export interface IUser {
     name: string;
     userId: string;
     image?: string;
+    about?: string;
+    font?: FontName;
     theme?: { light: string; dark: string };
   };
   createdAt: Date;

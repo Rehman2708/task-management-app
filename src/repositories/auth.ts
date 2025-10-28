@@ -90,6 +90,7 @@ export class AuthRepo {
   static async updateProfile(payload: {
     userId: string;
     name?: string;
+    about?: string;
     image?: string | null;
   }) {
     const data = Object.fromEntries(

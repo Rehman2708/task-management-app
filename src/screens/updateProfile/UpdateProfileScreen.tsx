@@ -22,15 +22,17 @@ const UpdateProfileScreen = () => {
   const ProfileScreenStyles = styles(theme);
   const [userImage, setUserImage] = useState(user?.image ?? "");
   const [userName, setUserName] = useState(user?.name ?? "");
+  const [userAbout, setUserAbout] = useState(user?.about ?? "");
   const [loading, setLoading] = useState(false);
 
   // 🔹 Detect if there’s any change (name or image)
   const hasChanges = useMemo(() => {
     return (
       userName.trim() !== (user?.name ?? "").trim() ||
+      userAbout.trim() !== (user?.about ?? "").trim() ||
       userImage !== (user?.image ?? "")
     );
-  }, [userName, userImage, user]);
+  }, [userName, userImage, user, userAbout]);
 
   const updateProfile = async () => {
     try {
@@ -40,6 +42,7 @@ const UpdateProfileScreen = () => {
       const res = await AuthRepo.updateProfile({
         userId: user.userId,
         name: userName.trim(),
+        about: userAbout.trim(),
         image: userImage || null,
       });
 
@@ -102,7 +105,11 @@ const UpdateProfileScreen = () => {
       />
 
       <CustomInput title="Name" onChangeText={setUserName} value={userName} />
-
+      <CustomInput
+        title="About"
+        onChangeText={setUserAbout}
+        value={userAbout}
+      />
       {hasChanges && (
         <CustomButton
           title={loading ? "Updating..." : "Update"}
