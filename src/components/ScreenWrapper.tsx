@@ -1,4 +1,4 @@
-import { SafeAreaView, StatusBar, View } from "react-native";
+import { SafeAreaView, View } from "react-native";
 import React from "react";
 import { useCommonStyles } from "../styles/commonstyles";
 import LinearHeader from "./LinearHeader";
@@ -37,8 +37,6 @@ const ScreenWrapper = ({
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <StatusBar barStyle={"default"} />
-
       <LinearHeader image={image} />
 
       <SafeAreaView

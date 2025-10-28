@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useCommonStyles } from "./src/styles/commonstyles";
 import { FontAsset } from "./assets/fonts";
 import { useTheme } from "./src/infrastructure/theme";
+import { StatusBar } from "react-native";
 
 export default function App() {
   const [fontsLoaded] = useFonts(FontAsset);
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={commonStyles.fullFlex}>
       <NavigationContainer>
+        <StatusBar backgroundColor={"black"} />
         <AppNavigator />
       </NavigationContainer>
     </GestureHandlerRootView>
