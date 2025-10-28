@@ -1,6 +1,5 @@
-import { View, Text, ScrollView, Alert } from "react-native";
-import React, { useEffect, useState } from "react";
-import ScreenWrapper from "../../components/ScreenWrapper";
+import { View, Text, Alert } from "react-native";
+import { useEffect, useState } from "react";
 import { Note, NotesRepo } from "../../repositories/notes";
 import { useHelper } from "../../utils/helper";
 import { commonStyles } from "../../styles/commonstyles";
@@ -8,11 +7,11 @@ import CustomButton from "../../components/customButton";
 import { isAndroid, Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
 import { useNavigation } from "@react-navigation/native";
-import ImageModal from "../../components/imageModal";
-import ImageView from "react-native-image-viewing";
 import ScreenLoader from "../../components/screenLoader";
 import { useUtilStore } from "../../store/utils";
 import { useAuthStore } from "../../store/authStore";
+import CollapsibleHeader from "../../components/collapsibleHeader";
+import { theme } from "../../infrastructure/theme";
 
 interface NoteDetailScreenProps {
   route: {
@@ -32,7 +31,6 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState<Note>();
   const [gettingNote, setGettingNote] = useState(false);
-  const [showImage, setShowImage] = useState(false);
   const getNote = async () => {
     try {
       setGettingNote(true);
@@ -75,37 +73,24 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
     getNote();
   }, []);
   return (
-    <ScreenWrapper
-      title={note?.title}
-      subTitle={formatDate(note?.createdAt!) ?? ""}
-      showBackbutton
-      image={note?.image}
+    <View
+      style={[
+        commonStyles.fullFlex,
+        { backgroundColor: theme.colors.background },
+      ]}
     >
       {gettingNote ? (
         <ScreenLoader />
       ) : (
         <>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={commonStyles.screenWrapper}
+          <CollapsibleHeader
+            title={note?.title ?? ""}
+            subTitle={formatDate(note?.createdAt!) ?? ""}
+            headerImage={note?.image}
           >
-            {note?.image && (
-              <>
-                <ImageModal
-                  defaultImage={note?.image}
-                  onPress={() => setShowImage(true)}
-                />
-                <ImageView
-                  images={[{ uri: note.image }]}
-                  imageIndex={0}
-                  visible={showImage}
-                  onRequestClose={() => setShowImage(false)}
-                />
-              </>
-            )}
             <Text style={commonStyles.basicText}>{note?.note}</Text>
             <Spacer size={50} />
-          </ScrollView>
+          </CollapsibleHeader>
           <Row
             justifyContent="space-between"
             style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
@@ -128,7 +113,7 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
           </Row>
         </>
       )}
-    </ScreenWrapper>
+    </View>
   );
 };
 

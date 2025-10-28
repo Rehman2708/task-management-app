@@ -49,57 +49,21 @@ export default function ProfileScreen() {
       {loading ? (
         <ScreenLoader />
       ) : (
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={loadingUserDetail}
-              onRefresh={fetchUserDetails}
-              colors={[theme.colors.primary]}
-            />
-          }
-        >
-          <Column gap={isAndroid ? 6 : 8} style={[commonStyles.screenWrapper]}>
-            <Row justifyContent="center" alignItems="center" gap={8}>
-              <Row
-                justifyContent="center"
-                alignItems="center"
-                style={[
-                  commonStyles.cardContainer,
-                  commonStyles.secondaryContainer,
-                  ProfileScreenStyles.imageContainer,
-                  {
-                    backgroundColor: `${themeColor.light}20`,
-                    borderColor: user?.theme.dark,
-                  },
-                ]}
-              >
-                <Pressable
-                  onPress={() => {
-                    if (user?.image) {
-                      setCurrentImage({ uri: user.image });
-                    }
-                    setIsVisible(true);
-                  }}
-                >
-                  {user?.image ? (
-                    <Image
-                      style={ProfileScreenStyles.image}
-                      source={{ uri: user.image }}
-                    />
-                  ) : (
-                    <Text
-                      style={[
-                        ProfileScreenStyles.nameText,
-                        { color: themeColor?.dark ?? theme.colors.primary },
-                      ]}
-                    >
-                      {getInitials(user?.name ?? "")}
-                    </Text>
-                  )}
-                </Pressable>
-              </Row>
-              {partnerId && <Ionicons name="heart" size={40} color={"red"} />}
-              {partnerId && (
+        <>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={loadingUserDetail}
+                onRefresh={fetchUserDetails}
+                colors={[theme.colors.primary]}
+              />
+            }
+          >
+            <Column
+              gap={isAndroid ? 6 : 8}
+              style={[commonStyles.screenWrapper]}
+            >
+              <Row justifyContent="center" alignItems="center" gap={8}>
                 <Row
                   justifyContent="center"
                   alignItems="center"
@@ -108,125 +72,166 @@ export default function ProfileScreen() {
                     commonStyles.secondaryContainer,
                     ProfileScreenStyles.imageContainer,
                     {
-                      backgroundColor: `${user?.partner?.theme?.light}20`,
-                      borderColor: user?.partner?.theme?.light,
+                      backgroundColor: `${themeColor.light}20`,
+                      borderColor: user?.theme.dark,
                     },
                   ]}
                 >
-                  {partnerImage ? (
-                    <Pressable
-                      onPress={() => {
-                        setCurrentImage({ uri: partnerImage });
-                        setIsVisible(true);
-                      }}
-                    >
+                  <Pressable
+                    onPress={() => {
+                      if (user?.image) {
+                        setCurrentImage({ uri: user.image });
+                      }
+                      setIsVisible(true);
+                    }}
+                  >
+                    {user?.image ? (
                       <Image
                         style={ProfileScreenStyles.image}
-                        source={{ uri: partnerImage }}
+                        source={{ uri: user.image }}
                       />
-                    </Pressable>
-                  ) : (
-                    <Text
-                      style={[
-                        ProfileScreenStyles.nameText,
-                        { color: themeColor?.dark ?? theme.colors.primary },
-                      ]}
-                    >
-                      {getInitials(partnerId ?? "")}
-                    </Text>
-                  )}
+                    ) : (
+                      <Text
+                        style={[
+                          ProfileScreenStyles.nameText,
+                          { color: themeColor?.dark ?? theme.colors.primary },
+                        ]}
+                      >
+                        {getInitials(user?.name ?? "")}
+                      </Text>
+                    )}
+                  </Pressable>
                 </Row>
-              )}
-            </Row>
+                {partnerId && <Ionicons name="heart" size={40} color={"red"} />}
+                {partnerId && (
+                  <Row
+                    justifyContent="center"
+                    alignItems="center"
+                    style={[
+                      commonStyles.cardContainer,
+                      commonStyles.secondaryContainer,
+                      ProfileScreenStyles.imageContainer,
+                      {
+                        backgroundColor: `${user?.partner?.theme?.light}20`,
+                        borderColor: user?.partner?.theme?.light,
+                      },
+                    ]}
+                  >
+                    {partnerImage ? (
+                      <Pressable
+                        onPress={() => {
+                          setCurrentImage({ uri: partnerImage });
+                          setIsVisible(true);
+                        }}
+                      >
+                        <Image
+                          style={ProfileScreenStyles.image}
+                          source={{ uri: partnerImage }}
+                        />
+                      </Pressable>
+                    ) : (
+                      <Text
+                        style={[
+                          ProfileScreenStyles.nameText,
+                          { color: themeColor?.dark ?? theme.colors.primary },
+                        ]}
+                      >
+                        {getInitials(partnerId ?? "")}
+                      </Text>
+                    )}
+                  </Row>
+                )}
+              </Row>
 
-            <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-              <Text style={[commonStyles.smallText]}>Name:</Text>
-              <Text style={[commonStyles.subTitleText]}>
-                {user?.name || "N/A"}
-              </Text>
-            </Row>
-            {/* <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
+              <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
+                <Text style={[commonStyles.smallText]}>Name:</Text>
+                <Text style={[commonStyles.subTitleText]}>
+                  {user?.name || "N/A"}
+                </Text>
+              </Row>
+              {/* <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
               <Text style={[commonStyles.smallText]}>UserId:</Text>
               <Text style={[commonStyles.subTitleText]}>
                 {user?.userId || "N/A"}
               </Text>
             </Row> */}
-            {partnerId ? (
-              <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-                <Text style={[commonStyles.smallText]}>Partner:</Text>
-                <Text style={[commonStyles.subTitleText]}>
-                  {partnerId || "N/A"}
-                </Text>
-              </Row>
-            ) : (
-              <Column>
-                <Spacer size={50} />
-                <Text style={[commonStyles.basicText]}>Add Partner Id:</Text>
+              {partnerId ? (
+                <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
+                  <Text style={[commonStyles.smallText]}>Partner:</Text>
+                  <Text style={[commonStyles.subTitleText]}>
+                    {partnerId || "N/A"}
+                  </Text>
+                </Row>
+              ) : (
+                <Column>
+                  <Spacer size={50} />
+                  <Text style={[commonStyles.basicText]}>Add Partner Id:</Text>
 
-                <CustomInput
-                  value={partnerInput}
-                  onChangeText={setPartnerInput}
-                />
+                  <CustomInput
+                    value={partnerInput}
+                    onChangeText={setPartnerInput}
+                  />
 
-                <CustomButton
-                  title="Add"
-                  outlined
-                  onPress={() => {
-                    if (!partnerInput) {
-                      Alert.alert("Error", "Please enter Partner ID");
-                      return;
-                    }
-                    addPartner(partnerInput);
-                    setPartnerInput("");
-                  }}
-                />
-              </Column>
-            )}
-            <Spacer size={20} />
-            <TouchableOpacity onPress={updateProfileScreen}>
-              <Row
-                style={commonStyles.cardContainer}
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Text style={[commonStyles.basicText]}>Update profile</Text>
-                <Ionicons
-                  name="chevron-forward-outline"
-                  size={20}
-                  color={theme.colors.text}
-                />
-              </Row>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={changeThemeScreen}>
-              <Row
-                style={commonStyles.cardContainer}
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Text style={[commonStyles.basicText]}>Change theme</Text>
-                <Ionicons
-                  name="chevron-forward-outline"
-                  size={20}
-                  color={theme.colors.text}
-                />
-              </Row>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={createVideoScreen}>
-              <Row
-                style={commonStyles.cardContainer}
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Text style={[commonStyles.basicText]}>Add Video</Text>
-                <Ionicons
-                  name="chevron-forward-outline"
-                  size={20}
-                  color={theme.colors.text}
-                />
-              </Row>
-            </TouchableOpacity>
-            <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
-          </Column>
+                  <CustomButton
+                    title="Add"
+                    outlined
+                    onPress={() => {
+                      if (!partnerInput) {
+                        Alert.alert("Error", "Please enter Partner ID");
+                        return;
+                      }
+                      addPartner(partnerInput);
+                      setPartnerInput("");
+                    }}
+                  />
+                </Column>
+              )}
+              <Spacer size={20} />
+              <TouchableOpacity onPress={updateProfileScreen}>
+                <Row
+                  style={commonStyles.cardContainer}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Text style={[commonStyles.basicText]}>Update profile</Text>
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={theme.colors.text}
+                  />
+                </Row>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={changeThemeScreen}>
+                <Row
+                  style={commonStyles.cardContainer}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Text style={[commonStyles.basicText]}>Change theme</Text>
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={theme.colors.text}
+                  />
+                </Row>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={createVideoScreen}>
+                <Row
+                  style={commonStyles.cardContainer}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Text style={[commonStyles.basicText]}>Add Video</Text>
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={theme.colors.text}
+                  />
+                </Row>
+              </TouchableOpacity>
+              <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
+            </Column>
+          </ScrollView>
           <Row style={{ paddingHorizontal: isAndroid ? 10 : 16 }}>
             <CustomButton
               rounded
@@ -236,7 +241,7 @@ export default function ProfileScreen() {
               loading={loggingOut}
             />
           </Row>
-        </ScrollView>
+        </>
       )}
       <ImageView
         images={[currentImage]}

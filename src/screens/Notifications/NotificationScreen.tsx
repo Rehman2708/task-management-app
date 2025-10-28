@@ -12,10 +12,11 @@ import EmptyState from "../../components/emptyState";
 import { NotificationRepo } from "../../repositories/notification";
 import { useHelper } from "../../utils/helper";
 import { commonStyles } from "../../styles/commonstyles";
-import { Column } from "../../tools";
+import { Column, Row } from "../../tools";
 import { theme } from "../../infrastructure/theme";
 import { Images } from "../../../assets/images/images";
 import ScreenLoader from "../../components/screenLoader";
+import Avatar from "../../components/avatar";
 
 interface NotificationItem {
   _id: string;
@@ -116,25 +117,37 @@ const NotificationScreen = () => {
   // ------------------ Render notification item ------------------ //
   const renderItem = ({ item }: { item: NotificationItem }) => {
     const bgColor = item.isRead ? "transparent" : `${themeColor.light}30`;
-
     return (
       <TouchableOpacity
-        style={[commonStyles.cardContainer, { backgroundColor: bgColor }]}
+        style={[
+          // commonStyles.cardContainer,
+          {
+            backgroundColor: bgColor,
+            borderBottomWidth: 1,
+            paddingVertical: 16,
+            paddingHorizontal: 16,
+          },
+        ]}
         onPress={() => handleNotification(item._id, item?.data)}
       >
-        <Column gap={3} style={commonStyles.fullFlex}>
-          <Text style={commonStyles.basicText}>{item.title}</Text>
-          <Text style={commonStyles.tinyText}>{item.body}</Text>
-          <Text style={commonStyles.tTinyText}>
-            {formatDate(item.createdAt)}
-          </Text>
-        </Column>
+        <Row gap={12} alignItems="center">
+          {item?.data?.image && (
+            <Avatar disabled image={item.data.image} name="NA" size={36} />
+          )}
+          <Column gap={3} style={commonStyles.fullFlex}>
+            <Text style={commonStyles.basicText}>{item.title}</Text>
+            <Text style={commonStyles.tinyText}>{item.body}</Text>
+            <Text style={commonStyles.tTinyText}>
+              {formatDate(item.createdAt)}
+            </Text>
+          </Column>
+        </Row>
       </TouchableOpacity>
     );
   };
 
   return (
-    <ScreenWrapper title="Notifications" showBackbutton>
+    <ScreenWrapper noPadding title="Notifications" showBackbutton>
       {loading && notifications.length === 0 && <ScreenLoader />}
       {notifications.length === 0 && !loading ? (
         <EmptyState

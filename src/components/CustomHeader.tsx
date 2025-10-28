@@ -11,6 +11,7 @@ interface HeaderProps {
   title?: string;
   subTitle?: string;
   showBackbutton?: boolean;
+  hideNotificationButton?: boolean;
   showImage?: boolean;
   onBackButtonPress?: () => void;
   onSearchPress?: () => void;
@@ -22,6 +23,7 @@ const CustomHeader = ({
   showImage,
   onBackButtonPress,
   onSearchPress,
+  hideNotificationButton,
 }: HeaderProps) => {
   const navigation: any = useNavigation();
   const { loggedInUser } = useHelper();
@@ -73,15 +75,17 @@ const CustomHeader = ({
             <Ionicons name="search" size={30} color={theme.colors.white} />
           </TouchableOpacity>
         )}
-        <TouchableOpacity
-          onPress={() => navigation.navigate(ROUTES.NOTIFICATION)}
-        >
-          <Ionicons
-            name="notifications-outline"
-            size={30}
-            color={theme.colors.white}
-          />
-        </TouchableOpacity>
+        {!hideNotificationButton && (
+          <TouchableOpacity
+            onPress={() => navigation.navigate(ROUTES.NOTIFICATION)}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={30}
+              color={theme.colors.white}
+            />
+          </TouchableOpacity>
+        )}
       </Row>
     </Row>
   );

@@ -81,7 +81,6 @@ const TasksCard = ({
               padding: 0,
               borderLeftWidth: 3,
               borderStartColor: getPriorityColor(item?.priority!),
-              marginBottom: 6,
               ...containerStyle,
             },
           ]}

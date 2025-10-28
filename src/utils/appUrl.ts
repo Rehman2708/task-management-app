@@ -32,6 +32,10 @@ export class AppUrl {
     `${this.BASE_URL}/tasks/${taskId}/comment`;
   public static addSubtaskComment = (taskId: string, subtaskId: string) =>
     `${this.BASE_URL}/tasks/${taskId}/subtask/${subtaskId}/comment`;
+  public static getTaskComments = (taskId: string) =>
+    `${this.BASE_URL}/tasks/${taskId}/comments`;
+  public static getSubtaskComments = (taskId: string, subtaskId: string) =>
+    `${this.BASE_URL}/tasks/${taskId}/subtask/${subtaskId}/comments`;
 
   // 🔹 Notification
   public static sendNotification = `${this.BASE_URL}/notifications`;

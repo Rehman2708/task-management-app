@@ -7,6 +7,7 @@ import { useUtilStore } from "../../store/utils";
 export function useTaskDetailViewModel(taskId: string) {
   const { user } = useAuthStore();
   const { refetchTask, refetchHistory } = useUtilStore();
+
   const [task, setTask] = useState<any>(null);
   const [taskDetailLoading, setTaskDetailLoading] = useState(true);
   const [taskCommentLoading, setTaskCommentLoading] = useState(false);
@@ -23,67 +24,76 @@ export function useTaskDetailViewModel(taskId: string) {
 
   useEffect(() => {
     if (user?.userId) setUserId(user.userId);
-    fetchTaskDetail();
+    initializeTask();
 
-    // Start background polling (real-time like updates)
     pollingRef.current = setInterval(fetchNewComments, 3000); // every 3s
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
+    return () => pollingRef.current && clearInterval(pollingRef.current);
   }, [taskId]);
 
-  // ---------- Fetch Task Details ----------
-  const fetchTaskDetail = async () => {
+  // ---------- Initialize: fetch task + initial comments ----------
+  const initializeTask = async () => {
     try {
       setTaskDetailLoading(true);
-      const response = await TaskRepo.getTaskById(taskId);
-      setTask(response);
+      const taskData = await TaskRepo.getTaskById(taskId);
+
+      // Fetch comments separately for better performance
+      const [taskComments, subtasksWithComments] = await Promise.all([
+        TaskRepo.getTaskComments(taskId),
+        Promise.all(
+          (taskData.subtasks || []).map(async (s: any) => {
+            const comments = await TaskRepo.getSubtaskComments(taskId, s._id);
+            return { ...s, comments };
+          })
+        ),
+      ]);
+
+      setTask({
+        ...taskData,
+        comments: taskComments,
+        subtasks: subtasksWithComments,
+      });
     } catch (err: any) {
-      console.error("Fetch task detail error:", err);
+      console.error("Init task error:", err);
       setError(err.message || "Something went wrong");
     } finally {
       setTaskDetailLoading(false);
     }
   };
 
-  // ---------- Polling Helper: merge only new comments ----------
+  // ---------- Poll only comments for live updates ----------
   const fetchNewComments = async () => {
+    if (!task) return;
+
     try {
-      const response = await TaskRepo.getTaskById(taskId);
+      // Fetch new task-level comments
+      const newTaskComments = await TaskRepo.getTaskComments(taskId);
 
-      setTask((prev: any) => {
-        if (!prev) return response;
+      // Fetch all subtask comments in parallel
+      const newSubtasks = await Promise.all(
+        task.subtasks.map(async (s: any) => {
+          const comments = await TaskRepo.getSubtaskComments(taskId, s._id);
+          return { ...s, comments };
+        })
+      );
 
-        // Merge new task comments
-        const oldComments = prev.comments || [];
-        const newComments = response.comments || [];
-        const mergedComments =
-          newComments.length > oldComments.length ? newComments : oldComments;
-
-        // Merge new subtask comments individually
-        const mergedSubtasks = prev.subtasks?.map((oldSubtask: any) => {
-          const newSubtask = response.subtasks?.find(
-            (s: any) => s._id === oldSubtask._id
-          );
-          if (!newSubtask) return oldSubtask;
-
-          const oldC = oldSubtask.comments || [];
-          const newC = newSubtask.comments || [];
-
+      setTask((prev: any) => ({
+        ...prev,
+        comments:
+          newTaskComments.length > (prev?.comments?.length || 0)
+            ? newTaskComments
+            : prev.comments,
+        subtasks: newSubtasks.map((newS: any) => {
+          const oldS = prev.subtasks.find((p: any) => p._id === newS._id);
+          const oldC = oldS?.comments || [];
+          const newC = newS.comments || [];
           return {
-            ...oldSubtask,
+            ...newS,
             comments: newC.length > oldC.length ? newC : oldC,
           };
-        });
-
-        return {
-          ...prev,
-          comments: mergedComments,
-          subtasks: mergedSubtasks || prev.subtasks,
-        };
-      });
+        }),
+      }));
     } catch (err) {
-      console.error("Polling fetch error:", err);
+      console.error("Polling comments error:", err);
     }
   };
 
@@ -187,7 +197,7 @@ export function useTaskDetailViewModel(taskId: string) {
     subtaskStatusLoading,
     error,
     userId,
-    fetchTaskDetail,
+    fetchTaskDetail: initializeTask,
     updateSubtaskStatus,
     addTaskComment,
     addSubtaskComment,

@@ -1,24 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, FlatList, Pressable, RefreshControl } from "react-native";
+import { View, Text, FlatList, Pressable } from "react-native";
 import { theme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { commonStyles } from "../../styles/commonstyles";
-import ScreenWrapper from "../../components/ScreenWrapper";
 import { Column, isAndroid, Row, Spacer } from "../../tools";
-import { Ionicons } from "@expo/vector-icons";
 import CustomButton from "../../components/customButton";
 import CustomInput from "../../components/customInput";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import ScreenLoader from "../../components/screenLoader";
 import { useHelper } from "../../utils/helper";
-import ImageModal from "../../components/imageModal";
 import Avatar from "../../components/avatar";
 import EmptyState from "../../components/emptyState";
-import { SubtaskStatus, TaskStatus } from "../../enums/tasks";
+import { SubtaskStatus } from "../../enums/tasks";
 import CommentCard from "../../components/commentCard";
 import TimeLeftProgress from "../../components/timeLeftProgress";
 import { SubtaskComment } from "../../types/task";
-import ImageView from "react-native-image-viewing";
+import CollapsibleHeaderTabs from "../../components/collapsibleHeader";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -40,6 +36,11 @@ export default function TaskDetailScreen({ route }: any) {
   const [subtaskComments, setSubtaskComments] = useState<
     Record<string, string>
   >({});
+  const [showAllTaskComments, setShowAllTaskComments] = useState(false);
+  const [expandedSubtasks, setExpandedSubtasks] = useState<
+    Record<string, boolean>
+  >({});
+
   const taskCommentsRef = useRef<FlatList>(null);
   useEffect(() => {
     if (task?.comments?.length) {
@@ -104,7 +105,35 @@ export default function TaskDetailScreen({ route }: any) {
       )}
       {/* Subtask Comments */}
       <View style={{ marginTop: theme.spacing.sm }}>
-        {item?.comments?.map((c: SubtaskComment, idx: number) => {
+        {item?.comments?.length > 0 && (
+          <Row justifyContent="space-between" alignItems="center">
+            <Text style={commonStyles.basicText}>Comments</Text>
+            {item.comments.length > 5 && (
+              <Pressable
+                onPress={() =>
+                  setExpandedSubtasks((prev) => ({
+                    ...prev,
+                    [item._id]: !prev[item._id],
+                  }))
+                }
+              >
+                <Text
+                  style={[
+                    commonStyles.tinyText,
+                    { color: theme.colors.primary },
+                  ]}
+                >
+                  {expandedSubtasks[item._id] ? "Hide" : "Show all"}
+                </Text>
+              </Pressable>
+            )}
+          </Row>
+        )}
+
+        {(expandedSubtasks[item._id]
+          ? item.comments
+          : item.comments?.slice(-5)
+        )?.map((c: SubtaskComment, idx: number) => {
           const prev = item?.comments?.[idx - 1];
           const sameUser = idx > 0 && c?.createdBy === prev?.createdBy;
 
@@ -156,180 +185,188 @@ export default function TaskDetailScreen({ route }: any) {
   );
 
   return (
-    <ScreenWrapper
-      title={task?.title ?? "Task"}
-      showBackbutton
-      subTitle={formatDate(task?.createdAt)}
-      image={task?.image}
+    <View
+      style={[
+        commonStyles.fullFlex,
+        { backgroundColor: theme.colors.background },
+      ]}
     >
-      {error ? (
-        <EmptyState text="Retry" button={fetchTaskDetail} error />
-      ) : (
-        <>
-          {loading ? (
-            <ScreenLoader />
-          ) : (
-            <View style={[commonStyles.screenWrapper]}>
-              {task && (
-                <KeyboardAwareScrollView
-                  style={commonStyles.fullFlex}
-                  showsVerticalScrollIndicator={false}
-                  keyboardShouldPersistTaps="always"
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={loading}
-                      onRefresh={fetchTaskDetail}
-                      colors={[theme.colors.primary]}
-                    />
-                  }
-                >
-                  {task?.image && (
-                    <>
-                      <ImageModal
-                        onPress={() => setShowImage(true)}
-                        defaultImage={task.image}
-                      />
-                      <ImageView
-                        images={[{ uri: task.image }]}
-                        imageIndex={0}
-                        visible={showImage}
-                        onRequestClose={() => setShowImage(false)}
-                      />
-                    </>
-                  )}
-
-                  <Column gap={isAndroid ? 5 : 6}>
-                    <Text style={commonStyles.subTitleText}>{task?.title}</Text>
-                    {task?.description && (
-                      <Text style={commonStyles.smallText}>
-                        {task?.description}
-                      </Text>
-                    )}
-                    <Row justifyContent="space-between">
-                      <Row alignItems="center">
-                        <Text style={commonStyles.tTinyText}>Creator: </Text>
-                        <Avatar
-                          name={
-                            task?.createdByDetails
-                              ? task.createdByDetails.name.split(" ")[0]
-                              : task?.createdBy
-                          }
-                          image={task?.createdByDetails?.image}
-                          withName
-                        />
-                      </Row>
-                      <Text style={commonStyles.tinyText}>
-                        Assigned To: {task?.assignedTo}
-                      </Text>
-                    </Row>
-                    {task?.subtasks?.length > 0 && (
-                      <View
-                        style={[
-                          commonStyles.secondaryContainer,
-                          {
-                            backgroundColor: `${themeColor.light}20`,
-                          },
-                        ]}
-                      >
-                        <Text style={commonStyles.basicText}>Subtasks</Text>
-                        <FlatList
-                          data={task?.subtasks}
-                          keyExtractor={(item) => item._id}
-                          renderItem={({ item }) =>
-                            renderSubtask({ item, createdAt: task?.createdAt })
-                          }
-                          scrollEnabled={false}
-                          keyboardShouldPersistTaps="always"
-                        />
-                      </View>
-                    )}
-                    {task?.comments?.length > 0 && (
-                      <View
-                        style={[
-                          commonStyles.secondaryContainer,
-                          { backgroundColor: `${themeColor.light}20` },
-                        ]}
-                      >
-                        <Text style={commonStyles.basicText}>
-                          Task Comments
+      <CollapsibleHeaderTabs
+        title={task?.title ?? "Task"}
+        subTitle={formatDate(task?.createdAt)}
+        headerImage={task?.image}
+      >
+        {error ? (
+          <EmptyState text="Retry" button={fetchTaskDetail} error />
+        ) : (
+          <>
+            {loading ? (
+              <ScreenLoader />
+            ) : (
+              <>
+                {task && (
+                  <>
+                    <Column gap={isAndroid ? 5 : 6}>
+                      {task?.description && (
+                        <Text style={commonStyles.smallText}>
+                          {task?.description}
                         </Text>
-                        <Spacer size={12} />
-
-                        <FlatList
-                          ref={taskCommentsRef}
-                          data={task.comments}
-                          keyExtractor={(item, index) =>
-                            item._id ?? index.toString()
-                          }
-                          renderItem={({ item, index }) => {
-                            const prev = task.comments[index - 1];
-                            const sameUser =
-                              index > 0 &&
-                              (item?.createdBy ?? item?.by) ===
-                                (prev?.createdBy ?? prev?.by);
-
-                            return (
-                              <CommentCard
-                                image={item?.createdByDetails?.image}
-                                text={item?.text}
-                                name={
-                                  item?.createdByDetails?.name ??
-                                  item?.createdBy ??
-                                  item?.by
+                      )}
+                      <Row justifyContent="space-between">
+                        <Row alignItems="center">
+                          <Text style={commonStyles.tTinyText}>Creator: </Text>
+                          <Avatar
+                            name={
+                              task?.createdByDetails
+                                ? task.createdByDetails.name.split(" ")[0]
+                                : task?.createdBy
+                            }
+                            image={task?.createdByDetails?.image}
+                            withName
+                          />
+                        </Row>
+                        <Text style={commonStyles.tinyText}>
+                          Assigned To: {task?.assignedTo}
+                        </Text>
+                      </Row>
+                      {task?.subtasks?.length > 0 && (
+                        <View
+                          style={[
+                            commonStyles.secondaryContainer,
+                            {
+                              backgroundColor: `${themeColor.light}20`,
+                            },
+                          ]}
+                        >
+                          <Text style={commonStyles.basicText}>Subtasks</Text>
+                          <Spacer size={8} />
+                          <FlatList
+                            data={task?.subtasks}
+                            keyExtractor={(item) => item._id}
+                            renderItem={({ item }) =>
+                              renderSubtask({
+                                item,
+                                createdAt: task?.createdAt,
+                              })
+                            }
+                            scrollEnabled={false}
+                            keyboardShouldPersistTaps="always"
+                          />
+                        </View>
+                      )}
+                      {task?.comments?.length > 0 && (
+                        <View
+                          style={[
+                            commonStyles.secondaryContainer,
+                            { backgroundColor: `${themeColor.light}20` },
+                          ]}
+                        >
+                          <Row
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <Text style={commonStyles.basicText}>
+                              Task Comments
+                            </Text>
+                            {task.comments.length > 10 && (
+                              <Pressable
+                                onPress={() =>
+                                  setShowAllTaskComments((prev) => !prev)
                                 }
-                                userId={item?.createdBy ?? item?.by}
-                                time={formatDate(item?.date)}
-                                repeated={sameUser}
-                              />
-                            );
+                              >
+                                <Text
+                                  style={[
+                                    commonStyles.tinyText,
+                                    { color: theme.colors.primary },
+                                  ]}
+                                >
+                                  {showAllTaskComments ? "Hide" : "Show all"}
+                                </Text>
+                              </Pressable>
+                            )}
+                          </Row>
+                          <Spacer size={12} />
+
+                          <FlatList
+                            ref={taskCommentsRef}
+                            data={
+                              showAllTaskComments
+                                ? task.comments
+                                : task.comments.slice(-10)
+                            }
+                            keyExtractor={(item, index) =>
+                              item._id ?? index.toString()
+                            }
+                            renderItem={({ item, index }) => {
+                              const prev = task.comments[index - 1];
+                              const sameUser =
+                                index > 0 &&
+                                (item?.createdBy ?? item?.by) ===
+                                  (prev?.createdBy ?? prev?.by);
+
+                              return (
+                                <CommentCard
+                                  image={item?.createdByDetails?.image}
+                                  text={item?.text}
+                                  name={
+                                    item?.createdByDetails?.name ??
+                                    item?.createdBy ??
+                                    item?.by
+                                  }
+                                  userId={item?.createdBy ?? item?.by}
+                                  time={formatDate(item?.date)}
+                                  repeated={sameUser}
+                                />
+                              );
+                            }}
+                            showsVerticalScrollIndicator={false}
+                            scrollEnabled={false}
+                          />
+                        </View>
+                      )}
+
+                      {/* {!readOnly && ( */}
+                      <View
+                        style={{
+                          marginTop: theme.spacing.md,
+                          gap: 8,
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <CustomInput
+                          placeholder="Add comment on task..."
+                          value={taskComment}
+                          onChangeText={setTaskComment}
+                          fullFlex
+                          multiline
+                          inputStyle={{
+                            minHeight: 40,
+                            textAlignVertical: "center",
                           }}
-                          showsVerticalScrollIndicator={false}
-                          scrollEnabled={false}
+                          rounded
+                        />
+                        <CustomButton
+                          title="Send"
+                          loading={taskCommentLoading}
+                          sendButton
+                          onPress={() => {
+                            if (taskComment) {
+                              addTaskComment(taskComment);
+                              setTaskComment("");
+                            }
+                          }}
                         />
                       </View>
-                    )}
-
-                    {/* {!readOnly && ( */}
-                    <View
-                      style={{
-                        marginTop: theme.spacing.md,
-                        gap: 8,
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <CustomInput
-                        placeholder="Add comment on task..."
-                        value={taskComment}
-                        onChangeText={setTaskComment}
-                        fullFlex
-                        multiline
-                        inputStyle={{
-                          minHeight: 40,
-                          textAlignVertical: "center",
-                        }}
-                        rounded
-                      />
-                      <CustomButton
-                        title="Send"
-                        loading={taskCommentLoading}
-                        sendButton
-                        onPress={() => {
-                          if (taskComment) {
-                            addTaskComment(taskComment);
-                            setTaskComment("");
-                          }
-                        }}
-                      />
-                    </View>
-                    {/* // )} */}
-                  </Column>
-                </KeyboardAwareScrollView>
-              )}
-            </View>
-          )}
-        </>
-      )}
-    </ScreenWrapper>
+                      {/* // )} */}
+                    </Column>
+                  </>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </CollapsibleHeaderTabs>
+    </View>
   );
 }

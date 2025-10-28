@@ -11,11 +11,10 @@ import { AppUrl } from "../utils/appUrl";
 export class TaskRepo {
   static async getActiveTasks(params: { ownerUserId: string }) {
     const { ownerUserId } = params;
-    let url = `${AppUrl.getAllTasks}/${ownerUserId}`;
+    const url = `${AppUrl.getAllTasks}/${ownerUserId}`;
     return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 
-  // 🔹 Get completed/expired tasks
   // 🔹 Get completed/expired tasks (history) with optional pagination
   static async getCompletedTasks(params: {
     ownerUserId: string;
@@ -23,8 +22,6 @@ export class TaskRepo {
     pageSize?: number;
   }) {
     const { ownerUserId, page, pageSize } = params;
-
-    // Build query string only if pagination values exist
     const queryParts: string[] = [];
     if (page !== undefined) queryParts.push(`page=${page}`);
     if (pageSize !== undefined) queryParts.push(`pageSize=${pageSize}`);
@@ -65,9 +62,7 @@ export class TaskRepo {
     return ApiService.getApiResponse(
       AppUrl.deleteTask(taskId),
       HttpMethods.DELETE,
-      {
-        userId,
-      }
+      { userId }
     );
   }
 
@@ -103,6 +98,22 @@ export class TaskRepo {
       AppUrl.updateSubtaskStatus(taskId, subtaskId),
       HttpMethods.PATCH,
       payload
+    );
+  }
+
+  // 🔹 Fetch all task-level comments
+  static async getTaskComments(taskId: string) {
+    return ApiService.getApiResponse(
+      AppUrl.getTaskComments(taskId),
+      HttpMethods.GET
+    );
+  }
+
+  // 🔹 Fetch all comments for a specific subtask
+  static async getSubtaskComments(taskId: string, subtaskId: string) {
+    return ApiService.getApiResponse(
+      AppUrl.getSubtaskComments(taskId, subtaskId),
+      HttpMethods.GET
     );
   }
 }

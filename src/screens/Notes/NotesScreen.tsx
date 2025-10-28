@@ -64,10 +64,12 @@ export default function NotesScreen() {
           { borderRightWidth: 1, borderBottomWidth: 1, padding: 0 },
         ]}
       >
-        <Image
-          source={{ uri: item?.image }}
-          style={{ width: "100%", height: 80 }}
-        />
+        {item.image && (
+          <Image
+            source={{ uri: item.image }}
+            style={{ width: "100%", height: 80 }}
+          />
+        )}
         <Column
           gap={6}
           style={[

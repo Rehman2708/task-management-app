@@ -1,7 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { useFonts } from "expo-font";
-import { StatusBar } from "react-native";
 import { useEffect } from "react";
 import { getNotificationPermission } from "./notification";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -34,7 +33,6 @@ export default function App() {
   return (
     <GestureHandlerRootView style={commonStyles.fullFlex}>
       <NavigationContainer>
-        <StatusBar backgroundColor={"black"} />
         <AppNavigator />
       </NavigationContainer>
     </GestureHandlerRootView>

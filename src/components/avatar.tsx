@@ -11,6 +11,7 @@ interface AvatarProps {
   name?: string;
   withName?: boolean;
   size?: number;
+  disabled?: boolean;
 }
 
 const Avatar: React.FC<AvatarProps> = ({
@@ -18,12 +19,16 @@ const Avatar: React.FC<AvatarProps> = ({
   name,
   withName = false,
   size = 16,
+  disabled,
 }) => {
   const { getInitials, themeColor, loggedInUser } = useHelper();
   const inverted = loggedInUser?.userId === name || loggedInUser?.name === name;
   const navigation: any = useNavigation();
   return (
-    <Pressable onPress={() => navigation.navigate(ROUTES.PROFILE)}>
+    <Pressable
+      disabled={disabled}
+      onPress={() => navigation.navigate(ROUTES.PROFILE)}
+    >
       <Row alignItems="center">
         {image ? (
           <Image
