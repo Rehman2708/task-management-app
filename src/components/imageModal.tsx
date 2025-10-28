@@ -11,10 +11,10 @@ import {
 import React, { useEffect, useState } from "react";
 import CustomInput from "./customInput";
 import { Column, Row } from "../tools";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 import axios from "axios";
 import CustomButton from "./customButton";
-import { theme } from "../infrastructure/theme";
+import { useTheme } from "../infrastructure/theme";
 import ImageView from "react-native-image-viewing";
 import { useHelper } from "../utils/helper";
 
@@ -32,6 +32,10 @@ const ImageModal = ({
   button?: React.ReactNode;
 }) => {
   const { themeColor } = useHelper();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
+  const styles = ImageModalStyle(theme);
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -190,53 +194,54 @@ const ImageModal = ({
 
 export default ImageModal;
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "#00000066",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    width: "90%",
-    maxHeight: "70%",
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-  },
-  searchRow: {
-    gap: 12,
-    alignItems: "center",
-  },
-  listContent: {
-    marginTop: 16,
-    paddingBottom: 30,
-  },
-  imageWrapper: {
-    width: 100,
-    height: 100,
-    margin: 4,
-    borderRadius: 12,
-    backgroundColor: theme.colors.background,
-    justifyContent: "center",
-    alignItems: "center",
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  selectedImageWrapper: {
-    width: 180,
-    height: 180,
-  },
-  selectedBorder: {
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
-  },
-  image: {
-    height: "100%",
-    width: "100%",
-  },
-  loader: {
-    marginTop: 20,
-  },
-});
+const ImageModalStyle = (theme: any) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: "#00000066",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContent: {
+      width: "90%",
+      maxHeight: "70%",
+      backgroundColor: "#fff",
+      borderRadius: 16,
+      padding: 16,
+    },
+    searchRow: {
+      gap: 12,
+      alignItems: "center",
+    },
+    listContent: {
+      marginTop: 16,
+      paddingBottom: 30,
+    },
+    imageWrapper: {
+      width: 100,
+      height: 100,
+      margin: 4,
+      borderRadius: 12,
+      backgroundColor: theme.colors.background,
+      justifyContent: "center",
+      alignItems: "center",
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    selectedImageWrapper: {
+      width: 180,
+      height: 180,
+    },
+    selectedBorder: {
+      borderWidth: 3,
+      borderColor: theme.colors.primary,
+    },
+    image: {
+      height: "100%",
+      width: "100%",
+    },
+    loader: {
+      marginTop: 20,
+    },
+  });

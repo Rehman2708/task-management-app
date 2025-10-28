@@ -2,9 +2,10 @@ import React from "react";
 import { Text, Image, Pressable } from "react-native";
 import { useHelper } from "../utils/helper";
 import { Row, Spacer } from "../tools";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 import { useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../enums/routes";
+import { useTheme } from "../infrastructure/theme";
 
 interface AvatarProps {
   image?: string | null;
@@ -24,6 +25,8 @@ const Avatar: React.FC<AvatarProps> = ({
   const { getInitials, themeColor, loggedInUser } = useHelper();
   const inverted = loggedInUser?.userId === name || loggedInUser?.name === name;
   const navigation: any = useNavigation();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   return (
     <Pressable
       disabled={disabled}

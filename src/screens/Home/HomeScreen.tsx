@@ -1,9 +1,8 @@
 import { View, FlatList } from "react-native";
-import { theme } from "../../infrastructure/theme";
 import FloatingAdd from "../../components/FloatingAdd";
 import { useHomeScreenViewModel } from "./homeViewModel";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
 import { useHelper } from "../../utils/helper";
 import EmptyState from "../../components/emptyState";
@@ -11,11 +10,15 @@ import React, { useEffect } from "react";
 import TasksCard from "../../components/tasksCard";
 import { Images } from "../../../assets/images/images";
 import { useUtilStore } from "../../store/utils";
+import { useTheme } from "../../infrastructure/theme";
 
 export default function HomeScreen({ navigation }: any) {
   const { tasks, loading, error, fetchTasks, deleteTask } =
     useHomeScreenViewModel();
   const { loggedInUser, themeColor } = useHelper();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   const { fetchingTask } = useUtilStore();
   useEffect(() => {
     fetchTasks();

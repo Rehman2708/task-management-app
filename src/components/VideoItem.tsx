@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { View, Pressable, Text, StyleSheet } from "react-native";
 import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
@@ -6,12 +6,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { IVideo } from "../types/videos";
 import Avatar from "./avatar";
 import { Column, Row } from "../tools";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 import { useHelper } from "../utils/helper";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../store/authStore";
 import { VideoRepo } from "../repositories/videos";
-import { theme } from "../infrastructure/theme";
+import { useTheme } from "../infrastructure/theme";
 import VideoCommentsModal from "../screens/Reels/VideoCommentsModal";
 import ProgressBar from "./timeLeftProgress";
 
@@ -55,7 +55,8 @@ export default function VideoItem({
   const [commentsModalVisible, setCommentsModalVisible] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   const navigation: any = useNavigation();
   const { user } = useAuthStore();
   const { formatDate } = useHelper();

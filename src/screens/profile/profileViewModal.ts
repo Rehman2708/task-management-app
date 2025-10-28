@@ -64,6 +64,8 @@ export function useProfileViewModel() {
     ]);
   };
   const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
+  const changeFontScreen = () => navigation.navigate(ROUTES.FONT);
+
   const createVideoScreen = () => navigation.navigate(ROUTES.CREATE_VIDEO);
   const updateProfileScreen = () => navigation.navigate(ROUTES.UPDATE_PROFILE);
   function getTimeLeft(targetDate = "2026-04-27") {
@@ -111,6 +113,7 @@ export function useProfileViewModel() {
     addPartner,
     logout,
     changeThemeScreen,
+    changeFontScreen,
     createVideoScreen,
     updateProfileScreen,
     loggingOut,

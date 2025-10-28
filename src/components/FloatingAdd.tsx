@@ -1,10 +1,10 @@
-import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
-import { theme } from "../infrastructure/theme";
 import { useHelper } from "../utils/helper";
+import { useTheme } from "../infrastructure/theme";
 
 export default function FloatingAdd({ onPress }: { onPress: () => void }) {
   const { themeColor } = useHelper();
+  const theme = useTheme();
   return (
     <TouchableOpacity
       style={[

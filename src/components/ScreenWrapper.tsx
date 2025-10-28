@@ -1,10 +1,10 @@
 import { SafeAreaView, StatusBar, View } from "react-native";
 import React from "react";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 import LinearHeader from "./LinearHeader";
 import CustomHeader from "./CustomHeader";
 import { isAndroid, Spacer } from "../tools";
-import { theme } from "../infrastructure/theme";
+import { useTheme } from "../infrastructure/theme";
 
 const ScreenWrapper = ({
   children,
@@ -27,6 +27,9 @@ const ScreenWrapper = ({
   onSearchPress?: () => void;
   image?: string;
 }) => {
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   return (
     <View
       style={[

@@ -1,10 +1,10 @@
 import { View, Text, Switch } from "react-native";
 import { Note } from "../../repositories/notes";
 import { useNoteDetailViewModel } from "./createNoteViewModal";
-import { styles } from "./styles";
+import { createNoteStyle } from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -12,6 +12,7 @@ import { ROUTES } from "../../enums/routes";
 import ImageModal from "../../components/imageModal";
 import { useState } from "react";
 import { Row } from "../../tools";
+import { useTheme } from "../../infrastructure/theme";
 
 interface NoteDetailScreenProps {
   route: {
@@ -36,7 +37,9 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     setNoteImage,
     noteImage,
   } = useNoteDetailViewModel(note);
-
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+  const styles = createNoteStyle(theme);
   const navigation: any = useNavigation();
   const [appendMode, setAppendMode] = useState(false); // ⬅️ new state
 

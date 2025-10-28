@@ -20,12 +20,12 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
-import { commonStyles } from "../styles/commonstyles";
-import { theme } from "../infrastructure/theme";
 import CustomHeader from "./CustomHeader";
 import { Spacer } from "../tools";
 import ImageView from "react-native-image-viewing";
 import { useAuthStore } from "../store/authStore";
+import { useTheme } from "../infrastructure/theme";
+import { useCommonStyles } from "../styles/commonstyles";
 
 const { width: screenWidth } = Dimensions.get("window");
 export const HEADER_MAX_HEIGHT = 250;
@@ -48,6 +48,9 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
   children,
   onRefresh,
 }) => {
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+  const styles = collapsibleHeaderStyle(theme);
   const { user } = useAuthStore();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
@@ -216,37 +219,38 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    width: screenWidth,
-    position: "absolute",
-    top: 0,
-    zIndex: 0, // ensure it's below the topBar
-  },
-  topBar: {
-    position: "absolute",
-    left: 16,
-    right: 16,
-    zIndex: 30, // higher than header image
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  backButton: {
-    paddingVertical: 16,
-  },
-  stickyHeader: {
-    paddingVertical: 12,
-    zIndex: 20,
-  },
-  contentContainer: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: -36,
-    backgroundColor: theme.colors.background,
-    paddingTop: 16,
-    paddingHorizontal: 10,
-  },
-});
-
 export default CollapsibleHeaderTabs;
+
+const collapsibleHeaderStyle = (theme: any) =>
+  StyleSheet.create({
+    headerContainer: {
+      width: screenWidth,
+      position: "absolute",
+      top: 0,
+      zIndex: 0, // ensure it's below the topBar
+    },
+    topBar: {
+      position: "absolute",
+      left: 16,
+      right: 16,
+      zIndex: 30, // higher than header image
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    backButton: {
+      paddingVertical: 16,
+    },
+    stickyHeader: {
+      paddingVertical: 12,
+      zIndex: 20,
+    },
+    contentContainer: {
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      marginTop: -36,
+      backgroundColor: theme.colors.background,
+      paddingTop: 16,
+      paddingHorizontal: 10,
+    },
+  });

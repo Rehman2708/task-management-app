@@ -7,12 +7,10 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { theme } from "../../infrastructure/theme";
 import { useNotesListViewModel } from "./notesViewModal";
 import FloatingAdd from "../../components/FloatingAdd";
 import { useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { commonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
 import { Column, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
@@ -23,8 +21,12 @@ import CustomInput from "../../components/customInput";
 import Avatar from "../../components/avatar";
 import CardWrapper from "../../components/cardWrapper";
 import { useUtilStore } from "../../store/utils";
+import { useTheme } from "../../infrastructure/theme";
+import { useCommonStyles } from "../../styles/commonstyles";
 
 export default function NotesScreen() {
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   const { formatDate, themeColor } = useHelper();
   const { fetchingNotes } = useUtilStore();
   const {

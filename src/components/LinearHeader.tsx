@@ -1,13 +1,15 @@
 import { Image, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { theme } from "../infrastructure/theme";
+import { useTheme } from "../infrastructure/theme";
 import { isAndroid } from "../tools";
 import { useHelper } from "../utils/helper";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 
 const LinearHeader = ({ image }: { image?: string }) => {
   const { themeColor, loggedInUser } = useHelper();
   const imageUri = image ?? loggedInUser?.image;
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
 
   return (
     <View>

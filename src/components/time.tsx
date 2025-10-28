@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
+import { useTheme } from "../infrastructure/theme";
 
 const TimeDisplay = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
 
   useEffect(() => {
     const timer = setInterval(() => {

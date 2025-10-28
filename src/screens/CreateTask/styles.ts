@@ -1,8 +1,7 @@
 import { StyleSheet } from "react-native";
-import { theme } from "../../infrastructure/theme";
 import { useHelper } from "../../utils/helper";
 
-export const createTaskStyle = () => {
+export const createTaskStyle = (theme: any) => {
   const { themeColor } = useHelper();
 
   return StyleSheet.create({

@@ -1,13 +1,14 @@
 import { TouchableOpacity, ScrollView, Text } from "react-native";
 import { Column, Row } from "../../tools";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import { AuthRepo } from "../../repositories/auth"; // ensure this path matches your structure
 import { useAuthStore } from "../../store/authStore";
+import { useTheme } from "../../infrastructure/theme";
 
 const colors = [
   { dark: "#3F87E9", light: "#6697D9" },
@@ -22,6 +23,9 @@ const colors = [
 
 const ThemeScreen = () => {
   const navigation = useNavigation();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   const { user, updateUser } = useAuthStore();
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
   const [loading, setLoading] = useState(false);

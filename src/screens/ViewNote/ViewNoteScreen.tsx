@@ -2,16 +2,15 @@ import { View, Text, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import { Note, NotesRepo } from "../../repositories/notes";
 import { useHelper } from "../../utils/helper";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import CustomButton from "../../components/customButton";
 import { isAndroid, Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import ScreenLoader from "../../components/screenLoader";
 import { useUtilStore } from "../../store/utils";
 import { useAuthStore } from "../../store/authStore";
 import CollapsibleHeader from "../../components/collapsibleHeader";
-import { theme } from "../../infrastructure/theme";
 
 interface NoteDetailScreenProps {
   route: {
@@ -24,6 +23,9 @@ interface NoteDetailScreenProps {
 
 const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   const { user } = useAuthStore();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   const { refetchNotes } = useUtilStore();
   const { noteId } = route.params || {};
   const { formatDate } = useHelper();

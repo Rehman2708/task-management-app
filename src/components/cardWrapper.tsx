@@ -2,7 +2,8 @@ import { BlurView } from "expo-blur";
 import React from "react";
 import { View, ImageBackground, StyleProp, ViewStyle } from "react-native";
 import { isAndroid, isDarkMode } from "../tools";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
+import { useTheme } from "../infrastructure/theme";
 
 interface CardWrapperProps {
   image?: string | null;
@@ -15,6 +16,8 @@ const CardWrapper: React.FC<CardWrapperProps> = ({
   children,
   style,
 }) => {
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   const MemoBlur = React.memo(() => (
     <BlurView
       intensity={isAndroid ? 100 : 40}

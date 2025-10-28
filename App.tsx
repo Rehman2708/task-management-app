@@ -4,24 +4,14 @@ import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import { getNotificationPermission } from "./notification";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { commonStyles } from "./src/styles/commonstyles";
+import { useCommonStyles } from "./src/styles/commonstyles";
+import { FontAsset } from "./assets/fonts";
+import { useTheme } from "./src/infrastructure/theme";
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
-    MontserratBold: require("./assets/fonts/MontserratAlternates-Bold.ttf"),
-    MontserratLight: require("./assets/fonts/MontserratAlternates-Light.ttf"),
-    MontserratMedium: require("./assets/fonts/MontserratAlternates-Medium.ttf"),
-    MontserratRegular: require("./assets/fonts/MontserratAlternates-Regular.ttf"),
-    MontserratSemiBold: require("./assets/fonts/MontserratAlternates-SemiBold.ttf"),
-    SourGummyBold: require("./assets/fonts/SourGummy-Bold.ttf"),
-    SourGummyLight: require("./assets/fonts/SourGummy-Light.ttf"),
-    SourGummyMedium: require("./assets/fonts/SourGummy-Medium.ttf"),
-    SourGummyRegular: require("./assets/fonts/SourGummy-Regular.ttf"),
-    SourGummySemiBold: require("./assets/fonts/SourGummy-SemiBold.ttf"),
-    TangerineRegular: require("./assets/fonts/Tangerine-Regular.ttf"),
-    TangerineBold: require("./assets/fonts/Tangerine-Bold.ttf"),
-  });
-
+  const [fontsLoaded] = useFonts(FontAsset);
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   useEffect(() => {
     getNotificationPermission();
   }, []);

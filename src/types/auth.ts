@@ -1,3 +1,5 @@
+import { FontName } from "../../assets/fonts";
+
 export interface IUser {
   name: string;
   userId: string;
@@ -12,4 +14,6 @@ export interface IUser {
   notificationToken?: string | null;
   image?: string;
   theme: { light: string; dark: string };
+  font?: FontName;
+  about?: string;
 }

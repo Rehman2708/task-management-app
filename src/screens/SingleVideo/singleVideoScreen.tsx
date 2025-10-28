@@ -1,13 +1,15 @@
 import { useRoute } from "@react-navigation/native";
 import VideoItem from "../../components/VideoItem";
-import ScreenWrapper from "../../components/ScreenWrapper";
 import { dimensions } from "../../tools";
 import { View } from "react-native";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
+import { useTheme } from "../../infrastructure/theme";
 
 const SingleVideoScreen = () => {
   const { params } = useRoute<any>(); // { video: IVideo }
   const video = params.video;
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
 
   return (
     <View style={[commonStyles.fullFlex]}>

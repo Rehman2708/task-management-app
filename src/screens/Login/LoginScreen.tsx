@@ -1,13 +1,13 @@
 import { Text } from "react-native";
 import { useLoginViewModel } from "./loginViewModel";
-import { useNavigation } from "@react-navigation/native";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, Spacer } from "../../tools";
 import Logo from "../../components/logo";
 import AuthBgContainer from "../../components/videoContainer";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useTheme } from "../../infrastructure/theme";
 
 export const LoginScreen = () => {
   const {
@@ -20,8 +20,8 @@ export const LoginScreen = () => {
     loginUser,
     Register,
   } = useLoginViewModel();
-
-  const navigation = useNavigation();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   const handleLogin = async () => {
     try {
       await loginUser();

@@ -11,9 +11,9 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import EmptyState from "../../components/emptyState";
 import { NotificationRepo } from "../../repositories/notification";
 import { useHelper } from "../../utils/helper";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, Row } from "../../tools";
-import { theme } from "../../infrastructure/theme";
+import { useTheme } from "../../infrastructure/theme";
 import { Images } from "../../../assets/images/images";
 import ScreenLoader from "../../components/screenLoader";
 import Avatar from "../../components/avatar";
@@ -30,6 +30,8 @@ interface NotificationItem {
 const PAGE_SIZE = 20;
 
 const NotificationScreen = () => {
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   const { loggedInUser, formatDate, themeColor, handleNotificationNavigation } =
     useHelper();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);

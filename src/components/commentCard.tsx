@@ -2,8 +2,9 @@ import { Text, View } from "react-native";
 import { dimensions, Row, Spacer } from "../tools";
 import { useHelper } from "../utils/helper";
 import Avatar from "./avatar";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 import Swiper from "./swiper";
+import { useTheme } from "../infrastructure/theme";
 
 const CommentCard = ({
   text,
@@ -22,6 +23,9 @@ const CommentCard = ({
 }) => {
   const { loggedInUser, themeColor } = useHelper();
   const isMyChat = loggedInUser?.userId === userId;
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   const renderAction = () => (
     <View
       style={{

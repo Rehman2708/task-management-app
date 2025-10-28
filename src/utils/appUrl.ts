@@ -12,6 +12,7 @@ export class AppUrl {
   public static logoutEndPoint = `${this.BASE_URL}/auth/logout`;
   public static updateProfileEndPoint = `${this.BASE_URL}/auth/update-profile`;
   public static updateThemeEndPoint = `${this.BASE_URL}/auth/update-theme`;
+  public static updateFontEndPoint = `${this.BASE_URL}/auth/update-font`;
   // 🔹 Task APIs
   public static getAllTasks = `${this.BASE_URL}/tasks`; // active tasks only
   public static getCompletedTasks = `${this.BASE_URL}/tasks/history`; // completed/expired tasks

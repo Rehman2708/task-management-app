@@ -13,9 +13,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { IVideoComment } from "../../types/videos";
 import { useAuthStore } from "../../store/authStore";
 import { VideoRepo } from "../../repositories/videos";
-import { theme } from "../../infrastructure/theme";
+import { useTheme } from "../../infrastructure/theme";
 import { Row } from "../../tools";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import CommentCard from "../../components/commentCard";
 import EmptyState from "../../components/emptyState";
 import CustomInput from "../../components/customInput";
@@ -33,6 +33,8 @@ export default function VideoCommentsModal({
   visible,
   onClose,
 }: Props) {
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   const [comments, setComments] = useState<IVideoComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [addingComment, setAddingComment] = useState(false);

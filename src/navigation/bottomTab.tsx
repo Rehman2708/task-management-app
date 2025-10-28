@@ -2,16 +2,17 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ROUTES } from "../enums/routes";
 import { isDarkMode, Row, Spacer } from "../tools";
-import { theme } from "../infrastructure/theme";
+import { useTheme } from "../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useHelper } from "../utils/helper";
 
 export interface TabIconProps {
   isFocused: boolean;
   routeName: keyof typeof ROUTES;
+  theme: any;
 }
 
-const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
+const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
   const icons: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "book-outline",
     [ROUTES.HISTORY]: "time-outline",
@@ -30,6 +31,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
 
   const iconName = isFocused ? activeIcons[routeName] : icons[routeName];
   const { themeColor } = useHelper();
+
   return (
     <Ionicons
       name={iconName}
@@ -46,7 +48,8 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName }) => {
 };
 
 const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
-  const styles = useBottomTabStyles();
+  const theme = useTheme();
+  const styles = useBottomTabStyles(theme);
   const routeTitles: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "Tasks",
     [ROUTES.HISTORY]: "History",
@@ -90,6 +93,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
               <TabIcon
                 isFocused={isFocused}
                 routeName={route.name as keyof typeof ROUTES}
+                theme={theme}
               />
               <Spacer size={8} />
               <Text
@@ -111,7 +115,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
   );
 };
 
-const useBottomTabStyles = () => {
+const useBottomTabStyles = (theme: any) => {
   return StyleSheet.create({
     container: {
       borderTopColor: isDarkMode ? "#000" : `${theme.colors.border}`,

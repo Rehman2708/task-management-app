@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Text,
   Pressable,
@@ -9,17 +9,16 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import { theme } from "../../infrastructure/theme";
+import { useTheme } from "../../infrastructure/theme";
 import { useProfileViewModel } from "./profileViewModal";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, isAndroid, Row, Spacer } from "../../tools";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
 import ScreenLoader from "../../components/screenLoader";
-import ImageModal from "../../components/imageModal";
 import ImageView from "react-native-image-viewing";
 
 export default function ProfileScreen() {
@@ -30,6 +29,7 @@ export default function ProfileScreen() {
     addPartner,
     logout,
     changeThemeScreen,
+    changeFontScreen,
     createVideoScreen,
     updateProfileScreen,
     loggingOut,
@@ -40,6 +40,9 @@ export default function ProfileScreen() {
     loadingUserDetail,
     fetchUserDetails,
   } = useProfileViewModel();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+  const ProfileScreenStyles = styles(theme);
   const { getInitials, themeColor } = useHelper();
   const [visible, setIsVisible] = useState(false);
   const [currentImage, setCurrentImage] = useState({});
@@ -215,6 +218,20 @@ export default function ProfileScreen() {
                   />
                 </Row>
               </TouchableOpacity>
+              <TouchableOpacity onPress={changeFontScreen}>
+                <Row
+                  style={commonStyles.cardContainer}
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Text style={[commonStyles.basicText]}>Change font</Text>
+                  <Ionicons
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={theme.colors.text}
+                  />
+                </Row>
+              </TouchableOpacity>
               <TouchableOpacity onPress={createVideoScreen}>
                 <Row
                   style={commonStyles.cardContainer}
@@ -253,27 +270,28 @@ export default function ProfileScreen() {
   );
 }
 
-export const ProfileScreenStyles = StyleSheet.create({
-  imageContainer: {
-    width: 120,
-    height: 120,
-    marginVertical: 20,
-    position: "relative",
-  },
-  deleteIcon: {
-    position: "absolute",
-    right: -3,
-    top: -3,
-    borderRadius: 100,
-    backgroundColor: theme.colors.error,
-    padding: 8,
-  },
-  image: {
-    height: 120,
-    width: 120,
-  },
-  nameText: {
-    fontSize: 50,
-    fontFamily: theme.fonts.bold,
-  },
-});
+export const styles = (theme: any) =>
+  StyleSheet.create({
+    imageContainer: {
+      width: 120,
+      height: 120,
+      marginVertical: 20,
+      position: "relative",
+    },
+    deleteIcon: {
+      position: "absolute",
+      right: -3,
+      top: -3,
+      borderRadius: 100,
+      backgroundColor: theme.colors.error,
+      padding: 8,
+    },
+    image: {
+      height: 120,
+      width: 120,
+    },
+    nameText: {
+      fontSize: 50,
+      fontFamily: theme.fonts.bold,
+    },
+  });

@@ -1,8 +1,9 @@
 import { Text, Image, ImageSourcePropType, View } from "react-native";
 import { Column, isAndroid, Row } from "../tools";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 import CustomButton from "./customButton";
 import { Images } from "../../assets/images/images";
+import { useTheme } from "../infrastructure/theme";
 
 const EmptyState = ({
   image = Images.noData,
@@ -18,6 +19,9 @@ const EmptyState = ({
   error?: boolean;
 }) => {
   const errorImage = Images.error;
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   return (
     <Column
       style={commonStyles.fullFlex}

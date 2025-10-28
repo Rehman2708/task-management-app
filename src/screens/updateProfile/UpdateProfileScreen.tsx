@@ -5,18 +5,21 @@ import ImageModal from "../../components/imageModal";
 import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
 import { Row } from "../../tools";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
-import { theme } from "../../infrastructure/theme";
-import { ProfileScreenStyles } from "../profile/ProfileScreen";
+import { styles } from "../profile/ProfileScreen";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
+import { useTheme } from "../../infrastructure/theme";
 
 const UpdateProfileScreen = () => {
   const { user, updateUser } = useAuthStore();
   const { themeColor, getInitials } = useHelper();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
 
+  const ProfileScreenStyles = styles(theme);
   const [userImage, setUserImage] = useState(user?.image ?? "");
   const [userName, setUserName] = useState(user?.name ?? "");
   const [loading, setLoading] = useState(false);

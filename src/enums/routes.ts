@@ -14,6 +14,7 @@ export enum ROUTES {
   VIEW_NOTE = "ViewNote",
   TASK_DETAIL = "TaskDetail",
   THEME = "Theme",
+  FONT = "Font",
   SINGLE_VIDEO = "SingleVideo",
   UPDATE_PROFILE = "UpdateProfile",
   NOTIFICATION = "Notification",

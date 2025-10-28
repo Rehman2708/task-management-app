@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Column, isAndroid, Row, Spacer } from "../tools";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 import { useHelper } from "../utils/helper";
 import Avatar from "./avatar";
 import Swiper from "./swiper";
@@ -16,6 +16,7 @@ import { Task } from "../types/task";
 import { ROUTES } from "../enums/routes";
 import { useNavigation } from "@react-navigation/native";
 import CardWrapper from "./cardWrapper";
+import { useTheme } from "../infrastructure/theme";
 
 const TasksCard = ({
   item,
@@ -29,6 +30,9 @@ const TasksCard = ({
   isCompleted?: boolean;
 }) => {
   const navigation: any = useNavigation();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   const { formatDate, getPriorityColor, themeColor } = useHelper();
   const rightAction = () => (
     <Pressable onPress={handleDelete} style={{ width: 80 }}>

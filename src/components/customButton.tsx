@@ -6,11 +6,11 @@ import {
   ViewStyle,
   ActivityIndicator,
 } from "react-native";
-import { theme } from "../infrastructure/theme";
-import { commonStyles } from "../styles/commonstyles";
+import { useCommonStyles } from "../styles/commonstyles";
 import { Row } from "../tools";
 import { Ionicons } from "@expo/vector-icons";
 import { useHelper } from "../utils/helper";
+import { useTheme } from "../infrastructure/theme";
 
 interface ICustomButton {
   title?: string;
@@ -47,6 +47,9 @@ const CustomButton = ({
   iconName,
 }: ICustomButton) => {
   const { themeColor } = useHelper();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+  const styles = customButtonStyle(theme);
   const buttonStyles = [
     styles.button,
     {
@@ -129,48 +132,49 @@ const CustomButton = ({
 
 export default CustomButton;
 
-const styles = StyleSheet.create({
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    height: 56,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-    borderWidth: 0,
-    marginVertical: 8,
-    width: "100%",
-    backgroundColor: theme.colors.primary,
-  },
-  outlined: {
-    backgroundColor: theme.colors.transparent,
-    borderWidth: 2,
-    borderColor: theme.colors.primary,
-  },
-  secondary: {
-    backgroundColor: theme.colors.secondary,
-  },
-  error: {
-    backgroundColor: theme.colors.error,
-  },
-  success: {
-    backgroundColor: theme.colors.success,
-  },
-  small: {
-    height: 44,
-    paddingHorizontal: 8,
-    borderRadius: 10,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  rounded: {
-    borderRadius: 500,
-  },
-  text: {
-    fontSize: theme.fontSizes.md,
-    fontFamily: theme.fonts.medium,
-    color: theme.colors.white,
-  },
-});
+const customButtonStyle = (theme: any) =>
+  StyleSheet.create({
+    button: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      height: 56,
+      paddingHorizontal: 12,
+      borderRadius: 12,
+      borderWidth: 0,
+      marginVertical: 8,
+      width: "100%",
+      backgroundColor: theme.colors.primary,
+    },
+    outlined: {
+      backgroundColor: theme.colors.transparent,
+      borderWidth: 2,
+      borderColor: theme.colors.primary,
+    },
+    secondary: {
+      backgroundColor: theme.colors.secondary,
+    },
+    error: {
+      backgroundColor: theme.colors.error,
+    },
+    success: {
+      backgroundColor: theme.colors.success,
+    },
+    small: {
+      height: 44,
+      paddingHorizontal: 8,
+      borderRadius: 10,
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+    rounded: {
+      borderRadius: 500,
+    },
+    text: {
+      fontSize: theme.fontSizes.md,
+      fontFamily: theme.fonts.medium,
+      color: theme.colors.white,
+    },
+  });

@@ -4,22 +4,25 @@ import { useCreateTaskViewModel } from "./createViewModel";
 import { createTaskStyle } from "./styles";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ScreenWrapper from "../../components/ScreenWrapper";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import CustomButton from "../../components/customButton";
 import CustomInput from "../../components/customInput";
 import { isAndroid, Row, Spacer } from "../../tools";
-import { theme } from "../../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { AndroidDateTimePicker } from "./components/subtaskItem";
 import { useHelper } from "../../utils/helper";
 import ImageModal from "../../components/imageModal";
 import { Priority } from "../../enums/tasks";
+import { useTheme } from "../../infrastructure/theme";
 // Pass `task` prop for edit mode
 export const CreateTaskScreen = ({ route, navigation }: any) => {
   const { task, repeat } = route.params || {};
   const vm = useCreateTaskViewModel(task, repeat);
-  const styles = createTaskStyle();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
+  const styles = createTaskStyle(theme);
   const { themeColor, getPriorityColor } = useHelper();
 
   useEffect(() => {

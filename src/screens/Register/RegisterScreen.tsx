@@ -2,13 +2,14 @@ import { Text } from "react-native";
 import { useRegisterViewModel } from "./registerViewModel";
 import { useNavigation } from "@react-navigation/native";
 import CustomInput from "../../components/customInput";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, Spacer } from "../../tools";
 import CustomButton from "../../components/customButton";
 import { ROUTES } from "../../enums/routes";
 import Logo from "../../components/logo";
 import AuthBgContainer from "../../components/videoContainer";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useTheme } from "../../infrastructure/theme";
 
 export const RegisterScreen = () => {
   const {
@@ -24,6 +25,8 @@ export const RegisterScreen = () => {
     error,
     registerUser,
   } = useRegisterViewModel();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
 
   const handleRegister = async () => {
     try {

@@ -16,18 +16,22 @@ import Video from "react-native-video";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { CreateVideoPayload, IVideo } from "../../types/videos";
 import { VideoRepo } from "../../repositories/videos";
-import { theme } from "../../infrastructure/theme";
+import { useTheme } from "../../infrastructure/theme";
 import { useHelper } from "../../utils/helper";
 import { useCreateVideoViewModal } from "./useViewModal";
 import CommentCard from "../../components/commentCard";
 import { Column, Row, Spacer } from "../../tools";
-import { styles } from "./styles";
 import { ROUTES } from "../../enums/routes";
+import { createVideoStyle } from "./styles";
 
 export default function CreateVideoScreen() {
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
+  const styles = createVideoStyle(theme);
   const navigation: any = useNavigation();
   const [title, setTitle] = useState("");
   const [videoUrl, setVideoUrl] = useState("");

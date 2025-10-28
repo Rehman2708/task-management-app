@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
-import { getDataFromAsyncStorage } from "./localstorage";
-import { LocalStorageKey } from "../enums/localstorage";
-import { theme } from "../infrastructure/theme";
+import { useState } from "react";
 import { Priority } from "../enums/tasks";
 import { useAuthStore } from "../store/authStore";
 import { useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../enums/routes";
+import { useTheme } from "../infrastructure/theme";
 
 export function useHelper() {
   const { user } = useAuthStore();
+  const theme = useTheme();
   const [themeColor] = useState({
     light: user?.theme?.light ?? theme.colors.secondary,
     dark: user?.theme?.dark ?? theme.colors.primary,

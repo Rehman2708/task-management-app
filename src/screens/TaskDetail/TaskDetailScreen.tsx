@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { View, Text, FlatList, Pressable } from "react-native";
-import { theme } from "../../infrastructure/theme";
+import { useTheme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, isAndroid, Row, Spacer } from "../../tools";
 import CustomButton from "../../components/customButton";
 import CustomInput from "../../components/customInput";
@@ -15,6 +15,7 @@ import CommentCard from "../../components/commentCard";
 import TimeLeftProgress from "../../components/timeLeftProgress";
 import { SubtaskComment } from "../../types/task";
 import CollapsibleHeaderTabs from "../../components/collapsibleHeader";
+import { TaskDetailStyles } from "./styles";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -31,8 +32,11 @@ export default function TaskDetailScreen({ route }: any) {
     subtaskStatusLoading,
   } = useTaskDetailViewModel(taskId);
   const { formatDate, themeColor } = useHelper();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
+  const styles = TaskDetailStyles(theme);
   const [taskComment, setTaskComment] = useState("");
-  const [showImage, setShowImage] = useState(false);
   const [subtaskComments, setSubtaskComments] = useState<
     Record<string, string>
   >({});
@@ -206,7 +210,7 @@ export default function TaskDetailScreen({ route }: any) {
               <>
                 {task && (
                   <>
-                    <Column gap={isAndroid ? 5 : 6}>
+                    <Column gap={12}>
                       {task?.description && (
                         <Text style={commonStyles.smallText}>
                           {task?.description}
@@ -230,15 +234,10 @@ export default function TaskDetailScreen({ route }: any) {
                         </Text>
                       </Row>
                       {task?.subtasks?.length > 0 && (
-                        <View
-                          style={[
-                            commonStyles.secondaryContainer,
-                            {
-                              backgroundColor: `${themeColor.light}20`,
-                            },
-                          ]}
-                        >
-                          <Text style={commonStyles.basicText}>Subtasks</Text>
+                        <View style={[styles.container]}>
+                          <Text style={commonStyles.subTitleText}>
+                            Subtasks
+                          </Text>
                           <Spacer size={8} />
                           <FlatList
                             data={task?.subtasks}
@@ -255,12 +254,7 @@ export default function TaskDetailScreen({ route }: any) {
                         </View>
                       )}
                       {task?.comments?.length > 0 && (
-                        <View
-                          style={[
-                            commonStyles.secondaryContainer,
-                            { backgroundColor: `${themeColor.light}20` },
-                          ]}
-                        >
+                        <View style={[styles.container]}>
                           <Row
                             justifyContent="space-between"
                             alignItems="center"

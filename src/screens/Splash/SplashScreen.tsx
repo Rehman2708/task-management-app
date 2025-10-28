@@ -2,19 +2,23 @@ import { ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import { Column } from "../../tools";
 import Logo from "../../components/logo";
-import { commonStyles } from "../../styles/commonstyles";
+import { useCommonStyles } from "../../styles/commonstyles";
 import { getDataFromAsyncStorage } from "../../utils/localstorage";
 import { LocalStorageKey } from "../../enums/localstorage";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
-import { theme } from "../../infrastructure/theme";
+import { useTheme } from "../../infrastructure/theme";
 import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
 
 const SplashScreen = () => {
   const navigation = useNavigation();
+
   const [loading, setLoading] = useState(true);
   const { updateUser } = useAuthStore();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   // Check if user already logged in
 
   const fetchUserDetails = async (id: string) => {

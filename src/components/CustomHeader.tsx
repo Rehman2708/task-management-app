@@ -2,11 +2,11 @@ import { Text, TouchableOpacity } from "react-native";
 import { Column, Row } from "../tools";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { commonStyles } from "../styles/commonstyles";
-import { theme } from "../infrastructure/theme";
+import { useCommonStyles } from "../styles/commonstyles";
 import Avatar from "./avatar";
 import { useHelper } from "../utils/helper";
 import { ROUTES } from "../enums/routes";
+import { useTheme } from "../infrastructure/theme";
 interface HeaderProps {
   title?: string;
   subTitle?: string;
@@ -27,6 +27,9 @@ const CustomHeader = ({
 }: HeaderProps) => {
   const navigation: any = useNavigation();
   const { loggedInUser } = useHelper();
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
+
   return (
     <Row
       justifyContent="space-between"

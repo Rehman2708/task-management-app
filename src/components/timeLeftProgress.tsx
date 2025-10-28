@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Animated, Text } from "react-native";
-import { theme } from "../infrastructure/theme";
+import { useTheme } from "../infrastructure/theme";
 import { useHelper } from "../utils/helper";
 
 interface ProgressBarProps {
@@ -19,7 +19,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [percentage, setPercentage] = useState(0);
   const { themeColor } = useHelper();
-
+  const theme = useTheme();
+  const styles = progressBarStyle(theme);
   useEffect(() => {
     // 🟢 CASE 1: When duration & currentTime are provided (e.g., video progress)
     if (typeof duration === "number" && typeof currentTime === "number") {
@@ -94,18 +95,19 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  progressBackground: {
-    height: 8,
-    borderRadius: 10,
-    backgroundColor: theme.colors.background,
-    overflow: "hidden",
-    flex: 1,
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: 10,
-  },
-});
+const progressBarStyle = (theme: any) =>
+  StyleSheet.create({
+    progressBackground: {
+      height: 8,
+      borderRadius: 10,
+      backgroundColor: theme.colors.background,
+      overflow: "hidden",
+      flex: 1,
+    },
+    progressFill: {
+      height: "100%",
+      borderRadius: 10,
+    },
+  });
 
 export default ProgressBar;
