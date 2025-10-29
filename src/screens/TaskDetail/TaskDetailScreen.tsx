@@ -16,6 +16,8 @@ import TimeLeftProgress from "../../components/timeLeftProgress";
 import { SubtaskComment } from "../../types/task";
 import CollapsibleHeaderTabs from "../../components/collapsibleHeader";
 import { TaskDetailStyles } from "./styles";
+import { Ionicons } from "@expo/vector-icons";
+import { AssignedIcon } from "../CreateTask/components/subtaskItem";
 
 export default function TaskDetailScreen({ route }: any) {
   const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
@@ -79,9 +81,17 @@ export default function TaskDetailScreen({ route }: any) {
         <Column gap={6} justifyContent="center" style={commonStyles.fullFlex}>
           <Text style={[commonStyles.basicText]}>{item.title}</Text>
           {item.dueDateTime && (
-            <Text style={commonStyles.tTinyText}>
-              Due: {formatDate(item.dueDateTime)}
-            </Text>
+            <Row alignItems="center">
+              <Ionicons
+                name="timer-outline"
+                size={12}
+                color={theme.colors.textLight}
+              />
+              <Text style={commonStyles.tTinyText}>
+                {" "}
+                Due: {formatDate(item.dueDateTime)}
+              </Text>
+            </Row>
           )}
         </Column>
         {!readOnly && item.status === SubtaskStatus.Pending && (
@@ -229,9 +239,16 @@ export default function TaskDetailScreen({ route }: any) {
                             withName
                           />
                         </Row>
-                        <Text style={commonStyles.tinyText}>
-                          Assigned To: {task?.assignedTo}
-                        </Text>
+                        <Row alignItems="flex-start">
+                          <Text style={commonStyles.tinyText}>
+                            Assigned To: {task?.assignedTo}{" "}
+                          </Text>
+                          <AssignedIcon
+                            type={task?.assignedTo}
+                            size={12}
+                            color={theme.colors.text}
+                          />
+                        </Row>
                       </Row>
                       {task?.subtasks?.length > 0 && (
                         <View style={[styles.container]}>

@@ -17,6 +17,8 @@ import { ROUTES } from "../enums/routes";
 import { useNavigation } from "@react-navigation/native";
 import CardWrapper from "./cardWrapper";
 import { useTheme } from "../infrastructure/theme";
+import { AssignedIcon } from "../screens/CreateTask/components/subtaskItem";
+import { AssignedTo } from "../enums/tasks";
 
 const TasksCard = ({
   item,
@@ -64,7 +66,7 @@ const TasksCard = ({
           <Ionicons
             name={isCompleted ? "reload-outline" : "create-outline"}
             size={30}
-            color={themeColor.light}
+            color={themeColor.dark}
           />
         </Row>
       </Pressable>
@@ -118,9 +120,16 @@ const TasksCard = ({
                   {item.title}
                 </Text>
                 <Spacer size={20} position="right" />
-                <Text style={commonStyles.tTinyText}>
-                  {formatDate(item.createdAt)}
-                </Text>
+                <Row alignItems="flex-start" gap={4}>
+                  <Ionicons
+                    name="time-outline"
+                    size={12}
+                    color={theme.colors.textLight}
+                  />
+                  <Text style={commonStyles.tTinyText}>
+                    {formatDate(item.createdAt)}
+                  </Text>
+                </Row>
               </Row>
               <Text numberOfLines={2} style={commonStyles.tinyText}>
                 {item.description || "No Description"}
@@ -138,9 +147,13 @@ const TasksCard = ({
                     withName
                   />
                 </Row>
-
-                <Text style={commonStyles.tTinyText}>
-                  Assigned To: {item.assignedTo}
+                <Text style={[commonStyles.tTinyText]}>
+                  Assigned To: {item.assignedTo}{" "}
+                  <AssignedIcon
+                    type={item.assignedTo as AssignedTo}
+                    color={theme.colors.textLight}
+                    size={10}
+                  />
                 </Text>
               </Row>
             </Column>

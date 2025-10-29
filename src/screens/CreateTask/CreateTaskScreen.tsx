@@ -10,10 +10,10 @@ import CustomInput from "../../components/customInput";
 import { isAndroid, Row, Spacer } from "../../tools";
 import { Ionicons } from "@expo/vector-icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { AndroidDateTimePicker } from "./components/subtaskItem";
+import { AndroidDateTimePicker, AssignedIcon } from "./components/subtaskItem";
 import { useHelper } from "../../utils/helper";
 import ImageModal from "../../components/imageModal";
-import { Priority } from "../../enums/tasks";
+import { AssignedTo, Priority } from "../../enums/tasks";
 import { useTheme } from "../../infrastructure/theme";
 // Pass `task` prop for edit mode
 export const CreateTaskScreen = ({ route, navigation }: any) => {
@@ -67,7 +67,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
 
           <Text style={commonStyles.smallText}>Assigned To</Text>
           <Row gap={isAndroid ? 14 : 16} alignItems="center">
-            {["Me", "Partner", "Both"].map((option) => (
+            {["Me", "Partner", "Both"].map((option, index) => (
               <TouchableOpacity
                 key={option}
                 onPress={() => vm.setAssignedTo(option as any)}
@@ -79,16 +79,26 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                   {},
                 ]}
               >
-                <Text
-                  style={[
-                    commonStyles.smallText,
-                    vm.assignedTo === option
-                      ? styles.assignTextActive
-                      : styles.assignTextInactive,
-                  ]}
-                >
-                  {option}
-                </Text>
+                <Row gap={6} alignItems="center">
+                  <AssignedIcon
+                    type={option as AssignedTo}
+                    color={
+                      vm.assignedTo === option
+                        ? theme.colors.text
+                        : themeColor.dark
+                    }
+                  />
+                  <Text
+                    style={[
+                      commonStyles.smallText,
+                      vm.assignedTo === option
+                        ? styles.assignTextActive
+                        : styles.assignTextInactive,
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                </Row>
               </TouchableOpacity>
             ))}
           </Row>
@@ -161,31 +171,31 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 value={subtask?.title}
                 onChangeText={(text) => vm.updateSubtask(index, "title", text)}
               />
-              <Row gap={isAndroid ? 5 : 6} alignItems="center">
-                <Text style={commonStyles.smallText}>Due:</Text>
+              <Row justifyContent="space-between" alignItems="center">
+                <Row gap={isAndroid ? 5 : 6} alignItems="center">
+                  <Text style={commonStyles.smallText}>Due:</Text>
 
-                {Platform.OS === "ios" ? (
-                  // iOS: Inline picker
-                  <DateTimePicker
-                    value={subtask?.dueDateTime}
-                    mode="datetime"
-                    display="default"
-                    onChange={(_, date) => {
-                      if (date) vm.updateSubtask(index, "dueDateTime", date);
-                    }}
-                    minimumDate={new Date(Date.now() + 60 * 60 * 1000)}
-                  />
-                ) : (
-                  // Android: Show buttons instead of picker directly
-                  <AndroidDateTimePicker
-                    dueDateTime={subtask?.dueDateTime}
-                    onChange={(date) =>
-                      vm.updateSubtask(index, "dueDateTime", date)
-                    }
-                  />
-                )}
-              </Row>
-              <Row justifyContent="flex-end">
+                  {Platform.OS === "ios" ? (
+                    // iOS: Inline picker
+                    <DateTimePicker
+                      value={subtask?.dueDateTime}
+                      mode="datetime"
+                      display="default"
+                      onChange={(_, date) => {
+                        if (date) vm.updateSubtask(index, "dueDateTime", date);
+                      }}
+                      minimumDate={new Date(Date.now() + 60 * 60 * 1000)}
+                    />
+                  ) : (
+                    // Android: Show buttons instead of picker directly
+                    <AndroidDateTimePicker
+                      dueDateTime={subtask?.dueDateTime}
+                      onChange={(date) =>
+                        vm.updateSubtask(index, "dueDateTime", date)
+                      }
+                    />
+                  )}
+                </Row>
                 {vm.subtasks?.length > 1 && (
                   <CustomButton
                     small
@@ -194,6 +204,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                     onPress={() => vm.removeSubtask(index)}
                     halfWidth
                     rounded
+                    customStyle={{ maxWidth: 80, height: 30 }}
                   />
                 )}
               </Row>

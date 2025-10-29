@@ -122,7 +122,7 @@ const customInputStyle = (theme: any) =>
       paddingRight: 40, // space for the eye icon
     },
     multiline: {
-      minHeight: 200,
+      minHeight: 150,
       textAlignVertical: "top",
     },
     passwordInput: {
