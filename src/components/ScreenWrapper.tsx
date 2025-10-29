@@ -5,6 +5,7 @@ import LinearHeader from "./LinearHeader";
 import CustomHeader from "./CustomHeader";
 import { isAndroid, Spacer } from "../tools";
 import { useTheme } from "../infrastructure/theme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ScreenWrapper = ({
   children,
@@ -29,7 +30,7 @@ const ScreenWrapper = ({
 }) => {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-
+  const insets = useSafeAreaInsets();
   return (
     <View
       style={[
@@ -39,7 +40,7 @@ const ScreenWrapper = ({
     >
       <LinearHeader image={image} />
 
-      <SafeAreaView
+      <View
         style={[
           commonStyles.screenWrapper,
           noPadding && { paddingHorizontal: 0 },
@@ -47,7 +48,8 @@ const ScreenWrapper = ({
       >
         <Spacer size={isAndroid ? (subTitle ? 10 : 20) : 0} />
 
-        <View style={{ height: title ? 80 : 0 }}>
+        <View style={{ height: title ? 80 + insets.top : 0 }}>
+          <Spacer size={insets.top} />
           <View style={[noPadding && { paddingHorizontal: 6 }]}>
             <CustomHeader
               title={title}
@@ -61,7 +63,7 @@ const ScreenWrapper = ({
           {/* {!subTitle && <TimeDisplay />} */}
         </View>
         {children}
-      </SafeAreaView>
+      </View>
     </View>
   );
 };

@@ -1,6 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Dimensions,
   ImageBackground,
@@ -19,16 +17,20 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import CustomHeader from "./CustomHeader";
-import { Spacer } from "../tools";
 import ImageView from "react-native-image-viewing";
-import { useAuthStore } from "../store/authStore";
+
 import { useTheme } from "../infrastructure/theme";
+import { useAuthStore } from "../store/authStore";
 import { useCommonStyles } from "../styles/commonstyles";
+import CustomHeader from "./CustomHeader";
+import { dimensions, Spacer } from "../tools";
 
 const { width: screenWidth } = Dimensions.get("window");
-export const HEADER_MAX_HEIGHT = 250;
+export const HEADER_MAX_HEIGHT = 300;
 export const HEADER_MIN_HEIGHT = 0;
 
 interface CollapsibleHeaderTabsProps {
@@ -50,48 +52,67 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
 }) => {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-  const styles = collapsibleHeaderStyle(theme);
-  const { user } = useAuthStore();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation();
-  const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
+  const { user } = useAuthStore();
+
   const scrollY = useSharedValue(0);
+  const [refreshing, setRefreshing] = useState(false);
   const [showImage, setShowImage] = useState(false);
 
-  const HEADER_SCROLL_DISTANCE = headerHeight - HEADER_MIN_HEIGHT;
+  const HEADER_SCROLL_DISTANCE = useMemo(
+    () => headerHeight - HEADER_MIN_HEIGHT,
+    [headerHeight]
+  );
 
   const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => (scrollY.value = event.contentOffset.y),
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
   });
 
-  const headerImageStyle = useAnimatedStyle(() => {
-    const scale = interpolate(
-      scrollY.value,
-      [-200, 0],
-      [2, 1],
-      Extrapolate.CLAMP
-    );
-    const height = interpolate(
+  // Header scaling and parallax
+  const headerImageStyle = useAnimatedStyle(() => ({
+    height: interpolate(
       scrollY.value,
       [0, HEADER_SCROLL_DISTANCE],
       [headerHeight, HEADER_MIN_HEIGHT],
       Extrapolate.CLAMP
-    );
-    return { height, transform: [{ scale }] };
-  });
+    ),
+    transform: [
+      {
+        scale: interpolate(scrollY.value, [-200, 0], [2, 1], Extrapolate.CLAMP),
+      },
+    ],
+  }));
 
+  // Blur overlay
   const blurStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
       scrollY.value,
       [-50, 0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
-      [1, 0, 0, 1]
+      [1, 0, 0, 1],
+      Extrapolate.CLAMP
     ),
   }));
 
+  // Sticky header visibility
   const stickyHeaderStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
       scrollY.value,
       [HEADER_SCROLL_DISTANCE / 3, HEADER_SCROLL_DISTANCE / 1.4],
       [0, 1],
+      Extrapolate.CLAMP
+    ),
+  }));
+
+  // Back button fade-out
+  const animatedBackButtonStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      scrollY.value,
+      [HEADER_SCROLL_DISTANCE / 3, HEADER_SCROLL_DISTANCE / 1.4],
+      [1, 0],
       Extrapolate.CLAMP
     ),
   }));
@@ -105,27 +126,20 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
       setRefreshing(false);
     }
   }, [onRefresh]);
-  const animatedBackButtonStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      scrollY.value,
-      [HEADER_SCROLL_DISTANCE / 3, HEADER_SCROLL_DISTANCE / 1.4],
-      [1, 0],
-      Extrapolate.CLAMP
-    ),
-  }));
+
+  const backgroundSource = headerImage
+    ? { uri: headerImage }
+    : user?.image
+    ? { uri: user.image }
+    : undefined;
+
   return (
     <>
-      {/* Header Image */}
+      {/* Header Section */}
       <Animated.View style={[styles.headerContainer, headerImageStyle]}>
-        {headerImage ? (
+        {backgroundSource && (
           <ImageBackground
-            source={{ uri: headerImage }}
-            resizeMode="cover"
-            style={StyleSheet.absoluteFill}
-          />
-        ) : (
-          <ImageBackground
-            source={{ uri: user?.image }}
+            source={backgroundSource}
             resizeMode="cover"
             style={StyleSheet.absoluteFill}
           />
@@ -136,31 +150,39 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
       </Animated.View>
 
       {/* Top Navigation Bar */}
-      <Animated.View style={[styles.topBar, animatedBackButtonStyle]}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
+      <Animated.View
+        style={[
+          styles.topBar,
+          animatedBackButtonStyle,
+          { top: insets.top + 11 },
+        ]}
+      >
+        <TouchableOpacity onPress={navigation.goBack}>
           <Ionicons
             name="arrow-back-outline"
             size={30}
             color={theme.colors.white}
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setShowImage(true)}
-          style={styles.backButton}
-        >
-          <Ionicons
-            name="expand-outline"
-            size={30}
-            color={theme.colors.white}
-          />
-        </TouchableOpacity>
+        {headerImage && (
+          <TouchableOpacity onPress={() => setShowImage(true)}>
+            <Ionicons
+              name="expand-outline"
+              size={30}
+              color={theme.colors.white}
+            />
+          </TouchableOpacity>
+        )}
       </Animated.View>
 
-      {/* Sticky Header */}
-      <Animated.View style={[styles.stickyHeader, stickyHeaderStyle]}>
+      {/* Sticky Header (Visible when collapsed) */}
+      <Animated.View
+        style={[
+          styles.stickyHeader,
+          stickyHeaderStyle,
+          { paddingTop: insets.top, height: 120 },
+        ]}
+      >
         <CustomHeader
           subTitle={subTitle}
           title={title}
@@ -169,11 +191,10 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
         />
       </Animated.View>
 
-      {/* Keyboard + Scroll Handling */}
+      {/* Scrollable Content */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+        style={commonStyles.fullFlex}
       >
         <Animated.ScrollView
           scrollEventThrottle={16}
@@ -181,27 +202,34 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           refreshControl={
-            onRefresh ? (
+            onRefresh && (
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
               />
-            ) : undefined
+            )
           }
           contentContainerStyle={{
-            paddingTop: headerHeight - 56,
-            paddingBottom: Platform.OS === "ios" ? 100 : 0,
+            paddingTop: headerHeight - insets.top,
           }}
         >
-          <View style={[commonStyles.screenWrapper, styles.contentContainer]}>
+          <View
+            style={[
+              commonStyles.screenWrapper,
+              styles.contentContainer,
+              // { minHeight: dimensions.height + insets.top + 50 },
+            ]}
+          >
             <Text numberOfLines={3} style={commonStyles.titleText}>
               {title}
             </Text>
-            <Spacer size={6} />
             {subTitle && (
-              <Text numberOfLines={3} style={commonStyles.tinyText}>
-                {subTitle}
-              </Text>
+              <>
+                <Spacer size={6} />
+                <Text numberOfLines={3} style={commonStyles.tinyText}>
+                  {subTitle}
+                </Text>
+              </>
             )}
             <Spacer size={16} />
             {children}
@@ -209,8 +237,9 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
         </Animated.ScrollView>
       </KeyboardAvoidingView>
 
+      {/* Image Viewer */}
       <ImageView
-        images={[{ uri: headerImage }]}
+        images={headerImage ? [{ uri: headerImage }] : []}
         imageIndex={0}
         visible={showImage}
         onRequestClose={() => setShowImage(false)}
@@ -221,34 +250,31 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
 
 export default CollapsibleHeaderTabs;
 
-const collapsibleHeaderStyle = (theme: any) =>
+const createStyles = (theme: any) =>
   StyleSheet.create({
     headerContainer: {
       width: screenWidth,
       position: "absolute",
       top: 0,
-      zIndex: 0, // ensure it's below the topBar
+      zIndex: 0,
     },
     topBar: {
       position: "absolute",
       left: 16,
       right: 16,
-      zIndex: 30, // higher than header image
+      zIndex: 30,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
     },
-    backButton: {
-      paddingVertical: 16,
-    },
+
     stickyHeader: {
-      paddingVertical: 12,
       zIndex: 20,
     },
     contentContainer: {
       borderTopLeftRadius: 24,
       borderTopRightRadius: 24,
-      marginTop: -36,
+      marginTop: -100,
       backgroundColor: theme.colors.background,
       paddingTop: 16,
       paddingHorizontal: 10,

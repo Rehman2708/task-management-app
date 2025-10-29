@@ -154,11 +154,12 @@ export default function ProfileScreen() {
                   {user?.name || "N/A"}
                 </Text>
               </Row>
-
-              <Row gap={isAndroid ? 6 : 8}>
-                <Text style={[commonStyles.smallText]}>About me:</Text>
-                <Text style={[commonStyles.subTitleText]}>{user?.about}</Text>
-              </Row>
+              {user?.about && (
+                <Row gap={isAndroid ? 6 : 8}>
+                  <Text style={[commonStyles.smallText]}>About me:</Text>
+                  <Text style={[commonStyles.subTitleText]}>{user.about}</Text>
+                </Row>
+              )}
               {partnerId ? (
                 <>
                   <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">

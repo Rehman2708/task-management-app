@@ -4,11 +4,13 @@ import { useTheme } from "../infrastructure/theme";
 import { isAndroid } from "../tools";
 import { useHelper } from "../utils/helper";
 import { useCommonStyles } from "../styles/commonstyles";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const LinearHeader = ({ image }: { image?: string }) => {
   const { themeColor, loggedInUser } = useHelper();
   const imageUri = image ?? loggedInUser?.image;
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const commonStyles = useCommonStyles(theme);
 
   return (
@@ -23,7 +25,7 @@ const LinearHeader = ({ image }: { image?: string }) => {
               ]
         }
         style={{
-          height: isAndroid ? 80 : 130,
+          height: isAndroid ? 80 + insets.top : 130,
           width: "100%",
           borderBottomLeftRadius: 40,
           borderBottomRightRadius: 40,

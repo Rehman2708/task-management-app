@@ -134,7 +134,7 @@ const NotificationScreen = () => {
       >
         <Row gap={12} alignItems="center">
           {item?.data?.image && (
-            <Avatar disabled image={item.data.image} name="NA" size={36} />
+            <Avatar disabled image={item.data.image} name="NA" size={50} />
           )}
           <Column gap={3} style={commonStyles.fullFlex}>
             <Text style={commonStyles.basicText}>{item.title}</Text>
@@ -161,7 +161,7 @@ const NotificationScreen = () => {
         <FlatList
           showsVerticalScrollIndicator={false}
           data={notifications}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => String(index)}
           renderItem={renderItem}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}

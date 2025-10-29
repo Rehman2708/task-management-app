@@ -22,9 +22,16 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView style={commonStyles.fullFlex}>
+    <GestureHandlerRootView
+      style={[
+        commonStyles.fullFlex,
+        {
+          backgroundColor: theme.colors.background,
+        },
+      ]}
+    >
       <NavigationContainer>
-        <StatusBar backgroundColor={"black"} />
+        <StatusBar backgroundColor={"#00000030"} translucent />
         <AppNavigator />
       </NavigationContainer>
     </GestureHandlerRootView>

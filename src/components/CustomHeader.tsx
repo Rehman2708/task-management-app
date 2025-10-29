@@ -33,12 +33,10 @@ const CustomHeader = ({
 
   return (
     <>
-      <Spacer size={showImage ? -10 : 0} />
-
       <Row
         justifyContent="space-between"
         alignItems="center"
-        style={{ paddingHorizontal: 16 }}
+        style={{ paddingHorizontal: 16, height: 55 }}
       >
         <Row alignItems="center" gap={10}>
           {showBackbutton && (

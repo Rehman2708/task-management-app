@@ -1,17 +1,14 @@
 import { useRef, useCallback, useEffect, useState, useMemo } from "react";
 import {
-  View,
   StyleSheet,
   ActivityIndicator,
   FlatList,
-  Pressable,
-  Text,
   ListRenderItem,
   RefreshControl,
+  SafeAreaView,
 } from "react-native";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { useReelsViewModal } from "./useViewModal";
-import { commonStyles } from "../../styles/commonstyles";
 import { IVideo } from "../../types/videos";
 import { useHelper } from "../../utils/helper";
 import VideoItem from "../../components/VideoItem";
@@ -38,7 +35,7 @@ export default function ReelsScreen() {
     refreshing,
     onRefresh,
   } = useReelsViewModal();
-  const { formatDate } = useHelper();
+  const { themeColor } = useHelper();
   const flatListRef = useRef<FlatList<IVideo>>(null);
   const isFocused = useIsFocused();
   const [longPressedIndex, setLongPressedIndex] = useState<number | null>(null);
@@ -131,18 +128,18 @@ export default function ReelsScreen() {
 
   if (error || loading || videos.length === 0) {
     return (
-      <View style={[styles.container]}>
+      <SafeAreaView style={[styles.container]}>
         <EmptyState
           text={"No videos found"}
           loading={loading}
           error={error?.trim()?.length > 0 && false}
           button={() => fetchVideos(1, false)}
         />
-      </View>
+      </SafeAreaView>
     );
   }
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+    <SafeAreaView style={[styles.container, { paddingBottom: insets.bottom }]}>
       <FlatList
         ref={flatListRef}
         data={videos}
@@ -166,7 +163,7 @@ export default function ReelsScreen() {
         })}
         ListFooterComponent={
           isFetchingMore ? (
-            <ActivityIndicator size="large" color="#fff" />
+            <ActivityIndicator size="large" color={themeColor.dark} />
           ) : null
         }
         refreshControl={
@@ -178,7 +175,7 @@ export default function ReelsScreen() {
           />
         }
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
