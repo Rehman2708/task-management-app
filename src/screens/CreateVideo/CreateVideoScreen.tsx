@@ -101,7 +101,7 @@ export default function CreateVideoScreen() {
     <ScreenWrapper
       title="Add Video"
       showBackbutton
-      subTitle="Videos > Add Video"
+      // subTitle="Videos > Add Video"
     >
       <Row justifyContent="flex-end">
         <Text

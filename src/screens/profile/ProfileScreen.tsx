@@ -157,7 +157,9 @@ export default function ProfileScreen() {
               {user?.about && (
                 <Row gap={isAndroid ? 6 : 8}>
                   <Text style={[commonStyles.smallText]}>About me:</Text>
-                  <Text style={[commonStyles.subTitleText]}>{user.about}</Text>
+                  <Text style={[commonStyles.subTitleText, { maxWidth: 300 }]}>
+                    {user.about}
+                  </Text>
                 </Row>
               )}
               {partnerId ? (
@@ -181,7 +183,10 @@ export default function ProfileScreen() {
                       <Text
                         style={[
                           commonStyles.subTitleText,
-                          { fontFamily: `${user.partner.font}SemiBold` },
+                          {
+                            fontFamily: `${user.partner.font}Bold`,
+                            maxWidth: 300,
+                          },
                         ]}
                       >
                         {user.partner.about}

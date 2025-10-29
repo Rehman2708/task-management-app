@@ -36,7 +36,7 @@ const CustomHeader = ({
       <Row
         justifyContent="space-between"
         alignItems="center"
-        style={{ paddingHorizontal: 16, height: 55 }}
+        style={{ paddingHorizontal: 16, height: 50 }}
       >
         <Row alignItems="center" gap={10}>
           {showBackbutton && (
@@ -76,22 +76,27 @@ const CustomHeader = ({
                 {subTitle}
               </Text>
             )}
-            {showImage && loggedInUser?.about && (
-              <>
-                <View style={{ width: dimensions.width - 150 }}>
-                  <TextTicker
-                    duration={loggedInUser.about.length * 100}
-                    loop
-                    bounce
-                    repeatSpacer={50}
-                    marqueeDelay={1000}
-                    style={[commonStyles.smallText, commonStyles.whiteText]}
-                  >
-                    {loggedInUser.about}
-                  </TextTicker>
-                </View>
-              </>
-            )}
+            {showImage &&
+              (loggedInUser?.about || loggedInUser?.partner?.about) && (
+                <>
+                  <View style={{ width: dimensions.width - 150 }}>
+                    <TextTicker
+                      duration={
+                        (loggedInUser.partner.about
+                          ? loggedInUser.partner.about.length
+                          : loggedInUser.about.length ?? 0) * 100
+                      }
+                      loop
+                      bounce
+                      repeatSpacer={50}
+                      marqueeDelay={1000}
+                      style={[commonStyles.smallText, commonStyles.whiteText]}
+                    >
+                      {loggedInUser.partner.about ?? loggedInUser.about}
+                    </TextTicker>
+                  </View>
+                </>
+              )}
           </Column>
         </Row>
         <Row gap={20}>

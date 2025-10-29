@@ -39,12 +39,12 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
       navigation.goBack();
     }
   };
-
   return (
     <ScreenWrapper
       title={task ? "Edit Task" : "Create Task"}
       showBackbutton
-      subTitle={task ? "Edit" : "Home > Create Task"}
+      image={vm.image.length ? vm.image : undefined}
+      // subTitle={task ? "Edit" : "Home > Create Task"}
     >
       <View style={[commonStyles.screenWrapper]}>
         <KeyboardAwareScrollView

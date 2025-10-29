@@ -13,6 +13,8 @@ import { IVideo } from "../../types/videos";
 import { useHelper } from "../../utils/helper";
 import VideoItem from "../../components/VideoItem";
 import EmptyState from "../../components/emptyState";
+import { Spacer } from "../../tools";
+import { useTheme } from "../../infrastructure/theme";
 
 export default function ReelsScreen() {
   const {
@@ -36,6 +38,8 @@ export default function ReelsScreen() {
     onRefresh,
   } = useReelsViewModal();
   const { themeColor } = useHelper();
+  const theme = useTheme();
+  const styles = reelsScreenStyles(theme);
   const flatListRef = useRef<FlatList<IVideo>>(null);
   const isFocused = useIsFocused();
   const [longPressedIndex, setLongPressedIndex] = useState<number | null>(null);
@@ -129,6 +133,7 @@ export default function ReelsScreen() {
   if (error || loading || videos.length === 0) {
     return (
       <SafeAreaView style={[styles.container]}>
+        <Spacer size={insets.top} />
         <EmptyState
           text={"No videos found"}
           loading={loading}
@@ -179,17 +184,18 @@ export default function ReelsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#000" },
-  videoContainer: {
-    width: "100%",
-  },
-  video: { ...StyleSheet.absoluteFillObject },
-  overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
-  loaderOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#000",
-  },
-});
+const reelsScreenStyles = (theme: any) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.background },
+    videoContainer: {
+      width: "100%",
+    },
+    video: { ...StyleSheet.absoluteFillObject },
+    overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
+    loaderOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#000",
+    },
+  });

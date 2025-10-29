@@ -149,7 +149,12 @@ const NotificationScreen = () => {
   };
 
   return (
-    <ScreenWrapper noPadding title="Notifications" showBackbutton>
+    <ScreenWrapper
+      noPadding
+      title="Notifications"
+      showBackbutton
+      hideNotificationButton
+    >
       {loading && notifications.length === 0 && <ScreenLoader />}
       {notifications.length === 0 && !loading ? (
         <EmptyState

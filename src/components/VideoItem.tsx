@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { IVideo } from "../types/videos";
 import Avatar from "./avatar";
-import { Column, Row } from "../tools";
+import { Column, Row, Spacer } from "../tools";
 import { useCommonStyles } from "../styles/commonstyles";
 import { useHelper } from "../utils/helper";
 import { useNavigation } from "@react-navigation/native";
@@ -14,6 +14,7 @@ import { VideoRepo } from "../repositories/videos";
 import { useTheme } from "../infrastructure/theme";
 import VideoCommentsModal from "../screens/Reels/VideoCommentsModal";
 import ProgressBar from "./timeLeftProgress";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {
   item: IVideo;
@@ -60,6 +61,7 @@ export default function VideoItem({
   const navigation: any = useNavigation();
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
+  const insets = useSafeAreaInsets();
 
   const shouldPlay =
     playAlways || (Math.abs(currentIndex - index) <= 0 && isFocused);
@@ -73,12 +75,6 @@ export default function VideoItem({
       console.error("markRead video error:", err);
     }
   }, [item._id]);
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
-  };
 
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
@@ -110,6 +106,7 @@ export default function VideoItem({
         onLongPress={() => setLongPressedIndex?.(index)}
         onPressOut={() => setLongPressedIndex?.(null)}
       >
+        <Spacer size={insets.top} />
         {/* Top Row: Back + Title + Duration */}
         <Row
           alignItems="center"

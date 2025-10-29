@@ -52,7 +52,8 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     <ScreenWrapper
       title={note ? "Edit Note" : "Create Note"}
       showBackbutton
-      subTitle={`Notes > ${note ? "Edit Note" : "Create Note"}`}
+      image={noteImage.length ? noteImage : undefined}
+      // subTitle={`Notes > ${note ? "Edit Note" : "Create Note"}`}
     >
       <View style={commonStyles.screenWrapper}>
         <KeyboardAwareScrollView

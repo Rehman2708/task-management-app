@@ -154,7 +154,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
         style={[
           styles.topBar,
           animatedBackButtonStyle,
-          { top: insets.top + 11 },
+          { top: insets.top + 10 },
         ]}
       >
         <TouchableOpacity onPress={navigation.goBack}>
