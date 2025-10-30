@@ -93,7 +93,7 @@ export default function NotesScreen() {
                 <Ionicons size={16} color={themeColor.dark} name="pricetag" />
               )}
             </Row>
-            <Text numberOfLines={4} style={commonStyles.tinyText}>
+            <Text numberOfLines={3} style={commonStyles.tinyText}>
               {item.note}
             </Text>
           </Column>
@@ -110,7 +110,7 @@ export default function NotesScreen() {
                 withName
               />
             </Row>
-            <Text numberOfLines={5} style={commonStyles.tTinyText}>
+            <Text numberOfLines={1} style={commonStyles.tTinyText}>
               {formatDate(item?.createdAt)}
             </Text>
           </Column>

@@ -1,201 +1,144 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { View, Text, FlatList, Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, isAndroid, Row, Spacer } from "../../tools";
-import CustomButton from "../../components/customButton";
-import CustomInput from "../../components/customInput";
-import ScreenLoader from "../../components/screenLoader";
 import { useHelper } from "../../utils/helper";
+import { SubtaskStatus } from "../../enums/tasks";
+import { AppUrl } from "../../utils/appUrl";
+
+import CustomButton from "../../components/customButton";
+import ScreenLoader from "../../components/screenLoader";
 import Avatar from "../../components/avatar";
 import EmptyState from "../../components/emptyState";
-import { SubtaskStatus } from "../../enums/tasks";
-import CommentCard from "../../components/commentCard";
 import TimeLeftProgress from "../../components/timeLeftProgress";
-import { SubtaskComment } from "../../types/task";
 import CollapsibleHeaderTabs from "../../components/collapsibleHeader";
 import { TaskDetailStyles } from "./styles";
-import { Ionicons } from "@expo/vector-icons";
 import { AssignedIcon } from "../CreateTask/components/subtaskItem";
+import CommentsModal from "../../components/comments/commentModal";
+import { Subtask } from "../../types/task";
 
 export default function TaskDetailScreen({ route }: any) {
-  const { taskId, readOnly = false } = route.params; // readOnly true for completed/expired
+  const { taskId, readOnly = false } = route.params;
   const {
     task,
-    taskDetailLoading: loading,
-    taskCommentLoading,
-    subtaskCommentLoading,
+    taskDetailLoading,
     error,
     fetchTaskDetail,
     updateSubtaskStatus,
-    addTaskComment,
-    addSubtaskComment,
     subtaskStatusLoading,
   } = useTaskDetailViewModel(taskId);
-  const { formatDate, themeColor } = useHelper();
+
+  const { formatDate } = useHelper();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-
   const styles = TaskDetailStyles(theme);
-  const [taskComment, setTaskComment] = useState("");
-  const [subtaskComments, setSubtaskComments] = useState<
-    Record<string, string>
-  >({});
-  const [showAllTaskComments, setShowAllTaskComments] = useState(false);
-  const [expandedSubtasks, setExpandedSubtasks] = useState<
-    Record<string, boolean>
-  >({});
 
-  const taskCommentsRef = useRef<FlatList>(null);
-  useEffect(() => {
-    if (task?.comments?.length) {
-      taskCommentsRef.current?.scrollToEnd({ animated: true });
-    }
-  }, [task?.comments?.length]);
+  const [showTaskComments, setShowTaskComments] = useState(false);
+  const [showSubTaskComments, setShowSubTaskComments] = useState(false);
+  const [commentModalId, setCommentModalId] = useState("");
 
-  const renderSubtask = ({
-    item,
-    createdAt,
-  }: {
-    item: any;
-    createdAt: string;
-  }) => (
-    <Column
-      gap={isAndroid ? 6 : 8}
-      style={[
-        commonStyles.cardContainer,
-        {
-          backgroundColor:
-            item.status === "Completed"
-              ? `${theme.colors.success}20`
-              : `${theme.colors.error}20`,
-          borderColor:
-            item.status === "Completed"
-              ? `${theme.colors.success}20`
-              : `${theme.colors.error}20`,
-        },
-      ]}
-    >
-      <Row justifyContent="space-between" alignItems="center">
-        <Column gap={6} justifyContent="center" style={commonStyles.fullFlex}>
-          <Text style={[commonStyles.basicText]}>{item.title}</Text>
-          {item.dueDateTime && (
-            <Row alignItems="center">
-              <Ionicons
-                name="timer-outline"
-                size={12}
-                color={theme.colors.textLight}
-              />
-              <Text style={commonStyles.tTinyText}>
-                {" "}
-                Due: {formatDate(item.dueDateTime)}
-              </Text>
-            </Row>
-          )}
-        </Column>
-        {!readOnly && item.status === SubtaskStatus.Pending && (
-          <>
-            <Spacer size={4} position="right" />
-            <CustomButton
-              onPress={() =>
-                updateSubtaskStatus(item._id, SubtaskStatus.Completed)
-              }
-              iconName="checkmark-done-outline"
-              title="Send"
-              sendButton
-              loading={subtaskStatusLoading === item._id}
-              success
-            />
-          </>
-        )}
-      </Row>
-      {!readOnly && item.status === SubtaskStatus.Pending && createdAt && (
-        <Row alignItems="center" style={commonStyles.fullFlex}>
-          <Text style={commonStyles.tTinyText}>Time left: {} </Text>
+  const handleOpenSubtaskComments = useCallback((subtaskId: string) => {
+    setCommentModalId(subtaskId);
+    setShowSubTaskComments(true);
+  }, []);
 
-          <TimeLeftProgress startTime={createdAt} endTime={item?.dueDateTime} />
-        </Row>
-      )}
-      {/* Subtask Comments */}
-      <View style={{ marginTop: theme.spacing.sm }}>
-        {item?.comments?.length > 0 && (
+  const handleUpdateStatus = useCallback(
+    (id: string) => updateSubtaskStatus(id, SubtaskStatus.Completed),
+    [updateSubtaskStatus]
+  );
+
+  const renderSubtask = useCallback(
+    ({ item }: { item: Subtask }) => {
+      const backgroundColor =
+        item.status === SubtaskStatus.Completed
+          ? `${theme.colors.success}20`
+          : `${theme.colors.error}20`;
+
+      return (
+        <Column
+          gap={8}
+          style={[
+            commonStyles.cardContainer,
+            { backgroundColor, borderColor: backgroundColor },
+          ]}
+        >
           <Row justifyContent="space-between" alignItems="center">
-            <Text style={commonStyles.basicText}>Comments</Text>
-            {item.comments.length > 5 && (
-              <Pressable
-                onPress={() =>
-                  setExpandedSubtasks((prev) => ({
-                    ...prev,
-                    [item._id]: !prev[item._id],
-                  }))
-                }
-              >
-                <Text
-                  style={[
-                    commonStyles.tinyText,
-                    { color: theme.colors.primary },
-                  ]}
-                >
-                  {expandedSubtasks[item._id] ? "Hide" : "Show all"}
+            <Column gap={6} style={commonStyles.fullFlex}>
+              <Text style={commonStyles.basicText}>{item.title}</Text>
+              {item.dueDateTime && (
+                <Row alignItems="center">
+                  <Ionicons
+                    name="timer-outline"
+                    size={12}
+                    color={theme.colors.textLight}
+                  />
+                  <Text style={commonStyles.tTinyText}>
+                    {" "}
+                    Due: {formatDate(item.dueDateTime)}
+                  </Text>
+                </Row>
+              )}
+            </Column>
+          </Row>
+
+          {!readOnly &&
+            item.status === SubtaskStatus.Pending &&
+            task?.createdAt && (
+              <Row alignItems="center" style={commonStyles.fullFlex}>
+                <Text style={commonStyles.tTinyText}>Time left: </Text>
+                <TimeLeftProgress
+                  startTime={task.createdAt}
+                  endTime={item.dueDateTime}
+                />
+              </Row>
+            )}
+          <Row alignItems="center" justifyContent="space-between">
+            <Pressable
+              onPress={() => handleOpenSubtaskComments(item._id)}
+              style={{ marginTop: theme.spacing.sm }}
+            >
+              <Row alignItems="center" gap={6}>
+                <Text style={commonStyles.subTitleText}>
+                  {item.totalComments ?? 0}
                 </Text>
-              </Pressable>
+                <Ionicons
+                  name="chatbubble-outline"
+                  size={30}
+                  color={theme.colors.text}
+                />
+              </Row>
+            </Pressable>
+            {!readOnly && item.status === SubtaskStatus.Pending && (
+              <CustomButton
+                onPress={() => handleUpdateStatus(item._id)}
+                iconName="checkmark-done-outline"
+                title="Send"
+                sendButton
+                loading={subtaskStatusLoading === item._id}
+                success
+              />
             )}
           </Row>
-        )}
+        </Column>
+      );
+    },
+    [
+      theme,
+      commonStyles,
+      task?.createdAt,
+      readOnly,
+      subtaskStatusLoading,
+      handleUpdateStatus,
+      handleOpenSubtaskComments,
+    ]
+  );
 
-        {(expandedSubtasks[item._id]
-          ? item.comments
-          : item.comments?.slice(-5)
-        )?.map((c: SubtaskComment, idx: number) => {
-          const prev = item?.comments?.[idx - 1];
-          const sameUser = idx > 0 && c?.createdBy === prev?.createdBy;
-
-          return (
-            <CommentCard
-              key={idx}
-              image={c?.createdByDetails?.image}
-              text={c?.text}
-              name={c?.createdByDetails?.name ?? c?.createdBy}
-              userId={c?.createdBy}
-              time={formatDate(c?.createdAt!)}
-              repeated={sameUser}
-            />
-          );
-        })}
-
-        {!readOnly && item.status !== "Completed" && (
-          <View style={{ gap: 8, flexDirection: "row", alignItems: "center" }}>
-            <CustomInput
-              placeholder="Add comment..."
-              value={subtaskComments[item._id] || ""}
-              onChangeText={(text) =>
-                setSubtaskComments({ ...subtaskComments, [item._id]: text })
-              }
-              fullFlex
-              multiline
-              rounded
-              inputStyle={{
-                minHeight: 40,
-                textAlignVertical: "center",
-              }}
-            />
-
-            <CustomButton
-              onPress={() => {
-                if (subtaskComments[item._id]) {
-                  addSubtaskComment(item._id, subtaskComments[item._id]);
-                  setSubtaskComments({ ...subtaskComments, [item._id]: "" });
-                }
-              }}
-              title="Send"
-              sendButton
-              loading={subtaskCommentLoading === item._id}
-            />
-          </View>
-        )}
-      </View>
-    </Column>
+  const taskSubtitle = useMemo(
+    () => (task?.createdAt ? formatDate(task.createdAt) : ""),
+    [task?.createdAt, formatDate]
   );
 
   return (
@@ -207,177 +150,101 @@ export default function TaskDetailScreen({ route }: any) {
     >
       <CollapsibleHeaderTabs
         title={task?.title ?? "Task"}
-        subTitle={formatDate(task?.createdAt)}
+        subTitle={taskSubtitle}
         headerImage={task?.image}
       >
         {error ? (
           <EmptyState text="Retry" button={fetchTaskDetail} error />
+        ) : taskDetailLoading ? (
+          <ScreenLoader />
         ) : (
-          <>
-            {loading ? (
-              <ScreenLoader />
-            ) : (
-              <>
-                {task && (
-                  <>
-                    <Column gap={12}>
-                      {task?.description && (
-                        <Text style={commonStyles.smallText}>
-                          {task?.description}
-                        </Text>
-                      )}
-                      <Row justifyContent="space-between">
-                        <Row alignItems="center">
-                          <Text style={commonStyles.tTinyText}>Creator: </Text>
-                          <Avatar
-                            name={
-                              task?.createdByDetails
-                                ? task.createdByDetails.name.split(" ")[0]
-                                : task?.createdBy
-                            }
-                            image={task?.createdByDetails?.image}
-                            withName
-                          />
-                        </Row>
-                        <Row alignItems="flex-start">
-                          <Text style={commonStyles.tinyText}>
-                            Assigned To: {task?.assignedTo}{" "}
-                          </Text>
-                          <AssignedIcon
-                            type={task?.assignedTo}
-                            size={12}
-                            color={theme.colors.text}
-                          />
-                        </Row>
-                      </Row>
-                      {task?.subtasks?.length > 0 && (
-                        <View style={[styles.container]}>
-                          <Text style={commonStyles.subTitleText}>
-                            Subtasks
-                          </Text>
-                          <Spacer size={8} />
-                          <FlatList
-                            data={task?.subtasks}
-                            keyExtractor={(item) => item._id}
-                            renderItem={({ item }) =>
-                              renderSubtask({
-                                item,
-                                createdAt: task?.createdAt,
-                              })
-                            }
-                            scrollEnabled={false}
-                            keyboardShouldPersistTaps="always"
-                          />
-                        </View>
-                      )}
-                      {task?.comments?.length > 0 && (
-                        <View style={[styles.container]}>
-                          <Row
-                            justifyContent="space-between"
-                            alignItems="center"
-                          >
-                            <Text style={commonStyles.basicText}>
-                              Task Comments
-                            </Text>
-                            {task.comments.length > 10 && (
-                              <Pressable
-                                onPress={() =>
-                                  setShowAllTaskComments((prev) => !prev)
-                                }
-                              >
-                                <Text
-                                  style={[
-                                    commonStyles.tinyText,
-                                    { color: theme.colors.primary },
-                                  ]}
-                                >
-                                  {showAllTaskComments ? "Hide" : "Show all"}
-                                </Text>
-                              </Pressable>
-                            )}
-                          </Row>
-                          <Spacer size={12} />
+          task && (
+            <Column gap={12}>
+              {task.description && (
+                <Text style={commonStyles.smallText}>{task.description}</Text>
+              )}
 
-                          <FlatList
-                            ref={taskCommentsRef}
-                            data={
-                              showAllTaskComments
-                                ? task.comments
-                                : task.comments.slice(-10)
-                            }
-                            keyExtractor={(item, index) =>
-                              item._id ?? index.toString()
-                            }
-                            renderItem={({ item, index }) => {
-                              const prev = task.comments[index - 1];
-                              const sameUser =
-                                index > 0 &&
-                                (item?.createdBy ?? item?.by) ===
-                                  (prev?.createdBy ?? prev?.by);
+              <Row justifyContent="space-between">
+                <Row alignItems="center">
+                  <Text style={commonStyles.tTinyText}>Creator: </Text>
+                  <Avatar
+                    name={
+                      task.createdByDetails
+                        ? task.createdByDetails.name.split(" ")[0]
+                        : task.createdBy
+                    }
+                    image={task.createdByDetails?.image}
+                    withName
+                  />
+                </Row>
 
-                              return (
-                                <CommentCard
-                                  image={item?.createdByDetails?.image}
-                                  text={item?.text}
-                                  name={
-                                    item?.createdByDetails?.name ??
-                                    item?.createdBy ??
-                                    item?.by
-                                  }
-                                  userId={item?.createdBy ?? item?.by}
-                                  time={formatDate(item?.date)}
-                                  repeated={sameUser}
-                                />
-                              );
-                            }}
-                            showsVerticalScrollIndicator={false}
-                            scrollEnabled={false}
-                          />
-                        </View>
-                      )}
+                <Row alignItems="flex-start">
+                  <Text style={commonStyles.tinyText}>
+                    Assigned To: {task.assignedTo}{" "}
+                  </Text>
+                  <AssignedIcon
+                    type={task.assignedTo}
+                    size={12}
+                    color={theme.colors.text}
+                  />
+                </Row>
+              </Row>
 
-                      {/* {!readOnly && ( */}
-                      <View
-                        style={{
-                          marginTop: theme.spacing.md,
-                          gap: 8,
-                          flexDirection: "row",
-                          alignItems: "center",
-                        }}
-                      >
-                        <CustomInput
-                          placeholder="Add comment on task..."
-                          value={taskComment}
-                          onChangeText={setTaskComment}
-                          fullFlex
-                          multiline
-                          inputStyle={{
-                            minHeight: 40,
-                            textAlignVertical: "center",
-                          }}
-                          rounded
-                        />
-                        <CustomButton
-                          title="Send"
-                          loading={taskCommentLoading}
-                          sendButton
-                          onPress={() => {
-                            if (taskComment) {
-                              addTaskComment(taskComment);
-                              setTaskComment("");
-                            }
-                          }}
-                        />
-                      </View>
-                      {/* // )} */}
-                    </Column>
-                  </>
-                )}
-              </>
-            )}
-          </>
+              {task.subtasks?.length > 0 && (
+                <View style={styles.container}>
+                  <Text style={commonStyles.subTitleText}>Subtasks</Text>
+                  <Spacer size={8} />
+                  <FlatList
+                    data={task.subtasks}
+                    keyExtractor={(item) => item._id}
+                    renderItem={renderSubtask}
+                    scrollEnabled={false}
+                    keyboardShouldPersistTaps="always"
+                  />
+                </View>
+              )}
+
+              <View style={styles.container}>
+                <Row justifyContent="space-between" alignItems="center">
+                  <Text style={commonStyles.basicText}>Task Comments</Text>
+                  <Pressable onPress={() => setShowTaskComments(true)}>
+                    <Row alignItems="center" gap={6}>
+                      <Text style={commonStyles.subTitleText}>
+                        {task.totalComments ?? 0}
+                      </Text>
+                      <Ionicons
+                        name="chatbubble-outline"
+                        size={30}
+                        color={theme.colors.text}
+                      />
+                    </Row>
+                  </Pressable>
+                </Row>
+                <Spacer size={12} />
+              </View>
+            </Column>
+          )
         )}
       </CollapsibleHeaderTabs>
+
+      {/* Task Comments Modal */}
+      <CommentsModal
+        visible={showTaskComments}
+        onClose={() => setShowTaskComments(false)}
+        fetchUrl={AppUrl.getTaskComments(taskId)}
+        postUrl={AppUrl.addTaskComment(taskId)}
+        entityId={taskId}
+      />
+
+      {/* Subtask Comments Modal */}
+      <CommentsModal
+        visible={showSubTaskComments}
+        onClose={() => setShowSubTaskComments(false)}
+        fetchUrl={AppUrl.getSubtaskComments(taskId, commentModalId)}
+        postUrl={AppUrl.addSubtaskComment(taskId, commentModalId)}
+        entityId={taskId}
+        subtask={commentModalId}
+      />
     </View>
   );
 }

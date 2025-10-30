@@ -12,7 +12,7 @@ import EmptyState from "../../components/emptyState";
 import { NotificationRepo } from "../../repositories/notification";
 import { useHelper } from "../../utils/helper";
 import { useCommonStyles } from "../../styles/commonstyles";
-import { Column, Row } from "../../tools";
+import { Column, Row, Spacer } from "../../tools";
 import { useTheme } from "../../infrastructure/theme";
 import { Images } from "../../../assets/images/images";
 import ScreenLoader from "../../components/screenLoader";
@@ -132,13 +132,14 @@ const NotificationScreen = () => {
         ]}
         onPress={() => handleNotification(item._id, item?.data)}
       >
-        <Row gap={12} alignItems="center">
+        <Row alignItems="center">
           {item?.data?.image && (
             <Avatar disabled image={item.data.image} name="NA" size={50} />
           )}
+          <Spacer size={12} position="right" />
           <Column gap={3} style={commonStyles.fullFlex}>
-            <Text style={commonStyles.basicText}>{item.title}</Text>
-            <Text style={commonStyles.tinyText}>{item.body}</Text>
+            <Text style={[commonStyles.basicText]}>{item.title}</Text>
+            <Text style={[commonStyles.tinyText]}>{item.body}</Text>
             <Text style={commonStyles.tTinyText}>
               {formatDate(item.createdAt)}
             </Text>

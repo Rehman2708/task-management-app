@@ -23,6 +23,7 @@ export interface IVideo {
   createdAt: string;
   updatedAt: string;
   comments?: IVideoComment[]; // added comments array
+  totalComments: number;
 }
 
 export interface CreateVideoPayload {

@@ -217,7 +217,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
             style={[
               commonStyles.screenWrapper,
               styles.contentContainer,
-              // { minHeight: dimensions.height + insets.top + 50 },
+              { minHeight: dimensions.height + insets.top + 50 },
             ]}
           >
             <Text numberOfLines={3} style={commonStyles.titleText}>
@@ -270,6 +270,8 @@ const createStyles = (theme: any) =>
 
     stickyHeader: {
       zIndex: 20,
+      borderBottomWidth: 1,
+      borderColor: theme.colors.border,
     },
     contentContainer: {
       borderTopLeftRadius: 24,

@@ -96,13 +96,12 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
 
           {error && <Text style={styles.error}>{error}</Text>}
           {success && <Text style={styles.success}>{success}</Text>}
-
-          <CustomButton
-            title={note?._id ? "Update" : "Save"}
-            loading={loading}
-            onPress={handleSave}
-          />
         </KeyboardAwareScrollView>
+        <CustomButton
+          title={note?._id ? "Update" : "Save"}
+          loading={loading}
+          onPress={handleSave}
+        />
       </View>
     </ScreenWrapper>
   );

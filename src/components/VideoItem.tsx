@@ -12,9 +12,10 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../store/authStore";
 import { VideoRepo } from "../repositories/videos";
 import { useTheme } from "../infrastructure/theme";
-import VideoCommentsModal from "../screens/Reels/VideoCommentsModal";
 import ProgressBar from "./timeLeftProgress";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CommentsModal from "./comments/commentModal";
+import { AppUrl } from "../utils/appUrl";
 
 type Props = {
   item: IVideo;
@@ -174,12 +175,18 @@ export default function VideoItem({
             </Column>
           </Row>
           <Column gap={20}>
-            <Ionicons
-              onPress={() => setCommentsModalVisible(true)}
-              name="chatbubble-outline"
-              color={"white"}
-              size={35}
-            />
+            <Column alignItems="center" gap={4}>
+              <Ionicons
+                onPress={() => setCommentsModalVisible(true)}
+                name="chatbubble-outline"
+                color={"white"}
+                size={35}
+              />
+              <Text style={commonStyles.subTitleText}>
+                {item.totalComments ?? 0}
+              </Text>
+            </Column>
+
             {user?.userId !== item.createdBy && !isViewed ? (
               <Ionicons
                 onPress={handleViewed}
@@ -210,10 +217,12 @@ export default function VideoItem({
       </Pressable>
 
       {/* Comments Modal */}
-      <VideoCommentsModal
-        videoId={item._id}
+      <CommentsModal
         visible={commentsModalVisible}
         onClose={() => setCommentsModalVisible(false)}
+        fetchUrl={`${AppUrl.getVideoComments(item._id)}`}
+        postUrl={`${AppUrl.addVideoComment(item._id)}`}
+        entityId={item._id}
       />
     </View>
   );

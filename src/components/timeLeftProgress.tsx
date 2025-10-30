@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Animated, Text } from "react-native";
+import { View, StyleSheet, Animated } from "react-native";
 import { useTheme } from "../infrastructure/theme";
 import { useHelper } from "../utils/helper";
 
@@ -21,6 +21,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const { themeColor } = useHelper();
   const theme = useTheme();
   const styles = progressBarStyle(theme);
+
   useEffect(() => {
     // 🟢 CASE 1: When duration & currentTime are provided (e.g., video progress)
     if (typeof duration === "number" && typeof currentTime === "number") {
@@ -30,7 +31,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       return;
     }
 
-    // 🟢 CASE 2: Default time-based progress (startTime → endTime)
+    // 🟢 CASE 2: Time-based progress (startTime → endTime)
     if (!startTime || !endTime) return;
 
     const start = new Date(startTime).getTime();
@@ -39,20 +40,32 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
     if (end <= start) return;
 
+    const totalDuration = end - start;
+    const twelveHours = 12 * 60 * 60 * 1000; // 12 hours in ms
+
+    // 🔴 If total duration is more than 12 hours, keep progress empty
+    if (totalDuration > twelveHours) {
+      animatedValue.setValue(0);
+      setPercentage(0);
+      return;
+    }
+
+    // ✅ Otherwise calculate progress normally within that 12-hour window
     const updatePercentage = () => {
-      const now = new Date().getTime();
+      const current = new Date().getTime();
       let progress = 0;
-      if (now <= start) progress = 0;
-      else if (now >= end) progress = 1;
-      else progress = (now - start) / (end - start);
+      if (current <= start) progress = 0;
+      else if (current >= end) progress = 1;
+      else progress = (current - start) / (end - start);
 
       setPercentage(Math.min(Math.round(progress * 100), 100));
       animatedValue.setValue(progress);
     };
 
-    // Initial set
+    // Initial call
     updatePercentage();
 
+    // Start animation when within time range
     if (now <= start) {
       const delay = start - now;
       setTimeout(() => {
