@@ -53,6 +53,12 @@ async function setupAndroidChannel() {
       sound: "notification.wav",
       importance: Notifications.AndroidImportance.DEFAULT,
     },
+    {
+      id: "list",
+      name: "List",
+      sound: "notification.wav",
+      importance: Notifications.AndroidImportance.DEFAULT,
+    },
   ];
 
   // Create each channel

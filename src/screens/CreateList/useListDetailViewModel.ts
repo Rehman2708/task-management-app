@@ -21,7 +21,6 @@ export function useListDetailViewModel(list?: List) {
   const [newItem, setNewItem] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const { user: loggedInUser } = useAuthStore();
 
   useEffect(() => {
@@ -53,7 +52,6 @@ export function useListDetailViewModel(list?: List) {
     try {
       setLoading(true);
       setError(null);
-      setSuccess(null);
 
       if (list?._id) {
         const payload: UpdateListPayload = {
@@ -64,7 +62,6 @@ export function useListDetailViewModel(list?: List) {
           userId: loggedInUser?.userId ?? "",
         };
         const updated = await ListsRepo.updateList(list._id, payload);
-        setSuccess("List updated successfully");
         setItems(updated.items);
       } else {
         const payload: CreateListPayload = {
@@ -75,7 +72,6 @@ export function useListDetailViewModel(list?: List) {
           items,
         };
         const created = await ListsRepo.createList(payload);
-        setSuccess("List created successfully");
         setItems(created.items);
       }
     } catch (err: any) {
@@ -102,7 +98,6 @@ export function useListDetailViewModel(list?: List) {
     removeItem,
     loading,
     error,
-    success,
     saveList,
   };
 }

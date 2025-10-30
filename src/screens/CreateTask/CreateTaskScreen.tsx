@@ -178,7 +178,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                   {Platform.OS === "ios" ? (
                     // iOS: Inline picker
                     <DateTimePicker
-                      value={subtask?.dueDateTime}
+                      value={subtask?.dueDateTime as unknown as Date}
                       mode="datetime"
                       display="default"
                       onChange={(_, date) => {
@@ -189,7 +189,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                   ) : (
                     // Android: Show buttons instead of picker directly
                     <AndroidDateTimePicker
-                      dueDateTime={subtask?.dueDateTime}
+                      dueDateTime={subtask?.dueDateTime as unknown as Date}
                       onChange={(date) =>
                         vm.updateSubtask(index, "dueDateTime", date)
                       }

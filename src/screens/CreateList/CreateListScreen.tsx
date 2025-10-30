@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, Switch, FlatList, Pressable } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import { useListDetailViewModel } from "./useListDetailViewModel";
-import { useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
@@ -10,7 +8,6 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { Row, Spacer } from "../../tools";
-import { ROUTES } from "../../enums/routes";
 import { List } from "../../repositories/lists";
 import { createNoteStyle } from "../CreateNote/styles";
 
@@ -34,7 +31,6 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
     setImage,
     loading,
     error,
-    success,
     saveList,
     items,
     newItem,
@@ -46,7 +42,6 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
   const styles = createNoteStyle(theme);
-  const navigation: any = useNavigation();
 
   const handleSave = async () => {
     await saveList();
@@ -129,7 +124,6 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
           />
 
           {error && <Text style={styles.error}>{error}</Text>}
-          {success && <Text style={styles.success}>{success}</Text>}
         </KeyboardAwareScrollView>
 
         <CustomButton
