@@ -1,11 +1,15 @@
 import { Image } from "react-native";
 
-const Logo = () => {
+const Logo = ({ height }: { height?: number }) => {
   return (
     <Image
-      style={{ height: 100, width: "100%", marginBottom: 20 }}
+      style={{
+        height: height && height > 0 ? height : 200,
+        width: "100%",
+        marginBottom: 20,
+      }}
       resizeMode="contain"
-      source={require("../../assets/images/logo2.png")}
+      source={require("../../assets/images/logo.png")}
     />
   );
 };
