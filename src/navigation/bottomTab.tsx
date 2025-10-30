@@ -17,7 +17,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
     [ROUTES.TASKS]: "book-outline",
     [ROUTES.REELS]: "heart-outline",
     [ROUTES.NOTES]: "document-text-outline",
-    [ROUTES.LISTS]: "document-text-outline",
+    [ROUTES.LISTS]: "list-circle-outline",
     [ROUTES.PROFILE]: "person-outline",
   };
 
@@ -25,7 +25,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
     [ROUTES.TASKS]: "book",
     [ROUTES.REELS]: "heart",
     [ROUTES.NOTES]: "document-text",
-    [ROUTES.LISTS]: "document-text",
+    [ROUTES.LISTS]: "list-circle",
     [ROUTES.PROFILE]: "person",
   };
 

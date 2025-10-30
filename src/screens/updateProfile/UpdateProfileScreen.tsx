@@ -103,7 +103,12 @@ const UpdateProfileScreen = () => {
           </Row>
         }
       />
-
+      <CustomInput
+        title="User Id"
+        editable={false}
+        value={user?.userId}
+        onChangeText={() => {}}
+      />
       <CustomInput title="Name" onChangeText={setUserName} value={userName} />
       <CustomInput
         title="About"

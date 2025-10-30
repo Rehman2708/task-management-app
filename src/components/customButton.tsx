@@ -85,6 +85,7 @@ const CustomButton = ({
               backgroundColor: themeColor?.dark ?? theme.colors.primary,
             },
             success && styles.success,
+            error && styles.error,
           ]}
         >
           {loading ? (

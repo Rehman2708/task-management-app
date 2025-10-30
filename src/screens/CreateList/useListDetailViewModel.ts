@@ -35,7 +35,7 @@ export function useListDetailViewModel(list?: List) {
 
   const addItem = () => {
     if (!newItem.trim()) return;
-    setItems([...items, { text: newItem.trim(), completed: false }]);
+    setItems([{ text: newItem.trim(), completed: false }, ...items]);
     setNewItem("");
   };
 

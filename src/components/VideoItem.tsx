@@ -86,22 +86,25 @@ export default function VideoItem({
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
       {shouldPlay && (
-        <Video
-          ref={(ref) => (videoRef.current = ref)}
-          source={{ uri: item.url }}
-          style={styles.video}
-          resizeMode="cover"
-          repeat
-          muted={muted}
-          controls={false}
-          paused={paused}
-          onError={(err) => console.warn("Video error:", item._id, err)}
-          onEnd={() => {
-            videoRef.current = null;
-          }}
-          onLoad={(data) => setDuration(data.duration)}
-          onProgress={(data) => setCurrentTime(data.currentTime)}
-        />
+        <>
+          <Video
+            ref={(ref) => (videoRef.current = ref)}
+            source={{ uri: item.url }}
+            style={styles.video}
+            resizeMode="contain"
+            repeat
+            muted={muted}
+            controls={false}
+            paused={paused}
+            onError={(err) => console.warn("Video error:", item._id, err)}
+            onEnd={() => {
+              videoRef.current = null;
+            }}
+            onLoad={(data) => setDuration(data.duration)}
+            onProgress={(data) => setCurrentTime(data.currentTime)}
+          />
+          <View style={styles.overlayBackground} />
+        </>
       )}
 
       <Pressable
@@ -135,13 +138,6 @@ export default function VideoItem({
               </Text>
             </Column>
           </Row>
-
-          {/* Duration Display */}
-          {/* {duration > 0 && (
-            <Text style={[commonStyles.smallText, { color: "#fff" }]}>
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </Text>
-          )} */}
         </Row>
 
         {/* Center Mute Icon */}
@@ -185,7 +181,7 @@ export default function VideoItem({
               <Ionicons
                 onPress={() => setCommentsModalVisible(true)}
                 name="chatbubble-outline"
-                color={"white"}
+                color={"#fff"}
                 size={35}
               />
               <Text style={commonStyles.subTitleText}>
@@ -197,13 +193,13 @@ export default function VideoItem({
               <Ionicons
                 onPress={handleViewed}
                 name="eye-outline"
-                color={"white"}
+                color={"#fff"}
                 size={35}
               />
             ) : (
               <Ionicons
                 name={isViewed ? "eye" : "eye-off"}
-                color={"white"}
+                color={"#fff"}
                 size={35}
               />
             )}
@@ -211,7 +207,7 @@ export default function VideoItem({
               <Ionicons
                 onPress={() => deleteVideo?.(item._id)}
                 name="trash"
-                color={"red"}
+                color={theme.colors.error}
                 size={35}
               />
             )}
@@ -238,4 +234,9 @@ const styles = StyleSheet.create({
   videoContainer: { width: "100%" },
   video: { ...StyleSheet.absoluteFillObject },
   overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
+  overlayBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.20)",
+    zIndex: 1,
+  },
 });

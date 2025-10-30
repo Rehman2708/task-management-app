@@ -81,18 +81,24 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
 
           {/* Add List Items */}
           <Text style={commonStyles.subTitleText}>List Items</Text>
-          <Row alignItems="center" gap={8}>
+          <Row alignItems="center" justifyContent="space-between">
             <CustomInput
               value={newItem}
               onChangeText={setNewItem}
               placeholder="Enter item..."
-              // style={{ flex: 1 }}
+              fullFlex
+              multiline
+              inputStyle={{ minHeight: 50 }}
             />
+            <Spacer size={12} position="right" />
             <CustomButton
               title="Add"
               onPress={addItem}
               small
               disabled={!newItem.trim()}
+              sendButton
+              success
+              iconName="add-circle-outline"
             />
           </Row>
 
@@ -104,14 +110,20 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
               <Row
                 justifyContent="space-between"
                 alignItems="center"
-                style={{ marginVertical: 4 }}
+                style={commonStyles.cardContainer}
               >
-                <Text style={commonStyles.basicText}>{item.text}</Text>
-                <Pressable onPress={() => removeItem(index)}>
-                  <Text style={[commonStyles.smallText, { color: "red" }]}>
-                    Remove
-                  </Text>
-                </Pressable>
+                <Text style={[commonStyles.basicText, commonStyles.fullFlex]}>
+                  {item.text}
+                </Text>
+                <Spacer size={12} position="right" />
+                <CustomButton
+                  title="Add"
+                  onPress={() => removeItem(index)}
+                  small
+                  sendButton
+                  error
+                  iconName="remove-circle-outline"
+                />
               </Row>
             )}
           />

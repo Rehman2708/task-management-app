@@ -168,6 +168,7 @@ export default function GlobalCommentsModal({
                 rounded
                 inputStyle={{
                   minHeight: 40,
+                  maxHeight: 100,
                   textAlignVertical: "center",
                 }}
               />

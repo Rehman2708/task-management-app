@@ -86,8 +86,8 @@ export default function ProfileScreen() {
                     onPress={() => {
                       if (user?.image) {
                         setCurrentImage({ uri: user.image });
+                        setIsVisible(true);
                       }
-                      setIsVisible(true);
                     }}
                   >
                     {user?.image ? (
