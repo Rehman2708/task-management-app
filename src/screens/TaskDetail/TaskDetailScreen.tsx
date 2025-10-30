@@ -1,10 +1,16 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { View, Text, FlatList, Pressable } from "react-native";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
+import { View, Text, FlatList, Pressable, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { useCommonStyles } from "../../styles/commonstyles";
-import { Column, isAndroid, Row, Spacer } from "../../tools";
+import { Column, Row, Spacer } from "../../tools";
 import { useHelper } from "../../utils/helper";
 import { SubtaskStatus } from "../../enums/tasks";
 import { AppUrl } from "../../utils/appUrl";
@@ -21,7 +27,13 @@ import CommentsModal from "../../components/comments/commentModal";
 import { Subtask } from "../../types/task";
 
 export default function TaskDetailScreen({ route }: any) {
-  const { taskId, readOnly = false } = route.params;
+  const {
+    taskId,
+    readOnly = false,
+    showComments,
+    commentSubtaskId,
+  } = route.params;
+
   const {
     task,
     taskDetailLoading,
@@ -36,14 +48,64 @@ export default function TaskDetailScreen({ route }: any) {
   const commonStyles = useCommonStyles(theme);
   const styles = TaskDetailStyles(theme);
 
-  const [showTaskComments, setShowTaskComments] = useState(false);
-  const [showSubTaskComments, setShowSubTaskComments] = useState(false);
-  const [commentModalId, setCommentModalId] = useState("");
+  const [commentModal, setCommentModal] = useState<{
+    visible: boolean;
+    subtaskId?: string;
+  }>({
+    visible:
+      (showComments && (!!commentSubtaskId || commentSubtaskId === "")) ??
+      false,
+    subtaskId: commentSubtaskId ?? undefined,
+  });
 
-  const handleOpenSubtaskComments = useCallback((subtaskId: string) => {
-    setCommentModalId(subtaskId);
-    setShowSubTaskComments(true);
+  // Store the subtask that was last opened for comments
+  const [lastCommentedSubtask, setLastCommentedSubtask] = useState<
+    string | null
+  >(null);
+
+  // Keep animated scale refs for each subtask
+  const scaleAnimations = useRef<Record<string, Animated.Value>>({}).current;
+
+  const getScaleAnim = useCallback(
+    (id: string) => {
+      if (!scaleAnimations[id]) {
+        scaleAnimations[id] = new Animated.Value(1);
+      }
+      return scaleAnimations[id];
+    },
+    [scaleAnimations]
+  );
+
+  const triggerBounce = useCallback(
+    (id: string) => {
+      const anim = getScaleAnim(id);
+      Animated.sequence([
+        Animated.timing(anim, {
+          toValue: 1.25,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.spring(anim, {
+          toValue: 1,
+          friction: 4,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    },
+    [getScaleAnim]
+  );
+
+  const handleOpenComments = useCallback((subtaskId?: string) => {
+    setCommentModal({ visible: true, subtaskId });
+    setLastCommentedSubtask(subtaskId ?? null);
   }, []);
+
+  const handleCloseComments = useCallback(() => {
+    setCommentModal({ visible: false });
+    if (lastCommentedSubtask) {
+      triggerBounce(lastCommentedSubtask);
+    }
+  }, [lastCommentedSubtask, triggerBounce]);
 
   const handleUpdateStatus = useCallback(
     (id: string) => updateSubtaskStatus(id, SubtaskStatus.Completed),
@@ -56,6 +118,8 @@ export default function TaskDetailScreen({ route }: any) {
         item.status === SubtaskStatus.Completed
           ? `${theme.colors.success}20`
           : `${theme.colors.error}20`;
+
+      const scale = getScaleAnim(item._id);
 
       return (
         <Column
@@ -95,22 +159,26 @@ export default function TaskDetailScreen({ route }: any) {
                 />
               </Row>
             )}
+
           <Row alignItems="center" justifyContent="space-between">
             <Pressable
-              onPress={() => handleOpenSubtaskComments(item._id)}
+              onPress={() => handleOpenComments(item._id)}
               style={{ marginTop: theme.spacing.sm }}
             >
               <Row alignItems="center" gap={6}>
                 <Text style={commonStyles.subTitleText}>
                   {item.totalComments ?? 0}
                 </Text>
-                <Ionicons
-                  name="chatbubble-outline"
-                  size={30}
-                  color={theme.colors.text}
-                />
+                <Animated.View style={{ transform: [{ scale }] }}>
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={30}
+                    color={theme.colors.text}
+                  />
+                </Animated.View>
               </Row>
             </Pressable>
+
             {!readOnly && item.status === SubtaskStatus.Pending && (
               <CustomButton
                 onPress={() => handleUpdateStatus(item._id)}
@@ -132,7 +200,8 @@ export default function TaskDetailScreen({ route }: any) {
       readOnly,
       subtaskStatusLoading,
       handleUpdateStatus,
-      handleOpenSubtaskComments,
+      handleOpenComments,
+      getScaleAnim,
     ]
   );
 
@@ -207,7 +276,7 @@ export default function TaskDetailScreen({ route }: any) {
               <View style={styles.container}>
                 <Row justifyContent="space-between" alignItems="center">
                   <Text style={commonStyles.basicText}>Task Comments</Text>
-                  <Pressable onPress={() => setShowTaskComments(true)}>
+                  <Pressable onPress={() => handleOpenComments()}>
                     <Row alignItems="center" gap={6}>
                       <Text style={commonStyles.subTitleText}>
                         {task.totalComments ?? 0}
@@ -227,23 +296,21 @@ export default function TaskDetailScreen({ route }: any) {
         )}
       </CollapsibleHeaderTabs>
 
-      {/* Task Comments Modal */}
       <CommentsModal
-        visible={showTaskComments}
-        onClose={() => setShowTaskComments(false)}
-        fetchUrl={AppUrl.getTaskComments(taskId)}
-        postUrl={AppUrl.addTaskComment(taskId)}
+        visible={commentModal.visible}
+        onClose={handleCloseComments}
+        fetchUrl={
+          commentModal.subtaskId
+            ? AppUrl.getSubtaskComments(taskId, commentModal.subtaskId)
+            : AppUrl.getTaskComments(taskId)
+        }
+        postUrl={
+          commentModal.subtaskId
+            ? AppUrl.addSubtaskComment(taskId, commentModal.subtaskId)
+            : AppUrl.addTaskComment(taskId)
+        }
         entityId={taskId}
-      />
-
-      {/* Subtask Comments Modal */}
-      <CommentsModal
-        visible={showSubTaskComments}
-        onClose={() => setShowSubTaskComments(false)}
-        fetchUrl={AppUrl.getSubtaskComments(taskId, commentModalId)}
-        postUrl={AppUrl.addSubtaskComment(taskId, commentModalId)}
-        entityId={taskId}
-        subtask={commentModalId}
+        subtask={commentModal.subtaskId}
       />
     </View>
   );

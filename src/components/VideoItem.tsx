@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { View, Pressable, Text, StyleSheet } from "react-native";
 import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,6 +33,7 @@ type Props = {
   showDelete?: boolean;
   singleScreen?: boolean;
   playAlways?: boolean;
+  showComments?: boolean;
 };
 
 export default function VideoItem({
@@ -51,10 +52,13 @@ export default function VideoItem({
   showDelete = true,
   playAlways = false,
   singleScreen,
+  showComments,
 }: Props) {
   const videoRef = useRef<IVideo | null>(null);
   const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
-  const [commentsModalVisible, setCommentsModalVisible] = useState(false);
+  const [commentsModalVisible, setCommentsModalVisible] = useState(
+    showComments ?? false
+  );
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const theme = useTheme();
@@ -76,7 +80,9 @@ export default function VideoItem({
       console.error("markRead video error:", err);
     }
   }, [item._id]);
-
+  useEffect(() => {
+    setCommentsModalVisible(showComments ?? false);
+  }, [item._id]);
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
       {shouldPlay && (

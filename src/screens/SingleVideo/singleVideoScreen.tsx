@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const SingleVideoScreen = () => {
   const { params } = useRoute<any>(); // { video: IVideo }
   const video = params.video;
+  const showComments = params.showComments;
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
   const insets = useSafeAreaInsets();
@@ -30,6 +31,7 @@ const SingleVideoScreen = () => {
         playAlways
         showDelete={false}
         singleScreen
+        showComments={showComments}
       />
     </View>
   );

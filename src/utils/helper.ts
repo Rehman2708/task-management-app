@@ -88,6 +88,8 @@ export function useHelper() {
           navigation.navigate(ROUTES.TASK_DETAIL, {
             taskId: notData.taskId,
             readOnly: !notData?.isActive,
+            showComments: notData.isComment,
+            commentSubtaskId: notData.commentSubtaskId,
           });
         } else {
           navigation.navigate(ROUTES.TASKS);
@@ -102,6 +104,7 @@ export function useHelper() {
         if (notData.videoData) {
           navigation.navigate(ROUTES.SINGLE_VIDEO, {
             video: notData.videoData,
+            showComments: notData.isComment,
           });
         } else {
           navigation.navigate(ROUTES.REELS);
