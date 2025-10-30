@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { TaskRepo } from "../../repositories/task";
 import { Alert } from "react-native";
 import * as Notifications from "expo-notifications";
-import { useNavigation } from "@react-navigation/native";
-import { ROUTES } from "../../enums/routes";
 import { useAuthStore } from "../../store/authStore";
 import { useHelper } from "../../utils/helper";
-import { useUtilStore } from "../../store/utils";
+import { TaskRepo } from "../../repositories/task";
+import { Task } from "../../types/task";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -18,48 +16,72 @@ Notifications.setNotificationHandler({
 
 export function useHomeScreenViewModel() {
   const { user } = useAuthStore();
-  const { refetchTask } = useUtilStore();
   const { handleNotificationNavigation } = useHelper();
-  const navigation: any = useNavigation();
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  // Fetch user from local storage
-  useEffect(() => {
-    (async () => {
-      if (user?.userId) {
-        fetchTasks();
-      } else {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
-  // Fetch active tasks
-  const fetchTasks = async () => {
+  const [tab, setTab] = useState<"Active" | "History">("Active");
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(15);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Fetch Tasks (Active/History)
+  const fetchTasks = async (requestedPage = 1, isInitial = true) => {
+    if (!user?.userId) return;
     setError(null);
-    if (user?.userId) {
-      try {
-        setLoading(true);
-        const response = await TaskRepo.getActiveTasks({
-          ownerUserId: user.userId,
-        });
-        setTasks(response || []);
-      } catch (err: any) {
-        console.error("Fetch active tasks error:", err);
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
+
+    try {
+      if (isInitial) setLoading(true);
+      else setLoadingMore(true);
+
+      const response =
+        tab === "Active"
+          ? await TaskRepo.getActiveTasks({
+              ownerUserId: user.userId,
+            })
+          : await TaskRepo.getCompletedTasks({
+              ownerUserId: user.userId,
+              page: requestedPage,
+              pageSize,
+            });
+
+      const fetchedTasks =
+        tab === "Active" ? response || [] : response?.tasks || [];
+      const total = tab === "Active" ? 1 : response?.totalPages || 1;
+
+      if (requestedPage === 1) {
+        setTasks(fetchedTasks);
+      } else {
+        setTasks((prev) => [...prev, ...fetchedTasks]);
       }
+
+      setTotalPages(total);
+      setPage(requestedPage);
+    } catch (err: any) {
+      console.error("Fetch tasks error:", err);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  // Delete a task
+  // Load More Tasks
+  const loadMoreTasks = () => {
+    if (tab === "History" && page < totalPages && !loadingMore) {
+      fetchTasks(page + 1, false);
+    }
+  };
+
+  // Delete a Task
   const handleDeleteTask = async (taskId: string) => {
     try {
       setLoading(true);
       await TaskRepo.deleteTask(taskId, user?.userId ?? "");
-      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+      setTasks((prev) => prev.filter((task) => task._id !== taskId));
     } catch (err: any) {
       console.error("Delete task error:", err);
       setError(err.message || "Failed to delete task");
@@ -67,8 +89,9 @@ export function useHomeScreenViewModel() {
       setLoading(false);
     }
   };
+
   const deleteTask = (taskId: string) => {
-    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
+    Alert.alert("Delete Task", "Are you sure you want to delete this task?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
@@ -78,28 +101,22 @@ export function useHomeScreenViewModel() {
     ]);
   };
 
+  // Notifications Setup
   useEffect(() => {
     let isReady = false;
 
-    // Mark navigation ready after component mounts
     const timer = setTimeout(() => {
       isReady = true;
-    }, 500); // you can adjust this delay if needed
+    }, 500);
 
     const subscription = Notifications.addNotificationReceivedListener(
-      (notification) => {}
+      () => {}
     );
-
     const responseSubscription =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const notData = response?.notification?.request?.content?.data;
-
-        if (isReady) {
-          handleNotificationNavigation(notData);
-        } else {
-          // If not ready yet, wait a short moment and retry
-          setTimeout(() => handleNotificationNavigation(notData), 500);
-        }
+        if (isReady) handleNotificationNavigation(notData);
+        else setTimeout(() => handleNotificationNavigation(notData), 500);
       });
 
     return () => {
@@ -112,8 +129,12 @@ export function useHomeScreenViewModel() {
   return {
     tasks,
     loading,
+    loadingMore,
     error,
+    tab,
+    setTab,
     fetchTasks,
+    loadMoreTasks,
     deleteTask,
   };
 }

@@ -15,7 +15,6 @@ export interface TabIconProps {
 const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
   const icons: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "book-outline",
-    [ROUTES.HISTORY]: "time-outline",
     [ROUTES.REELS]: "heart-outline",
     [ROUTES.NOTES]: "document-text-outline",
     [ROUTES.LISTS]: "document-text-outline",
@@ -24,7 +23,6 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
 
   const activeIcons: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "book",
-    [ROUTES.HISTORY]: "time",
     [ROUTES.REELS]: "heart",
     [ROUTES.NOTES]: "document-text",
     [ROUTES.LISTS]: "document-text",
@@ -54,7 +52,6 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
   const styles = useBottomTabStyles(theme);
   const routeTitles: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "Tasks",
-    [ROUTES.HISTORY]: "History",
     [ROUTES.REELS]: "Reels",
     [ROUTES.NOTES]: "Notes",
     [ROUTES.LISTS]: "Lists",

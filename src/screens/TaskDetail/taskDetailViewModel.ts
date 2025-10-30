@@ -6,7 +6,7 @@ import { useUtilStore } from "../../store/utils";
 
 export function useTaskDetailViewModel(taskId: string) {
   const { user } = useAuthStore();
-  const { refetchTask, refetchHistory } = useUtilStore();
+  const { refetchTask } = useUtilStore();
 
   const [task, setTask] = useState<any>(null);
   const [taskDetailLoading, setTaskDetailLoading] = useState(true);
@@ -50,14 +50,13 @@ export function useTaskDetailViewModel(taskId: string) {
         );
 
         refetchTask();
-        refetchHistory();
       } catch (err) {
         console.error("Subtask update error:", err);
       } finally {
         setSubtaskStatusLoading(null);
       }
     },
-    [taskId, user?.userId, refetchTask, refetchHistory]
+    [taskId, user?.userId, refetchTask]
   );
 
   useEffect(() => {
