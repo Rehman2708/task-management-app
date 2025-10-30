@@ -7,6 +7,8 @@ interface AuthStateType {
   refetchHistory: () => void;
   fetchingNotes: boolean;
   refetchNotes: () => void;
+  fetchingLists: boolean;
+  refetchLists: () => void;
 }
 
 export const useUtilStore = create<AuthStateType>((set) => ({
@@ -19,4 +21,7 @@ export const useUtilStore = create<AuthStateType>((set) => ({
 
   fetchingNotes: false,
   refetchNotes: () => set((state) => ({ fetchingNotes: !state.fetchingNotes })),
+
+  fetchingLists: false,
+  refetchLists: () => set((state) => ({ fetchingLists: !state.fetchingLists })),
 }));

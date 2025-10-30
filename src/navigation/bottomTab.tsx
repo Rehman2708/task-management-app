@@ -18,6 +18,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
     [ROUTES.HISTORY]: "time-outline",
     [ROUTES.REELS]: "heart-outline",
     [ROUTES.NOTES]: "document-text-outline",
+    [ROUTES.LISTS]: "document-text-outline",
     [ROUTES.PROFILE]: "person-outline",
   };
 
@@ -26,6 +27,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
     [ROUTES.HISTORY]: "time",
     [ROUTES.REELS]: "heart",
     [ROUTES.NOTES]: "document-text",
+    [ROUTES.LISTS]: "document-text",
     [ROUTES.PROFILE]: "person",
   };
 
@@ -55,6 +57,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
     [ROUTES.HISTORY]: "History",
     [ROUTES.REELS]: "Reels",
     [ROUTES.NOTES]: "Notes",
+    [ROUTES.LISTS]: "Lists",
     [ROUTES.PROFILE]: "Profile",
   };
   const { themeColor } = useHelper();

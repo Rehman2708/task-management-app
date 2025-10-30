@@ -16,6 +16,8 @@ import SingleVideoScreen from "../screens/SingleVideo/singleVideoScreen";
 import UpdateProfileScreen from "../screens/updateProfile/UpdateProfileScreen";
 import NotificationScreen from "../screens/Notifications/NotificationScreen";
 import FontScreen from "../screens/theme/FontScreen";
+import CreateListScreen from "../screens/CreateList/CreateListScreen";
+import ViewListScreen from "../screens/ViewList/ViewListScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +46,8 @@ export default function AppNavigator() {
         component={UpdateProfileScreen}
       />
       <Stack.Screen name={ROUTES.NOTIFICATION} component={NotificationScreen} />
+      <Stack.Screen name={ROUTES.CREATE_LIST} component={CreateListScreen} />
+      <Stack.Screen name={ROUTES.VIEW_LIST} component={ViewListScreen} />
     </Stack.Navigator>
   );
 }
