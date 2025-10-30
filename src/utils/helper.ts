@@ -82,7 +82,13 @@ export function useHelper() {
           navigation.navigate(ROUTES.NOTES);
         }
         break;
-
+      case "list":
+        if (notData.listId) {
+          navigation.navigate(ROUTES.VIEW_LIST, { noteId: notData.listId });
+        } else {
+          navigation.navigate(ROUTES.LISTS);
+        }
+        break;
       case "task":
         if (notData.taskId) {
           navigation.navigate(ROUTES.TASK_DETAIL, {
