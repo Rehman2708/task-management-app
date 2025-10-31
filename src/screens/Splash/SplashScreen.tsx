@@ -26,6 +26,7 @@ const SplashScreen = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const { updateUser } = useAuthStore();
+  const { themeColor } = useHelper();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
 
@@ -106,9 +107,7 @@ const SplashScreen = () => {
       alignItems="center"
     >
       <Logo />
-      {loading && (
-        <ActivityIndicator size={"large"} color={theme.colors.primary} />
-      )}
+      {!loading && <ActivityIndicator size={"large"} color={themeColor.dark} />}
     </Column>
   );
 };
