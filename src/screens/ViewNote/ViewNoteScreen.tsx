@@ -4,14 +4,15 @@ import { Note, NotesRepo } from "../../repositories/notes";
 import { useHelper } from "../../utils/helper";
 import { useCommonStyles } from "../../styles/commonstyles";
 import CustomButton from "../../components/customButton";
-import { isAndroid, Row, Spacer } from "../../tools";
+import { Column, isAndroid, Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
 import { useNavigation } from "@react-navigation/native";
-import ScreenLoader from "../../components/screenLoader";
+import { LoaderTypes } from "../../components/screenLoader";
 import { useUtilStore } from "../../store/utils";
 import { useAuthStore } from "../../store/authStore";
 import CollapsibleHeader from "../../components/collapsibleHeader";
 import { useTheme } from "../../infrastructure/theme";
+import EmptyState from "../../components/emptyState";
 
 interface NoteDetailScreenProps {
   route: {
@@ -82,40 +83,52 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      {gettingNote ? (
-        <ScreenLoader />
-      ) : (
-        <>
-          <CollapsibleHeader
-            title={note?.title ?? ""}
-            subTitle={formatDate(note?.createdAt!) ?? ""}
-            headerImage={note?.image}
-          >
-            <Text style={commonStyles.basicText}>{note?.note}</Text>
-            <Spacer size={50} />
-          </CollapsibleHeader>
-          <Row
-            justifyContent="space-between"
-            style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
-            alignItems="center"
-          >
-            <CustomButton
-              title="Edit"
-              onPress={() => navigation.navigate(ROUTES.CREATE_NOTE, { note })}
-              rounded
-              halfWidth
+      <>
+        <CollapsibleHeader headerImage={note?.image}>
+          {gettingNote ? (
+            <EmptyState
+              loading={gettingNote}
+              type={LoaderTypes.NotesDetailScreen}
+              text={""}
             />
-            <CustomButton
-              title="Delete"
-              onPress={handleDelete}
-              halfWidth
-              rounded
-              error
-              loading={loading}
-            />
-          </Row>
-        </>
-      )}
+          ) : (
+            <>
+              <Column>
+                <Text numberOfLines={3} style={commonStyles.titleText}>
+                  {note?.title}
+                </Text>
+                <Text numberOfLines={3} style={commonStyles.tinyText}>
+                  {formatDate(note?.createdAt!) ?? ""}
+                </Text>
+              </Column>
+              <Spacer size={12} />
+
+              <Text style={commonStyles.basicText}>{note?.note}</Text>
+              <Spacer size={50} />
+            </>
+          )}
+        </CollapsibleHeader>
+        <Row
+          justifyContent="space-between"
+          style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
+          alignItems="center"
+        >
+          <CustomButton
+            title="Edit"
+            onPress={() => navigation.navigate(ROUTES.CREATE_NOTE, { note })}
+            rounded
+            halfWidth
+          />
+          <CustomButton
+            title="Delete"
+            onPress={handleDelete}
+            halfWidth
+            rounded
+            error
+            loading={loading}
+          />
+        </Row>
+      </>
     </View>
   );
 };

@@ -4,12 +4,13 @@ import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
-import { Row, Spacer, isAndroid } from "../../tools";
+import { Column, Row, Spacer, isAndroid } from "../../tools";
 import CustomButton from "../../components/customButton";
-import ScreenLoader from "../../components/screenLoader";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import CollapsibleHeader from "../../components/collapsibleHeader";
 import { useHelper } from "../../utils/helper";
 import { useViewListViewModel } from "./useListDetailViewModel";
+import EmptyState from "../../components/emptyState";
 
 interface ViewListScreenProps {
   route: {
@@ -83,15 +84,24 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <CollapsibleHeader
-        title={list?.title ?? "List"}
-        subTitle={formatDate(list?.createdAt ?? new Date())}
-        headerImage={list?.image}
-      >
+      <CollapsibleHeader headerImage={list?.image}>
         {loading ? (
-          <ScreenLoader />
+          <EmptyState
+            loading={loading}
+            type={LoaderTypes.ListDetailScreen}
+            text={""}
+          />
         ) : (
           <>
+            <Column>
+              <Text numberOfLines={3} style={commonStyles.titleText}>
+                {list?.title}
+              </Text>
+              <Text numberOfLines={3} style={commonStyles.tinyText}>
+                {formatDate(list?.createdAt!) ?? ""}
+              </Text>
+            </Column>
+            <Spacer size={12} />
             <Text style={[commonStyles.basicText]}>{list?.description}</Text>
             <Spacer size={16} />
             <FlatList

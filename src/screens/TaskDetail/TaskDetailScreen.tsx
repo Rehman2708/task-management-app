@@ -16,7 +16,7 @@ import { SubtaskStatus } from "../../enums/tasks";
 import { AppUrl } from "../../utils/appUrl";
 
 import CustomButton from "../../components/customButton";
-import ScreenLoader from "../../components/screenLoader";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import Avatar from "../../components/avatar";
 import EmptyState from "../../components/emptyState";
 import TimeLeftProgress from "../../components/timeLeftProgress";
@@ -219,10 +219,14 @@ export default function TaskDetailScreen({ route }: any) {
       ]}
     >
       <CollapsibleHeaderTabs headerImage={task?.image}>
-        {error ? (
-          <EmptyState text="Retry" button={fetchTaskDetail} error />
-        ) : taskDetailLoading ? (
-          <ScreenLoader />
+        {error || taskDetailLoading ? (
+          <EmptyState
+            type={LoaderTypes.TaskDetailScreen}
+            text="Retry"
+            button={fetchTaskDetail}
+            error
+            loading={taskDetailLoading}
+          />
         ) : (
           task && (
             <Column gap={12}>
