@@ -10,17 +10,51 @@ import { ROUTES } from "../../enums/routes";
 import { useTheme } from "../../infrastructure/theme";
 import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
+import { useHelper } from "../../utils/helper";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 const SplashScreen = () => {
+  const { handleNotificationNavigation } = useHelper();
   const navigation = useNavigation();
-
   const [loading, setLoading] = useState(true);
   const { updateUser } = useAuthStore();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
 
-  // Check if user already logged in
+  // Notifications Setup
+  useEffect(() => {
+    let isReady = false;
 
+    const timer = setTimeout(() => {
+      isReady = true;
+    }, 500);
+
+    const subscription = Notifications.addNotificationReceivedListener(
+      () => {}
+    );
+    const responseSubscription =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        const notData = response?.notification?.request?.content?.data;
+        if (isReady) handleNotificationNavigation(notData);
+        else setTimeout(() => handleNotificationNavigation(notData), 500);
+      });
+
+    return () => {
+      clearTimeout(timer);
+      subscription.remove();
+      responseSubscription.remove();
+    };
+  }, []);
+
+  // Check if user already logged in
   const fetchUserDetails = async (id: string) => {
     try {
       setLoading(true);

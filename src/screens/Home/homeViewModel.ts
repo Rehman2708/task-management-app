@@ -1,22 +1,11 @@
 import { useState, useEffect } from "react";
 import { Alert } from "react-native";
-import * as Notifications from "expo-notifications";
 import { useAuthStore } from "../../store/authStore";
-import { useHelper } from "../../utils/helper";
 import { TaskRepo } from "../../repositories/task";
 import { Task } from "../../types/task";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
-
 export function useHomeScreenViewModel() {
   const { user } = useAuthStore();
-  const { handleNotificationNavigation } = useHelper();
 
   const [tab, setTab] = useState<"Active" | "History">("Active");
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -100,31 +89,6 @@ export function useHomeScreenViewModel() {
       },
     ]);
   };
-
-  // Notifications Setup
-  useEffect(() => {
-    let isReady = false;
-
-    const timer = setTimeout(() => {
-      isReady = true;
-    }, 500);
-
-    const subscription = Notifications.addNotificationReceivedListener(
-      () => {}
-    );
-    const responseSubscription =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        const notData = response?.notification?.request?.content?.data;
-        if (isReady) handleNotificationNavigation(notData);
-        else setTimeout(() => handleNotificationNavigation(notData), 500);
-      });
-
-    return () => {
-      clearTimeout(timer);
-      subscription.remove();
-      responseSubscription.remove();
-    };
-  }, []);
 
   return {
     tasks,

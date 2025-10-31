@@ -119,7 +119,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
       {Array.from({ length: 15 }).map((_, i) => {
         const isRight = Math.random() > 0.5;
         const bubbleWidth = getRandomInt(80, 250);
-        const bubbleHeight = getRandomInt(20, 60);
+        const bubbleHeight = getRandomInt(18, 40);
         const avatarSize = 30;
 
         return (

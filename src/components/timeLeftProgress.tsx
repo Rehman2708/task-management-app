@@ -20,7 +20,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const [percentage, setPercentage] = useState(0);
   const { themeColor } = useHelper();
   const theme = useTheme();
-  const styles = progressBarStyle(theme);
+  const styles = progressBarStyle(theme, duration ? true : false);
 
   useEffect(() => {
     // 🟢 CASE 1: When duration & currentTime are provided (e.g., video progress)
@@ -108,18 +108,18 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   );
 };
 
-const progressBarStyle = (theme: any) =>
+const progressBarStyle = (theme: any, duration?: boolean) =>
   StyleSheet.create({
     progressBackground: {
       height: 8,
-      borderRadius: 10,
+      borderRadius: duration ? 0 : 10,
       backgroundColor: theme.colors.background,
       overflow: "hidden",
       flex: 1,
     },
     progressFill: {
       height: "100%",
-      borderRadius: 10,
+      borderRadius: duration ? 0 : 10,
     },
   });
 
