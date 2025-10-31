@@ -184,7 +184,7 @@ export default function VideoItem({
                 color={"#fff"}
                 size={35}
               />
-              <Text style={commonStyles.subTitleText}>
+              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
                 {item.totalComments ?? 0}
               </Text>
             </Column>

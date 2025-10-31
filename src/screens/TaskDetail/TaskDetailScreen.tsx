@@ -163,19 +163,20 @@ export default function TaskDetailScreen({ route }: any) {
           <Row alignItems="center" justifyContent="space-between">
             <Pressable
               onPress={() => handleOpenComments(item._id)}
-              style={{ marginTop: theme.spacing.sm }}
+              style={{ paddingTop: theme.spacing.sm }}
             >
-              <Row alignItems="center" gap={6}>
-                <Text style={commonStyles.subTitleText}>
-                  {item.totalComments ?? 0}
-                </Text>
+              <Row alignItems="center" gap={4}>
                 <Animated.View style={{ transform: [{ scale }] }}>
                   <Ionicons
                     name="chatbubble-outline"
-                    size={30}
+                    size={20}
                     color={theme.colors.text}
                   />
                 </Animated.View>
+                <Text style={commonStyles.smallText}>
+                  {item.totalComments ?? 0} Comment
+                  {(item?.totalComments ?? 0) > 1 ? "s" : ""}
+                </Text>
               </Row>
             </Pressable>
 
@@ -217,11 +218,7 @@ export default function TaskDetailScreen({ route }: any) {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <CollapsibleHeaderTabs
-        title={task?.title ?? "Task"}
-        subTitle={taskSubtitle}
-        headerImage={task?.image}
-      >
+      <CollapsibleHeaderTabs headerImage={task?.image}>
         {error ? (
           <EmptyState text="Retry" button={fetchTaskDetail} error />
         ) : taskDetailLoading ? (
@@ -229,6 +226,30 @@ export default function TaskDetailScreen({ route }: any) {
         ) : (
           task && (
             <Column gap={12}>
+              <Row justifyContent="space-between" alignItems="center">
+                <Column style={commonStyles.fullFlex}>
+                  <Text numberOfLines={3} style={commonStyles.titleText}>
+                    {task.title}
+                  </Text>
+                  <Text numberOfLines={3} style={commonStyles.tinyText}>
+                    {taskSubtitle}
+                  </Text>
+                </Column>
+                <Spacer size={6} position="right" />
+                <Pressable onPress={() => handleOpenComments()}>
+                  <Row alignItems="center" gap={6}>
+                    <Ionicons
+                      name="chatbubble-outline"
+                      size={20}
+                      color={theme.colors.text}
+                    />
+                    <Text style={commonStyles.smallText}>
+                      {task.totalComments ?? 0} Comment
+                      {(task?.totalComments ?? 0) > 1 ? "s" : ""}
+                    </Text>
+                  </Row>
+                </Pressable>
+              </Row>
               {task.description && (
                 <Text style={commonStyles.smallText}>{task.description}</Text>
               )}
@@ -272,25 +293,6 @@ export default function TaskDetailScreen({ route }: any) {
                   />
                 </View>
               )}
-
-              <View style={styles.container}>
-                <Row justifyContent="space-between" alignItems="center">
-                  <Text style={commonStyles.basicText}>Task Comments</Text>
-                  <Pressable onPress={() => handleOpenComments()}>
-                    <Row alignItems="center" gap={6}>
-                      <Text style={commonStyles.subTitleText}>
-                        {task.totalComments ?? 0}
-                      </Text>
-                      <Ionicons
-                        name="chatbubble-outline"
-                        size={30}
-                        color={theme.colors.text}
-                      />
-                    </Row>
-                  </Pressable>
-                </Row>
-                <Spacer size={12} />
-              </View>
             </Column>
           )
         )}

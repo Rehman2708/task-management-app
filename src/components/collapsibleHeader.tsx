@@ -36,7 +36,7 @@ export const HEADER_MIN_HEIGHT = 0;
 interface CollapsibleHeaderTabsProps {
   headerHeight?: number;
   headerImage?: string;
-  title: string;
+  title?: string;
   subTitle?: string;
   children: React.ReactNode;
   onRefresh?: () => Promise<void>;
@@ -220,9 +220,11 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
               { minHeight: dimensions.height + insets.top + 50 },
             ]}
           >
-            <Text numberOfLines={3} style={commonStyles.titleText}>
-              {title}
-            </Text>
+            {title && (
+              <Text numberOfLines={3} style={commonStyles.titleText}>
+                {title}
+              </Text>
+            )}
             {subTitle && (
               <>
                 <Spacer size={6} />

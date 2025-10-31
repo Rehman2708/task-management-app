@@ -120,7 +120,7 @@ const TasksCard = ({
                   {item.title}
                 </Text>
                 <Spacer size={20} position="right" />
-                <Row alignItems="flex-start" gap={4}>
+                <Row alignItems="center" gap={4}>
                   <Ionicons
                     name="time-outline"
                     size={12}
@@ -147,14 +147,16 @@ const TasksCard = ({
                     withName
                   />
                 </Row>
-                <Text style={[commonStyles.tTinyText]}>
-                  Assigned To: {item.assignedTo}{" "}
+                <Row alignItems="center" gap={4}>
+                  <Text style={[commonStyles.tTinyText]}>
+                    Assigned To: {item.assignedTo}
+                  </Text>
                   <AssignedIcon
                     type={item.assignedTo as AssignedTo}
                     color={theme.colors.textLight}
                     size={10}
                   />
-                </Text>
+                </Row>
               </Row>
             </Column>
           </Row>

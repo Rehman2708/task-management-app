@@ -10,7 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
-import { Row } from "../../tools";
+import { isAndroid, Row } from "../../tools";
 import CommentCard from "../commentCard";
 import EmptyState from "../emptyState";
 import CustomInput from "../customInput";
@@ -156,7 +156,8 @@ export default function GlobalCommentsModal({
                 flexDirection: "row",
                 gap: 8,
                 alignItems: "center",
-                marginBottom: Platform.OS === "ios" ? 20 : 10,
+                marginBottom: !isAndroid ? 20 : 10,
+                paddingHorizontal: 8,
               }}
             >
               <CustomInput

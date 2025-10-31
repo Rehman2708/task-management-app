@@ -23,6 +23,7 @@ import CardWrapper from "../../components/cardWrapper";
 import { useUtilStore } from "../../store/utils";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
+import { LoaderTypes } from "../../components/screenLoader";
 
 export default function NotesScreen() {
   const theme = useTheme();
@@ -110,9 +111,16 @@ export default function NotesScreen() {
                 withName
               />
             </Row>
-            <Text numberOfLines={1} style={commonStyles.tTinyText}>
-              {formatDate(item?.createdAt)}
-            </Text>
+            <Row alignItems="center" gap={4}>
+              <Ionicons
+                name="time-outline"
+                size={12}
+                color={theme.colors.textLight}
+              />
+              <Text numberOfLines={1} style={commonStyles.tTinyText}>
+                {formatDate(item?.createdAt)}
+              </Text>
+            </Row>
           </Column>
         </Column>
       </CardWrapper>
@@ -160,6 +168,7 @@ export default function NotesScreen() {
             button={() => fetchNotes(1, true)}
             loading={initialLoading}
             error={!!error?.length}
+            type={LoaderTypes.NotesScreen}
           />
         )}
       </View>

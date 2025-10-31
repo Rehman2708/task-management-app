@@ -76,13 +76,6 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
       )}
     </Row>
   );
-  if (error)
-    return (
-      <View style={commonStyles.fullFlex}>
-        <Text style={commonStyles.errorText}>{error}</Text>
-      </View>
-    );
-
   return (
     <View
       style={[
@@ -90,57 +83,51 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      {list ? (
-        <>
-          <CollapsibleHeader
-            title={list.title ?? "List"}
-            subTitle={formatDate(list.createdAt ?? new Date())}
-            headerImage={list.image}
-          >
-            {loading ? (
-              <ScreenLoader />
-            ) : (
-              <>
-                <Text style={[commonStyles.basicText]}>{list.description}</Text>
-                <Spacer size={16} />
-                <FlatList
-                  data={list.items || []}
-                  keyExtractor={(_, i) => i.toString()}
-                  renderItem={renderListItem}
-                  scrollEnabled={false}
-                  ListEmptyComponent={
-                    <Text style={commonStyles.smallText}>
-                      No items in this list.
-                    </Text>
-                  }
-                />
-              </>
-            )}
-          </CollapsibleHeader>
-          <Row
-            justifyContent="space-between"
-            style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
-            alignItems="center"
-          >
-            <CustomButton
-              title="Edit"
-              onPress={() => navigation.navigate(ROUTES.CREATE_LIST, { list })}
-              rounded
-              halfWidth
+      <CollapsibleHeader
+        title={list?.title ?? "List"}
+        subTitle={formatDate(list?.createdAt ?? new Date())}
+        headerImage={list?.image}
+      >
+        {loading ? (
+          <ScreenLoader />
+        ) : (
+          <>
+            <Text style={[commonStyles.basicText]}>{list?.description}</Text>
+            <Spacer size={16} />
+            <FlatList
+              data={list?.items || []}
+              keyExtractor={(_, i) => i.toString()}
+              renderItem={renderListItem}
+              scrollEnabled={false}
+              ListEmptyComponent={
+                <Text style={commonStyles.smallText}>
+                  No items in this list.
+                </Text>
+              }
             />
-            <CustomButton
-              title="Delete"
-              onPress={handleDelete}
-              rounded
-              halfWidth
-              error
-              loading={updating}
-            />
-          </Row>
-        </>
-      ) : (
-        <Text style={commonStyles.smallText}>No list found.</Text>
-      )}
+          </>
+        )}
+      </CollapsibleHeader>
+      <Row
+        justifyContent="space-between"
+        style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
+        alignItems="center"
+      >
+        <CustomButton
+          title="Edit"
+          onPress={() => navigation.navigate(ROUTES.CREATE_LIST, { list })}
+          rounded
+          halfWidth
+        />
+        <CustomButton
+          title="Delete"
+          onPress={handleDelete}
+          rounded
+          halfWidth
+          error
+          loading={updating}
+        />
+      </Row>
     </View>
   );
 }

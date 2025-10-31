@@ -18,6 +18,7 @@ import { useTheme } from "../../infrastructure/theme";
 import { useUtilStore } from "../../store/utils";
 import { Row } from "../../tools";
 import { useHomeScreenViewModel } from "./homeViewModel";
+import { LoaderTypes } from "../../components/screenLoader";
 
 export default function HomeScreen({ navigation }: any) {
   const {
@@ -95,6 +96,7 @@ export default function HomeScreen({ navigation }: any) {
             loading={loading}
             error={!!error?.length}
             image={Images.noTask}
+            type={LoaderTypes.TaskScreen}
           />
         ) : (
           <FlatList

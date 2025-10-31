@@ -8,7 +8,6 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useListsViewModel } from "./listsViewModel";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { useHelper } from "../../utils/helper";
@@ -23,6 +22,8 @@ import CardWrapper from "../../components/cardWrapper";
 import CustomInput from "../../components/customInput";
 import Avatar from "../../components/avatar";
 import { List } from "../../repositories/lists";
+import { useListsViewModel } from "./listsViewModel";
+import { LoaderTypes } from "../../components/screenLoader";
 
 export default function ListsScreen() {
   const theme = useTheme();
@@ -92,9 +93,16 @@ export default function ListsScreen() {
               <Text numberOfLines={2} style={commonStyles.tinyText}>
                 {item.description}
               </Text>
-              <Text numberOfLines={2} style={commonStyles.tinyText}>
-                {completedCount}/{totalCount} items completed
-              </Text>
+              <Row alignItems="center" gap={4}>
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={12}
+                  color={theme.colors.success}
+                />
+                <Text numberOfLines={2} style={commonStyles.tinyText}>
+                  {completedCount}/{totalCount} items completed
+                </Text>
+              </Row>
             </Column>
 
             <Row justifyContent="space-between" alignItems="center" gap={6}>
@@ -110,9 +118,16 @@ export default function ListsScreen() {
                   withName
                 />
               </Row>
-              <Text numberOfLines={1} style={commonStyles.tTinyText}>
-                {formatDate(item?.createdAt)}
-              </Text>
+              <Row alignItems="center" gap={4}>
+                <Ionicons
+                  name="time-outline"
+                  size={12}
+                  color={theme.colors.textLight}
+                />
+                <Text numberOfLines={1} style={commonStyles.tTinyText}>
+                  {formatDate(item?.createdAt)}
+                </Text>
+              </Row>
             </Row>
           </Column>
         </CardWrapper>
@@ -161,6 +176,7 @@ export default function ListsScreen() {
             button={() => fetchLists(1, true)}
             loading={initialLoading}
             error={!!error?.length}
+            type={LoaderTypes.ListScreen}
           />
         )}
       </View>

@@ -84,7 +84,7 @@ export function useHelper() {
         break;
       case "list":
         if (notData.listId) {
-          navigation.navigate(ROUTES.VIEW_LIST, { noteId: notData.listId });
+          navigation.navigate(ROUTES.VIEW_LIST, { listId: notData.listId });
         } else {
           navigation.navigate(ROUTES.LISTS);
         }
