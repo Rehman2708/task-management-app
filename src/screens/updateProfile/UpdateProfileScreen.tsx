@@ -114,6 +114,7 @@ const UpdateProfileScreen = () => {
         title="About"
         onChangeText={setUserAbout}
         value={userAbout}
+        multiline
       />
       {hasChanges && (
         <CustomButton

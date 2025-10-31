@@ -82,9 +82,9 @@ const CustomHeader = ({
                   <View style={{ width: dimensions.width - 150 }}>
                     <TextTicker
                       duration={
-                        (loggedInUser.partner.about
+                        (loggedInUser?.partner?.about
                           ? loggedInUser.partner.about.length
-                          : loggedInUser.about.length ?? 0) * 100
+                          : loggedInUser?.about?.length ?? 0) * 120
                       }
                       loop
                       bounce

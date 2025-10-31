@@ -125,6 +125,7 @@ const NotificationScreen = () => {
           // commonStyles.cardContainer,
           {
             backgroundColor: bgColor,
+            borderColor: theme.colors.border,
             borderBottomWidth: 1,
             paddingVertical: 16,
             paddingHorizontal: 16,
@@ -176,12 +177,7 @@ const NotificationScreen = () => {
           }
           ListFooterComponent={
             loadingMore ? (
-              <View style={{ paddingVertical: theme.spacing.md }}>
-                <ActivityIndicator
-                  size="small"
-                  color={themeColor.dark ?? theme.colors.primary}
-                />
-              </View>
+              <ScreenLoader count={4} type={LoaderTypes.NotificationScreen} />
             ) : null
           }
         />

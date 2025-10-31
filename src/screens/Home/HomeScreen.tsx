@@ -18,7 +18,7 @@ import { useTheme } from "../../infrastructure/theme";
 import { useUtilStore } from "../../store/utils";
 import { Row } from "../../tools";
 import { useHomeScreenViewModel } from "./homeViewModel";
-import { LoaderTypes } from "../../components/screenLoader";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 
 export default function HomeScreen({ navigation }: any) {
   const {
@@ -49,12 +49,7 @@ export default function HomeScreen({ navigation }: any) {
 
   const renderFooter = () =>
     tab === "History" && loadingMore ? (
-      <View style={{ paddingVertical: theme.spacing.md }}>
-        <ActivityIndicator
-          size="small"
-          color={themeColor.dark ?? theme.colors.primary}
-        />
-      </View>
+      <ScreenLoader type={LoaderTypes.TaskScreen} count={4} />
     ) : null;
 
   return (
@@ -89,7 +84,7 @@ export default function HomeScreen({ navigation }: any) {
 
       <View style={[commonStyles.screenWrapper]}>
         {/* Empty State */}
-        {tasks?.length === 0 ? (
+        {tasks?.length === 0 || loading ? (
           <EmptyState
             text={tab === "Active" ? "No active tasks" : "Nothing to show"}
             button={() => fetchTasks(1, true)}

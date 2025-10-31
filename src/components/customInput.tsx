@@ -55,10 +55,7 @@ const CustomInput = ({
 
   useEffect(() => {
     // Dynamically set maxChar if title contains specific keywords
-    if (
-      title?.toLowerCase().includes("title") ||
-      title?.toLowerCase().includes("about")
-    ) {
+    if (title?.toLowerCase().includes("title")) {
       setMaxChar(30);
     } else if (title?.toLowerCase().includes("description")) {
       setMaxChar(200);

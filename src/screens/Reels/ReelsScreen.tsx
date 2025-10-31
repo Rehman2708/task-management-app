@@ -15,6 +15,7 @@ import VideoItem from "../../components/VideoItem";
 import EmptyState from "../../components/emptyState";
 import { Spacer } from "../../tools";
 import { useTheme } from "../../infrastructure/theme";
+import { LoaderTypes } from "../../components/screenLoader";
 
 export default function ReelsScreen() {
   const {
@@ -139,6 +140,7 @@ export default function ReelsScreen() {
           loading={loading}
           error={error?.trim()?.length > 0 && false}
           button={() => fetchVideos(1, false)}
+          type={LoaderTypes.VideoScreen}
         />
       </SafeAreaView>
     );

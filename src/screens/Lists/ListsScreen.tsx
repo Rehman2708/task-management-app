@@ -23,7 +23,7 @@ import CustomInput from "../../components/customInput";
 import Avatar from "../../components/avatar";
 import { List } from "../../repositories/lists";
 import { useListsViewModel } from "./listsViewModel";
-import { LoaderTypes } from "../../components/screenLoader";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 
 export default function ListsScreen() {
   const theme = useTheme();
@@ -67,7 +67,7 @@ export default function ListsScreen() {
           style={[
             commonStyles.cardContainer,
             commonStyles.fullFlex,
-            { borderRightWidth: 1, borderBottomWidth: 1, padding: 0 },
+            { padding: 0 },
           ]}
         >
           {item.image && (
@@ -137,12 +137,7 @@ export default function ListsScreen() {
 
   const renderFooter = () =>
     loadingMore && page < totalPages ? (
-      <View style={{ paddingVertical: theme.spacing.md }}>
-        <ActivityIndicator
-          size="small"
-          color={themeColor.dark ?? theme.colors.primary}
-        />
-      </View>
+      <ScreenLoader type={LoaderTypes.ListScreen} count={3} />
     ) : null;
 
   return (

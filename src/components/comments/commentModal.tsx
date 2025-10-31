@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
@@ -17,6 +18,7 @@ import CustomInput from "../customInput";
 import CustomButton from "../customButton";
 import { useCommentsViewModel } from "./useCommentsViewModel";
 import { useEffect, useState } from "react";
+import { LoaderTypes } from "../screenLoader";
 
 type Props = {
   visible: boolean;
@@ -52,6 +54,7 @@ export default function GlobalCommentsModal({
     flatListRef,
     formatDate,
     isFetching,
+    initialLoading,
   } = useCommentsViewModel(
     fetchUrl,
     postUrl,
@@ -102,7 +105,7 @@ export default function GlobalCommentsModal({
         >
           <Row
             justifyContent="space-between"
-            style={{ paddingHorizontal: 6, paddingVertical: 20 }}
+            style={{ paddingHorizontal: 6, paddingVertical: 16 }}
           >
             <Text style={commonStyles.subTitleText}>Comments</Text>
             <Ionicons
@@ -118,45 +121,53 @@ export default function GlobalCommentsModal({
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
           >
-            <FlatList
-              ref={flatListRef}
-              data={comments}
-              extraData={comments}
-              keyExtractor={(item, index) =>
-                item._id ? item._id.toString() : `${item.by}-${index}`
-              }
-              keyboardShouldPersistTaps="handled"
-              contentContainerStyle={{
-                paddingHorizontal: 12,
-                paddingBottom: 10,
-                flexGrow: 1,
-              }}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item: c, index }) => {
-                const prev = comments[index - 1];
-                const sameUser =
-                  index > 0 &&
-                  (c.createdBy || c.by) === (prev?.createdBy || prev?.by);
-                return (
-                  <CommentCard
-                    image={c.createdByDetails?.image}
-                    text={c.text}
-                    name={c.createdByDetails?.name ?? c.createdBy ?? c.by}
-                    userId={c.createdBy || c.by}
-                    time={formatDate(c.createdAt!)}
-                    repeated={sameUser}
-                  />
-                );
-              }}
-              ListEmptyComponent={<EmptyState text="No Comments" />}
-            />
+            {initialLoading || !comments?.length ? (
+              <EmptyState
+                text="No Comments"
+                loading={initialLoading}
+                type={LoaderTypes.Comment}
+              />
+            ) : (
+              <FlatList
+                ref={flatListRef}
+                data={comments}
+                extraData={comments}
+                keyExtractor={(item, index) =>
+                  item._id ? item._id.toString() : `${item.by}-${index}`
+                }
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{
+                  paddingHorizontal: 12,
+                  paddingBottom: 10,
+                  flexGrow: 1,
+                }}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item: c, index }) => {
+                  const prev = comments[index - 1];
+                  const sameUser =
+                    index > 0 &&
+                    (c.createdBy || c.by) === (prev?.createdBy || prev?.by);
+                  return (
+                    <CommentCard
+                      image={c.createdByDetails?.image}
+                      text={c.text}
+                      name={c.createdByDetails?.name ?? c.createdBy ?? c.by}
+                      userId={c.createdBy || c.by}
+                      time={formatDate(c.createdAt!)}
+                      repeated={sameUser}
+                    />
+                  );
+                }}
+                ListEmptyComponent={<EmptyState text="No Comments" />}
+              />
+            )}
 
             <View
               style={{
                 flexDirection: "row",
                 gap: 8,
                 alignItems: "center",
-                marginBottom: !isAndroid ? 20 : 10,
+                marginBottom: !isAndroid ? 20 : 0,
                 paddingHorizontal: 8,
               }}
             >

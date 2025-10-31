@@ -62,10 +62,10 @@ const CommentCard = ({
               : `${themeColor.dark}`,
             paddingHorizontal: 14,
             paddingVertical: 6,
-            borderRadius: 26,
+            borderRadius: 16,
             maxWidth: dimensions.width - 120,
-            borderBottomLeftRadius: isMyChat ? 26 : repeated ? 26 : 16,
-            borderBottomRightRadius: !isMyChat ? 26 : repeated ? 26 : 16,
+            borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
+            borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
           }}
         >
           <Text style={[commonStyles.smallText, { color: "#fff" }]}>

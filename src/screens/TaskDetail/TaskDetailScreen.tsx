@@ -272,9 +272,9 @@ export default function TaskDetailScreen({ route }: any) {
                   />
                 </Row>
 
-                <Row alignItems="flex-start">
+                <Row alignItems="center" gap={4}>
                   <Text style={commonStyles.tinyText}>
-                    Assigned To: {task.assignedTo}{" "}
+                    Assigned To: {task.assignedTo}
                   </Text>
                   <AssignedIcon
                     type={task.assignedTo}

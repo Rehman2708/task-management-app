@@ -29,7 +29,7 @@ export function useCommentsViewModel(
 ) {
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
-
+  const [initialLoading, setInitialLoading] = useState(true);
   const [comments, setComments] = useState<IComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [addingComment, setAddingComment] = useState(false);
@@ -60,19 +60,21 @@ export function useCommentsViewModel(
   const fetchComments = async () => {
     if (fetchingRef.current) return;
     fetchingRef.current = true;
+
     try {
       const response = await fetch(fetchUrl);
       const res = await response.json();
+
       if (Array.isArray(res)) {
         setComments(res);
-      }
-      if (res?.comments) {
+      } else if (res?.comments) {
         setComments(res.comments);
       }
     } catch (err) {
       console.error("fetchComments error:", err);
     } finally {
       fetchingRef.current = false;
+      setInitialLoading(false); // ✅ only affects first load
     }
   };
 
@@ -127,5 +129,6 @@ export function useCommentsViewModel(
     flatListRef,
     formatDate,
     isFetching,
+    initialLoading,
   };
 }

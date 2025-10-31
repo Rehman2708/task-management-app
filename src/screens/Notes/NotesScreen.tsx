@@ -23,7 +23,7 @@ import CardWrapper from "../../components/cardWrapper";
 import { useUtilStore } from "../../store/utils";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
-import { LoaderTypes } from "../../components/screenLoader";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 
 export default function NotesScreen() {
   const theme = useTheme();
@@ -64,7 +64,7 @@ export default function NotesScreen() {
         style={[
           commonStyles.cardContainer,
           commonStyles.fullFlex,
-          { borderRightWidth: 1, borderBottomWidth: 1, padding: 0 },
+          { padding: 0 },
         ]}
       >
         {item.image && (
@@ -129,12 +129,7 @@ export default function NotesScreen() {
 
   const renderFooter = () =>
     loadingMore && page < totalPages ? (
-      <View style={{ paddingVertical: theme.spacing.md }}>
-        <ActivityIndicator
-          size="small"
-          color={themeColor.dark ?? theme.colors.primary}
-        />
-      </View>
+      <ScreenLoader type={LoaderTypes.NotesScreen} count={4} />
     ) : null;
 
   return (
