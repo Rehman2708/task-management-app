@@ -195,7 +195,10 @@ export default function CreateVideoScreen() {
           <Spacer size={12} />
 
           {loadingVideos ? (
-            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <ActivityIndicator
+              size="large"
+              color={themeColor.dark ?? theme.colors.primary}
+            />
           ) : (
             <>
               <FlatList

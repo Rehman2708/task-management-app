@@ -220,9 +220,16 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
       keyExtractor={(_, i) => i.toString()}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.listContainer}
-      renderItem={() => (
-        <Row alignItems="center" style={[styles.taskCard, { padding: 0 }]}>
-          <ShimmerBlock height={110} width={120} radius={0} />
+      renderItem={({ item, index }) => (
+        <Row
+          alignItems="center"
+          style={[styles.taskCard, { padding: 0, height: 110 }]}
+        >
+          {index % getRandomInt(0, 5) ? (
+            <ShimmerBlock height={"100%"} width={120} radius={0} />
+          ) : (
+            <></>
+          )}
           <Spacer position="right" size={12} />
           <View style={styles.taskTextContainer}>
             {renderLines(5, ["60%", "95%", "40%", "80%", "95%"])}

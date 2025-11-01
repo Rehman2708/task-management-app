@@ -107,7 +107,7 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({
   const barColor = colorValue.interpolate({
     inputRange: [0, 1],
     outputRange: [
-      duration ? themeColor.dark : theme.colors.border,
+      duration ? themeColor.dark : themeColor.light,
       themeColor.dark,
     ],
   });

@@ -65,7 +65,7 @@ const FontScreen = () => {
             return (
               <TouchableOpacity
                 key={font}
-                onPress={() => handleFontChange(font)}
+                onPress={() => !loading && handleFontChange(font)}
                 activeOpacity={0.8}
                 style={{
                   borderRadius: 16,
@@ -78,6 +78,7 @@ const FontScreen = () => {
                   backgroundColor: isSelected
                     ? `${themeColor.light}/20`
                     : "transparent",
+                  opacity: loading ? 0.6 : 1,
                 }}
               >
                 <Row justifyContent="center" alignItems="center">

@@ -245,6 +245,9 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
         imageIndex={0}
         visible={showImage}
         onRequestClose={() => setShowImage(false)}
+        presentationStyle="overFullScreen"
+        swipeToCloseEnabled
+        backgroundColor={theme.colors.background}
       />
     </>
   );

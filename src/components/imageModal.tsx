@@ -176,7 +176,10 @@ const ImageModal = ({
           images={[currentImage]}
           imageIndex={0}
           visible={visible}
+          swipeToCloseEnabled
+          backgroundColor={theme.colors.background}
           onRequestClose={() => setIsVisible(false)}
+          presentationStyle="overFullScreen"
           FooterComponent={
             onChange
               ? () => (
@@ -198,14 +201,14 @@ const ImageModalStyle = (theme: any) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: "#00000066",
+      backgroundColor: "#000000b3",
       justifyContent: "center",
       alignItems: "center",
     },
     modalContent: {
       width: "90%",
       maxHeight: "70%",
-      backgroundColor: "#fff",
+      backgroundColor: theme.colors.background,
       borderRadius: 16,
       padding: 16,
     },

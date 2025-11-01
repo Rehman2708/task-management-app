@@ -8,7 +8,6 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
-  View,
 } from "react-native";
 import { useTheme } from "../../infrastructure/theme";
 import { useProfileViewModel } from "./profileViewModal";
@@ -48,6 +47,7 @@ export default function ProfileScreen() {
   const { getInitials, themeColor } = useHelper();
   const [visible, setIsVisible] = useState(false);
   const [currentImage, setCurrentImage] = useState({});
+  const [footerText, setFooterText] = useState(user?.about);
 
   return (
     <ScreenWrapper title="Profile">
@@ -86,6 +86,7 @@ export default function ProfileScreen() {
                     onPress={() => {
                       if (user?.image) {
                         setCurrentImage({ uri: user.image });
+                        setFooterText(user.about);
                         setIsVisible(true);
                       }
                     }}
@@ -126,6 +127,7 @@ export default function ProfileScreen() {
                       <Pressable
                         onPress={() => {
                           setCurrentImage({ uri: partnerImage });
+                          setFooterText(user?.partner?.about);
                           setIsVisible(true);
                         }}
                       >
@@ -291,9 +293,22 @@ export default function ProfileScreen() {
       )}
       <ImageView
         images={[currentImage]}
+        swipeToCloseEnabled
+        backgroundColor={theme.colors.background}
         imageIndex={0}
         visible={visible}
         onRequestClose={() => setIsVisible(false)}
+        presentationStyle="overFullScreen"
+        FooterComponent={() => (
+          <Text
+            style={[
+              commonStyles.titleText,
+              { textAlign: "center", paddingBottom: 16 },
+            ]}
+          >
+            {footerText}
+          </Text>
+        )}
       />
     </ScreenWrapper>
   );
