@@ -8,6 +8,19 @@ import { useCommonStyles } from "./src/styles/commonstyles";
 import { FontAsset } from "./assets/fonts";
 import { useTheme } from "./src/infrastructure/theme";
 import { StatusBar } from "react-native";
+import {
+  handleNotificationNavigation,
+  navigationRef,
+} from "./src/utils/navigation";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function App() {
   const [fontsLoaded] = useFonts(FontAsset);
@@ -15,6 +28,30 @@ export default function App() {
   const commonStyles = useCommonStyles(theme);
   useEffect(() => {
     getNotificationPermission();
+  }, []);
+
+  useEffect(() => {
+    let isReady = false;
+    const timer = setTimeout(() => {
+      isReady = true;
+    }, 500);
+
+    const subscription = Notifications.addNotificationReceivedListener(
+      () => {}
+    );
+
+    const responseSubscription =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        const notData = response?.notification?.request?.content?.data;
+        if (isReady) handleNotificationNavigation(notData);
+        else setTimeout(() => handleNotificationNavigation(notData), 500);
+      });
+
+    return () => {
+      clearTimeout(timer);
+      subscription.remove();
+      responseSubscription.remove();
+    };
   }, []);
 
   if (!fontsLoaded) {
@@ -30,7 +67,7 @@ export default function App() {
         },
       ]}
     >
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <StatusBar backgroundColor={"#00000030"} translucent />
         <AppNavigator />
       </NavigationContainer>

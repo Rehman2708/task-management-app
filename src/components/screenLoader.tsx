@@ -112,8 +112,10 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         style={{ marginBottom: i < count - 1 ? 8 : 0 }}
       />
     ));
+
   const getRandomInt = (min: number, max: number) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
+
   const renderCommentLoader = () => (
     <Column gap={8} style={{ paddingHorizontal: 12, flex: 1 }}>
       {Array.from({ length: 15 }).map((_, i) => {
@@ -161,7 +163,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
       <View style={{ flex: 1 }} />
       <Row alignItems="flex-end" justifyContent="space-between">
         <Row alignItems="center" gap={12}>
-          <ShimmerBlock height={60} width={60} radius={100} />
+          <ShimmerBlock height={50} width={50} radius={100} />
           <View>{renderLines(2, [150, 100])}</View>
         </Row>
         <Column alignItems="center" gap={16}>
@@ -220,10 +222,10 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
       contentContainerStyle={styles.listContainer}
       renderItem={() => (
         <Row alignItems="center" style={[styles.taskCard, { padding: 0 }]}>
-          <ShimmerBlock height={90} width={110} radius={0} />
+          <ShimmerBlock height={110} width={120} radius={0} />
           <Spacer position="right" size={12} />
           <View style={styles.taskTextContainer}>
-            {renderLines(4, ["60%", "40%", "80%", "95%"])}
+            {renderLines(5, ["60%", "95%", "40%", "80%", "95%"])}
           </View>
         </Row>
       )}

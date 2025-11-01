@@ -25,7 +25,8 @@ export function useCommentsViewModel(
   visible: boolean,
   autoRefresh: boolean = true,
   refreshInterval: number = 5000,
-  subtask: string | undefined
+  subtask: string | undefined,
+  setCount: ((count: number) => void) | undefined
 ) {
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
@@ -67,8 +68,10 @@ export function useCommentsViewModel(
 
       if (Array.isArray(res)) {
         setComments(res);
+        if (setCount) setCount(res.length ?? 0);
       } else if (res?.comments) {
         setComments(res.comments);
+        if (setCount) setCount(res.comments.length ?? 0);
       }
     } catch (err) {
       console.error("fetchComments error:", err);
@@ -105,12 +108,15 @@ export function useCommentsViewModel(
       );
 
       if (subtask && res?.subtasks) {
-        setComments([
+        const comments = [
           ...res.subtasks.find((item: Subtask) => item._id === subtask)
             .comments,
-        ]);
+        ];
+        setComments(comments);
+        if (setCount) setCount(comments.length ?? 0);
       } else if (res?.comments) {
         setComments([...res.comments]);
+        if (setCount) setCount([...res.comments].length ?? 0);
       }
     } catch (err) {
       console.error("addComment error:", err);

@@ -59,6 +59,9 @@ export default function VideoItem({
   const [commentsModalVisible, setCommentsModalVisible] = useState(
     showComments ?? false
   );
+  const [totalComments, setTotalComments] = useState(
+    item?.comments?.length ?? 0
+  );
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const theme = useTheme();
@@ -185,7 +188,7 @@ export default function VideoItem({
                 size={35}
               />
               <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
-                {item.totalComments ?? 0}
+                {totalComments}
               </Text>
             </Column>
 
@@ -225,6 +228,7 @@ export default function VideoItem({
         fetchUrl={`${AppUrl.getVideoComments(item._id)}`}
         postUrl={`${AppUrl.addVideoComment(item._id)}`}
         entityId={item._id}
+        setCount={setTotalComments}
       />
     </View>
   );

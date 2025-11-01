@@ -11,51 +11,16 @@ import { useTheme } from "../../infrastructure/theme";
 import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
 import { useHelper } from "../../utils/helper";
-import * as Notifications from "expo-notifications";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+import { IUser } from "../../types/auth";
 
 const SplashScreen = () => {
-  const { handleNotificationNavigation } = useHelper();
+  const { themeColor } = useHelper();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const { updateUser } = useAuthStore();
-  const { themeColor } = useHelper();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
 
-  // Notifications Setup
-  useEffect(() => {
-    let isReady = false;
-
-    const timer = setTimeout(() => {
-      isReady = true;
-    }, 500);
-
-    const subscription = Notifications.addNotificationReceivedListener(
-      () => {}
-    );
-    const responseSubscription =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        const notData = response?.notification?.request?.content?.data;
-        if (isReady) handleNotificationNavigation(notData);
-        else setTimeout(() => handleNotificationNavigation(notData), 500);
-      });
-
-    return () => {
-      clearTimeout(timer);
-      subscription.remove();
-      responseSubscription.remove();
-    };
-  }, []);
-
-  // Check if user already logged in
   const fetchUserDetails = async (id: string) => {
     try {
       setLoading(true);
@@ -78,25 +43,18 @@ const SplashScreen = () => {
       const { data: user, success } = await getDataFromAsyncStorage(
         LocalStorageKey.USER
       );
-      updateUser(user);
+      updateUser(user as IUser);
       fetchUserDetails(user?.userId!);
-      if (success && user) {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: ROUTES.TABS }],
-          })
-        );
-      } else {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: ROUTES.LOGIN }],
-          })
-        );
-      }
+
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
+        })
+      );
     })();
   }, []);
+
   return (
     <Column
       style={[
@@ -107,7 +65,7 @@ const SplashScreen = () => {
       alignItems="center"
     >
       <Logo />
-      {!loading && <ActivityIndicator size={"large"} color={themeColor.dark} />}
+      {!loading && <ActivityIndicator size="large" color={themeColor.dark} />}
     </Column>
   );
 };

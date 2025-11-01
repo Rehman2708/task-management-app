@@ -9,6 +9,10 @@ export function useTaskDetailViewModel(taskId: string) {
   const { refetchTask } = useUtilStore();
 
   const [task, setTask] = useState<any>(null);
+  const [taskCommentCount, setTaskCommentCount] = useState(0);
+  const [subtaskCommentCounts, setSubtaskCommentCounts] = useState<
+    Record<string, number>
+  >({});
   const [taskDetailLoading, setTaskDetailLoading] = useState(true);
   const [subtaskStatusLoading, setSubtaskStatusLoading] = useState<
     string | null
@@ -21,6 +25,16 @@ export function useTaskDetailViewModel(taskId: string) {
     try {
       const taskData = await TaskRepo.getTaskById(taskId);
       setTask(taskData);
+
+      // Set task comment count
+      setTaskCommentCount(taskData?.comments?.length ?? 0);
+
+      // Set subtask comment counts
+      const subtaskCounts: Record<string, number> = {};
+      taskData?.subtasks?.forEach((subtask: any) => {
+        subtaskCounts[subtask._id] = subtask?.comments?.length ?? 0;
+      });
+      setSubtaskCommentCounts(subtaskCounts);
     } catch (err: any) {
       console.error("Task fetch error:", err);
       setError(err.message || "Unable to load task details");
@@ -70,5 +84,9 @@ export function useTaskDetailViewModel(taskId: string) {
     fetchTaskDetail,
     updateSubtaskStatus,
     subtaskStatusLoading,
+    taskCommentCount,
+    setTaskCommentCount,
+    subtaskCommentCounts,
+    setSubtaskCommentCounts,
   };
 }

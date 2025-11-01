@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-} from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import { View, Text, FlatList, Pressable, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
@@ -12,11 +6,11 @@ import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, Row, Spacer } from "../../tools";
 import { useHelper } from "../../utils/helper";
-import { SubtaskStatus } from "../../enums/tasks";
+import { AssignedTo, SubtaskStatus } from "../../enums/tasks";
 import { AppUrl } from "../../utils/appUrl";
 
 import CustomButton from "../../components/customButton";
-import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
+import { LoaderTypes } from "../../components/screenLoader";
 import Avatar from "../../components/avatar";
 import EmptyState from "../../components/emptyState";
 import TimeLeftProgress from "../../components/timeLeftProgress";
@@ -41,6 +35,10 @@ export default function TaskDetailScreen({ route }: any) {
     fetchTaskDetail,
     updateSubtaskStatus,
     subtaskStatusLoading,
+    taskCommentCount,
+    setTaskCommentCount,
+    subtaskCommentCounts,
+    setSubtaskCommentCounts,
   } = useTaskDetailViewModel(taskId);
 
   const { formatDate } = useHelper();
@@ -52,18 +50,14 @@ export default function TaskDetailScreen({ route }: any) {
     visible: boolean;
     subtaskId?: string;
   }>({
-    visible:
-      (showComments && (!!commentSubtaskId || commentSubtaskId === "")) ??
-      false,
+    visible: !!showComments,
     subtaskId: commentSubtaskId ?? undefined,
   });
 
-  // Store the subtask that was last opened for comments
   const [lastCommentedSubtask, setLastCommentedSubtask] = useState<
     string | null
   >(null);
 
-  // Keep animated scale refs for each subtask
   const scaleAnimations = useRef<Record<string, Animated.Value>>({}).current;
 
   const getScaleAnim = useCallback(
@@ -102,9 +96,7 @@ export default function TaskDetailScreen({ route }: any) {
 
   const handleCloseComments = useCallback(() => {
     setCommentModal({ visible: false });
-    if (lastCommentedSubtask) {
-      triggerBounce(lastCommentedSubtask);
-    }
+    if (lastCommentedSubtask) triggerBounce(lastCommentedSubtask);
   }, [lastCommentedSubtask, triggerBounce]);
 
   const handleUpdateStatus = useCallback(
@@ -120,6 +112,7 @@ export default function TaskDetailScreen({ route }: any) {
           : `${theme.colors.error}20`;
 
       const scale = getScaleAnim(item._id);
+      const commentCount = subtaskCommentCounts[item._id] ?? 0;
 
       return (
         <Column
@@ -174,8 +167,7 @@ export default function TaskDetailScreen({ route }: any) {
                   />
                 </Animated.View>
                 <Text style={commonStyles.smallText}>
-                  {item.totalComments ?? 0} Comment
-                  {(item?.totalComments ?? 0) > 1 ? "s" : ""}
+                  {commentCount} Comment{commentCount > 1 ? "s" : ""}
                 </Text>
               </Row>
             </Pressable>
@@ -203,6 +195,7 @@ export default function TaskDetailScreen({ route }: any) {
       handleUpdateStatus,
       handleOpenComments,
       getScaleAnim,
+      subtaskCommentCounts,
     ]
   );
 
@@ -248,42 +241,26 @@ export default function TaskDetailScreen({ route }: any) {
                       color={theme.colors.text}
                     />
                     <Text style={commonStyles.smallText}>
-                      {task.totalComments ?? 0} Comment
-                      {(task?.totalComments ?? 0) > 1 ? "s" : ""}
+                      {taskCommentCount ?? 0} Comment
+                      {taskCommentCount > 1 ? "s" : ""}
                     </Text>
                   </Row>
                 </Pressable>
               </Row>
+
               {task.description && (
                 <Text style={commonStyles.smallText}>{task.description}</Text>
               )}
-
-              <Row justifyContent="space-between">
-                <Row alignItems="center">
-                  <Text style={commonStyles.tTinyText}>Creator: </Text>
-                  <Avatar
-                    name={
-                      task.createdByDetails
-                        ? task.createdByDetails.name.split(" ")[0]
-                        : task.createdBy
-                    }
-                    image={task.createdByDetails?.image}
-                    withName
-                  />
-                </Row>
-
-                <Row alignItems="center" gap={4}>
-                  <Text style={commonStyles.tinyText}>
-                    Assigned To: {task.assignedTo}
-                  </Text>
-                  <AssignedIcon
-                    type={task.assignedTo}
-                    size={12}
-                    color={theme.colors.text}
-                  />
-                </Row>
+              <Row justifyContent="flex-end" alignItems="center" gap={4}>
+                <Text style={[commonStyles.tinyText]}>
+                  For {task.assignedTo}
+                </Text>
+                <AssignedIcon
+                  type={task.assignedTo as AssignedTo}
+                  color={theme.colors.textLight}
+                  size={12}
+                />
               </Row>
-
               {task.subtasks?.length > 0 && (
                 <View style={styles.container}>
                   <Text style={commonStyles.subTitleText}>Subtasks</Text>
@@ -317,6 +294,15 @@ export default function TaskDetailScreen({ route }: any) {
         }
         entityId={taskId}
         subtask={commentModal.subtaskId}
+        setCount={
+          commentModal.subtaskId
+            ? (count: number) =>
+                setSubtaskCommentCounts((prev) => ({
+                  ...prev,
+                  [commentModal.subtaskId as string]: count,
+                }))
+            : setTaskCommentCount
+        }
       />
     </View>
   );

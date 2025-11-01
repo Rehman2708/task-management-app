@@ -17,6 +17,7 @@ import { useTheme } from "../../infrastructure/theme";
 import { Images } from "../../../assets/images/images";
 import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import Avatar from "../../components/avatar";
+import { handleNotificationNavigation } from "../../utils/navigation";
 
 interface NotificationItem {
   _id: string;
@@ -32,8 +33,7 @@ const PAGE_SIZE = 20;
 const NotificationScreen = () => {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-  const { loggedInUser, formatDate, themeColor, handleNotificationNavigation } =
-    useHelper();
+  const { loggedInUser, formatDate, themeColor } = useHelper();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

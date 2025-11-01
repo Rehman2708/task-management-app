@@ -170,6 +170,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 title="Subtask title"
                 value={subtask?.title}
                 onChangeText={(text) => vm.updateSubtask(index, "title", text)}
+                maxLength={50}
               />
               <Row justifyContent="space-between" alignItems="center">
                 <Row gap={isAndroid ? 5 : 6} alignItems="center">

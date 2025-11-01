@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import CardWrapper from "./cardWrapper";
 import { useTheme } from "../infrastructure/theme";
 import { AssignedIcon } from "../screens/CreateTask/components/subtaskItem";
-import { AssignedTo } from "../enums/tasks";
+import { AssignedTo, SubtaskStatus } from "../enums/tasks";
 
 const TasksCard = ({
   item,
@@ -97,19 +97,19 @@ const TasksCard = ({
               <Image
                 source={{ uri: item.image }}
                 style={{
-                  height: 90,
-                  width: 110,
+                  height: "100%",
+                  width: 120,
                   // borderRadius: 100,
                   backgroundColor: "#c0c0c0",
                 }}
               />
             )}
             <Column
-              gap={isAndroid ? 3 : 4}
+              gap={6}
               justifyContent="space-evenly"
               style={[
                 commonStyles.fullFlex,
-                { paddingHorizontal: 12, paddingVertical: 4, height: 90 },
+                { paddingHorizontal: 12, paddingVertical: 6 },
               ]}
             >
               <Row justifyContent="space-between" alignItems="center">
@@ -147,9 +147,36 @@ const TasksCard = ({
                     withName
                   />
                 </Row>
+                <Row alignItems="center" gap={6}>
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={14}
+                    color={theme.colors.textLight}
+                  />
+                  <Text style={commonStyles.tTinyText}>
+                    {item.totalComments ?? 0}
+                  </Text>
+                </Row>
+              </Row>
+              <Row justifyContent="space-between" alignItems="center">
+                <Row alignItems="center" gap={4}>
+                  <Ionicons
+                    name="checkmark-circle-outline"
+                    size={12}
+                    color={theme.colors.success}
+                  />
+                  <Text numberOfLines={2} style={commonStyles.tinyText}>
+                    {
+                      item.subtasks?.filter(
+                        (item) => item.status === SubtaskStatus.Completed
+                      ).length
+                    }
+                    /{item.subtasks?.length}
+                  </Text>
+                </Row>
                 <Row alignItems="center" gap={4}>
                   <Text style={[commonStyles.tTinyText]}>
-                    Assigned To: {item.assignedTo}
+                    For {item.assignedTo}
                   </Text>
                   <AssignedIcon
                     type={item.assignedTo as AssignedTo}

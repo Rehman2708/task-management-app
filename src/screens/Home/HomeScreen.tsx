@@ -49,7 +49,7 @@ export default function HomeScreen({ navigation }: any) {
 
   const renderFooter = () =>
     tab === "History" && loadingMore ? (
-      <ScreenLoader type={LoaderTypes.TaskScreen} count={4} />
+      <ScreenLoader type={LoaderTypes.TaskScreen} count={5} />
     ) : null;
 
   return (

@@ -1,12 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  Image,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
@@ -137,13 +130,21 @@ export default function ListsScreen() {
 
   const renderFooter = () =>
     loadingMore && page < totalPages ? (
-      <ScreenLoader type={LoaderTypes.ListScreen} count={3} />
+      <ScreenLoader type={LoaderTypes.ListScreen} count={4} />
     ) : null;
 
   return (
     <ScreenWrapper title="Lists" onSearchPress={toggleSearch}>
       <View style={commonStyles.screenWrapper}>
-        {lists?.length > 0 ? (
+        {lists?.length === 0 || initialLoading ? (
+          <EmptyState
+            text="No lists found"
+            button={() => fetchLists(1, true)}
+            loading={initialLoading}
+            error={!!error?.length}
+            type={LoaderTypes.ListScreen}
+          />
+        ) : (
           <>
             {showSearch && (
               <CustomInput
@@ -165,14 +166,6 @@ export default function ListsScreen() {
               // numColumns={2}
             />
           </>
-        ) : (
-          <EmptyState
-            text="No lists found"
-            button={() => fetchLists(1, true)}
-            loading={initialLoading}
-            error={!!error?.length}
-            type={LoaderTypes.ListScreen}
-          />
         )}
       </View>
 

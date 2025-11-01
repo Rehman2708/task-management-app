@@ -74,7 +74,7 @@ export default function NotesScreen() {
           />
         )}
         <Column
-          gap={6}
+          gap={7}
           style={[
             commonStyles.fullFlex,
             {
@@ -98,7 +98,7 @@ export default function NotesScreen() {
               {item.note}
             </Text>
           </Column>
-          <Column gap={6}>
+          <Column gap={8}>
             <Row alignItems="center">
               <Text style={commonStyles.tTinyText}>Creator: </Text>
               <Avatar
@@ -135,7 +135,15 @@ export default function NotesScreen() {
   return (
     <ScreenWrapper title="Notes" onSearchPress={toggleSearch}>
       <View style={commonStyles.screenWrapper}>
-        {notes?.length > 0 ? (
+        {notes?.length === 0 || initialLoading ? (
+          <EmptyState
+            text="No notes found"
+            button={() => fetchNotes(1, true)}
+            loading={initialLoading}
+            error={!!error?.length}
+            type={LoaderTypes.NotesScreen}
+          />
+        ) : (
           <>
             {showSearch && (
               <CustomInput
@@ -157,14 +165,6 @@ export default function NotesScreen() {
               numColumns={2}
             />
           </>
-        ) : (
-          <EmptyState
-            text="No notes found"
-            button={() => fetchNotes(1, true)}
-            loading={initialLoading}
-            error={!!error?.length}
-            type={LoaderTypes.NotesScreen}
-          />
         )}
       </View>
       <FloatingAdd onPress={() => navigation.navigate(ROUTES.CREATE_NOTE)} />

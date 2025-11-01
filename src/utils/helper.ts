@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Priority } from "../enums/tasks";
 import { useAuthStore } from "../store/authStore";
-import { useNavigation } from "@react-navigation/native";
-import { ROUTES } from "../enums/routes";
 import { useTheme } from "../infrastructure/theme";
 
 export function useHelper() {
@@ -69,65 +67,11 @@ export function useHelper() {
     return colors[priority] ?? "green";
   };
 
-  // notificationHelper.js
-  const navigation: any = useNavigation();
-  const handleNotificationNavigation = (notData: any) => {
-    if (!notData) return;
-
-    switch (notData.type) {
-      case "note":
-        if (notData.noteId) {
-          navigation.navigate(ROUTES.VIEW_NOTE, { noteId: notData.noteId });
-        } else {
-          navigation.navigate(ROUTES.NOTES);
-        }
-        break;
-      case "list":
-        if (notData.listId) {
-          navigation.navigate(ROUTES.VIEW_LIST, { listId: notData.listId });
-        } else {
-          navigation.navigate(ROUTES.LISTS);
-        }
-        break;
-      case "task":
-        if (notData.taskId) {
-          navigation.navigate(ROUTES.TASK_DETAIL, {
-            taskId: notData.taskId,
-            readOnly: !notData?.isActive,
-            showComments: notData.isComment,
-            commentSubtaskId: notData.commentSubtaskId,
-          });
-        } else {
-          navigation.navigate(ROUTES.TASKS);
-        }
-        break;
-
-      case "profile":
-        navigation.navigate(ROUTES.PROFILE);
-        break;
-
-      case "video":
-        if (notData.videoData) {
-          navigation.navigate(ROUTES.SINGLE_VIDEO, {
-            video: notData.videoData,
-            showComments: notData.isComment,
-          });
-        } else {
-          navigation.navigate(ROUTES.REELS);
-        }
-        break;
-
-      default:
-        break;
-    }
-  };
-
   return {
     loggedInUser,
     getInitials,
     themeColor,
     formatDate,
     getPriorityColor,
-    handleNotificationNavigation,
   };
 }

@@ -29,6 +29,7 @@ type Props = {
   autoRefresh?: boolean;
   refreshInterval?: number;
   subtask?: string;
+  setCount?: (count: number) => void;
 };
 
 export default function GlobalCommentsModal({
@@ -40,6 +41,7 @@ export default function GlobalCommentsModal({
   autoRefresh,
   refreshInterval,
   subtask,
+  setCount,
 }: Props) {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -62,7 +64,8 @@ export default function GlobalCommentsModal({
     visible,
     autoRefresh,
     refreshInterval,
-    subtask
+    subtask,
+    setCount
   );
 
   // 👇 Listen to keyboard open/close events
