@@ -65,7 +65,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
             multiline
           />
 
-          <Text style={commonStyles.smallText}>Assigned To</Text>
+          <Text style={commonStyles.smallText}>For</Text>
           <Row gap={isAndroid ? 14 : 16} alignItems="center">
             {["Me", "Partner", "Both"].map((option, index) => (
               <TouchableOpacity
@@ -84,7 +84,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                     type={option as AssignedTo}
                     color={
                       vm.assignedTo === option
-                        ? theme.colors.text
+                        ? theme.colors.white
                         : themeColor.dark
                     }
                   />
