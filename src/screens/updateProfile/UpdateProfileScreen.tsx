@@ -97,7 +97,7 @@ const UpdateProfileScreen = () => {
                 style={ProfileScreenStyles.deleteIcon}
                 onPress={() => setUserImage("")}
               >
-                <Ionicons name="trash" color={"#fff"} size={20} />
+                <Ionicons name="trash" color={theme.colors.white} size={20} />
               </Pressable>
             ) : null}
           </Row>

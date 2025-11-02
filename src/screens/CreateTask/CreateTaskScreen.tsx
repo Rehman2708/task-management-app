@@ -152,7 +152,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                   style={[
                     commonStyles.smallText,
                     vm.priority === option
-                      ? { color: "#fff" }
+                      ? { color: theme.colors.white }
                       : {
                           color: getPriorityColor(option as Priority),
                         },

@@ -21,7 +21,7 @@ export const createNoteStyle = (theme: any) =>
       fontSize: theme.fontSizes.md,
       fontFamily: theme.fonts.regular,
       color: theme.colors.text,
-      backgroundColor: "#fff",
+      backgroundColor: theme.colors.white,
       marginBottom: theme.spacing.md,
     },
     button: {
@@ -32,7 +32,7 @@ export const createNoteStyle = (theme: any) =>
       marginTop: theme.spacing.md,
     },
     buttonText: {
-      color: "#fff",
+      color: theme.colors.white,
       fontSize: theme.fontSizes.md,
       fontFamily: theme.fonts.medium,
     },
@@ -44,7 +44,7 @@ export const createNoteStyle = (theme: any) =>
       marginTop: theme.spacing.md,
     },
     deleteText: {
-      color: "#fff",
+      color: theme.colors.white,
       fontSize: theme.fontSizes.md,
       fontFamily: theme.fonts.medium,
     },

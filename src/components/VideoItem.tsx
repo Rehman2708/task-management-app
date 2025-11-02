@@ -131,12 +131,17 @@ export default function VideoItem({
               <Ionicons
                 onPress={() => navigation.goBack()}
                 name="chevron-back-outline"
-                color={"#fff"}
+                color={theme.colors.white}
                 size={30}
               />
             )}
             <Column gap={2}>
-              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
                 {item.title}
               </Text>
             </Column>
@@ -153,7 +158,7 @@ export default function VideoItem({
             <Ionicons
               name={muted ? "volume-mute-outline" : "volume-high-outline"}
               size={50}
-              color={"#fff"}
+              color={theme.colors.white}
             />
           )}
         </Column>
@@ -171,10 +176,17 @@ export default function VideoItem({
               image={item.createdByDetails?.image}
             />
             <Column gap={2}>
-              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
                 {item.createdByDetails?.name}
               </Text>
-              <Text style={[commonStyles.smallText, { color: "#fff" }]}>
+              <Text
+                style={[commonStyles.smallText, { color: theme.colors.white }]}
+              >
                 {formatDate(item.createdAt)}
               </Text>
             </Column>
@@ -184,10 +196,15 @@ export default function VideoItem({
               <Ionicons
                 onPress={() => setCommentsModalVisible(true)}
                 name="chatbubble-outline"
-                color={"#fff"}
+                color={theme.colors.white}
                 size={35}
               />
-              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
                 {totalComments}
               </Text>
             </Column>
@@ -196,13 +213,13 @@ export default function VideoItem({
               <Ionicons
                 onPress={handleViewed}
                 name="eye-outline"
-                color={"#fff"}
+                color={theme.colors.white}
                 size={35}
               />
             ) : (
               <Ionicons
                 name={isViewed ? "eye" : "eye-off"}
-                color={"#fff"}
+                color={theme.colors.white}
                 size={35}
               />
             )}
