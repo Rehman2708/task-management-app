@@ -17,6 +17,7 @@ import { useCommonStyles } from "../styles/commonstyles";
 const { width } = Dimensions.get("window");
 
 export enum LoaderTypes {
+  ImageModal = "ImageModal",
   Comment = "Comment",
   NotificationScreen = "notificationScreen",
   TaskScreen = "taskScreen",
@@ -119,6 +120,34 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
 
   const getRandomInt = (min: number, max: number) =>
     Math.floor(Math.random() * (max - min + 1)) + min;
+
+  const renderImageModalLoader = () => (
+    <FlatList
+      data={Array.from({ length: 9 })}
+      renderItem={({ item }) => (
+        <ShimmerBlock
+          height={100}
+          width={100}
+          radius={12}
+          style={{
+            borderWidth: 1,
+            borderColor: theme.colors.border,
+            margin: 4,
+          }}
+        />
+      )}
+      showsVerticalScrollIndicator={false}
+      keyExtractor={(_, index) => index.toString()}
+      numColumns={3}
+      contentContainerStyle={{
+        marginTop: 16,
+        paddingBottom: 30,
+      }}
+      columnWrapperStyle={{
+        justifyContent: "center",
+      }}
+    />
+  );
 
   const renderCommentLoader = () => (
     <Column gap={8} style={{ paddingHorizontal: 12, flex: 1 }}>
@@ -250,7 +279,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
     >
       {Array.from({ length: count ?? 10 }).map((_, i) => (
         <View key={i} style={[styles.notesCard, isList && { width: "100%" }]}>
-          <ShimmerBlock height={90} width="100%" radius={0} />
+          <ShimmerBlock height={80} width="100%" radius={0} />
           <View style={styles.notesContent}>
             {renderLines(isList ? 4 : 6, [
               "100%",
@@ -331,6 +360,8 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
 
   const renderLoader = () => {
     switch (type) {
+      case LoaderTypes.ImageModal:
+        return renderImageModalLoader();
       case LoaderTypes.Comment:
         return renderCommentLoader();
       case LoaderTypes.VideoScreen:

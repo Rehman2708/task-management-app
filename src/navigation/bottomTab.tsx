@@ -89,7 +89,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
               //             } else
 
               if (route.name === ROUTES.REELS) {
-                triggerVibration("medium");
+                triggerVibration("light");
                 refetchReels();
               }
             }

@@ -17,6 +17,8 @@ import CustomButton from "./customButton";
 import { useTheme } from "../infrastructure/theme";
 import ImageView from "react-native-image-viewing";
 import { useHelper } from "../utils/helper";
+import EmptyState from "./emptyState";
+import { LoaderTypes } from "./screenLoader";
 
 const ImageModal = ({
   onChange,
@@ -120,16 +122,14 @@ const ImageModal = ({
               />
             </Row>
 
-            {loading ? (
-              <ActivityIndicator
-                size="large"
-                color={themeColor.dark ?? theme.colors.primary}
-                style={styles.loader}
-              />
-            ) : error ? (
-              <Column justifyContent="center" alignItems="center">
-                <Text style={[commonStyles.errorText]}>{error}</Text>
-              </Column>
+            {loading || error.trim().length > 0 || images.length <= 0 ? (
+              <View style={{ minHeight: 370 }}>
+                <EmptyState
+                  text={error.trim().length > 0 ? error : "No Image"}
+                  loading={loading}
+                  type={LoaderTypes.ImageModal}
+                />
+              </View>
             ) : (
               <FlatList
                 keyboardShouldPersistTaps="handled"
@@ -152,11 +152,6 @@ const ImageModal = ({
                 keyExtractor={(_, index) => index.toString()}
                 numColumns={3}
                 contentContainerStyle={styles.listContent}
-                ListEmptyComponent={
-                  <Column justifyContent="center" alignItems="center">
-                    <Text style={commonStyles.basicText}>No Image</Text>
-                  </Column>
-                }
                 columnWrapperStyle={{
                   justifyContent: "center",
                 }}
