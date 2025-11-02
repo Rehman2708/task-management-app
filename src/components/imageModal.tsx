@@ -98,7 +98,7 @@ const ImageModal = ({
             (selectedImage ? (
               <Image style={styles.image} source={{ uri: selectedImage }} />
             ) : (
-              <Text style={commonStyles.titleText}>Add Image</Text>
+              <Text style={commonStyles.subTitleText}>Add Image</Text>
             ))}
         </Pressable>
       </Row>

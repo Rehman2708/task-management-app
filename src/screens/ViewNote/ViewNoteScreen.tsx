@@ -84,7 +84,11 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
       ]}
     >
       <>
-        <CollapsibleHeader headerImage={note?.image}>
+        <CollapsibleHeader
+          headerImage={note?.image}
+          title={note?.title}
+          subTitle={formatDate(note?.createdAt!)}
+        >
           {gettingNote ? (
             <EmptyState
               loading={gettingNote}

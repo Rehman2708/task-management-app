@@ -211,7 +211,11 @@ export default function TaskDetailScreen({ route }: any) {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <CollapsibleHeaderTabs headerImage={task?.image}>
+      <CollapsibleHeaderTabs
+        headerImage={task?.image}
+        title={task?.title}
+        subTitle={formatDate(task?.createdAt)}
+      >
         {error || taskDetailLoading ? (
           <EmptyState
             type={LoaderTypes.TaskDetailScreen}

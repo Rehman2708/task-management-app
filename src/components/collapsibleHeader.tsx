@@ -15,6 +15,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated as RNAnimated,
+  ImageBackground,
 } from "react-native";
 import Animated, {
   Extrapolate,
@@ -178,13 +179,13 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
       {/* Header Section */}
       <Animated.View style={[styles.headerContainer, headerImageStyle]}>
         {currentImageUri && (
-          <RNAnimated.Image
+          <ImageBackground
             source={{ uri: currentImageUri }}
             style={{
               ...StyleSheet.absoluteFillObject,
-              width: screenWidth,
-              height: headerHeight,
-              opacity: fadeAnim,
+              // width: screenWidth,
+              // height: headerHeight,
+              // opacity: fadeAnim,
             }}
             resizeMode="cover"
           />
@@ -197,10 +198,6 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
             backgroundColor: "#00000090",
           }}
         />
-
-        <Animated.View style={[commonStyles.fullFlex, blurStyle]}>
-          <BlurView intensity={100} tint="dark" style={commonStyles.fullFlex} />
-        </Animated.View>
       </Animated.View>
 
       {/* Top Navigation Bar */}
@@ -279,7 +276,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
               { minHeight: dimensions.height + insets.top + 50 },
             ]}
           >
-            {title && (
+            {/* {title && (
               <Text numberOfLines={3} style={commonStyles.titleText}>
                 {title}
               </Text>
@@ -291,7 +288,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
                   {subTitle}
                 </Text>
               </>
-            )}
+            )} */}
             <Spacer size={16} />
             {children}
           </View>

@@ -21,7 +21,7 @@ export interface List {
   };
   items: ListItem[];
   pinned?: boolean;
-  createdAt: string;
+  createdAt: string | Date;
   updatedAt: string;
 }
 

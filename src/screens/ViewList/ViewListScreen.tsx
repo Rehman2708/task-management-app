@@ -84,7 +84,11 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <CollapsibleHeader headerImage={list?.image}>
+      <CollapsibleHeader
+        headerImage={list?.image}
+        title={list?.title}
+        subTitle={formatDate(list?.createdAt!)}
+      >
         {loading ? (
           <EmptyState
             loading={loading}

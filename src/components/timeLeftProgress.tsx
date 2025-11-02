@@ -54,16 +54,16 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({
     const start = new Date(startTime).getTime();
     const end = new Date(endTime).getTime();
     const now = Date.now();
-    const twelveHours = 12 * 60 * 60 * 1000;
+    // const twelveHours = 12 * 60 * 60 * 1000;
     const totalDuration = end - start;
 
     // 🔴 Gap too large → keep empty
-    if (totalDuration > twelveHours || end <= start) {
-      animatedValue.setValue(0);
-      colorValue.setValue(0);
-      setPercentage(0);
-      return;
-    }
+    // if (totalDuration > twelveHours || end <= start) {
+    //   animatedValue.setValue(0);
+    //   colorValue.setValue(0);
+    //   setPercentage(0);
+    //   return;
+    // }
 
     const calculateProgress = () => {
       let progress = 0;
