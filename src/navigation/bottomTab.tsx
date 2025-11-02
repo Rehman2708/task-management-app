@@ -60,7 +60,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
     [ROUTES.LISTS]: "Lists",
     [ROUTES.PROFILE]: "Profile",
   };
-  const { themeColor } = useHelper();
+  const { themeColor, triggerVibration } = useHelper();
   return (
     <View style={styles.container}>
       <Row justifyContent="space-between" style={styles.tabBarContainer}>
@@ -89,6 +89,7 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
               //             } else
 
               if (route.name === ROUTES.REELS) {
+                triggerVibration("medium");
                 refetchReels();
               }
             }

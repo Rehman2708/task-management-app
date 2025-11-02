@@ -29,7 +29,7 @@ export function useCommentsViewModel(
   setCount: ((count: number) => void) | undefined
 ) {
   const { user } = useAuthStore();
-  const { formatDate } = useHelper();
+  const { formatDate, triggerVibration } = useHelper();
   const [initialLoading, setInitialLoading] = useState(true);
   const [comments, setComments] = useState<IComment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -121,6 +121,7 @@ export function useCommentsViewModel(
     } catch (err) {
       console.error("addComment error:", err);
     } finally {
+      triggerVibration("medium");
       setNewComment("");
       setAddingComment(false);
     }

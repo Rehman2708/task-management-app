@@ -27,7 +27,7 @@ const CustomHeader = ({
   hideNotificationButton,
 }: HeaderProps) => {
   const navigation: any = useNavigation();
-  const { loggedInUser } = useHelper();
+  const { loggedInUser, triggerVibration } = useHelper();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
 
@@ -41,11 +41,14 @@ const CustomHeader = ({
         <Row alignItems="center" gap={10}>
           {showBackbutton && (
             <TouchableOpacity
-              onPress={
-                onBackButtonPress
-                  ? onBackButtonPress
-                  : () => navigation.goBack()
-              }
+              onPress={() => {
+                triggerVibration("medium");
+                if (onBackButtonPress) {
+                  onBackButtonPress();
+                } else {
+                  navigation.goBack();
+                }
+              }}
             >
               <Ionicons
                 name="arrow-back-outline"

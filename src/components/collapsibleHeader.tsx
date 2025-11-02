@@ -28,6 +28,7 @@ import { useAuthStore } from "../store/authStore";
 import { useCommonStyles } from "../styles/commonstyles";
 import CustomHeader from "./CustomHeader";
 import { dimensions, Spacer } from "../tools";
+import { useHelper } from "../utils/helper";
 
 const { width: screenWidth } = Dimensions.get("window");
 export const HEADER_MAX_HEIGHT = 300;
@@ -56,6 +57,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
+  const { triggerVibration } = useHelper();
 
   const scrollY = useSharedValue(0);
   const [refreshing, setRefreshing] = useState(false);
@@ -157,7 +159,12 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
           { top: insets.top + 10 },
         ]}
       >
-        <TouchableOpacity onPress={navigation.goBack}>
+        <TouchableOpacity
+          onPress={() => {
+            triggerVibration("medium");
+            navigation.goBack();
+          }}
+        >
           <Ionicons
             name="arrow-back-outline"
             size={30}

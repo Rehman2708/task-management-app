@@ -3,10 +3,12 @@ import { TaskRepo } from "../../repositories/task";
 import { SubtaskStatus } from "../../enums/tasks";
 import { useAuthStore } from "../../store/authStore";
 import { useUtilStore } from "../../store/utils";
+import { useHelper } from "../../utils/helper";
 
 export function useTaskDetailViewModel(taskId: string) {
   const { user } = useAuthStore();
   const { refetchTask } = useUtilStore();
+  const { triggerVibration } = useHelper();
 
   const [task, setTask] = useState<any>(null);
   const [taskCommentCount, setTaskCommentCount] = useState(0);
@@ -67,6 +69,7 @@ export function useTaskDetailViewModel(taskId: string) {
       } catch (err) {
         console.error("Subtask update error:", err);
       } finally {
+        triggerVibration("heavy");
         setSubtaskStatusLoading(null);
       }
     },

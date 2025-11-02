@@ -13,7 +13,7 @@ import ImageModal from "../../components/imageModal";
 import { useState } from "react";
 import { Row } from "../../tools";
 import { useTheme } from "../../infrastructure/theme";
-
+import { useHelper } from "../../utils/helper";
 interface NoteDetailScreenProps {
   route: {
     params?: {
@@ -38,6 +38,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     noteImage,
   } = useNoteDetailViewModel(note);
   const theme = useTheme();
+  const { triggerVibration, themeColor } = useHelper();
   const commonStyles = useCommonStyles(theme);
   const styles = createNoteStyle(theme);
   const navigation: any = useNavigation();
@@ -77,10 +78,16 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
               <Switch
                 value={appendMode}
                 onValueChange={(v) => {
+                  triggerVibration();
                   setAppendMode(v);
                   if (v) setNoteText("");
                   else setNoteText(note.note);
                 }}
+                trackColor={{
+                  true: themeColor.light,
+                  false: theme.colors.border,
+                }}
+                thumbColor={themeColor.dark}
               />
             </Row>
           )}

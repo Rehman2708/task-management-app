@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Priority } from "../enums/tasks";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../infrastructure/theme";
+import { Vibration } from "react-native";
+import { isAndroid } from "../tools";
 
 export function useHelper() {
   const { user } = useAuthStore();
@@ -67,11 +69,16 @@ export function useHelper() {
     return colors[priority] ?? "green";
   };
 
+  const triggerVibration = (type: "light" | "medium" | "heavy" = "light") => {
+    Vibration.vibrate(type === "medium" ? 50 : type === "heavy" ? 100 : 15);
+  };
+
   return {
     loggedInUser,
     getInitials,
     themeColor,
     formatDate,
     getPriorityColor,
+    triggerVibration,
   };
 }
