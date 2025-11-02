@@ -17,7 +17,7 @@ import { useTheme } from "../../infrastructure/theme";
 import { Images } from "../../../assets/images/images";
 import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import Avatar from "../../components/avatar";
-import { handleNotificationNavigation } from "../../utils/navigation";
+import { handleNotificationNavigation } from "../../../notification";
 
 interface NotificationItem {
   _id: string;

@@ -100,12 +100,6 @@ export default function HomeScreen({ navigation }: any) {
             renderItem={({ item }) => (
               <TasksCard
                 item={item}
-                containerStyle={{
-                  backgroundColor: theme.colors.background,
-                  borderColor: `${
-                    themeColor?.light ?? theme.colors.secondary
-                  }20`,
-                }}
                 handleDelete={() => deleteTask(item._id!)}
                 isCompleted={tab === "History"}
               />

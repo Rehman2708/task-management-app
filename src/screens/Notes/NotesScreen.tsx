@@ -70,7 +70,11 @@ export default function NotesScreen() {
         {item.image && (
           <Image
             source={{ uri: item.image }}
-            style={{ width: "100%", height: 80 }}
+            style={{
+              width: "100%",
+              height: 80,
+              backgroundColor: theme.colors.loaderBg,
+            }}
           />
         )}
         <Column

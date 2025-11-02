@@ -5,6 +5,7 @@ import { isDarkMode, Row, Spacer } from "../tools";
 import { useTheme } from "../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useHelper } from "../utils/helper";
+import { useUtilStore } from "../store/utils";
 
 export interface TabIconProps {
   isFocused: boolean;
@@ -41,7 +42,7 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
           ? "red"
           : isFocused
           ? themeColor?.dark ?? theme.colors.primary
-          : theme.colors.border
+          : theme.colors.textLight
       }
     />
   );
@@ -49,6 +50,8 @@ const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
 
 const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
   const theme = useTheme();
+  const { refetchLists, refetchTask, refetchNotes, refetchReels } =
+    useUtilStore();
   const styles = useBottomTabStyles(theme);
   const routeTitles: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "Tasks",
@@ -76,6 +79,18 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
                 screen: route.name,
                 isBottomTab: true,
               });
+            } else {
+              // if (route.name === ROUTES.TASKS) {
+              //               refetchTask();
+              //             } else if (route.name === ROUTES.NOTES) {
+              //               refetchNotes();
+              //             } else if (route.name === ROUTES.LISTS) {
+              //               refetchLists();
+              //             } else
+
+              if (route.name === ROUTES.REELS) {
+                refetchReels();
+              }
             }
           };
 
@@ -118,8 +133,9 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
 const useBottomTabStyles = (theme: any) => {
   return StyleSheet.create({
     container: {
-      borderTopColor: isDarkMode ? "#000" : `${theme.colors.border}`,
       borderTopWidth: 1,
+      borderTopColor: `${theme.colors.border}`,
+      backgroundColor: theme.colors.background,
     },
     tabBarContainer: {
       backgroundColor: theme.colors.background,
@@ -132,8 +148,7 @@ const useBottomTabStyles = (theme: any) => {
     },
     tabLabel: {
       fontSize: theme.fontSizes.sm,
-      color: theme.colors.border,
-      // width: 85,
+      color: theme.colors.textLight,
       textAlign: "center",
       fontFamily: theme.fonts.regular,
     },

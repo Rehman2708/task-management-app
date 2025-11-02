@@ -16,6 +16,7 @@ import EmptyState from "../../components/emptyState";
 import { Spacer } from "../../tools";
 import { useTheme } from "../../infrastructure/theme";
 import { LoaderTypes } from "../../components/screenLoader";
+import { useUtilStore } from "../../store/utils";
 
 export default function ReelsScreen() {
   const {
@@ -39,6 +40,7 @@ export default function ReelsScreen() {
     onRefresh,
   } = useReelsViewModal();
   const { themeColor } = useHelper();
+  const { fetchingReels } = useUtilStore();
   const theme = useTheme();
   const styles = reelsScreenStyles(theme);
   const flatListRef = useRef<FlatList<IVideo>>(null);
@@ -48,7 +50,7 @@ export default function ReelsScreen() {
 
   useEffect(() => {
     fetchVideos(1, false); // initial load
-  }, [fetchVideos]);
+  }, [fetchVideos, fetchingReels]);
 
   useFocusEffect(
     useCallback(() => {
@@ -188,7 +190,7 @@ export default function ReelsScreen() {
 
 const reelsScreenStyles = (theme: any) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.colors.background },
+    container: { flex: 1, backgroundColor: "#0e0e0e" },
     videoContainer: {
       width: "100%",
     },

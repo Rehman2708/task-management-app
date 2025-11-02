@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
@@ -141,7 +140,6 @@ export default function GlobalCommentsModal({
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{
                   paddingHorizontal: 12,
-                  paddingBottom: 10,
                   flexGrow: 1,
                 }}
                 showsVerticalScrollIndicator={false}

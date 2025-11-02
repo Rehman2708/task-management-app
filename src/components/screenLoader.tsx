@@ -40,7 +40,6 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
   const commonStyles = useCommonStyles(theme);
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
-  const baseColor = isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
   const highlightColor = themeColor?.dark ?? theme.colors.primary;
 
   useEffect(() => {
@@ -80,7 +79,12 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
       <View
         style={[
           styles.block,
-          { height, width, borderRadius: radius, backgroundColor: baseColor },
+          {
+            height,
+            width,
+            borderRadius: radius,
+            backgroundColor: theme.colors.loaderBg,
+          },
           style,
         ]}
       >
@@ -377,7 +381,7 @@ const screenLoaderStyles = (theme: any) => {
     taskCard: {
       ...commonStyles.cardContainer,
 
-      backgroundColor: "rgba(255,255,255,0.05)",
+      backgroundColor: "#ffffff0d",
       width: "100%",
     },
     taskTextContainer: {
@@ -391,7 +395,7 @@ const screenLoaderStyles = (theme: any) => {
     },
     notesCard: {
       ...commonStyles.cardContainer,
-      backgroundColor: "rgba(255,255,255,0.05)",
+      backgroundColor: "#ffffff0d",
       width: "48%",
       padding: 0,
     },

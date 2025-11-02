@@ -1,4 +1,3 @@
-// src/features/lists/viewListViewModel.ts
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { useUtilStore } from "../../store/utils";
@@ -12,12 +11,13 @@ export function useViewListViewModel(listId?: string) {
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
   const { user } = useAuthStore();
-  const { refetchLists, fetchingLists } = useUtilStore();
+  const { refetchLists } = useUtilStore();
 
   const getList = async () => {
+    if (!listId) return;
     try {
       setLoading(true);
-      const data = await ListsRepo.getSingleList(listId!);
+      const data = await ListsRepo.getSingleList(listId);
       setList(data);
     } catch (err: any) {
       console.error("Get list error:", err);
@@ -44,33 +44,36 @@ export function useViewListViewModel(listId?: string) {
 
   const toggleItemCompletion = async (index: number) => {
     if (!list) return;
-    try {
-      setUpdating(true);
-      const updatedItems = [...(list.items || [])];
-      updatedItems[index].completed = !updatedItems[index].completed;
 
-      // Send updated list to backend
-      const updated = await ListsRepo.updateList(list._id, {
-        title: list.title,
-        description: list.description,
-        items: updatedItems,
-        image: list.image ?? undefined,
-        userId: user?.userId ?? "",
-      });
+    const updatedItems = [...(list.items || [])];
+    updatedItems[index].completed = !updatedItems[index].completed;
+    setList({ ...list, items: updatedItems });
 
-      setList(updated);
-      refetchLists();
-    } catch (err: any) {
-      console.error("Toggle completion error:", err);
-      setError(err.message || "Failed to update list");
-    } finally {
-      setUpdating(false);
-    }
+    (async () => {
+      try {
+        await ListsRepo.updateList(list._id, {
+          title: list.title,
+          description: list.description,
+          items: updatedItems,
+          image: list.image ?? undefined,
+          userId: user?.userId ?? "",
+        });
+      } catch (err: any) {
+        console.error("Toggle completion error:", err);
+        setError(err.message || "Failed to update list");
+        setList((prev) => {
+          if (!prev) return prev;
+          const revert = [...prev.items];
+          revert[index].completed = !revert[index].completed;
+          return { ...prev, items: revert };
+        });
+      }
+    })();
   };
 
   useEffect(() => {
-    if (listId) getList();
-  }, [listId, fetchingLists]);
+    getList();
+  }, [listId]);
 
   return {
     list,

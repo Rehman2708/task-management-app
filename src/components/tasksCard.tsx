@@ -87,6 +87,7 @@ const TasksCard = ({
               padding: 0,
               borderLeftWidth: 3,
               borderStartColor: getPriorityColor(item?.priority!),
+              backgroundColor: theme.colors.background,
               ...containerStyle,
             },
           ]}
@@ -99,8 +100,7 @@ const TasksCard = ({
                 style={{
                   height: "100%",
                   width: 120,
-                  // borderRadius: 100,
-                  backgroundColor: "#c0c0c0",
+                  backgroundColor: theme.colors.loaderBg,
                 }}
               />
             )}

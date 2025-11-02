@@ -42,6 +42,7 @@
         {
           "icon": "./assets/images/logo.png",
           "color": "#00000000",
+          "vibrationPattern": [0, 100, 50, 300, 100, 300],
           "sounds": ["./assets/audio/notification.wav"]
         }
       ]

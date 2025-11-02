@@ -22,6 +22,7 @@ export function useTheme() {
       warning: "#ffa500",
       transparent: "transparent",
       white: "#ffffff",
+      loaderBg: isDarkMode ? "#ffffff14" : "#0000000f",
     },
     spacing: {
       xs: 4,
