@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 import { TaskRepo } from "../../repositories/task";
@@ -90,6 +90,10 @@ export function useHomeScreenViewModel() {
     ]);
   };
 
+  const taskImages: string[] = tasks
+    .map((task) => task.image)
+    .filter((img): img is string => !!img);
+
   return {
     tasks,
     loading,
@@ -100,5 +104,6 @@ export function useHomeScreenViewModel() {
     fetchTasks,
     loadMoreTasks,
     deleteTask,
+    taskImages,
   };
 }

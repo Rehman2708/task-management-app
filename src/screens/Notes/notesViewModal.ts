@@ -109,6 +109,10 @@ export function useNotesListViewModel(userId?: string) {
     setNotes(filtered);
   };
 
+  const noteImages: string[] = notes
+    .map((note) => note.image)
+    .filter((img): img is string => !!img);
+
   return {
     notes,
     initialLoading,
@@ -122,5 +126,6 @@ export function useNotesListViewModel(userId?: string) {
     totalPages,
     showSearch,
     toggleSearch,
+    noteImages,
   };
 }

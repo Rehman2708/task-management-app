@@ -1,7 +1,12 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import {
   Dimensions,
-  ImageBackground,
   RefreshControl,
   StyleSheet,
   TouchableOpacity,
@@ -9,6 +14,7 @@ import {
   Text,
   KeyboardAvoidingView,
   Platform,
+  Animated as RNAnimated,
 } from "react-native";
 import Animated, {
   Extrapolate,
@@ -36,7 +42,7 @@ export const HEADER_MIN_HEIGHT = 0;
 
 interface CollapsibleHeaderTabsProps {
   headerHeight?: number;
-  headerImage?: string;
+  headerImage?: string | string[];
   title?: string;
   subTitle?: string;
   children: React.ReactNode;
@@ -129,23 +135,69 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
     }
   }, [onRefresh]);
 
-  const backgroundSource = headerImage
-    ? { uri: headerImage }
-    : user?.image
-    ? { uri: user.image }
-    : undefined;
+  // -----------------------------
+  // Multi-image fade animation
+  // -----------------------------
+  const fadeAnim = useRef(new RNAnimated.Value(1)).current;
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const images = useMemo(() => {
+    if (headerImage) {
+      const arr = Array.isArray(headerImage) ? headerImage : [headerImage];
+      return arr.filter((i): i is string => !!i?.trim());
+    } else {
+      return [user?.image, user?.partner?.image].filter(Boolean) as string[];
+    }
+  }, [headerImage, user?.image, user?.partner?.image]);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      RNAnimated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => {
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+        RNAnimated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [images, fadeAnim]);
+
+  const currentImageUri = images[currentIndex];
 
   return (
     <>
       {/* Header Section */}
       <Animated.View style={[styles.headerContainer, headerImageStyle]}>
-        {backgroundSource && (
-          <ImageBackground
-            source={backgroundSource}
+        {currentImageUri && (
+          <RNAnimated.Image
+            source={{ uri: currentImageUri }}
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              width: screenWidth,
+              height: headerHeight,
+              opacity: fadeAnim,
+            }}
             resizeMode="cover"
-            style={StyleSheet.absoluteFill}
           />
         )}
+
+        {/* Black overlay */}
+        <RNAnimated.View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor: "#00000090",
+          }}
+        />
+
         <Animated.View style={[commonStyles.fullFlex, blurStyle]}>
           <BlurView intensity={100} tint="dark" style={commonStyles.fullFlex} />
         </Animated.View>
@@ -171,7 +223,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
             color={theme.colors.white}
           />
         </TouchableOpacity>
-        {headerImage && (
+        {currentImageUri && (
           <TouchableOpacity onPress={() => setShowImage(true)}>
             <Ionicons
               name="expand-outline"
@@ -182,7 +234,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
         )}
       </Animated.View>
 
-      {/* Sticky Header (Visible when collapsed) */}
+      {/* Sticky Header */}
       <Animated.View
         style={[
           styles.stickyHeader,
@@ -248,8 +300,8 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
 
       {/* Image Viewer */}
       <ImageView
-        images={headerImage ? [{ uri: headerImage }] : []}
-        imageIndex={0}
+        images={images.map((uri) => ({ uri }))}
+        imageIndex={currentIndex}
         visible={showImage}
         onRequestClose={() => setShowImage(false)}
         presentationStyle="overFullScreen"
@@ -279,7 +331,6 @@ const createStyles = (theme: any) =>
       alignItems: "center",
       justifyContent: "space-between",
     },
-
     stickyHeader: {
       zIndex: 20,
       borderBottomWidth: 1,

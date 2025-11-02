@@ -27,7 +27,8 @@ const ScreenWrapper = ({
   noPadding?: boolean;
   onBackButtonPress?: () => void;
   onSearchPress?: () => void;
-  image?: string;
+  image?: string | string[];
+
   hideNotificationButton?: boolean;
 }) => {
   const theme = useTheme();

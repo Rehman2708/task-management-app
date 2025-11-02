@@ -31,6 +31,7 @@ export default function HomeScreen({ navigation }: any) {
     deleteTask,
     tab,
     setTab,
+    taskImages,
   } = useHomeScreenViewModel();
 
   const { loggedInUser, themeColor } = useHelper();
@@ -53,7 +54,11 @@ export default function HomeScreen({ navigation }: any) {
     ) : null;
 
   return (
-    <ScreenWrapper showImage title={`Hey, ${loggedInUser?.name?.trim()}!`}>
+    <ScreenWrapper
+      image={taskImages}
+      showImage
+      title={`Hey, ${loggedInUser?.name?.trim()}!`}
+    >
       {/* Tabs */}
       <Row>
         {tabs.map((item, index) => (

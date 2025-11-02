@@ -38,6 +38,7 @@ export default function ListsScreen() {
     toggleSearch,
     showSearch,
     searchLists,
+    listImages,
   } = useListsViewModel();
 
   useEffect(() => {
@@ -138,7 +139,11 @@ export default function ListsScreen() {
     ) : null;
 
   return (
-    <ScreenWrapper title="Lists" onSearchPress={toggleSearch}>
+    <ScreenWrapper
+      title="Lists"
+      image={listImages}
+      onSearchPress={toggleSearch}
+    >
       <View style={commonStyles.screenWrapper}>
         {lists?.length === 0 || initialLoading ? (
           <EmptyState

@@ -233,7 +233,7 @@ export default function VideoItem({
             )}
           </Column>
         </Row>
-        <View style={{ height: 5 }}>
+        <View style={{ height: 4 }}>
           <ProgressBar currentTime={currentTime} duration={duration} />
         </View>
       </Pressable>
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
   overlayBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.20)",
+    backgroundColor: "#00000033",
     zIndex: 1,
   },
 });

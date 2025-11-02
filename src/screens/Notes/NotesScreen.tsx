@@ -43,6 +43,7 @@ export default function NotesScreen() {
     totalPages,
     showSearch,
     toggleSearch,
+    noteImages,
   } = useNotesListViewModel();
 
   const navigation: any = useNavigation();
@@ -137,7 +138,11 @@ export default function NotesScreen() {
     ) : null;
 
   return (
-    <ScreenWrapper title="Notes" onSearchPress={toggleSearch}>
+    <ScreenWrapper
+      title="Notes"
+      image={noteImages}
+      onSearchPress={toggleSearch}
+    >
       <View style={commonStyles.screenWrapper}>
         {notes?.length === 0 || initialLoading ? (
           <EmptyState

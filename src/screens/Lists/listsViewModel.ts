@@ -106,6 +106,10 @@ export function useListsViewModel(userId?: string) {
     setLists(filtered);
   };
 
+  const listImages: string[] = lists
+    .map((list) => list.image)
+    .filter((img): img is string => !!img);
+
   return {
     lists,
     initialLoading,
@@ -119,5 +123,6 @@ export function useListsViewModel(userId?: string) {
     totalPages,
     showSearch,
     toggleSearch,
+    listImages,
   };
 }
