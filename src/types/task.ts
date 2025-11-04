@@ -15,13 +15,14 @@ export interface SubtaskComment {
   };
 }
 export interface Subtask {
-  _id?: string;
+  _id: string;
   title: string;
   status?: SubtaskStatus;
-  dueDateTime: Date;
+  dueDateTime: string;
   completedAt?: string | Date | null;
   updatedBy?: string | null;
   comments?: SubtaskComment[];
+  totalComments?: number;
 }
 
 export interface Task {
@@ -46,6 +47,7 @@ export interface Task {
     image?: string;
     name?: string;
   };
+  totalComments: number;
 }
 
 // Payloads

@@ -23,6 +23,7 @@ import CardWrapper from "../../components/cardWrapper";
 import { useUtilStore } from "../../store/utils";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 
 export default function NotesScreen() {
   const theme = useTheme();
@@ -42,6 +43,7 @@ export default function NotesScreen() {
     totalPages,
     showSearch,
     toggleSearch,
+    noteImages,
   } = useNotesListViewModel();
 
   const navigation: any = useNavigation();
@@ -63,17 +65,21 @@ export default function NotesScreen() {
         style={[
           commonStyles.cardContainer,
           commonStyles.fullFlex,
-          { borderRightWidth: 1, borderBottomWidth: 1, padding: 0 },
+          { padding: 0 },
         ]}
       >
         {item.image && (
           <Image
             source={{ uri: item.image }}
-            style={{ width: "100%", height: 80 }}
+            style={{
+              width: "100%",
+              height: 80,
+              backgroundColor: theme.colors.loaderBg,
+            }}
           />
         )}
         <Column
-          gap={6}
+          gap={7}
           style={[
             commonStyles.fullFlex,
             {
@@ -93,11 +99,11 @@ export default function NotesScreen() {
                 <Ionicons size={16} color={themeColor.dark} name="pricetag" />
               )}
             </Row>
-            <Text numberOfLines={4} style={commonStyles.tinyText}>
+            <Text numberOfLines={3} style={commonStyles.tinyText}>
               {item.note}
             </Text>
           </Column>
-          <Column gap={6}>
+          <Column gap={8}>
             <Row alignItems="center">
               <Text style={commonStyles.tTinyText}>Creator: </Text>
               <Avatar
@@ -110,9 +116,16 @@ export default function NotesScreen() {
                 withName
               />
             </Row>
-            <Text numberOfLines={5} style={commonStyles.tTinyText}>
-              {formatDate(item?.createdAt)}
-            </Text>
+            <Row alignItems="center" gap={4}>
+              <Ionicons
+                name="time-outline"
+                size={12}
+                color={theme.colors.textLight}
+              />
+              <Text numberOfLines={1} style={commonStyles.tTinyText}>
+                {formatDate(item?.createdAt)}
+              </Text>
+            </Row>
           </Column>
         </Column>
       </CardWrapper>
@@ -121,18 +134,25 @@ export default function NotesScreen() {
 
   const renderFooter = () =>
     loadingMore && page < totalPages ? (
-      <View style={{ paddingVertical: theme.spacing.md }}>
-        <ActivityIndicator
-          size="small"
-          color={themeColor.dark ?? theme.colors.primary}
-        />
-      </View>
+      <ScreenLoader type={LoaderTypes.NotesScreen} count={4} />
     ) : null;
 
   return (
-    <ScreenWrapper title="Notes" onSearchPress={toggleSearch}>
+    <ScreenWrapper
+      title="Notes"
+      image={noteImages}
+      onSearchPress={toggleSearch}
+    >
       <View style={commonStyles.screenWrapper}>
-        {notes?.length > 0 ? (
+        {notes?.length === 0 || initialLoading ? (
+          <EmptyState
+            text="No notes found"
+            button={() => fetchNotes(1, true)}
+            loading={initialLoading}
+            error={!!error?.length}
+            type={LoaderTypes.NotesScreen}
+          />
+        ) : (
           <>
             {showSearch && (
               <CustomInput
@@ -154,13 +174,6 @@ export default function NotesScreen() {
               numColumns={2}
             />
           </>
-        ) : (
-          <EmptyState
-            text="No notes found"
-            button={() => fetchNotes(1, true)}
-            loading={initialLoading}
-            error={!!error?.length}
-          />
         )}
       </View>
       <FloatingAdd onPress={() => navigation.navigate(ROUTES.CREATE_NOTE)} />

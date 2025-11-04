@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "♥️ RMK",
+    "name": "♥️ 𝑅𝑀𝒦",
     "slug": "rmk",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/images/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -21,7 +21,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/androidLogo.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#000000"
       }
     },
     "ios": {
@@ -41,7 +41,8 @@
         "expo-notifications",
         {
           "icon": "./assets/images/logo.png",
-          "color": "#ffffff",
+          "color": "#00000000",
+          "vibrationPattern": [0, 100, 50, 300, 100, 300],
           "sounds": ["./assets/audio/notification.wav"]
         }
       ]

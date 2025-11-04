@@ -17,6 +17,8 @@ import { ROUTES } from "../enums/routes";
 import { useNavigation } from "@react-navigation/native";
 import CardWrapper from "./cardWrapper";
 import { useTheme } from "../infrastructure/theme";
+import { AssignedIcon } from "../screens/CreateTask/components/subtaskItem";
+import { AssignedTo, SubtaskStatus } from "../enums/tasks";
 
 const TasksCard = ({
   item,
@@ -64,7 +66,7 @@ const TasksCard = ({
           <Ionicons
             name={isCompleted ? "reload-outline" : "create-outline"}
             size={30}
-            color={themeColor.light}
+            color={themeColor.dark}
           />
         </Row>
       </Pressable>
@@ -85,6 +87,7 @@ const TasksCard = ({
               padding: 0,
               borderLeftWidth: 3,
               borderStartColor: getPriorityColor(item?.priority!),
+              backgroundColor: theme.colors.background,
               ...containerStyle,
             },
           ]}
@@ -95,19 +98,18 @@ const TasksCard = ({
               <Image
                 source={{ uri: item.image }}
                 style={{
-                  height: 90,
-                  width: 110,
-                  // borderRadius: 100,
-                  backgroundColor: "#c0c0c0",
+                  height: "100%",
+                  width: 120,
+                  backgroundColor: theme.colors.loaderBg,
                 }}
               />
             )}
             <Column
-              gap={isAndroid ? 3 : 4}
+              gap={6}
               justifyContent="space-evenly"
               style={[
                 commonStyles.fullFlex,
-                { paddingHorizontal: 12, paddingVertical: 4, height: 90 },
+                { paddingHorizontal: 12, paddingVertical: 6 },
               ]}
             >
               <Row justifyContent="space-between" alignItems="center">
@@ -118,9 +120,16 @@ const TasksCard = ({
                   {item.title}
                 </Text>
                 <Spacer size={20} position="right" />
-                <Text style={commonStyles.tTinyText}>
-                  {formatDate(item.createdAt)}
-                </Text>
+                <Row alignItems="center" gap={4}>
+                  <Ionicons
+                    name="time-outline"
+                    size={12}
+                    color={theme.colors.textLight}
+                  />
+                  <Text style={commonStyles.tTinyText}>
+                    {formatDate(item.createdAt)}
+                  </Text>
+                </Row>
               </Row>
               <Text numberOfLines={2} style={commonStyles.tinyText}>
                 {item.description || "No Description"}
@@ -138,10 +147,43 @@ const TasksCard = ({
                     withName
                   />
                 </Row>
-
-                <Text style={commonStyles.tTinyText}>
-                  Assigned To: {item.assignedTo}
-                </Text>
+                <Row alignItems="center" gap={6}>
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={14}
+                    color={theme.colors.textLight}
+                  />
+                  <Text style={commonStyles.tTinyText}>
+                    {item.totalComments ?? 0}
+                  </Text>
+                </Row>
+              </Row>
+              <Row justifyContent="space-between" alignItems="center">
+                <Row alignItems="center" gap={4}>
+                  <Ionicons
+                    name="checkmark-circle-outline"
+                    size={12}
+                    color={theme.colors.success}
+                  />
+                  <Text numberOfLines={2} style={commonStyles.tinyText}>
+                    {
+                      item.subtasks?.filter(
+                        (item) => item.status === SubtaskStatus.Completed
+                      ).length
+                    }
+                    /{item.subtasks?.length}
+                  </Text>
+                </Row>
+                <Row alignItems="center" gap={4}>
+                  <Text style={[commonStyles.tTinyText]}>
+                    For {item.assignedTo}
+                  </Text>
+                  <AssignedIcon
+                    type={item.assignedTo as AssignedTo}
+                    color={theme.colors.textLight}
+                    size={10}
+                  />
+                </Row>
               </Row>
             </Column>
           </Row>

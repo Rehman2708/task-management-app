@@ -1,12 +1,12 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/Home/HomeScreen";
-import HistoryScreen from "../screens/History/HistoryScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import NotesScreen from "../screens/Notes/NotesScreen";
 import { ROUTES } from "../enums/routes";
 import BottomTab from "./bottomTab";
 import ReelsScreen from "../screens/Reels/ReelsScreen";
+import ListsScreen from "../screens/Lists/ListsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -17,9 +17,9 @@ export default function Tabs() {
       tabBar={(props) => <BottomTab {...props} />}
     >
       <Tab.Screen name={ROUTES.TASKS} component={HomeScreen} />
-      <Tab.Screen name={ROUTES.HISTORY} component={HistoryScreen} />
-      <Tab.Screen name={ROUTES.REELS} component={ReelsScreen} />
       <Tab.Screen name={ROUTES.NOTES} component={NotesScreen} />
+      <Tab.Screen name={ROUTES.REELS} component={ReelsScreen} />
+      <Tab.Screen name={ROUTES.LISTS} component={ListsScreen} />
       <Tab.Screen name={ROUTES.PROFILE} component={ProfileScreen} />
     </Tab.Navigator>
   );

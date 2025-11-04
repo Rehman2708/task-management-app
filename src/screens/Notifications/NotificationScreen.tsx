@@ -12,11 +12,12 @@ import EmptyState from "../../components/emptyState";
 import { NotificationRepo } from "../../repositories/notification";
 import { useHelper } from "../../utils/helper";
 import { useCommonStyles } from "../../styles/commonstyles";
-import { Column, Row } from "../../tools";
+import { Column, Row, Spacer } from "../../tools";
 import { useTheme } from "../../infrastructure/theme";
 import { Images } from "../../../assets/images/images";
-import ScreenLoader from "../../components/screenLoader";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import Avatar from "../../components/avatar";
+import { handleNotificationNavigation } from "../../../notification";
 
 interface NotificationItem {
   _id: string;
@@ -32,8 +33,7 @@ const PAGE_SIZE = 20;
 const NotificationScreen = () => {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-  const { loggedInUser, formatDate, themeColor, handleNotificationNavigation } =
-    useHelper();
+  const { loggedInUser, formatDate, themeColor } = useHelper();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -125,6 +125,7 @@ const NotificationScreen = () => {
           // commonStyles.cardContainer,
           {
             backgroundColor: bgColor,
+            borderColor: theme.colors.border,
             borderBottomWidth: 1,
             paddingVertical: 16,
             paddingHorizontal: 16,
@@ -132,13 +133,14 @@ const NotificationScreen = () => {
         ]}
         onPress={() => handleNotification(item._id, item?.data)}
       >
-        <Row gap={12} alignItems="center">
+        <Row alignItems="center">
           {item?.data?.image && (
-            <Avatar disabled image={item.data.image} name="NA" size={36} />
+            <Avatar disabled image={item.data.image} name="NA" size={50} />
           )}
+          <Spacer size={12} position="right" />
           <Column gap={3} style={commonStyles.fullFlex}>
-            <Text style={commonStyles.basicText}>{item.title}</Text>
-            <Text style={commonStyles.tinyText}>{item.body}</Text>
+            <Text style={[commonStyles.basicText]}>{item.title}</Text>
+            <Text style={[commonStyles.tinyText]}>{item.body}</Text>
             <Text style={commonStyles.tTinyText}>
               {formatDate(item.createdAt)}
             </Text>
@@ -149,19 +151,24 @@ const NotificationScreen = () => {
   };
 
   return (
-    <ScreenWrapper noPadding title="Notifications" showBackbutton>
-      {loading && notifications.length === 0 && <ScreenLoader />}
-      {notifications.length === 0 && !loading ? (
+    <ScreenWrapper
+      noPadding
+      title="Notifications"
+      showBackbutton
+      hideNotificationButton
+    >
+      {notifications.length === 0 || loading ? (
         <EmptyState
           text="No notifications!"
           loading={loading}
           image={Images.noNotification}
+          type={LoaderTypes.NotificationScreen}
         />
       ) : (
         <FlatList
           showsVerticalScrollIndicator={false}
           data={notifications}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item, index) => String(index)}
           renderItem={renderItem}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}
@@ -170,12 +177,7 @@ const NotificationScreen = () => {
           }
           ListFooterComponent={
             loadingMore ? (
-              <View style={{ paddingVertical: theme.spacing.md }}>
-                <ActivityIndicator
-                  size="small"
-                  color={themeColor.dark ?? theme.colors.primary}
-                />
-              </View>
+              <ScreenLoader count={4} type={LoaderTypes.NotificationScreen} />
             ) : null
           }
         />

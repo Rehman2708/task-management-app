@@ -4,6 +4,7 @@ import { useCommonStyles } from "../styles/commonstyles";
 import CustomButton from "./customButton";
 import { Images } from "../../assets/images/images";
 import { useTheme } from "../infrastructure/theme";
+import ScreenLoader, { LoaderTypes } from "./screenLoader";
 
 const EmptyState = ({
   image = Images.noData,
@@ -11,17 +12,21 @@ const EmptyState = ({
   button,
   loading,
   error,
+  type,
 }: {
   image?: ImageSourcePropType;
   text: string;
   button?: () => void;
   loading?: boolean;
   error?: boolean;
+  type?: LoaderTypes;
 }) => {
   const errorImage = Images.error;
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-
+  if (loading) {
+    return <ScreenLoader type={type} />;
+  }
   return (
     <Column
       style={commonStyles.fullFlex}

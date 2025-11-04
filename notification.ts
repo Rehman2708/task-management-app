@@ -1,10 +1,21 @@
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { Platform } from "react-native";
+import { ROUTES } from "./src/enums/routes";
+import { createNavigationContainerRef } from "@react-navigation/native";
 
-async function ensurePermission() {
+export const navigationRef = createNavigationContainerRef();
+export let pendingNotificationData: any = null;
+let _launchedFromNotification = false;
+
+export const getLaunchedFromNotification = () => _launchedFromNotification;
+export const setLaunchedFromNotification = (value: boolean) => {
+  _launchedFromNotification = value;
+};
+
+export async function ensurePermission() {
   if (!Device.isDevice) {
-    console.log("Must use physical device for Push Notifications");
+    console.log("Must use a physical device for Push Notifications");
     return null;
   }
 
@@ -24,48 +35,32 @@ async function ensurePermission() {
   return finalStatus;
 }
 
-async function setupAndroidChannel() {
+async function setupAndroidChannels() {
   if (Platform.OS !== "android") return;
 
-  // Define your channels
   const channels = [
-    {
-      id: "note",
-      name: "Notes",
-      sound: "notification.wav", // must exist in your assets folder (if used)
-      importance: Notifications.AndroidImportance.DEFAULT,
-    },
-    {
-      id: "task",
-      name: "Tasks",
-      sound: "notification.wav",
-      importance: Notifications.AndroidImportance.HIGH,
-    },
-    {
-      id: "video",
-      name: "Videos",
-      sound: "notification.wav",
-      importance: Notifications.AndroidImportance.HIGH,
-    },
-    {
-      id: "profile",
-      name: "Profile Updates",
-      sound: "notification.wav",
-      importance: Notifications.AndroidImportance.DEFAULT,
-    },
+    { id: "note", name: "Notes" },
+    { id: "task", name: "Tasks" },
+    { id: "video", name: "Videos" },
+    { id: "profile", name: "Profile Updates" },
+    { id: "list", name: "List" },
   ];
 
-  // Create each channel
-  for (const channel of channels) {
-    await Notifications.setNotificationChannelAsync(channel.id, {
-      name: channel.name,
-      importance: channel.importance,
-      sound: channel.sound,
-      vibrationPattern: [0, 250, 250, 250],
+  for (const c of channels) {
+    await Notifications.setNotificationChannelAsync(c.id, {
+      name: c.name,
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 100, 50, 300, 100, 300],
+      sound: "notification.wav",
     });
   }
+}
 
-  console.log("✅ Android notification channels set up");
+export async function getNotificationPermission() {
+  const hasPermission = await ensurePermission();
+  if (!hasPermission) return null;
+  await setupAndroidChannels();
+  return true;
 }
 
 export async function registerForPushNotificationsAsync() {
@@ -78,14 +73,60 @@ export async function registerForPushNotificationsAsync() {
     })
   ).data;
 
-  await setupAndroidChannel();
+  await setupAndroidChannels();
   return token;
 }
 
-export async function getNotificationPermission() {
-  const hasPermission = await ensurePermission();
-  if (!hasPermission) return null;
-
-  await setupAndroidChannel();
-  return true;
+export function navigate(name: string, params?: any) {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate(name, params);
+  } else {
+    console.log("⏳ Navigation not ready yet, storing for later");
+  }
 }
+
+export const handleNotificationNavigation = (data?: any) => {
+  if (!data) return;
+
+  switch (data.type) {
+    case "note":
+      data.noteId
+        ? navigate(ROUTES.VIEW_NOTE, { noteId: data.noteId })
+        : navigate(ROUTES.NOTES);
+      break;
+
+    case "list":
+      data.listId
+        ? navigate(ROUTES.VIEW_LIST, { listId: data.listId })
+        : navigate(ROUTES.LISTS);
+      break;
+
+    case "task":
+      data.taskId
+        ? navigate(ROUTES.TASK_DETAIL, {
+            taskId: data.taskId,
+            readOnly: !data.isActive,
+            showComments: data.isComment,
+            commentSubtaskId: data.commentSubtaskId,
+          })
+        : navigate(ROUTES.TASKS);
+      break;
+
+    case "profile":
+      navigate(ROUTES.PROFILE);
+      break;
+
+    case "video":
+      data.videoData
+        ? navigate(ROUTES.SINGLE_VIDEO, {
+            video: data.videoData,
+            showComments: data.isComment,
+          })
+        : navigate(ROUTES.REELS);
+      break;
+
+    default:
+      console.log("Unhandled notification type:", data.type);
+      break;
+  }
+};

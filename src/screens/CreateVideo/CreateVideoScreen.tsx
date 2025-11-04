@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Modal,
   ActivityIndicator,
   FlatList,
@@ -23,7 +22,7 @@ import { useTheme } from "../../infrastructure/theme";
 import { useHelper } from "../../utils/helper";
 import { useCreateVideoViewModal } from "./useViewModal";
 import CommentCard from "../../components/commentCard";
-import { Column, Row, Spacer } from "../../tools";
+import { Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
 import { createVideoStyle } from "./styles";
 
@@ -101,7 +100,7 @@ export default function CreateVideoScreen() {
     <ScreenWrapper
       title="Add Video"
       showBackbutton
-      subTitle="Videos > Add Video"
+      // subTitle="Videos > Add Video"
     >
       <Row justifyContent="flex-end">
         <Text
@@ -196,7 +195,10 @@ export default function CreateVideoScreen() {
           <Spacer size={12} />
 
           {loadingVideos ? (
-            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <ActivityIndicator
+              size="large"
+              color={themeColor.dark ?? theme.colors.primary}
+            />
           ) : (
             <>
               <FlatList

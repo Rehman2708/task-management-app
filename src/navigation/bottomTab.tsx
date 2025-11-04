@@ -5,59 +5,93 @@ import { isDarkMode, Row, Spacer } from "../tools";
 import { useTheme } from "../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useHelper } from "../utils/helper";
+import { useUtilStore } from "../store/utils";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 
 export interface TabIconProps {
   isFocused: boolean;
   routeName: keyof typeof ROUTES;
   theme: any;
+  onPress: any;
 }
 
-const TabIcon: React.FC<TabIconProps> = ({ isFocused, routeName, theme }) => {
+const TabIcon: React.FC<TabIconProps> = ({
+  isFocused,
+  routeName,
+  theme,
+  onPress,
+}) => {
   const icons: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "book-outline",
-    [ROUTES.HISTORY]: "time-outline",
     [ROUTES.REELS]: "heart-outline",
     [ROUTES.NOTES]: "document-text-outline",
+    [ROUTES.LISTS]: "list-circle-outline",
     [ROUTES.PROFILE]: "person-outline",
   };
 
   const activeIcons: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "book",
-    [ROUTES.HISTORY]: "time",
     [ROUTES.REELS]: "heart",
     [ROUTES.NOTES]: "document-text",
+    [ROUTES.LISTS]: "list-circle",
     [ROUTES.PROFILE]: "person",
   };
 
   const iconName = isFocused ? activeIcons[routeName] : icons[routeName];
   const { themeColor } = useHelper();
 
+  // Animation for icon scale
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <Ionicons
-      name={iconName}
-      size={24}
-      color={
-        iconName === "heart"
-          ? "red"
-          : isFocused
-          ? themeColor?.dark ?? theme.colors.primary
-          : theme.colors.border
-      }
-    />
+    <Pressable
+      onPressIn={() => {
+        scale.value = withSpring(1.2, { damping: 7, stiffness: 200 });
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, { damping: 7, stiffness: 200 });
+      }}
+      onPress={onPress}
+    >
+      <Animated.View style={animatedStyle}>
+        <Ionicons
+          name={iconName}
+          size={24}
+          color={
+            iconName === "heart"
+              ? "red"
+              : isFocused
+              ? themeColor?.dark ?? theme.colors.primary
+              : theme.colors.textLight
+          }
+        />
+      </Animated.View>
+    </Pressable>
   );
 };
 
 const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
   const theme = useTheme();
+  const { refetchLists, refetchTask, refetchNotes, refetchReels } =
+    useUtilStore();
   const styles = useBottomTabStyles(theme);
   const routeTitles: Record<keyof typeof ROUTES, string> = {
     [ROUTES.TASKS]: "Tasks",
-    [ROUTES.HISTORY]: "History",
     [ROUTES.REELS]: "Reels",
     [ROUTES.NOTES]: "Notes",
+    [ROUTES.LISTS]: "Lists",
     [ROUTES.PROFILE]: "Profile",
   };
-  const { themeColor } = useHelper();
+  const { themeColor, triggerVibration } = useHelper();
+
   return (
     <View style={styles.container}>
       <Row justifyContent="space-between" style={styles.tabBarContainer}>
@@ -76,6 +110,11 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
                 screen: route.name,
                 isBottomTab: true,
               });
+            } else {
+              if (route.name === ROUTES.REELS) {
+                triggerVibration("light");
+                refetchReels();
+              }
             }
           };
 
@@ -94,19 +133,16 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
                 isFocused={isFocused}
                 routeName={route.name as keyof typeof ROUTES}
                 theme={theme}
+                onPress={handleNavigation}
               />
               <Spacer size={8} />
-              <Text
-                style={[
-                  styles.tabLabel,
-                  isFocused && {
-                    ...styles.tabLabelFocused,
-                    color: themeColor?.dark ?? theme.colors.primary,
-                  },
-                ]}
-              >
-                {routeTitles[route.name as keyof typeof ROUTES] || route.name}
-              </Text>
+              <AnimatedLabel
+                label={
+                  routeTitles[route.name as keyof typeof ROUTES] || route.name
+                }
+                isFocused={isFocused}
+                theme={theme}
+              />
             </Pressable>
           );
         })}
@@ -115,11 +151,41 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
   );
 };
 
+// Animated label component
+const AnimatedLabel: React.FC<{
+  label: string;
+  isFocused: boolean;
+  theme: any;
+}> = ({ label, isFocused, theme }) => {
+  const { themeColor } = useHelper();
+  const scale = useSharedValue(isFocused ? 1.1 : 1);
+  const styles = useBottomTabStyles(theme);
+
+  React.useEffect(() => {
+    scale.value = withSpring(isFocused ? 1.1 : 1, {
+      damping: 7,
+      stiffness: 150,
+    });
+  }, [isFocused]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    color: isFocused
+      ? themeColor?.dark ?? theme.colors.primary
+      : theme.colors.textLight,
+  }));
+
+  return (
+    <Animated.Text style={[styles.label, animatedStyle]}>{label}</Animated.Text>
+  );
+};
+
 const useBottomTabStyles = (theme: any) => {
   return StyleSheet.create({
     container: {
-      borderTopColor: isDarkMode ? "#000" : `${theme.colors.border}`,
       borderTopWidth: 1,
+      borderTopColor: `${theme.colors.border}`,
+      backgroundColor: theme.colors.background,
     },
     tabBarContainer: {
       backgroundColor: theme.colors.background,
@@ -130,15 +196,10 @@ const useBottomTabStyles = (theme: any) => {
     tab: {
       alignItems: "center",
     },
-    tabLabel: {
+    label: {
       fontSize: theme.fontSizes.sm,
-      color: theme.colors.border,
-      // width: 85,
       textAlign: "center",
-      fontFamily: theme.fonts.regular,
-    },
-    tabLabelFocused: {
-      fontFamily: theme.fonts.semibold,
+      fontFamily: theme.fonts.medium,
     },
   });
 };

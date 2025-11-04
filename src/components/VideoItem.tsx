@@ -1,19 +1,21 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { View, Pressable, Text, StyleSheet } from "react-native";
 import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
 
 import { IVideo } from "../types/videos";
 import Avatar from "./avatar";
-import { Column, Row } from "../tools";
+import { Column, Row, Spacer } from "../tools";
 import { useCommonStyles } from "../styles/commonstyles";
 import { useHelper } from "../utils/helper";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../store/authStore";
 import { VideoRepo } from "../repositories/videos";
 import { useTheme } from "../infrastructure/theme";
-import VideoCommentsModal from "../screens/Reels/VideoCommentsModal";
 import ProgressBar from "./timeLeftProgress";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CommentsModal from "./comments/commentModal";
+import { AppUrl } from "../utils/appUrl";
 
 type Props = {
   item: IVideo;
@@ -31,6 +33,7 @@ type Props = {
   showDelete?: boolean;
   singleScreen?: boolean;
   playAlways?: boolean;
+  showComments?: boolean;
 };
 
 export default function VideoItem({
@@ -49,10 +52,16 @@ export default function VideoItem({
   showDelete = true,
   playAlways = false,
   singleScreen,
+  showComments,
 }: Props) {
   const videoRef = useRef<IVideo | null>(null);
   const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
-  const [commentsModalVisible, setCommentsModalVisible] = useState(false);
+  const [commentsModalVisible, setCommentsModalVisible] = useState(
+    showComments ?? false
+  );
+  const [totalComments, setTotalComments] = useState(
+    item?.comments?.length ?? 0
+  );
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const theme = useTheme();
@@ -60,6 +69,7 @@ export default function VideoItem({
   const navigation: any = useNavigation();
   const { user } = useAuthStore();
   const { formatDate } = useHelper();
+  const insets = useSafeAreaInsets();
 
   const shouldPlay =
     playAlways || (Math.abs(currentIndex - index) <= 0 && isFocused);
@@ -73,32 +83,31 @@ export default function VideoItem({
       console.error("markRead video error:", err);
     }
   }, [item._id]);
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
-  };
-
+  useEffect(() => {
+    setCommentsModalVisible(showComments ?? false);
+  }, [item._id]);
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
       {shouldPlay && (
-        <Video
-          ref={(ref) => (videoRef.current = ref)}
-          source={{ uri: item.url }}
-          style={styles.video}
-          resizeMode="cover"
-          repeat
-          muted={muted}
-          controls={false}
-          paused={paused}
-          onError={(err) => console.warn("Video error:", item._id, err)}
-          onEnd={() => {
-            videoRef.current = null;
-          }}
-          onLoad={(data) => setDuration(data.duration)}
-          onProgress={(data) => setCurrentTime(data.currentTime)}
-        />
+        <>
+          <Video
+            ref={(ref) => (videoRef.current = ref)}
+            source={{ uri: item.url }}
+            style={styles.video}
+            resizeMode="contain"
+            repeat
+            muted={muted}
+            controls={false}
+            paused={paused}
+            onError={(err) => console.warn("Video error:", item._id, err)}
+            onEnd={() => {
+              videoRef.current = null;
+            }}
+            onLoad={(data) => setDuration(data.duration)}
+            onProgress={(data) => setCurrentTime(data.currentTime)}
+          />
+          <View style={styles.overlayBackground} />
+        </>
       )}
 
       <Pressable
@@ -110,6 +119,7 @@ export default function VideoItem({
         onLongPress={() => setLongPressedIndex?.(index)}
         onPressOut={() => setLongPressedIndex?.(null)}
       >
+        <Spacer size={insets.top} />
         {/* Top Row: Back + Title + Duration */}
         <Row
           alignItems="center"
@@ -121,23 +131,21 @@ export default function VideoItem({
               <Ionicons
                 onPress={() => navigation.goBack()}
                 name="chevron-back-outline"
-                color={"#fff"}
+                color={theme.colors.white}
                 size={30}
               />
             )}
             <Column gap={2}>
-              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
                 {item.title}
               </Text>
             </Column>
           </Row>
-
-          {/* Duration Display */}
-          {/* {duration > 0 && (
-            <Text style={[commonStyles.smallText, { color: "#fff" }]}>
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </Text>
-          )} */}
         </Row>
 
         {/* Center Mute Icon */}
@@ -150,7 +158,7 @@ export default function VideoItem({
             <Ionicons
               name={muted ? "volume-mute-outline" : "volume-high-outline"}
               size={50}
-              color={"#fff"}
+              color={theme.colors.white}
             />
           )}
         </Column>
@@ -168,32 +176,50 @@ export default function VideoItem({
               image={item.createdByDetails?.image}
             />
             <Column gap={2}>
-              <Text style={[commonStyles.subTitleText, { color: "#fff" }]}>
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
                 {item.createdByDetails?.name}
               </Text>
-              <Text style={[commonStyles.smallText, { color: "#fff" }]}>
+              <Text
+                style={[commonStyles.smallText, { color: theme.colors.white }]}
+              >
                 {formatDate(item.createdAt)}
               </Text>
             </Column>
           </Row>
           <Column gap={20}>
-            <Ionicons
-              onPress={() => setCommentsModalVisible(true)}
-              name="chatbubble-outline"
-              color={"white"}
-              size={35}
-            />
+            <Column alignItems="center" gap={4}>
+              <Ionicons
+                onPress={() => setCommentsModalVisible(true)}
+                name="chatbubble-outline"
+                color={theme.colors.white}
+                size={35}
+              />
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
+                {totalComments}
+              </Text>
+            </Column>
+
             {user?.userId !== item.createdBy && !isViewed ? (
               <Ionicons
                 onPress={handleViewed}
                 name="eye-outline"
-                color={"white"}
+                color={theme.colors.white}
                 size={35}
               />
             ) : (
               <Ionicons
                 name={isViewed ? "eye" : "eye-off"}
-                color={"white"}
+                color={theme.colors.white}
                 size={35}
               />
             )}
@@ -201,22 +227,25 @@ export default function VideoItem({
               <Ionicons
                 onPress={() => deleteVideo?.(item._id)}
                 name="trash"
-                color={"red"}
+                color={theme.colors.error}
                 size={35}
               />
             )}
           </Column>
         </Row>
-        <View style={{ height: 5 }}>
+        <View style={{ height: 4 }}>
           <ProgressBar currentTime={currentTime} duration={duration} />
         </View>
       </Pressable>
 
       {/* Comments Modal */}
-      <VideoCommentsModal
-        videoId={item._id}
+      <CommentsModal
         visible={commentsModalVisible}
         onClose={() => setCommentsModalVisible(false)}
+        fetchUrl={`${AppUrl.getVideoComments(item._id)}`}
+        postUrl={`${AppUrl.addVideoComment(item._id)}`}
+        entityId={item._id}
+        setCount={setTotalComments}
       />
     </View>
   );
@@ -226,4 +255,9 @@ const styles = StyleSheet.create({
   videoContainer: { width: "100%" },
   video: { ...StyleSheet.absoluteFillObject },
   overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
+  overlayBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#00000033",
+    zIndex: 1,
+  },
 });

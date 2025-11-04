@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { View, Button, Text, Platform } from "react-native";
+import { View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomButton from "../../../components/customButton";
+import { Ionicons } from "@expo/vector-icons";
+import { AssignedTo } from "../../../enums/tasks";
 
 export const AndroidDateTimePicker = ({
   dueDateTime,
@@ -42,7 +44,7 @@ export const AndroidDateTimePicker = ({
         title={dueDateTime ? dueDateTime.toLocaleString() : "No date selected"}
         rounded
         onPress={() => setShowDatePicker(true)}
-        customStyle={{ height: 30, width: 210 }}
+        customStyle={{ height: 30, width: "auto" }}
       />
 
       {showDatePicker && (
@@ -64,4 +66,25 @@ export const AndroidDateTimePicker = ({
       )}
     </View>
   );
+};
+
+interface AssignedIconProps {
+  type: AssignedTo;
+  size?: number;
+  color?: string;
+}
+
+export const AssignedIcon: React.FC<AssignedIconProps> = ({
+  type,
+  size = 14,
+  color = "#000",
+}) => {
+  const iconName =
+    type === "Me"
+      ? "person-outline"
+      : type === "Partner"
+      ? "person-add-outline"
+      : "people-outline";
+
+  return <Ionicons name={iconName} size={size} color={color} />;
 };

@@ -38,7 +38,7 @@ export const RegisterScreen = () => {
   return (
     <AuthBgContainer>
       <Column style={commonStyles.screenWrapper} justifyContent="center">
-        <Logo />
+        <Logo height={150} />
         <Text style={commonStyles.titleText}>Register</Text>
         <Spacer size={20} />
         <KeyboardAwareScrollView

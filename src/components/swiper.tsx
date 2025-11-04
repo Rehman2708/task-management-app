@@ -1,6 +1,7 @@
 import React, { ReactNode, useRef, useCallback } from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
+import { useHelper } from "../utils/helper";
 
 interface SwiperProps {
   children: ReactNode;
@@ -16,7 +17,7 @@ const Swiper: React.FC<SwiperProps> = ({
   containerStyle,
 }) => {
   const swipeableRef = useRef<Swipeable>(null);
-
+  const { triggerVibration } = useHelper();
   const handleSwipeOpen = useCallback(() => {
     const timer = setTimeout(() => {
       swipeableRef.current?.close();
@@ -32,6 +33,7 @@ const Swiper: React.FC<SwiperProps> = ({
       renderLeftActions={leftAction}
       onSwipeableOpen={handleSwipeOpen}
       containerStyle={containerStyle}
+      onActivated={() => triggerVibration()}
     >
       {children}
     </Swipeable>

@@ -10,16 +10,17 @@ import { ROUTES } from "../../enums/routes";
 import { useTheme } from "../../infrastructure/theme";
 import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
+import { useHelper } from "../../utils/helper";
+import { IUser } from "../../types/auth";
+import { getLaunchedFromNotification } from "../../../notification";
 
 const SplashScreen = () => {
+  const { themeColor } = useHelper();
   const navigation = useNavigation();
-
   const [loading, setLoading] = useState(true);
   const { updateUser } = useAuthStore();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-
-  // Check if user already logged in
 
   const fetchUserDetails = async (id: string) => {
     try {
@@ -43,25 +44,20 @@ const SplashScreen = () => {
       const { data: user, success } = await getDataFromAsyncStorage(
         LocalStorageKey.USER
       );
-      updateUser(user);
-      fetchUserDetails(user?.userId!);
-      if (success && user) {
+      updateUser(user as IUser);
+      await fetchUserDetails(user?.userId!);
+
+      if (!getLaunchedFromNotification()) {
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: ROUTES.TABS }],
-          })
-        );
-      } else {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: ROUTES.LOGIN }],
+            routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
           })
         );
       }
     })();
   }, []);
+
   return (
     <Column
       style={[
@@ -72,9 +68,7 @@ const SplashScreen = () => {
       alignItems="center"
     >
       <Logo />
-      {loading && (
-        <ActivityIndicator size={"large"} color={theme.colors.primary} />
-      )}
+      {!loading && <ActivityIndicator size="large" color={themeColor.dark} />}
     </Column>
   );
 };

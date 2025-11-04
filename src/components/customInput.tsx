@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,9 +10,9 @@ import {
   TextStyle,
 } from "react-native";
 import { useTheme } from "../infrastructure/theme";
-import { Column, isAndroid } from "../tools";
+import { Column, isAndroid, Row } from "../tools";
 import { useCommonStyles } from "../styles/commonstyles";
-import { Ionicons } from "@expo/vector-icons"; // Make sure expo/vector-icons is installed
+import { Ionicons } from "@expo/vector-icons";
 
 export type CustomInputProps = {
   title?: string;
@@ -28,12 +28,13 @@ export type CustomInputProps = {
   fullFlex?: boolean;
   rounded?: boolean;
   inputStyle?: StyleProp<TextStyle>;
+  maxLength?: number;
 };
 
 const CustomInput = ({
   title,
   placeholder = "Enter here...",
-  value,
+  value = "",
   onChangeText,
   keyboardType = "default",
   numberOfLines = 1,
@@ -44,11 +45,24 @@ const CustomInput = ({
   fullFlex = false,
   rounded,
   inputStyle,
+  maxLength,
 }: CustomInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [maxChar, setMaxChar] = useState<number | undefined>(maxLength);
   const theme = useTheme();
   const styles = customInputStyle(theme);
   const commonStyles = useCommonStyles(theme);
+
+  useEffect(() => {
+    // Dynamically set maxChar if title contains specific keywords
+    if (title?.toLowerCase().includes("title")) {
+      setMaxChar(maxLength ?? 30);
+    } else if (title?.toLowerCase().includes("description")) {
+      setMaxChar(maxLength ?? 200);
+    } else {
+      setMaxChar(maxLength);
+    }
+  }, [title, maxLength]);
 
   return (
     <Column
@@ -65,7 +79,7 @@ const CustomInput = ({
             multiline && styles.multiline,
             secureTextEntry && styles.passwordInput,
             rounded && styles.rounded,
-            inputStyle && inputStyle,
+            inputStyle,
           ]}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.border}
@@ -76,6 +90,7 @@ const CustomInput = ({
           value={value}
           secureTextEntry={secureTextEntry && !isPasswordVisible}
           multiline={multiline}
+          maxLength={maxChar}
         />
 
         {secureTextEntry && (
@@ -91,11 +106,27 @@ const CustomInput = ({
           </TouchableOpacity>
         )}
       </View>
+
+      {maxChar && (
+        <Row justifyContent="flex-end">
+          <Text
+            style={[
+              commonStyles.tinyText,
+              value?.length === maxChar && {
+                color: theme.colors.error,
+              },
+            ]}
+          >
+            {value?.length ?? 0}/{maxChar}
+          </Text>
+        </Row>
+      )}
     </Column>
   );
 };
 
 export default CustomInput;
+
 const customInputStyle = (theme: any) =>
   StyleSheet.create({
     container: {
@@ -119,14 +150,13 @@ const customInputStyle = (theme: any) =>
       fontSize: theme.fontSizes.sm,
       fontFamily: theme.fonts.regular,
       color: theme.colors.text,
-      paddingRight: 40, // space for the eye icon
     },
     multiline: {
-      minHeight: 200,
+      minHeight: 150,
       textAlignVertical: "top",
     },
     passwordInput: {
-      // additional styling if needed for password fields
+      paddingRight: 50,
     },
     rounded: { borderRadius: 100 },
     iconWrapper: {

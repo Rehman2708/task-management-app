@@ -97,18 +97,24 @@ const UpdateProfileScreen = () => {
                 style={ProfileScreenStyles.deleteIcon}
                 onPress={() => setUserImage("")}
               >
-                <Ionicons name="trash" color={"#fff"} size={20} />
+                <Ionicons name="trash" color={theme.colors.white} size={20} />
               </Pressable>
             ) : null}
           </Row>
         }
       />
-
+      <CustomInput
+        title="User Id"
+        editable={false}
+        value={user?.userId}
+        onChangeText={() => {}}
+      />
       <CustomInput title="Name" onChangeText={setUserName} value={userName} />
       <CustomInput
         title="About"
         onChangeText={setUserAbout}
         value={userAbout}
+        multiline
       />
       {hasChanges && (
         <CustomButton

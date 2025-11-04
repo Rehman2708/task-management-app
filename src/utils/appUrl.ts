@@ -13,9 +13,10 @@ export class AppUrl {
   public static updateProfileEndPoint = `${this.BASE_URL}/auth/update-profile`;
   public static updateThemeEndPoint = `${this.BASE_URL}/auth/update-theme`;
   public static updateFontEndPoint = `${this.BASE_URL}/auth/update-font`;
+
   // 🔹 Task APIs
-  public static getAllTasks = `${this.BASE_URL}/tasks`; // active tasks only
-  public static getCompletedTasks = `${this.BASE_URL}/tasks/history`; // completed/expired tasks
+  public static getAllTasks = `${this.BASE_URL}/tasks`;
+  public static getCompletedTasks = `${this.BASE_URL}/tasks/history`;
   public static createTask = `${this.BASE_URL}/tasks`;
   public static getTaskById = (taskId: string) =>
     `${this.BASE_URL}/tasks/task/${taskId}`;
@@ -53,10 +54,24 @@ export class AppUrl {
   public static getSingleNote = (noteId: string) =>
     `${this.BASE_URL}/notes/note/${noteId}`;
 
+  // 🔹 Lists APIs
+  public static getAllLists = `${this.BASE_URL}/lists`; // e.g. GET /lists/:ownerUserId
+  public static createList = `${this.BASE_URL}/lists`; // POST /lists
+  public static getSingleList = (listId: string) =>
+    `${this.BASE_URL}/lists/list/${listId}`; // GET /lists/list/:id
+  public static updateList = (listId: string) =>
+    `${this.BASE_URL}/lists/${listId}`; // PUT /lists/:id
+  public static deleteList = (listId: string) =>
+    `${this.BASE_URL}/lists/${listId}`; // DELETE /lists/:id
+  public static pinUnpinList = (listId: string) =>
+    `${this.BASE_URL}/lists/pin/${listId}`; // PATCH /lists/pin/:id
+  public static toggleListItem = (listId: string, itemIndex: number) =>
+    `${this.BASE_URL}/lists/toggle-item/${listId}/${itemIndex}`; // PATCH /lists/toggle-item/:listId/:itemIndex
+
   // 🔹 Videos APIs
-  public static getAllVideos = `${this.BASE_URL}/videos`; // e.g., GET /videos/user/:ownerUserId
-  public static createVideo = `${this.BASE_URL}/videos`; // POST /videos
-  public static deleteVideo = (id: string) => `${this.BASE_URL}/videos/${id}`; // DELETE /videos/:id
+  public static getAllVideos = `${this.BASE_URL}/videos`;
+  public static createVideo = `${this.BASE_URL}/videos`;
+  public static deleteVideo = (id: string) => `${this.BASE_URL}/videos/${id}`;
   public static markVideoAsViewed = (videoId: string) =>
     `${this.BASE_URL}/videos/${videoId}/viewed`;
   public static addVideoComment = (videoId: string) =>
@@ -65,6 +80,6 @@ export class AppUrl {
     `${this.BASE_URL}/videos/${videoId}/comments`;
 
   // 🔹 Notification APIs
-  public static getNotifications = `${this.BASE_URL}/notifications`; // plural to match your router
+  public static getNotifications = `${this.BASE_URL}/notifications`;
   public static markNotificationsRead = `${this.BASE_URL}/notifications/mark-read`;
 }

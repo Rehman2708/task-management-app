@@ -13,6 +13,7 @@ interface HeaderProps {
   subTitle?: string;
   showBackbutton?: boolean;
   hideNotificationButton?: boolean;
+  whiteBg?: boolean;
   showImage?: boolean;
   onBackButtonPress?: () => void;
   onSearchPress?: () => void;
@@ -22,37 +23,39 @@ const CustomHeader = ({
   subTitle,
   showBackbutton,
   showImage,
+  whiteBg,
   onBackButtonPress,
   onSearchPress,
   hideNotificationButton,
 }: HeaderProps) => {
   const navigation: any = useNavigation();
-  const { loggedInUser } = useHelper();
+  const { loggedInUser, triggerVibration } = useHelper();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
 
   return (
     <>
-      <Spacer size={showImage ? -10 : 0} />
-
       <Row
         justifyContent="space-between"
         alignItems="center"
-        style={{ paddingHorizontal: 16 }}
+        style={{ paddingHorizontal: 16, height: 50 }}
       >
         <Row alignItems="center" gap={10}>
           {showBackbutton && (
             <TouchableOpacity
-              onPress={
-                onBackButtonPress
-                  ? onBackButtonPress
-                  : () => navigation.goBack()
-              }
+              onPress={() => {
+                triggerVibration("medium");
+                if (onBackButtonPress) {
+                  onBackButtonPress();
+                } else {
+                  navigation.goBack();
+                }
+              }}
             >
               <Ionicons
                 name="arrow-back-outline"
                 size={30}
-                color={theme.colors.white}
+                color={whiteBg ? theme.colors.text : theme.colors.white}
               />
             </TouchableOpacity>
           )}
@@ -69,37 +72,56 @@ const CustomHeader = ({
           )}
           <Column>
             {title && (
-              <Text style={[commonStyles.titleText, commonStyles.whiteText]}>
+              <Text
+                style={[
+                  commonStyles.titleText,
+                  !whiteBg && commonStyles.whiteText,
+                ]}
+              >
                 {title}
               </Text>
             )}
             {subTitle && (
-              <Text style={[commonStyles.smallText, commonStyles.whiteText]}>
+              <Text
+                style={[
+                  commonStyles.smallText,
+                  !whiteBg && commonStyles.whiteText,
+                ]}
+              >
                 {subTitle}
               </Text>
             )}
-            {showImage && loggedInUser?.about && (
-              <>
-                <View style={{ width: dimensions.width - 150 }}>
-                  <TextTicker
-                    duration={loggedInUser.about.length * 100}
-                    loop
-                    bounce
-                    repeatSpacer={50}
-                    marqueeDelay={1000}
-                    style={[commonStyles.smallText, commonStyles.whiteText]}
-                  >
-                    {loggedInUser.about}
-                  </TextTicker>
-                </View>
-              </>
-            )}
+            {showImage &&
+              (loggedInUser?.about || loggedInUser?.partner?.about) && (
+                <>
+                  <View style={{ width: dimensions.width - 150 }}>
+                    <TextTicker
+                      duration={
+                        (loggedInUser?.partner?.about
+                          ? loggedInUser.partner.about.length
+                          : loggedInUser?.about?.length ?? 0) * 120
+                      }
+                      loop
+                      bounce
+                      repeatSpacer={50}
+                      marqueeDelay={1000}
+                      style={[commonStyles.smallText, commonStyles.whiteText]}
+                    >
+                      {loggedInUser.partner.about ?? loggedInUser.about}
+                    </TextTicker>
+                  </View>
+                </>
+              )}
           </Column>
         </Row>
         <Row gap={20}>
           {onSearchPress && (
             <TouchableOpacity onPress={onSearchPress}>
-              <Ionicons name="search" size={30} color={theme.colors.white} />
+              <Ionicons
+                name="search"
+                size={30}
+                color={whiteBg ? theme.colors.text : theme.colors.white}
+              />
             </TouchableOpacity>
           )}
           {!hideNotificationButton && (
@@ -109,7 +131,7 @@ const CustomHeader = ({
               <Ionicons
                 name="notifications-outline"
                 size={30}
-                color={theme.colors.white}
+                color={whiteBg ? theme.colors.text : theme.colors.white}
               />
             </TouchableOpacity>
           )}

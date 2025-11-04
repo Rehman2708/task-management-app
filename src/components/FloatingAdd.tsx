@@ -5,6 +5,7 @@ import { useTheme } from "../infrastructure/theme";
 export default function FloatingAdd({ onPress }: { onPress: () => void }) {
   const { themeColor } = useHelper();
   const theme = useTheme();
+  const styles = AddButtonStyles(theme);
   return (
     <TouchableOpacity
       style={[
@@ -20,17 +21,18 @@ export default function FloatingAdd({ onPress }: { onPress: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
-  fab: {
-    position: "absolute",
-    right: 20,
-    bottom: 30,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 6,
-  },
-  plus: { color: "#fff", fontSize: 32, lineHeight: 36 },
-});
+const AddButtonStyles = (theme: any) =>
+  StyleSheet.create({
+    fab: {
+      position: "absolute",
+      right: 20,
+      bottom: 30,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      alignItems: "center",
+      justifyContent: "center",
+      elevation: 6,
+    },
+    plus: { color: theme.colors.white, fontSize: 32, lineHeight: 36 },
+  });

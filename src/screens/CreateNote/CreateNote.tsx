@@ -13,7 +13,7 @@ import ImageModal from "../../components/imageModal";
 import { useState } from "react";
 import { Row } from "../../tools";
 import { useTheme } from "../../infrastructure/theme";
-
+import { useHelper } from "../../utils/helper";
 interface NoteDetailScreenProps {
   route: {
     params?: {
@@ -38,6 +38,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     noteImage,
   } = useNoteDetailViewModel(note);
   const theme = useTheme();
+  const { triggerVibration, themeColor } = useHelper();
   const commonStyles = useCommonStyles(theme);
   const styles = createNoteStyle(theme);
   const navigation: any = useNavigation();
@@ -52,7 +53,8 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
     <ScreenWrapper
       title={note ? "Edit Note" : "Create Note"}
       showBackbutton
-      subTitle={`Notes > ${note ? "Edit Note" : "Create Note"}`}
+      image={noteImage.length ? noteImage : undefined}
+      // subTitle={`Notes > ${note ? "Edit Note" : "Create Note"}`}
     >
       <View style={commonStyles.screenWrapper}>
         <KeyboardAwareScrollView
@@ -76,10 +78,16 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
               <Switch
                 value={appendMode}
                 onValueChange={(v) => {
+                  triggerVibration();
                   setAppendMode(v);
                   if (v) setNoteText("");
                   else setNoteText(note.note);
                 }}
+                trackColor={{
+                  true: themeColor.light,
+                  false: theme.colors.border,
+                }}
+                thumbColor={themeColor.dark}
               />
             </Row>
           )}
@@ -95,13 +103,12 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
 
           {error && <Text style={styles.error}>{error}</Text>}
           {success && <Text style={styles.success}>{success}</Text>}
-
-          <CustomButton
-            title={note?._id ? "Update" : "Save"}
-            loading={loading}
-            onPress={handleSave}
-          />
         </KeyboardAwareScrollView>
+        <CustomButton
+          title={note?._id ? "Update" : "Save"}
+          loading={loading}
+          onPress={handleSave}
+        />
       </View>
     </ScreenWrapper>
   );

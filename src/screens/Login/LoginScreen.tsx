@@ -32,7 +32,7 @@ export const LoginScreen = () => {
     <AuthBgContainer>
       <Spacer size={100} />
       <Column style={commonStyles.screenWrapper} justifyContent="center">
-        <Logo />
+        <Logo height={150} />
         <>
           <Text style={commonStyles.titleText}>Login</Text>
           <Spacer size={20} />

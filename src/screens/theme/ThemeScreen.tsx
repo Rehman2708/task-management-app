@@ -11,14 +11,47 @@ import { useAuthStore } from "../../store/authStore";
 import { useTheme } from "../../infrastructure/theme";
 
 const colors = [
+  // Calm & Trust
   { dark: "#3F87E9", light: "#6697D9" },
+
+  // Refreshing & Natural
   { dark: "#22B08D", light: "#83C0B1" },
+
+  // Energetic & Bold
   { dark: "#F6454B", light: "#FFA6B5" },
+
+  // Warm & Motivating
   { dark: "#FF7C0A", light: "#FFB259" },
+
+  // Passionate & Deep
   { dark: "#6d073a", light: "#9f798a" },
-  { dark: "#620d0d", light: "#a86a27" },
+
+  // Minimal & Neutral
   { light: "#999999", dark: "#333333" },
+
+  // Cool & Oceanic
   { light: "#50c9ce", dark: "#0b545d" },
+
+  // Creative & Dreamy
+  { dark: "#7B2CBF", light: "#B892FF" },
+
+  // Peaceful & Earthy
+  { dark: "#1B4332", light: "#95D5B2" },
+
+  // Futuristic & Tech
+  { dark: "#0A192F", light: "#64FFDA" },
+
+  // Optimistic & Sunny
+  { dark: "#F59E0B", light: "#FCD34D" },
+
+  // Mysterious & Luxurious
+  { dark: "#4B0082", light: "#A78BFA" },
+
+  // Soothing & Pastel
+  { dark: "#6A994E", light: "#A7C957" },
+
+  // Energetic & Youthful
+  { dark: "#FF006E", light: "#FFB3C6" },
 ];
 
 const ThemeScreen = () => {

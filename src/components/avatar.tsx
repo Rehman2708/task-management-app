@@ -66,7 +66,7 @@ const Avatar: React.FC<AvatarProps> = ({
                 commonStyles.titleText,
                 {
                   fontSize: size / 2,
-                  color: "#fff",
+                  color: theme.colors.white,
                 },
               ]}
             >
