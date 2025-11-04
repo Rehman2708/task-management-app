@@ -55,7 +55,7 @@ const LinearHeader: React.FC<LinearHeaderProps> = ({ image }) => {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [images, fadeAnim]);
+  }, [images.length, fadeAnim]);
 
   const headerHeight = isAndroid ? 80 + insets.top : 130;
   const currentImageUri =
@@ -102,7 +102,7 @@ const LinearHeader: React.FC<LinearHeaderProps> = ({ image }) => {
 
       {/* Black overlay */}
       <LinearGradient
-        colors={["#00000099", "#00000099"]}
+        colors={["#00000080", "#00000080"]}
         style={{
           ...commonStyles.fullFlex,
           position: "absolute",

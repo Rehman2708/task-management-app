@@ -51,7 +51,11 @@ const CommentCard = ({
             {repeated ? (
               <Spacer size={26} position="right" />
             ) : (
-              <Avatar size={26} name={name} image={image} />
+              <Avatar
+                size={26}
+                name={loggedInUser?.partner?.name}
+                image={loggedInUser?.partner?.image}
+              />
             )}
           </>
         )}
@@ -68,7 +72,7 @@ const CommentCard = ({
             borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
           }}
         >
-          <Text style={[commonStyles.smallText, { color: "#fff" }]}>
+          <Text style={[commonStyles.smallText, { color: theme.colors.white }]}>
             {text}
           </Text>
         </View>
@@ -77,7 +81,11 @@ const CommentCard = ({
             {repeated ? (
               <Spacer size={26} position="right" />
             ) : (
-              <Avatar size={26} name={name} image={image} />
+              <Avatar
+                size={26}
+                name={loggedInUser?.name}
+                image={loggedInUser?.image}
+              />
             )}
           </>
         )}

@@ -12,6 +12,7 @@ import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
 import { useHelper } from "../../utils/helper";
 import { IUser } from "../../types/auth";
+import { getLaunchedFromNotification } from "../../../notification";
 
 const SplashScreen = () => {
   const { themeColor } = useHelper();
@@ -46,12 +47,14 @@ const SplashScreen = () => {
       updateUser(user as IUser);
       await fetchUserDetails(user?.userId!);
 
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
-        })
-      );
+      if (!getLaunchedFromNotification()) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
+          })
+        );
+      }
     })();
   }, []);
 

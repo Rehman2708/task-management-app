@@ -11,7 +11,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Text,
   KeyboardAvoidingView,
   Platform,
   Animated as RNAnimated,
@@ -25,7 +24,6 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import ImageView from "react-native-image-viewing";
@@ -34,7 +32,7 @@ import { useTheme } from "../infrastructure/theme";
 import { useAuthStore } from "../store/authStore";
 import { useCommonStyles } from "../styles/commonstyles";
 import CustomHeader from "./CustomHeader";
-import { dimensions, Spacer } from "../tools";
+import { dimensions, isDarkMode, Spacer } from "../tools";
 import { useHelper } from "../utils/helper";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -96,16 +94,6 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
     ],
   }));
 
-  // Blur overlay
-  const blurStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      scrollY.value,
-      [-50, 0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
-      [1, 0, 0, 1],
-      Extrapolate.CLAMP
-    ),
-  }));
-
   // Sticky header visibility
   const stickyHeaderStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
@@ -143,13 +131,20 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const images = useMemo(() => {
-    if (headerImage) {
-      const arr = Array.isArray(headerImage) ? headerImage : [headerImage];
-      return arr.filter((i): i is string => !!i?.trim());
+    let arr: string[] = [];
+    if (Array.isArray(headerImage)) {
+      arr = headerImage.filter((i): i is string => !!i?.trim());
+    } else if (typeof headerImage === "string" && headerImage.trim()) {
+      arr = [headerImage];
     } else {
-      return [user?.image, user?.partner?.image].filter(Boolean) as string[];
+      arr = [user?.image, user?.partner?.image].filter(Boolean) as string[];
     }
-  }, [headerImage, user?.image, user?.partner?.image]);
+    return arr;
+  }, [
+    Array.isArray(headerImage) ? headerImage.join(",") : headerImage,
+    user?.image,
+    user?.partner?.image,
+  ]);
 
   useEffect(() => {
     if (images.length <= 1) return;
@@ -170,9 +165,15 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [images, fadeAnim]);
+  }, [images.length]);
 
-  const currentImageUri = images[currentIndex];
+  useEffect(() => {
+    if (currentIndex >= images.length) {
+      setCurrentIndex(0);
+    }
+  }, [images.length, currentIndex]);
+
+  const currentImageUri = images[currentIndex] || null;
 
   return (
     <>
@@ -195,7 +196,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
         <RNAnimated.View
           style={{
             ...StyleSheet.absoluteFillObject,
-            backgroundColor: "#00000090",
+            backgroundColor: "#00000080",
           }}
         />
       </Animated.View>
@@ -236,7 +237,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
         style={[
           styles.stickyHeader,
           stickyHeaderStyle,
-          { paddingTop: insets.top, height: 120 },
+          { paddingTop: insets.top, height: 115 },
         ]}
       >
         <CustomHeader
@@ -244,6 +245,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
           title={title}
           showBackbutton
           hideNotificationButton
+          whiteBg={!isDarkMode}
         />
       </Animated.View>
 

@@ -13,6 +13,7 @@ interface HeaderProps {
   subTitle?: string;
   showBackbutton?: boolean;
   hideNotificationButton?: boolean;
+  whiteBg?: boolean;
   showImage?: boolean;
   onBackButtonPress?: () => void;
   onSearchPress?: () => void;
@@ -22,6 +23,7 @@ const CustomHeader = ({
   subTitle,
   showBackbutton,
   showImage,
+  whiteBg,
   onBackButtonPress,
   onSearchPress,
   hideNotificationButton,
@@ -53,7 +55,7 @@ const CustomHeader = ({
               <Ionicons
                 name="arrow-back-outline"
                 size={30}
-                color={theme.colors.white}
+                color={whiteBg ? theme.colors.text : theme.colors.white}
               />
             </TouchableOpacity>
           )}
@@ -70,12 +72,22 @@ const CustomHeader = ({
           )}
           <Column>
             {title && (
-              <Text style={[commonStyles.titleText, commonStyles.whiteText]}>
+              <Text
+                style={[
+                  commonStyles.titleText,
+                  !whiteBg && commonStyles.whiteText,
+                ]}
+              >
                 {title}
               </Text>
             )}
             {subTitle && (
-              <Text style={[commonStyles.smallText, commonStyles.whiteText]}>
+              <Text
+                style={[
+                  commonStyles.smallText,
+                  !whiteBg && commonStyles.whiteText,
+                ]}
+              >
                 {subTitle}
               </Text>
             )}
@@ -105,7 +117,11 @@ const CustomHeader = ({
         <Row gap={20}>
           {onSearchPress && (
             <TouchableOpacity onPress={onSearchPress}>
-              <Ionicons name="search" size={30} color={theme.colors.white} />
+              <Ionicons
+                name="search"
+                size={30}
+                color={whiteBg ? theme.colors.text : theme.colors.white}
+              />
             </TouchableOpacity>
           )}
           {!hideNotificationButton && (
@@ -115,7 +131,7 @@ const CustomHeader = ({
               <Ionicons
                 name="notifications-outline"
                 size={30}
-                color={theme.colors.white}
+                color={whiteBg ? theme.colors.text : theme.colors.white}
               />
             </TouchableOpacity>
           )}

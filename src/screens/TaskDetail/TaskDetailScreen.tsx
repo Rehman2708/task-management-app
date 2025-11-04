@@ -104,22 +104,56 @@ export default function TaskDetailScreen({ route }: any) {
     [updateSubtaskStatus]
   );
 
+  // 🔹 Compute once per render — outside renderSubtask
+  const uniqueDates = useMemo(() => {
+    if (!task?.subtasks?.length) return [];
+    const dateSet = new Set(
+      task.subtasks
+        .filter((s: Subtask) => s.dueDateTime)
+        .map((s: Subtask) => new Date(s.dueDateTime).toDateString())
+    );
+    return Array.from(dateSet);
+  }, [task?.subtasks]);
+
+  const hasMultipleDates = uniqueDates.length > 1;
+
   const renderSubtask = useCallback(
     ({ item }: { item: Subtask }) => {
       const backgroundColor =
         item.status === SubtaskStatus.Completed
           ? `${theme.colors.success}20`
           : `${theme.colors.error}20`;
-
+      const borderColor =
+        item.status === SubtaskStatus.Completed
+          ? `${theme.colors.success}40`
+          : `${theme.colors.error}40`;
       const scale = getScaleAnim(item._id);
       const commentCount = subtaskCommentCounts[item._id] ?? 0;
+
+      // 🔹 Check if this subtask's due date is today
+      const isToday = (() => {
+        if (!item.dueDateTime) return false;
+        const due = new Date(item.dueDateTime);
+        const now = new Date();
+        return (
+          due.getDate() === now.getDate() &&
+          due.getMonth() === now.getMonth() &&
+          due.getFullYear() === now.getFullYear()
+        );
+      })();
+
+      const highlightToday = hasMultipleDates && isToday;
 
       return (
         <Column
           gap={8}
           style={[
             commonStyles.cardContainer,
-            { backgroundColor, borderColor: backgroundColor },
+            {
+              backgroundColor,
+              borderColor: highlightToday ? borderColor : backgroundColor,
+              borderWidth: highlightToday ? 2 : 1,
+            },
           ]}
         >
           <Row justifyContent="space-between" alignItems="center">
@@ -189,6 +223,7 @@ export default function TaskDetailScreen({ route }: any) {
     [
       theme,
       commonStyles,
+      hasMultipleDates, // include here now
       task?.createdAt,
       readOnly,
       subtaskStatusLoading,

@@ -7,6 +7,7 @@ import {
   handleNotificationNavigation,
   navigationRef,
   pendingNotificationData,
+  setLaunchedFromNotification,
 } from "./notification";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useCommonStyles } from "./src/styles/commonstyles";
@@ -41,7 +42,11 @@ export default function App() {
 
       if (lastResponse?.notification) {
         const data = lastResponse.notification.request.content.data;
-        if (data) setInitialData(data);
+        if (data) {
+          setLaunchedFromNotification(true);
+          setInitialData(data);
+          setLaunchedFromNotification(false);
+        }
       }
 
       // Foreground or background taps
