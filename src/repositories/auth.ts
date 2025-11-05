@@ -138,4 +138,23 @@ export class AuthRepo {
       data
     );
   }
+
+  /**
+   * 🔹 Update Theme (Light & Dark)
+   */
+  static async updatePassword(payload: {
+    userId: string;
+    oldPassword: string;
+    newPassword: string;
+  }) {
+    const data = Object.fromEntries(
+      Object.entries(payload).filter(([_, v]) => v !== undefined)
+    );
+
+    return ApiService.getApiResponse(
+      AppUrl.updatePasswordEndPoint,
+      HttpMethods.PUT,
+      data
+    );
+  }
 }

@@ -67,6 +67,7 @@ export function useProfileViewModel() {
   const changeFontScreen = () => navigation.navigate(ROUTES.FONT);
 
   const createVideoScreen = () => navigation.navigate(ROUTES.CREATE_VIDEO);
+  const resetPasswordScreen = () => navigation.navigate(ROUTES.RESET_PASSWORD);
   const updateProfileScreen = () => navigation.navigate(ROUTES.UPDATE_PROFILE);
   function getTimeLeft(targetDate = "2026-04-27") {
     const now = new Date();
@@ -123,5 +124,6 @@ export function useProfileViewModel() {
     partnerImage,
     loadingUserDetail,
     fetchUserDetails,
+    resetPasswordScreen,
   };
 }

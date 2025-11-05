@@ -13,7 +13,7 @@ export class AppUrl {
   public static updateProfileEndPoint = `${this.BASE_URL}/auth/update-profile`;
   public static updateThemeEndPoint = `${this.BASE_URL}/auth/update-theme`;
   public static updateFontEndPoint = `${this.BASE_URL}/auth/update-font`;
-
+  public static updatePasswordEndPoint = `${this.BASE_URL}/auth/update-password`;
   // 🔹 Task APIs
   public static getAllTasks = `${this.BASE_URL}/tasks`;
   public static getCompletedTasks = `${this.BASE_URL}/tasks/history`;

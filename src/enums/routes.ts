@@ -11,6 +11,7 @@ export enum ROUTES {
   CREATE_TASK = "CreateTask",
   CREATE_NOTE = "CreateNote",
   CREATE_VIDEO = "CreateVideo",
+  RESET_PASSWORD = "ResetPassword",
   LISTS = "Lists",
   VIEW_NOTE = "ViewNote",
   VIEW_LIST = "ViewList",

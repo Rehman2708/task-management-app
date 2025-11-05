@@ -40,6 +40,7 @@ export default function ProfileScreen() {
     partnerImage,
     loadingUserDetail,
     fetchUserDetails,
+    resetPasswordScreen,
   } = useProfileViewModel();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -48,7 +49,28 @@ export default function ProfileScreen() {
   const [visible, setIsVisible] = useState(false);
   const [currentImage, setCurrentImage] = useState({});
   const [footerText, setFooterText] = useState(user?.about);
-
+  const tabs = [
+    {
+      title: "Update profile",
+      onPress: updateProfileScreen,
+    },
+    {
+      title: "Change theme",
+      onPress: changeThemeScreen,
+    },
+    {
+      title: "Change font",
+      onPress: changeFontScreen,
+    },
+    {
+      title: "Reset password",
+      onPress: resetPasswordScreen,
+    },
+    {
+      title: "Add video",
+      onPress: createVideoScreen,
+    },
+  ];
   return (
     <ScreenWrapper title="Profile">
       {loading ? (
@@ -221,62 +243,25 @@ export default function ProfileScreen() {
                 </Column>
               )}
               <Spacer size={20} />
-              <TouchableOpacity onPress={updateProfileScreen}>
-                <Row
-                  style={commonStyles.cardContainer}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Text style={[commonStyles.basicText]}>Update profile</Text>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={20}
-                    color={theme.colors.text}
-                  />
-                </Row>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={changeThemeScreen}>
-                <Row
-                  style={commonStyles.cardContainer}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Text style={[commonStyles.basicText]}>Change theme</Text>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={20}
-                    color={theme.colors.text}
-                  />
-                </Row>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={changeFontScreen}>
-                <Row
-                  style={commonStyles.cardContainer}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Text style={[commonStyles.basicText]}>Change font</Text>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={20}
-                    color={theme.colors.text}
-                  />
-                </Row>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={createVideoScreen}>
-                <Row
-                  style={commonStyles.cardContainer}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Text style={[commonStyles.basicText]}>Add Video</Text>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={20}
-                    color={theme.colors.text}
-                  />
-                </Row>
-              </TouchableOpacity>
+              {tabs.map((item, index) => {
+                return (
+                  <TouchableOpacity key={index} onPress={item.onPress}>
+                    <Row
+                      style={commonStyles.cardContainer}
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Text style={[commonStyles.basicText]}>{item.title}</Text>
+                      <Ionicons
+                        name="chevron-forward-outline"
+                        size={20}
+                        color={theme.colors.text}
+                      />
+                    </Row>
+                  </TouchableOpacity>
+                );
+              })}
+
               <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
             </Column>
           </ScrollView>
