@@ -9,6 +9,8 @@ export function useListsViewModel(userId?: string) {
   const [allLists, setAllLists] = useState<List[]>([]);
   const [lists, setLists] = useState<List[]>([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [cardView, setCardView] = useState(false);
+
   const [initialLoading, setInitialLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,6 +19,7 @@ export function useListsViewModel(userId?: string) {
   const [totalPages, setTotalPages] = useState(1);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
+  const toggleView = () => setCardView((prev) => !prev);
 
   useEffect(() => {
     setPage(1);
@@ -124,5 +127,7 @@ export function useListsViewModel(userId?: string) {
     showSearch,
     toggleSearch,
     listImages,
+    toggleView,
+    cardView,
   };
 }

@@ -8,6 +8,7 @@ export function useNotesListViewModel(userId?: string) {
   const [allNotes, setAllNotes] = useState<Note[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [showSearch, setShowSearch] = useState(false);
+  const [cardView, setCardView] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true); // 🟢 First load or refresh
   const [loadingMore, setLoadingMore] = useState(false); // 🟢 Pagination
   const [error, setError] = useState<string | null>(null);
@@ -17,6 +18,7 @@ export function useNotesListViewModel(userId?: string) {
   const [totalPages, setTotalPages] = useState(1);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
+  const toggleView = () => setCardView((prev) => !prev);
 
   useEffect(() => {
     setPage(1);
@@ -127,5 +129,7 @@ export function useNotesListViewModel(userId?: string) {
     showSearch,
     toggleSearch,
     noteImages,
+    toggleView,
+    cardView,
   };
 }

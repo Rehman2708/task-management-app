@@ -4,15 +4,17 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  ActivityIndicator,
   Image,
+  StyleSheet,
+  ImageBackground,
+  Pressable,
 } from "react-native";
 import { useNotesListViewModel } from "./notesViewModal";
 import FloatingAdd from "../../components/FloatingAdd";
 import { useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { ROUTES } from "../../enums/routes";
-import { Column, Row } from "../../tools";
+import { Column, dimensions, isDarkMode, Row } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useHelper } from "../../utils/helper";
 import { Note } from "../../repositories/notes";
@@ -24,11 +26,14 @@ import { useUtilStore } from "../../store/utils";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
 import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
+import Swiper from "react-native-deck-swiper";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function NotesScreen() {
+  const { formatDate, themeColor, loggedInUser } = useHelper();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-  const { formatDate, themeColor } = useHelper();
+  const styles = cardStyle(theme, themeColor);
   const { fetchingNotes } = useUtilStore();
   const {
     notes,
@@ -44,16 +49,17 @@ export default function NotesScreen() {
     showSearch,
     toggleSearch,
     noteImages,
+    toggleView,
+    cardView,
   } = useNotesListViewModel();
-
   const navigation: any = useNavigation();
 
   useEffect(() => {
     fetchNotes(1, true);
   }, [fetchingNotes]);
 
-  const renderItem = ({ item }: { item: Note }) => (
-    <TouchableOpacity
+  const renderItem = ({ item, swiper }: { item: Note; swiper?: boolean }) => (
+    <Pressable
       onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
       onPress={() =>
         navigation.navigate(ROUTES.VIEW_NOTE, { noteId: item._id })
@@ -68,12 +74,12 @@ export default function NotesScreen() {
           { padding: 0 },
         ]}
       >
-        {item.image && (
+        {item.image && !swiper && (
           <Image
             source={{ uri: item.image }}
             style={{
               width: "100%",
-              height: 80,
+              height: swiper ? 200 : 80,
               backgroundColor: theme.colors.loaderBg,
             }}
           />
@@ -91,21 +97,41 @@ export default function NotesScreen() {
           <Column gap={6}>
             <Row justifyContent="space-between" gap={8} alignItems="center">
               {item?.title && (
-                <Text numberOfLines={1} style={commonStyles.basicText}>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    commonStyles.basicText,
+                    swiper && commonStyles.titleText,
+                  ]}
+                >
                   {item.title}
                 </Text>
               )}
               {item.pinned && (
-                <Ionicons size={16} color={themeColor.dark} name="pricetag" />
+                <Ionicons
+                  size={swiper ? 20 : 16}
+                  color={swiper ? themeColor.light : themeColor.dark}
+                  name="pricetag"
+                />
               )}
             </Row>
-            <Text numberOfLines={3} style={commonStyles.tinyText}>
+            <Text
+              numberOfLines={swiper ? 18 : 3}
+              style={[commonStyles.tinyText, swiper && commonStyles.basicText]}
+            >
               {item.note}
             </Text>
           </Column>
           <Column gap={8}>
             <Row alignItems="center">
-              <Text style={commonStyles.tTinyText}>Creator: </Text>
+              <Text
+                style={[
+                  commonStyles.tTinyText,
+                  swiper && commonStyles.tinyText,
+                ]}
+              >
+                Creator:{" "}
+              </Text>
               <Avatar
                 name={
                   item?.createdByDetails
@@ -114,22 +140,29 @@ export default function NotesScreen() {
                 }
                 image={item?.createdByDetails?.image}
                 withName
+                size={swiper ? 20 : undefined}
               />
             </Row>
             <Row alignItems="center" gap={4}>
               <Ionicons
                 name="time-outline"
-                size={12}
+                size={swiper ? 16 : 12}
                 color={theme.colors.textLight}
               />
-              <Text numberOfLines={1} style={commonStyles.tTinyText}>
+              <Text
+                numberOfLines={1}
+                style={[
+                  commonStyles.tTinyText,
+                  swiper && commonStyles.tinyText,
+                ]}
+              >
                 {formatDate(item?.createdAt)}
               </Text>
             </Row>
           </Column>
         </Column>
       </CardWrapper>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   const renderFooter = () =>
@@ -141,7 +174,16 @@ export default function NotesScreen() {
     <ScreenWrapper
       title="Notes"
       image={noteImages}
-      onSearchPress={toggleSearch}
+      // onSearchPress={toggleSearch}
+      rightIcon={
+        <TouchableOpacity onPress={toggleView}>
+          <Ionicons
+            name={cardView ? "grid-outline" : "tablet-portrait-outline"}
+            size={30}
+            color={theme.colors.white}
+          />
+        </TouchableOpacity>
+      }
     >
       <View style={commonStyles.screenWrapper}>
         {notes?.length === 0 || initialLoading ? (
@@ -160,19 +202,55 @@ export default function NotesScreen() {
                 onChangeText={searchNotes}
               />
             )}
-            <FlatList
-              data={notes}
-              keyExtractor={(item) => item._id!}
-              renderItem={renderItem}
-              refreshing={initialLoading}
-              onRefresh={() => fetchNotes(1, true)}
-              onEndReached={loadMoreNotes}
-              onEndReachedThreshold={0.5}
-              ListFooterComponent={renderFooter}
-              contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
-              showsVerticalScrollIndicator={false}
-              numColumns={2}
-            />
+            {!cardView ? (
+              <FlatList
+                data={notes}
+                keyExtractor={(item) => item._id!}
+                renderItem={renderItem}
+                refreshing={initialLoading}
+                onRefresh={() => fetchNotes(1, true)}
+                onEndReached={loadMoreNotes}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={renderFooter}
+                contentContainerStyle={{ paddingBottom: theme.spacing.lg }}
+                showsVerticalScrollIndicator={false}
+                numColumns={2}
+              />
+            ) : (
+              <View style={styles.container}>
+                <Swiper
+                  cards={notes}
+                  // verticalSwipe={false}
+                  swipeAnimationDuration={1000}
+                  stackSeparation={20}
+                  cardIndex={0}
+                  stackSize={3}
+                  cardVerticalMargin={0}
+                  cardHorizontalMargin={0}
+                  backgroundColor="transparent"
+                  onSwipedAll={() => {
+                    fetchNotes(1, true);
+                  }}
+                  renderCard={(note) => {
+                    return (
+                      <ImageBackground
+                        source={{
+                          uri: note.image?.trim() ? note.image : "",
+                          // : loggedInUser?.partner?.image ?? loggedInUser?.image,
+                        }}
+                        style={styles.card}
+                      >
+                        <LinearGradient
+                          colors={["#00000099", "#00000099"]}
+                          style={styles.overlay}
+                        />
+                        {renderItem({ item: note, swiper: true })}
+                      </ImageBackground>
+                    );
+                  }}
+                />
+              </View>
+            )}
           </>
         )}
       </View>
@@ -180,3 +258,29 @@ export default function NotesScreen() {
     </ScreenWrapper>
   );
 }
+
+export const cardStyle = (theme: any, themeColor: any) => {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    card: {
+      backgroundColor: isDarkMode ? themeColor.dark : themeColor.light,
+      borderRadius: 20,
+      width: dimensions.width - 24,
+      elevation: 10,
+      height: dimensions.height - 230,
+      overflow: "hidden",
+    },
+    overlay: {
+      ...StyleSheet.absoluteFill,
+      position: "absolute",
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+    },
+  });
+};

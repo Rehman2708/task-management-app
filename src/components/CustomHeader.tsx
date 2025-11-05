@@ -12,6 +12,7 @@ interface HeaderProps {
   title?: string;
   subTitle?: string;
   showBackbutton?: boolean;
+  rightIcon?: React.ReactNode;
   hideNotificationButton?: boolean;
   whiteBg?: boolean;
   showImage?: boolean;
@@ -22,6 +23,7 @@ const CustomHeader = ({
   title,
   subTitle,
   showBackbutton,
+  rightIcon,
   showImage,
   whiteBg,
   onBackButtonPress,
@@ -114,7 +116,7 @@ const CustomHeader = ({
               )}
           </Column>
         </Row>
-        <Row gap={20}>
+        <Row>
           {onSearchPress && (
             <TouchableOpacity onPress={onSearchPress}>
               <Ionicons
@@ -125,15 +127,24 @@ const CustomHeader = ({
             </TouchableOpacity>
           )}
           {!hideNotificationButton && (
-            <TouchableOpacity
-              onPress={() => navigation.navigate(ROUTES.NOTIFICATION)}
-            >
-              <Ionicons
-                name="notifications-outline"
-                size={30}
-                color={whiteBg ? theme.colors.text : theme.colors.white}
-              />
-            </TouchableOpacity>
+            <>
+              <Spacer size={20} position="right" />
+              <TouchableOpacity
+                onPress={() => navigation.navigate(ROUTES.NOTIFICATION)}
+              >
+                <Ionicons
+                  name="notifications-outline"
+                  size={30}
+                  color={whiteBg ? theme.colors.text : theme.colors.white}
+                />
+              </TouchableOpacity>
+            </>
+          )}
+          {rightIcon && (
+            <>
+              <Spacer size={20} position="right" />
+              {rightIcon}
+            </>
           )}
         </Row>
       </Row>
