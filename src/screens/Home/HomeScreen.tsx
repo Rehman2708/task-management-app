@@ -16,7 +16,7 @@ import TasksCard from "../../components/tasksCard";
 import { Images } from "../../../assets/images/images";
 import { useTheme } from "../../infrastructure/theme";
 import { useUtilStore } from "../../store/utils";
-import { Row } from "../../tools";
+import { Row, Spacer } from "../../tools";
 import { useHomeScreenViewModel } from "./homeViewModel";
 import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 
@@ -51,7 +51,9 @@ export default function HomeScreen({ navigation }: any) {
   const renderFooter = () =>
     tab === "History" && loadingMore ? (
       <ScreenLoader type={LoaderTypes.TaskScreen} count={5} />
-    ) : null;
+    ) : (
+      <Spacer size={120} />
+    );
 
   return (
     <ScreenWrapper

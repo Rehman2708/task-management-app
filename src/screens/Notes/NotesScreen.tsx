@@ -14,7 +14,7 @@ import FloatingAdd from "../../components/FloatingAdd";
 import { useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { ROUTES } from "../../enums/routes";
-import { Column, dimensions, isDarkMode, Row } from "../../tools";
+import { Column, dimensions, isDarkMode, Row, Spacer } from "../../tools";
 import EmptyState from "../../components/emptyState";
 import { useHelper } from "../../utils/helper";
 import { Note } from "../../repositories/notes";
@@ -174,7 +174,9 @@ export default function NotesScreen() {
   const renderFooter = () =>
     loadingMore && page < totalPages ? (
       <ScreenLoader type={LoaderTypes.NotesScreen} count={4} />
-    ) : null;
+    ) : (
+      <Spacer size={120} />
+    );
 
   return (
     <ScreenWrapper

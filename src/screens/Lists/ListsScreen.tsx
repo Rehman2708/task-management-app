@@ -17,7 +17,7 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import FloatingAdd from "../../components/FloatingAdd";
 import EmptyState from "../../components/emptyState";
 import { ROUTES } from "../../enums/routes";
-import { Column, Row } from "../../tools";
+import { Column, Row, Spacer } from "../../tools";
 import { Ionicons } from "@expo/vector-icons";
 import CardWrapper from "../../components/cardWrapper";
 import CustomInput from "../../components/customInput";
@@ -203,7 +203,9 @@ export default function ListsScreen() {
   const renderFooter = () =>
     loadingMore && page < totalPages ? (
       <ScreenLoader type={LoaderTypes.ListScreen} count={4} />
-    ) : null;
+    ) : (
+      <Spacer size={120} />
+    );
 
   return (
     <ScreenWrapper

@@ -70,6 +70,11 @@ export default function ProfileScreen() {
       title: "Add video",
       onPress: createVideoScreen,
     },
+    {
+      title: "Logout",
+      onPress: logout,
+      error: true,
+    },
   ];
   return (
     <ScreenWrapper title="Profile">
@@ -243,37 +248,43 @@ export default function ProfileScreen() {
                 </Column>
               )}
               <Spacer size={20} />
+              <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
+              <Spacer size={20} />
+
               {tabs.map((item, index) => {
                 return (
                   <TouchableOpacity key={index} onPress={item.onPress}>
                     <Row
-                      style={commonStyles.cardContainer}
+                      style={[
+                        commonStyles.cardContainer,
+                        item.error ? { borderColor: theme.colors.error } : {},
+                      ]}
                       justifyContent="space-between"
                       alignItems="center"
                     >
-                      <Text style={[commonStyles.basicText]}>{item.title}</Text>
+                      <Text
+                        style={[
+                          commonStyles.basicText,
+                          item.error && { color: theme.colors.error },
+                        ]}
+                      >
+                        {item.title}
+                      </Text>
                       <Ionicons
                         name="chevron-forward-outline"
                         size={20}
-                        color={theme.colors.text}
+                        color={
+                          item.error ? theme.colors.error : theme.colors.text
+                        }
                       />
                     </Row>
                   </TouchableOpacity>
                 );
               })}
-
-              <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
             </Column>
+
+            <Spacer size={120} />
           </ScrollView>
-          <Row style={{ paddingHorizontal: isAndroid ? 10 : 16 }}>
-            <CustomButton
-              rounded
-              title="Logout"
-              onPress={logout}
-              error
-              loading={loggingOut}
-            />
-          </Row>
         </>
       )}
       <ImageView
