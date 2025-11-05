@@ -50,7 +50,12 @@ const SplashScreen = () => {
       );
       updateUser(user as IUser);
       await fetchUserDetails(user?.userId!);
-
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
+        })
+      );
       // ✅ After navigation reset, handle notification launch if any
       if (launchedFromNotification) {
         setTimeout(() => {
@@ -58,12 +63,6 @@ const SplashScreen = () => {
           clearLaunchedFromNotification();
         }, 500); // wait until navigation tree is ready
       } else {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
-          })
-        );
       }
     })();
   }, []);

@@ -62,9 +62,9 @@ export default function ListsScreen() {
   const renderItem = ({ item, swiper }: { item: List; swiper?: boolean }) => {
     const completedCount = item.items.filter((i) => i.completed).length;
     const totalCount = item.items.length;
-
+    const Container = swiper ? Pressable : TouchableOpacity;
     return (
-      <Pressable
+      <Container
         onLongPress={() => pinUnpinList(item._id, item.pinned ?? false)}
         onPress={() =>
           navigation.navigate(ROUTES.VIEW_LIST, { listId: item._id })
@@ -196,7 +196,7 @@ export default function ListsScreen() {
             </Row>
           </Column>
         </CardWrapper>
-      </Pressable>
+      </Container>
     );
   };
 

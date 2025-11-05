@@ -58,112 +58,118 @@ export default function NotesScreen() {
     fetchNotes(1, true);
   }, [fetchingNotes]);
 
-  const renderItem = ({ item, swiper }: { item: Note; swiper?: boolean }) => (
-    <Pressable
-      onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
-      onPress={() =>
-        navigation.navigate(ROUTES.VIEW_NOTE, { noteId: item._id })
-      }
-      style={{ flex: 1, marginHorizontal: 4 }}
-    >
-      <CardWrapper
-        // image={item?.image}
-        style={[
-          commonStyles.cardContainer,
-          commonStyles.fullFlex,
-          { padding: 0 },
-        ]}
+  const renderItem = ({ item, swiper }: { item: Note; swiper?: boolean }) => {
+    const Container = swiper ? Pressable : TouchableOpacity;
+    return (
+      <Container
+        onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
+        onPress={() =>
+          navigation.navigate(ROUTES.VIEW_NOTE, { noteId: item._id })
+        }
+        style={{ flex: 1, marginHorizontal: 4 }}
       >
-        {item.image && !swiper && (
-          <Image
-            source={{ uri: item.image }}
-            style={{
-              width: "100%",
-              height: swiper ? 200 : 80,
-              backgroundColor: theme.colors.loaderBg,
-            }}
-          />
-        )}
-        <Column
-          gap={7}
+        <CardWrapper
+          // image={item?.image}
           style={[
+            commonStyles.cardContainer,
             commonStyles.fullFlex,
-            {
-              padding: 12,
-            },
+            { padding: 0 },
           ]}
-          justifyContent="space-between"
         >
-          <Column gap={6}>
-            <Row justifyContent="space-between" gap={8} alignItems="center">
-              {item?.title && (
+          {item.image && !swiper && (
+            <Image
+              source={{ uri: item.image }}
+              style={{
+                width: "100%",
+                height: swiper ? 200 : 80,
+                backgroundColor: theme.colors.loaderBg,
+              }}
+            />
+          )}
+          <Column
+            gap={7}
+            style={[
+              commonStyles.fullFlex,
+              {
+                padding: 12,
+              },
+            ]}
+            justifyContent="space-between"
+          >
+            <Column gap={6}>
+              <Row justifyContent="space-between" gap={8} alignItems="center">
+                {item?.title && (
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      commonStyles.basicText,
+                      swiper && commonStyles.titleText,
+                    ]}
+                  >
+                    {item.title}
+                  </Text>
+                )}
+                {item.pinned && (
+                  <Ionicons
+                    size={swiper ? 20 : 16}
+                    color={swiper ? themeColor.light : themeColor.dark}
+                    name="pricetag"
+                  />
+                )}
+              </Row>
+              <Text
+                numberOfLines={swiper ? 18 : 3}
+                style={[
+                  commonStyles.tinyText,
+                  swiper && commonStyles.basicText,
+                ]}
+              >
+                {item.note}
+              </Text>
+            </Column>
+            <Column gap={8}>
+              <Row alignItems="center">
+                <Text
+                  style={[
+                    commonStyles.tTinyText,
+                    swiper && commonStyles.tinyText,
+                  ]}
+                >
+                  Creator:{" "}
+                </Text>
+                <Avatar
+                  name={
+                    item?.createdByDetails
+                      ? item.createdByDetails.name.split(" ")[0]
+                      : item.createdBy
+                  }
+                  image={item?.createdByDetails?.image}
+                  withName
+                  size={swiper ? 20 : undefined}
+                />
+              </Row>
+              <Row alignItems="center" gap={4}>
+                <Ionicons
+                  name="time-outline"
+                  size={swiper ? 16 : 12}
+                  color={theme.colors.textLight}
+                />
                 <Text
                   numberOfLines={1}
                   style={[
-                    commonStyles.basicText,
-                    swiper && commonStyles.titleText,
+                    commonStyles.tTinyText,
+                    swiper && commonStyles.tinyText,
                   ]}
                 >
-                  {item.title}
+                  {formatDate(item?.createdAt)}
                 </Text>
-              )}
-              {item.pinned && (
-                <Ionicons
-                  size={swiper ? 20 : 16}
-                  color={swiper ? themeColor.light : themeColor.dark}
-                  name="pricetag"
-                />
-              )}
-            </Row>
-            <Text
-              numberOfLines={swiper ? 18 : 3}
-              style={[commonStyles.tinyText, swiper && commonStyles.basicText]}
-            >
-              {item.note}
-            </Text>
+              </Row>
+            </Column>
           </Column>
-          <Column gap={8}>
-            <Row alignItems="center">
-              <Text
-                style={[
-                  commonStyles.tTinyText,
-                  swiper && commonStyles.tinyText,
-                ]}
-              >
-                Creator:{" "}
-              </Text>
-              <Avatar
-                name={
-                  item?.createdByDetails
-                    ? item.createdByDetails.name.split(" ")[0]
-                    : item.createdBy
-                }
-                image={item?.createdByDetails?.image}
-                withName
-                size={swiper ? 20 : undefined}
-              />
-            </Row>
-            <Row alignItems="center" gap={4}>
-              <Ionicons
-                name="time-outline"
-                size={swiper ? 16 : 12}
-                color={theme.colors.textLight}
-              />
-              <Text
-                numberOfLines={1}
-                style={[
-                  commonStyles.tTinyText,
-                  swiper && commonStyles.tinyText,
-                ]}
-              >
-                {formatDate(item?.createdAt)}
-              </Text>
-            </Row>
-          </Column>
-        </Column>
-      </CardWrapper>
-    </Pressable>
-  );
+        </CardWrapper>
+      </Container>
+    );
+  };
 
   const renderFooter = () =>
     loadingMore && page < totalPages ? (

@@ -77,7 +77,7 @@ export default function App() {
         ref={navigationRef}
         onReady={() => {
           if (launchedFromNotification) {
-            handleNotificationNavigation(launchedFromNotification);
+            // handleNotificationNavigation(launchedFromNotification);
             clearLaunchedFromNotification();
           }
         }}
