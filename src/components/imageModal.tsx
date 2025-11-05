@@ -123,7 +123,7 @@ const ImageModal = ({
             </Row>
 
             {loading || error.trim().length > 0 || images.length <= 0 ? (
-              <View style={{ minHeight: 370 }}>
+              <View style={{ minHeight: 270 }}>
                 <EmptyState
                   text={error.trim().length > 0 ? error : "No Image"}
                   loading={loading}

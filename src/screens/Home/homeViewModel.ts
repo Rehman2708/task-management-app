@@ -92,7 +92,8 @@ export function useHomeScreenViewModel() {
 
   const taskImages: string[] = tasks
     .map((task) => task.image)
-    .filter((img): img is string => !!img);
+    .filter((img): img is string => !!img)
+    .sort(() => Math.random() - 0.5);
 
   return {
     tasks,

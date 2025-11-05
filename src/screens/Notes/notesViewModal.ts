@@ -113,7 +113,8 @@ export function useNotesListViewModel(userId?: string) {
 
   const noteImages: string[] = notes
     .map((note) => note.image)
-    .filter((img): img is string => !!img);
+    .filter((img): img is string => !!img)
+    .sort(() => Math.random() - 0.5);
 
   return {
     notes,

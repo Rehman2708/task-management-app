@@ -12,7 +12,8 @@ import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
 import { useHelper } from "../../utils/helper";
 import { IUser } from "../../types/auth";
-import { getLaunchedFromNotification } from "../../../notification";
+import { useNotificationStore } from "../../store/notificationStore";
+import { handleNotificationNavigation } from "../../../notification";
 
 const SplashScreen = () => {
   const { themeColor } = useHelper();
@@ -21,6 +22,9 @@ const SplashScreen = () => {
   const { updateUser } = useAuthStore();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
+
+  const { launchedFromNotification, clearLaunchedFromNotification } =
+    useNotificationStore();
 
   const fetchUserDetails = async (id: string) => {
     try {
@@ -47,7 +51,13 @@ const SplashScreen = () => {
       updateUser(user as IUser);
       await fetchUserDetails(user?.userId!);
 
-      if (!getLaunchedFromNotification()) {
+      // ✅ After navigation reset, handle notification launch if any
+      if (launchedFromNotification) {
+        setTimeout(() => {
+          handleNotificationNavigation(launchedFromNotification);
+          clearLaunchedFromNotification();
+        }, 500); // wait until navigation tree is ready
+      } else {
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -68,7 +78,7 @@ const SplashScreen = () => {
       alignItems="center"
     >
       <Logo />
-      {!loading && <ActivityIndicator size="large" color={themeColor.dark} />}
+      {loading && <ActivityIndicator size="large" color={themeColor.dark} />}
     </Column>
   );
 };

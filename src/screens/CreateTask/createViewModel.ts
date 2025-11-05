@@ -22,7 +22,8 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
     initialTask?.description || ""
   );
   const [assignedTo, setAssignedTo] = useState<AssignedTo>(
-    initialTask?.assignedTo || AssignedTo.Both
+    initialTask?.assignedTo ||
+      (user?.partner?.userId ? AssignedTo.Both : AssignedTo.Me)
   );
   const [frequency, setFrequency] = useState<Frequency>(
     initialTask?.frequency || Frequency.Once

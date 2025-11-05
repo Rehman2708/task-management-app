@@ -111,7 +111,8 @@ export function useListsViewModel(userId?: string) {
 
   const listImages: string[] = lists
     .map((list) => list.image)
-    .filter((img): img is string => !!img);
+    .filter((img): img is string => !!img)
+    .sort(() => Math.random() - 0.5);
 
   return {
     lists,
