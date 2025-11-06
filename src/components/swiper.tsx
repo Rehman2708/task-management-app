@@ -8,6 +8,8 @@ interface SwiperProps {
   rightAction?: () => ReactNode;
   leftAction?: () => ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
+  closeInstant?: boolean;
+  onEnded?: () => void;
 }
 
 const Swiper: React.FC<SwiperProps> = ({
@@ -15,15 +17,21 @@ const Swiper: React.FC<SwiperProps> = ({
   rightAction,
   leftAction,
   containerStyle,
+  closeInstant,
+  onEnded,
 }) => {
   const swipeableRef = useRef<Swipeable>(null);
   const { triggerVibration } = useHelper();
   const handleSwipeOpen = useCallback(() => {
-    const timer = setTimeout(() => {
-      swipeableRef.current?.close();
-    }, 3000);
+    if (!closeInstant) {
+      const timer = setTimeout(() => {
+        swipeableRef.current?.close();
+      }, 3000);
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    } else {
+      swipeableRef.current?.close();
+    }
   }, []);
 
   return (
@@ -34,6 +42,7 @@ const Swiper: React.FC<SwiperProps> = ({
       onSwipeableOpen={handleSwipeOpen}
       containerStyle={containerStyle}
       onActivated={() => triggerVibration()}
+      onSwipeableClose={onEnded}
     >
       {children}
     </Swipeable>

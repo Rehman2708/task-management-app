@@ -18,6 +18,8 @@ import { Images } from "../../../assets/images/images";
 import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import Avatar from "../../components/avatar";
 import { handleNotificationNavigation } from "../../../notification";
+import Swiper from "../../components/swiper";
+import { Ionicons } from "@expo/vector-icons";
 
 interface NotificationItem {
   _id: string;
@@ -120,33 +122,55 @@ const NotificationScreen = () => {
   const renderItem = ({ item }: { item: NotificationItem }) => {
     const bgColor = item.isRead ? "transparent" : `${themeColor.light}30`;
     return (
-      <TouchableOpacity
-        style={[
-          // commonStyles.cardContainer,
-          {
-            backgroundColor: bgColor,
-            borderColor: theme.colors.border,
-            borderBottomWidth: 1,
-            paddingVertical: 16,
-            paddingHorizontal: 16,
-          },
-        ]}
-        onPress={() => handleNotification(item._id, item?.data)}
+      <Swiper
+        closeInstant
+        onEnded={() => markAsRead(item._id)}
+        rightAction={
+          !item.isRead
+            ? () => (
+                <Column
+                  style={{ padding: 12, paddingHorizontal: 30 }}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Ionicons
+                    name="eye-outline"
+                    color={themeColor.dark}
+                    size={30}
+                  />
+                </Column>
+              )
+            : undefined
+        }
       >
-        <Row alignItems="center">
-          {item?.data?.image && (
-            <Avatar disabled image={item.data.image} name="NA" size={50} />
-          )}
-          <Spacer size={12} position="right" />
-          <Column gap={3} style={commonStyles.fullFlex}>
-            <Text style={[commonStyles.basicText]}>{item.title}</Text>
-            <Text style={[commonStyles.tinyText]}>{item.body}</Text>
-            <Text style={commonStyles.tTinyText}>
-              {formatDate(item.createdAt)}
-            </Text>
-          </Column>
-        </Row>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            // commonStyles.cardContainer,
+            {
+              backgroundColor: bgColor,
+              borderColor: theme.colors.border,
+              borderBottomWidth: 1,
+              paddingVertical: 16,
+              paddingHorizontal: 16,
+            },
+          ]}
+          onPress={() => handleNotification(item._id, item?.data)}
+        >
+          <Row alignItems="center">
+            {item?.data?.image && (
+              <Avatar disabled image={item.data.image} name="NA" size={50} />
+            )}
+            <Spacer size={12} position="right" />
+            <Column gap={3} style={commonStyles.fullFlex}>
+              <Text style={[commonStyles.basicText]}>{item.title}</Text>
+              <Text style={[commonStyles.tinyText]}>{item.body}</Text>
+              <Text style={commonStyles.tTinyText}>
+                {formatDate(item.createdAt)}
+              </Text>
+            </Column>
+          </Row>
+        </TouchableOpacity>
+      </Swiper>
     );
   };
 

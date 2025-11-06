@@ -282,9 +282,8 @@ export default function ProfileScreen() {
                 );
               })}
             </Column>
-
-            <Spacer size={120} />
           </ScrollView>
+          <Spacer size={120} />
         </>
       )}
       <ImageView
