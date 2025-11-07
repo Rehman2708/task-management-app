@@ -18,6 +18,7 @@ import NotificationScreen from "../screens/Notifications/NotificationScreen";
 import FontScreen from "../screens/theme/FontScreen";
 import CreateListScreen from "../screens/CreateList/CreateListScreen";
 import ViewListScreen from "../screens/ViewList/ViewListScreen";
+import ResetPasswordScreen from "../screens/ResetPassword/ResetPasswordScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,10 @@ export default function AppNavigator() {
       <Stack.Screen name={ROUTES.NOTIFICATION} component={NotificationScreen} />
       <Stack.Screen name={ROUTES.CREATE_LIST} component={CreateListScreen} />
       <Stack.Screen name={ROUTES.VIEW_LIST} component={ViewListScreen} />
+      <Stack.Screen
+        name={ROUTES.RESET_PASSWORD}
+        component={ResetPasswordScreen}
+      />
     </Stack.Navigator>
   );
 }

@@ -25,6 +25,11 @@ const CommentCard = ({
   const isMyChat = loggedInUser?.userId === userId;
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
+  const isSingleEmoji = (): boolean => {
+    if (!text) return false;
+    const emojiRegex = /^(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)$/u;
+    return emojiRegex.test(text.trim());
+  };
 
   const renderAction = () => (
     <View
@@ -45,7 +50,11 @@ const CommentCard = ({
       leftAction={!isMyChat ? renderAction : undefined}
       containerStyle={{ marginTop: repeated ? 2 : 8 }}
     >
-      <Row gap={8} justifyContent={isMyChat ? "flex-end" : "flex-start"}>
+      <Row
+        gap={8}
+        justifyContent={isMyChat ? "flex-end" : "flex-start"}
+        alignItems={isSingleEmoji() ? "center" : "flex-start"}
+      >
         {!isMyChat && (
           <>
             {repeated ? (
@@ -59,23 +68,29 @@ const CommentCard = ({
             )}
           </>
         )}
-        <View
-          style={{
-            backgroundColor: isMyChat
-              ? `${themeColor.light}`
-              : `${themeColor.dark}`,
-            paddingHorizontal: 14,
-            paddingVertical: 6,
-            borderRadius: 16,
-            maxWidth: dimensions.width - 120,
-            borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
-            borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
-          }}
-        >
-          <Text style={[commonStyles.smallText, { color: theme.colors.white }]}>
-            {text}
-          </Text>
-        </View>
+        {isSingleEmoji() ? (
+          <Text style={[{ fontSize: 36 }]}>{text}</Text>
+        ) : (
+          <View
+            style={{
+              backgroundColor: isMyChat
+                ? `${themeColor.light}`
+                : `${themeColor.dark}`,
+              paddingHorizontal: 14,
+              paddingVertical: 6,
+              borderRadius: 16,
+              maxWidth: dimensions.width - 120,
+              borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
+              borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
+            }}
+          >
+            <Text
+              style={[commonStyles.smallText, { color: theme.colors.white }]}
+            >
+              {text}
+            </Text>
+          </View>
+        )}
         {isMyChat && (
           <>
             {repeated ? (

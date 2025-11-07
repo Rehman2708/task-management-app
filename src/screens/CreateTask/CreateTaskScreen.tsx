@@ -23,7 +23,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
   const commonStyles = useCommonStyles(theme);
 
   const styles = createTaskStyle(theme);
-  const { themeColor, getPriorityColor } = useHelper();
+  const { themeColor, getPriorityColor, loggedInUser } = useHelper();
 
   useEffect(() => {
     if (task) {
@@ -64,44 +64,47 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
             onChangeText={vm.setDescription}
             multiline
           />
-
-          <Text style={commonStyles.smallText}>For</Text>
-          <Row gap={isAndroid ? 14 : 16} alignItems="center">
-            {["Me", "Partner", "Both"].map((option, index) => (
-              <TouchableOpacity
-                key={option}
-                onPress={() => vm.setAssignedTo(option as any)}
-                style={[
-                  styles.assignButton,
-                  vm.assignedTo === option
-                    ? styles.assignButtonActive
-                    : styles.assignButtonInactive,
-                  {},
-                ]}
-              >
-                <Row gap={6} alignItems="center">
-                  <AssignedIcon
-                    type={option as AssignedTo}
-                    color={
-                      vm.assignedTo === option
-                        ? theme.colors.white
-                        : themeColor.dark
-                    }
-                  />
-                  <Text
+          {loggedInUser?.partner?.userId && (
+            <>
+              <Text style={commonStyles.smallText}>For</Text>
+              <Row gap={isAndroid ? 14 : 16} alignItems="center">
+                {["Me", "Partner", "Both"].map((option, index) => (
+                  <TouchableOpacity
+                    key={option}
+                    onPress={() => vm.setAssignedTo(option as any)}
                     style={[
-                      commonStyles.smallText,
+                      styles.assignButton,
                       vm.assignedTo === option
-                        ? styles.assignTextActive
-                        : styles.assignTextInactive,
+                        ? styles.assignButtonActive
+                        : styles.assignButtonInactive,
+                      {},
                     ]}
                   >
-                    {option}
-                  </Text>
-                </Row>
-              </TouchableOpacity>
-            ))}
-          </Row>
+                    <Row gap={6} alignItems="center">
+                      <AssignedIcon
+                        type={option as AssignedTo}
+                        color={
+                          vm.assignedTo === option
+                            ? theme.colors.white
+                            : themeColor.dark
+                        }
+                      />
+                      <Text
+                        style={[
+                          commonStyles.smallText,
+                          vm.assignedTo === option
+                            ? styles.assignTextActive
+                            : styles.assignTextInactive,
+                        ]}
+                      >
+                        {option}
+                      </Text>
+                    </Row>
+                  </TouchableOpacity>
+                ))}
+              </Row>
+            </>
+          )}
 
           {/* <Text style={commonStyles.smallText}>Frequency</Text>
           <Row gap={isAndroid ? 14 : 16} alignItems="center">

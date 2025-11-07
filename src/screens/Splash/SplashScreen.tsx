@@ -12,7 +12,8 @@ import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
 import { useHelper } from "../../utils/helper";
 import { IUser } from "../../types/auth";
-import { getLaunchedFromNotification } from "../../../notification";
+import { useNotificationStore } from "../../store/notificationStore";
+import { handleNotificationNavigation } from "../../../notification";
 
 const SplashScreen = () => {
   const { themeColor } = useHelper();
@@ -21,6 +22,9 @@ const SplashScreen = () => {
   const { updateUser } = useAuthStore();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
+
+  const { launchedFromNotification, clearLaunchedFromNotification } =
+    useNotificationStore();
 
   const fetchUserDetails = async (id: string) => {
     try {
@@ -45,15 +49,20 @@ const SplashScreen = () => {
         LocalStorageKey.USER
       );
       updateUser(user as IUser);
-      await fetchUserDetails(user?.userId!);
-
-      if (!getLaunchedFromNotification()) {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
-          })
-        );
+      fetchUserDetails(user?.userId!);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
+        })
+      );
+      // ✅ After navigation reset, handle notification launch if any
+      if (launchedFromNotification) {
+        setTimeout(() => {
+          handleNotificationNavigation(launchedFromNotification);
+          clearLaunchedFromNotification();
+        }, 500); // wait until navigation tree is ready
+      } else {
       }
     })();
   }, []);
@@ -68,7 +77,7 @@ const SplashScreen = () => {
       alignItems="center"
     >
       <Logo />
-      {!loading && <ActivityIndicator size="large" color={themeColor.dark} />}
+      {loading && <ActivityIndicator size="large" color={themeColor.dark} />}
     </Column>
   );
 };

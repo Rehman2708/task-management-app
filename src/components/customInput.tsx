@@ -13,6 +13,7 @@ import { useTheme } from "../infrastructure/theme";
 import { Column, isAndroid, Row } from "../tools";
 import { useCommonStyles } from "../styles/commonstyles";
 import { Ionicons } from "@expo/vector-icons";
+import { useHelper } from "../utils/helper";
 
 export type CustomInputProps = {
   title?: string;
@@ -49,6 +50,7 @@ const CustomInput = ({
 }: CustomInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [maxChar, setMaxChar] = useState<number | undefined>(maxLength);
+  const { themeColor } = useHelper();
   const theme = useTheme();
   const styles = customInputStyle(theme);
   const commonStyles = useCommonStyles(theme);
@@ -101,7 +103,7 @@ const CustomInput = ({
             <Ionicons
               name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
               size={24}
-              color={theme.colors.primary}
+              color={themeColor.dark}
             />
           </TouchableOpacity>
         )}

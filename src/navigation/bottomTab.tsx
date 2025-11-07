@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ROUTES } from "../enums/routes";
-import { isDarkMode, Row, Spacer } from "../tools";
+import { dimensions, isDarkMode, Row, Spacer } from "../tools";
 import { useTheme } from "../infrastructure/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useHelper } from "../utils/helper";
@@ -61,10 +61,10 @@ const TabIcon: React.FC<TabIconProps> = ({
       }}
       onPress={onPress}
     >
-      <Animated.View style={animatedStyle}>
+      <Animated.View style={[{ paddingHorizontal: 6,paddingVertical:2 }, animatedStyle]}>
         <Ionicons
           name={iconName}
-          size={24}
+          size={26}
           color={
             iconName === "heart"
               ? "red"
@@ -135,14 +135,14 @@ const CustomTabBar: React.FC<any> = ({ state, descriptors, navigation }) => {
                 theme={theme}
                 onPress={handleNavigation}
               />
-              <Spacer size={8} />
+              {/* <Spacer size={8} />
               <AnimatedLabel
                 label={
                   routeTitles[route.name as keyof typeof ROUTES] || route.name
                 }
                 isFocused={isFocused}
                 theme={theme}
-              />
+              /> */}
             </Pressable>
           );
         })}
@@ -183,12 +183,20 @@ const AnimatedLabel: React.FC<{
 const useBottomTabStyles = (theme: any) => {
   return StyleSheet.create({
     container: {
-      borderTopWidth: 1,
-      borderTopColor: `${theme.colors.border}`,
-      backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: `${theme.colors.border}`,
+      backgroundColor: `${theme.colors.background}aa`,
+      position: "absolute",
+      width: dimensions.width - 100,
+      bottom: 0,
+      marginHorizontal: 50,
+      marginBottom: 10,
+      borderRadius: 100,
+      overflow: "hidden",
+      elevation: 20,
     },
     tabBarContainer: {
-      backgroundColor: theme.colors.background,
+      // backgroundColor: theme.colors.background,
       paddingHorizontal: 15,
       paddingBottom: 18,
       paddingTop: 15,

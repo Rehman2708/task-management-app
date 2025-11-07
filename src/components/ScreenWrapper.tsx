@@ -17,6 +17,7 @@ const ScreenWrapper = ({
   showImage,
   onSearchPress,
   noPadding,
+  rightIcon,
   hideNotificationButton,
 }: {
   children: React.ReactNode;
@@ -28,7 +29,7 @@ const ScreenWrapper = ({
   onBackButtonPress?: () => void;
   onSearchPress?: () => void;
   image?: string | string[];
-
+  rightIcon?: React.ReactNode;
   hideNotificationButton?: boolean;
 }) => {
   const theme = useTheme();
@@ -62,6 +63,7 @@ const ScreenWrapper = ({
               showImage={showImage}
               onSearchPress={onSearchPress}
               hideNotificationButton={hideNotificationButton}
+              rightIcon={rightIcon}
             />
           </View>
           {/* {!subTitle && <TimeDisplay />} */}

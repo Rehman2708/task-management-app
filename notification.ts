@@ -5,13 +5,6 @@ import { ROUTES } from "./src/enums/routes";
 import { createNavigationContainerRef } from "@react-navigation/native";
 
 export const navigationRef = createNavigationContainerRef();
-export let pendingNotificationData: any = null;
-let _launchedFromNotification = false;
-
-export const getLaunchedFromNotification = () => _launchedFromNotification;
-export const setLaunchedFromNotification = (value: boolean) => {
-  _launchedFromNotification = value;
-};
 
 export async function ensurePermission() {
   if (!Device.isDevice) {
