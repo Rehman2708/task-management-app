@@ -52,7 +52,7 @@ export default function HomeScreen({ navigation }: any) {
     tab === "History" && loadingMore ? (
       <ScreenLoader type={LoaderTypes.TaskScreen} count={5} />
     ) : (
-      <Spacer size={120} />
+      <Spacer size={100} />
     );
 
   return (

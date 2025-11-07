@@ -49,7 +49,7 @@ const SplashScreen = () => {
         LocalStorageKey.USER
       );
       updateUser(user as IUser);
-      await fetchUserDetails(user?.userId!);
+      fetchUserDetails(user?.userId!);
       navigation.dispatch(
         CommonActions.reset({
           index: 0,

@@ -185,7 +185,7 @@ export default function ReelsScreen() {
           />
         }
       />
-      <Spacer size={100} />
+      <Spacer size={80} />
     </SafeAreaView>
   );
 }

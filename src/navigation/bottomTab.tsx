@@ -61,10 +61,10 @@ const TabIcon: React.FC<TabIconProps> = ({
       }}
       onPress={onPress}
     >
-      <Animated.View style={[{ padding: 6 }, animatedStyle]}>
+      <Animated.View style={[{ paddingHorizontal: 6,paddingVertical:2 }, animatedStyle]}>
         <Ionicons
           name={iconName}
-          size={28}
+          size={26}
           color={
             iconName === "heart"
               ? "red"
@@ -185,12 +185,12 @@ const useBottomTabStyles = (theme: any) => {
     container: {
       borderWidth: 1,
       borderColor: `${theme.colors.border}`,
-      backgroundColor: `${theme.colors.background}99`,
+      backgroundColor: `${theme.colors.background}aa`,
       position: "absolute",
-      width: dimensions.width - 80,
+      width: dimensions.width - 100,
       bottom: 0,
-      marginHorizontal: 40,
-      marginBottom: 16,
+      marginHorizontal: 50,
+      marginBottom: 10,
       borderRadius: 100,
       overflow: "hidden",
       elevation: 20,

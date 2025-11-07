@@ -121,36 +121,38 @@ export default function VideoItem({
       >
         <Spacer size={insets.top} />
         {/* Top Row: Back + Title + Duration */}
-        <Row
-          alignItems="center"
-          justifyContent="space-between"
-          style={{ padding: 12 }}
-        >
-          <Row alignItems="center" gap={8}>
-            {singleScreen && (
-              <Ionicons
-                onPress={() => navigation.goBack()}
-                name="chevron-back-outline"
-                color={theme.colors.white}
-                size={30}
-              />
-            )}
-            <Column gap={2}>
-              <Text
-                style={[
-                  commonStyles.subTitleText,
-                  { color: theme.colors.white },
-                ]}
-              >
-                {item.title}
-              </Text>
-            </Column>
+        <View style={{ flex: 1 }}>
+          <Row
+            alignItems="center"
+            justifyContent="space-between"
+            style={{ padding: 12 }}
+          >
+            <Row alignItems="center" gap={8}>
+              {singleScreen && (
+                <Ionicons
+                  onPress={() => navigation.goBack()}
+                  name="chevron-back-outline"
+                  color={theme.colors.white}
+                  size={30}
+                />
+              )}
+              <Column gap={2}>
+                <Text
+                  style={[
+                    commonStyles.subTitleText,
+                    { color: theme.colors.white },
+                  ]}
+                >
+                  {item.title}
+                </Text>
+              </Column>
+            </Row>
           </Row>
-        </Row>
+        </View>
 
         {/* Center Mute Icon */}
         <Column
-          style={commonStyles.fullFlex}
+          style={[commonStyles.fullFlex, {}]}
           justifyContent="center"
           alignItems="center"
         >
@@ -167,7 +169,7 @@ export default function VideoItem({
         <Row
           justifyContent="space-between"
           alignItems="flex-end"
-          style={{ padding: 12 }}
+          style={{ padding: 12, flex: 1 }}
         >
           <Row alignItems="center" gap={8}>
             <Avatar

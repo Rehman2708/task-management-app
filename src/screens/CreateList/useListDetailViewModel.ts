@@ -8,6 +8,7 @@ import {
 } from "../../repositories/lists";
 import { useUtilStore } from "../../store/utils";
 import { useNavigation } from "@react-navigation/native";
+import { ROUTES } from "../../enums/routes";
 
 export function useListDetailViewModel(list?: List) {
   const { refetchLists } = useUtilStore();
@@ -79,7 +80,7 @@ export function useListDetailViewModel(list?: List) {
       setError(err.message || "Failed to save list");
     } finally {
       refetchLists();
-      navigation.goBack();
+      navigation.navigate(ROUTES.LISTS);
       setLoading(false);
     }
   };

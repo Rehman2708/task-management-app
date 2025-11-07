@@ -118,7 +118,7 @@ export default function NotesScreen() {
                 )}
               </Row>
               <Text
-                numberOfLines={swiper ? 18 : 3}
+                numberOfLines={swiper ? 28 : 3}
                 style={[
                   commonStyles.tinyText,
                   swiper && commonStyles.basicText,
@@ -175,7 +175,7 @@ export default function NotesScreen() {
     loadingMore && page < totalPages ? (
       <ScreenLoader type={LoaderTypes.NotesScreen} count={4} />
     ) : (
-      <Spacer size={120} />
+      <Spacer size={100} />
     );
 
   return (
@@ -228,23 +228,32 @@ export default function NotesScreen() {
               <View style={styles.container}>
                 <Swiper
                   cards={notes}
-                  // verticalSwipe={false}
-                  swipeAnimationDuration={1000}
+                  swipeAnimationDuration={600}
                   stackSeparation={20}
                   cardIndex={0}
                   stackSize={3}
                   cardVerticalMargin={0}
                   cardHorizontalMargin={0}
                   backgroundColor="transparent"
+                  onSwiped={(index) => {
+                    const nearEnd = index >= notes.length - 3;
+                    if (nearEnd && page < totalPages && !loadingMore) {
+                      loadMoreNotes();
+                    }
+                  }}
                   onSwipedAll={() => {
-                    fetchNotes(1, true);
+                    if (page < totalPages) {
+                      loadMoreNotes();
+                    } else {
+                      fetchNotes(1, true);
+                    }
                   }}
                   renderCard={(note) => {
+                    if (!note) return null;
                     return (
                       <ImageBackground
                         source={{
                           uri: note.image?.trim() ? note.image : "",
-                          // : loggedInUser?.partner?.image ?? loggedInUser?.image,
                         }}
                         style={styles.card}
                       >
@@ -279,7 +288,7 @@ export const cardStyle = (theme: any, themeColor: any) => {
       borderRadius: 20,
       width: dimensions.width - 24,
       elevation: 10,
-      height: dimensions.height - 230,
+      height: dimensions.height - 220,
       overflow: "hidden",
     },
     overlay: {

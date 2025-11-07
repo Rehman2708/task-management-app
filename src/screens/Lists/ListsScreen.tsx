@@ -204,7 +204,7 @@ export default function ListsScreen() {
     loadingMore && page < totalPages ? (
       <ScreenLoader type={LoaderTypes.ListScreen} count={4} />
     ) : (
-      <Spacer size={120} />
+      <Spacer size={100} />
     );
 
   return (
@@ -258,23 +258,33 @@ export default function ListsScreen() {
                 <View style={styles.container}>
                   <Swiper
                     cards={lists}
-                    // verticalSwipe={false}
-                    swipeAnimationDuration={1000}
+                    keyExtractor={(item) => item._id!}
+                    swipeAnimationDuration={600}
                     stackSeparation={20}
                     cardIndex={0}
                     stackSize={3}
                     cardVerticalMargin={0}
                     cardHorizontalMargin={0}
                     backgroundColor="transparent"
-                    onSwipedAll={() => {
-                      fetchLists(1, true);
+                    onSwiped={(index) => {
+                      const nearEnd = index >= lists.length - 3;
+                      if (nearEnd && page < totalPages && !loadingMore) {
+                        loadMoreLists();
+                      }
                     }}
-                    renderCard={(note) => {
+                    onSwipedAll={() => {
+                      if (page < totalPages) {
+                        loadMoreLists();
+                      } else {
+                        fetchLists(1, true);
+                      }
+                    }}
+                    renderCard={(list) => {
+                      if (!list) return null;
                       return (
                         <ImageBackground
                           source={{
-                            uri: note.image?.trim() ? note.image : "",
-                            // : loggedInUser?.partner?.image ?? loggedInUser?.image,
+                            uri: list.image?.trim() ? list.image : "",
                           }}
                           style={styles.card}
                         >
@@ -282,7 +292,7 @@ export default function ListsScreen() {
                             colors={["#00000099", "#00000099"]}
                             style={styles.overlay}
                           />
-                          {renderItem({ item: note, swiper: true })}
+                          {renderItem({ item: list, swiper: true })}
                         </ImageBackground>
                       );
                     }}
