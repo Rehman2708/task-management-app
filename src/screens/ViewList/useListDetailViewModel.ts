@@ -12,13 +12,16 @@ export function useViewListViewModel(listId?: string) {
   const navigation = useNavigation();
   const { user } = useAuthStore();
   const { refetchLists } = useUtilStore();
-
+  const [totalComments, setTotalComments] = useState(
+    list?.comments?.length ?? 0
+  );
   const getList = async () => {
     if (!listId) return;
     try {
       setLoading(true);
       const data = await ListsRepo.getSingleList(listId);
       setList(data);
+      setTotalComments(data?.comments?.length ?? 0);
     } catch (err: any) {
       console.error("Get list error:", err);
       setError(err.message || "Failed to fetch list");
@@ -83,5 +86,7 @@ export function useViewListViewModel(listId?: string) {
     deleteList,
     toggleItemCompletion,
     refetch: getList,
+    totalComments,
+    setTotalComments,
   };
 }

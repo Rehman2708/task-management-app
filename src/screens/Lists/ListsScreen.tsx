@@ -123,11 +123,12 @@ export default function ListsScreen() {
               </Text>
               {swiper &&
                 item.items.map((item, index) => (
-                  <Row>
-                    <Text style={commonStyles.smallText}>{index}. </Text>
+                  <Row key={index}>
+                    <Text style={commonStyles.smallText}>{index + 1}. </Text>
                     <Text
                       style={[
                         commonStyles.smallText,
+                        commonStyles.fullFlex,
                         item.completed && {
                           textDecorationLine: "line-through",
                           color: theme.colors.success,

@@ -11,7 +11,6 @@ import { AppUrl } from "../../utils/appUrl";
 
 import CustomButton from "../../components/customButton";
 import { LoaderTypes } from "../../components/screenLoader";
-import Avatar from "../../components/avatar";
 import EmptyState from "../../components/emptyState";
 import TimeLeftProgress from "../../components/timeLeftProgress";
 import CollapsibleHeaderTabs from "../../components/collapsibleHeader";

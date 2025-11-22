@@ -26,7 +26,7 @@ const AddButtonStyles = (theme: any) =>
     fab: {
       position: "absolute",
       right: 20,
-      bottom: 110,
+      bottom: 90,
       width: 60,
       height: 60,
       borderRadius: 30,

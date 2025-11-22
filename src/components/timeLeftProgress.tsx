@@ -1,103 +1,108 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Animated, Easing } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Animated, Easing } from "react-native";
 import { useTheme } from "../infrastructure/theme";
-import { useHelper } from "../utils/helper";
 
 interface ProgressBarProps {
-  startTime?: string; // e.g., "2025-09-19T10:49:00.000Z"
-  endTime?: string; // e.g., "2025-09-19T11:49:00.000Z"
-  duration?: number; // optional manual duration
-  currentTime?: number; // optional manual current time
+  endTime?: string;
 }
 
-const TimeProgressBar: React.FC<ProgressBarProps> = ({
-  startTime,
-  endTime,
-  duration,
-  currentTime,
-}) => {
+const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const colorValue = useRef(new Animated.Value(0)).current;
-  const [percentage, setPercentage] = useState(0);
-  const { themeColor } = useHelper();
+  const pulseValue = useRef(new Animated.Value(1)).current;
+
   const theme = useTheme();
-  const styles = getStyles(theme, !!duration);
 
   useEffect(() => {
-    // 🟢 CASE 1: Manual duration-based progress
-    if (typeof duration === "number" && typeof currentTime === "number") {
-      const progress = duration > 0 ? currentTime / duration : 0;
-      const clamped = Math.min(Math.max(progress, 0), 1);
-      setPercentage(Math.round(clamped * 100));
+    if (!endTime) return;
 
-      Animated.parallel([
-        Animated.timing(animatedValue, {
-          toValue: clamped,
-          duration: 400,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(colorValue, {
-          toValue: clamped,
-          duration: 400,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ]).start();
+    const end = new Date(endTime).getTime();
+    const now = Date.now();
 
+    // 2-Day window
+    const twoDays = 2 * 24 * 60 * 60 * 1000;
+    const start = end - twoDays;
+
+    if (now < start) {
+      animatedValue.setValue(0);
+      colorValue.setValue(0);
       return;
     }
 
-    // 🟢 CASE 2: Time-based progress
-    if (!startTime || !endTime) return;
+    const totalDuration = twoDays;
+    const timeLeft = end - now;
 
-    const start = new Date(startTime).getTime();
-    const end = new Date(endTime).getTime();
-    const now = Date.now();
-    // const twelveHours = 12 * 60 * 60 * 1000;
-    const totalDuration = end - start;
+    // Progress Animation
+    const progress = (now - start) / totalDuration;
+    const clamped = Math.min(Math.max(progress, 0), 1);
 
-    // 🔴 Gap too large → keep empty
-    // if (totalDuration > twelveHours || end <= start) {
-    //   animatedValue.setValue(0);
-    //   colorValue.setValue(0);
-    //   setPercentage(0);
-    //   return;
-    // }
+    Animated.timing(animatedValue, {
+      toValue: clamped,
+      duration: 600,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: false,
+    }).start();
 
-    const calculateProgress = () => {
-      let progress = 0;
-      if (now <= start) progress = 0;
-      else if (now >= end) progress = 1;
-      else progress = (now - start) / totalDuration;
+    // Color Stage
+    let stage = 0;
+    if (timeLeft > 24 * 60 * 60 * 1000) {
+      stage = 0; // Green
+    } else if (timeLeft > 12 * 60 * 60 * 1000) {
+      stage = 0.5; // Orange
+    } else {
+      stage = 1; // Red
+    }
 
-      const clamped = Math.min(Math.max(progress, 0), 1);
-      setPercentage(Math.round(clamped * 100));
+    // Smooth color transition
+    Animated.timing(colorValue, {
+      toValue: stage,
+      duration: 500,
+      easing: Easing.ease,
+      useNativeDriver: false,
+    }).start();
 
-      Animated.parallel([
-        Animated.timing(animatedValue, {
-          toValue: clamped,
-          duration: 500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(colorValue, {
-          toValue: clamped,
-          duration: 500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ]).start();
-    };
-
-    // Initial call
-    calculateProgress();
-
-    // Update every 1 second
-    const interval = setInterval(calculateProgress, 1000);
-
-    return () => clearInterval(interval);
-  }, [startTime, endTime, duration, currentTime]);
+    // 🔥 Pulse Animation based on urgency
+    if (stage === 1) {
+      // Red zone → Fast pulse
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseValue, {
+            toValue: 1.15,
+            duration: 600,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: false,
+          }),
+          Animated.timing(pulseValue, {
+            toValue: 1,
+            duration: 600,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: false,
+          }),
+        ])
+      ).start();
+    } else if (stage === 0.5) {
+      // Orange zone → Gentle breathing
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseValue, {
+            toValue: 1.07,
+            duration: 1200,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: false,
+          }),
+          Animated.timing(pulseValue, {
+            toValue: 1,
+            duration: 1200,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: false,
+          }),
+        ])
+      ).start();
+    } else {
+      // Green zone → No pulse
+      pulseValue.setValue(1);
+    }
+  }, [endTime]);
 
   const widthInterpolated = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -105,38 +110,35 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({
   });
 
   const barColor = colorValue.interpolate({
-    inputRange: [0, 1],
+    inputRange: [0, 0.5, 1],
     outputRange: [
-      duration ? themeColor.dark : themeColor.light,
-      themeColor.dark,
+      theme.colors.success, // green
+      theme.colors.warning, // orange
+      theme.colors.error, // red
     ],
   });
 
   return (
-    <View style={styles.progressBackground}>
+    <View
+      style={{
+        height: 8,
+        backgroundColor: theme.colors.background,
+        borderRadius: 10,
+        overflow: "hidden",
+        flex: 1,
+      }}
+    >
       <Animated.View
-        style={[
-          styles.progressFill,
-          { width: widthInterpolated, backgroundColor: barColor },
-        ]}
+        style={{
+          height: "100%",
+          width: widthInterpolated,
+          backgroundColor: barColor,
+          borderRadius: 10,
+          transform: [{ scaleY: pulseValue }],
+        }}
       />
     </View>
   );
 };
-
-const getStyles = (theme: any, isFlat: boolean) =>
-  StyleSheet.create({
-    progressBackground: {
-      height: 8,
-      borderRadius: isFlat ? 0 : 10,
-      backgroundColor: theme.colors.background,
-      overflow: "hidden",
-      flex: 1,
-    },
-    progressFill: {
-      height: "100%",
-      borderRadius: isFlat ? 0 : 10,
-    },
-  });
 
 export default TimeProgressBar;

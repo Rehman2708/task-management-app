@@ -12,6 +12,7 @@ import { styles } from "../profile/ProfileScreen";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { useTheme } from "../../infrastructure/theme";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const UpdateProfileScreen = () => {
   const { user, updateUser } = useAuthStore();
@@ -62,67 +63,69 @@ const UpdateProfileScreen = () => {
 
   return (
     <ScreenWrapper showBackbutton title="Update Profile">
-      <ImageModal
-        onChange={updateProfilePicture}
-        button={
-          <Row
-            justifyContent="center"
-            alignItems="center"
-            style={[
-              commonStyles.cardContainer,
-              commonStyles.secondaryContainer,
-              ProfileScreenStyles.imageContainer,
-              {
-                backgroundColor: `${themeColor.light}20`,
-              },
-            ]}
-          >
-            {userImage ? (
-              <Image
-                style={ProfileScreenStyles.image}
-                source={{ uri: userImage }}
-              />
-            ) : (
-              <Text
-                style={[
-                  ProfileScreenStyles.nameText,
-                  { color: themeColor?.dark ?? theme.colors.primary },
-                ]}
-              >
-                {getInitials(user?.name)}
-              </Text>
-            )}
-            {userImage ? (
-              <Pressable
-                style={ProfileScreenStyles.deleteIcon}
-                onPress={() => setUserImage("")}
-              >
-                <Ionicons name="trash" color={theme.colors.white} size={20} />
-              </Pressable>
-            ) : null}
-          </Row>
-        }
-      />
-      <CustomInput
-        title="User Id"
-        editable={false}
-        value={user?.userId}
-        onChangeText={() => {}}
-      />
-      <CustomInput title="Name" onChangeText={setUserName} value={userName} />
-      <CustomInput
-        title="About"
-        onChangeText={setUserAbout}
-        value={userAbout}
-        multiline
-      />
-      {hasChanges && (
-        <CustomButton
-          title={loading ? "Updating..." : "Update"}
-          onPress={updateProfile}
-          disabled={loading || !userName.trim()}
+      <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+        <ImageModal
+          onChange={updateProfilePicture}
+          button={
+            <Row
+              justifyContent="center"
+              alignItems="center"
+              style={[
+                commonStyles.cardContainer,
+                commonStyles.secondaryContainer,
+                ProfileScreenStyles.imageContainer,
+                {
+                  backgroundColor: `${themeColor.light}20`,
+                },
+              ]}
+            >
+              {userImage ? (
+                <Image
+                  style={ProfileScreenStyles.image}
+                  source={{ uri: userImage }}
+                />
+              ) : (
+                <Text
+                  style={[
+                    ProfileScreenStyles.nameText,
+                    { color: themeColor?.dark ?? theme.colors.primary },
+                  ]}
+                >
+                  {getInitials(user?.name)}
+                </Text>
+              )}
+              {userImage ? (
+                <Pressable
+                  style={ProfileScreenStyles.deleteIcon}
+                  onPress={() => setUserImage("")}
+                >
+                  <Ionicons name="trash" color={theme.colors.white} size={20} />
+                </Pressable>
+              ) : null}
+            </Row>
+          }
         />
-      )}
+        <CustomInput
+          title="User Id"
+          editable={false}
+          value={user?.userId}
+          onChangeText={() => {}}
+        />
+        <CustomInput title="Name" onChangeText={setUserName} value={userName} />
+        <CustomInput
+          title="About"
+          onChangeText={setUserAbout}
+          value={userAbout}
+          multiline
+        />
+        {hasChanges && (
+          <CustomButton
+            title={loading ? "Updating..." : "Update"}
+            onPress={updateProfile}
+            disabled={loading || !userName.trim()}
+          />
+        )}
+      </KeyboardAwareScrollView>
     </ScreenWrapper>
   );
 };
