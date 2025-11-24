@@ -129,6 +129,12 @@ const CustomHeader = ({
               />
             </TouchableOpacity>
           )}
+          {rightIcon && (
+            <>
+              <Spacer size={20} position="right" />
+              {rightIcon}
+            </>
+          )}
           {!hideNotificationButton && (
             <>
               <Spacer size={20} position="right" />
@@ -141,12 +147,6 @@ const CustomHeader = ({
                   color={whiteBg ? theme.colors.text : theme.colors.white}
                 />
               </TouchableOpacity>
-            </>
-          )}
-          {rightIcon && (
-            <>
-              <Spacer size={20} position="right" />
-              {rightIcon}
             </>
           )}
         </Row>

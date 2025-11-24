@@ -34,10 +34,7 @@ const CommentCard = ({
     const emojiRegex = /^(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)$/u;
     return emojiRegex.test(text.trim());
   };
-  const [imgSize, setImgSize] = useState<{ w: number; h: number }>({
-    w: dimensions.width * 0.5,
-    h: 250,
-  });
+  const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
 
   useEffect(() => {
     if (url) {
@@ -95,37 +92,41 @@ const CommentCard = ({
           </>
         )}
         {url ? (
-          <Pressable
-            onPress={() => setShowImage(true)}
-            style={{
-              aspectRatio: imgSize.w / imgSize.h,
-              maxHeight: 250,
-              borderRadius: 10,
-              overflow: "hidden",
-              backgroundColor: isMyChat
-                ? `${themeColor.dark}`
-                : `${theme.colors.border}`,
-              padding: 4,
-            }}
-          >
-            <Image
-              source={{ uri: url }}
-              style={{
-                flex: 1,
-                resizeMode: "contain",
-                borderRadius: 10,
-              }}
-            />
-            <ImageView
-              images={[{ uri: url }]}
-              visible={showImage}
-              onRequestClose={() => setShowImage(false)}
-              presentationStyle="overFullScreen"
-              swipeToCloseEnabled
-              backgroundColor={theme.colors.background}
-              imageIndex={0}
-            />
-          </Pressable>
+          <>
+            {imgSize && (
+              <Pressable
+                onPress={() => setShowImage(true)}
+                style={{
+                  aspectRatio: imgSize.w / imgSize.h,
+                  maxHeight: 250,
+                  borderRadius: 10,
+                  overflow: "hidden",
+                  backgroundColor: isMyChat
+                    ? `${themeColor.dark}`
+                    : `${theme.colors.border}`,
+                  padding: 4,
+                }}
+              >
+                <Image
+                  source={{ uri: url }}
+                  style={{
+                    flex: 1,
+                    resizeMode: "contain",
+                    borderRadius: 10,
+                  }}
+                />
+                <ImageView
+                  images={[{ uri: url }]}
+                  visible={showImage}
+                  onRequestClose={() => setShowImage(false)}
+                  presentationStyle="overFullScreen"
+                  swipeToCloseEnabled
+                  backgroundColor={theme.colors.background}
+                  imageIndex={0}
+                />
+              </Pressable>
+            )}
+          </>
         ) : (
           <>
             {isSingleEmoji() ? (

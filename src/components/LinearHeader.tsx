@@ -40,14 +40,14 @@ const LinearHeader: React.FC<LinearHeaderProps> = ({ image }) => {
     const interval = setInterval(() => {
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
         easing: Easing.linear,
       }).start(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 300,
+          duration: 200,
           useNativeDriver: true,
           easing: Easing.linear,
         }).start();
