@@ -47,7 +47,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
     const animation = Animated.loop(
       Animated.timing(shimmerAnim, {
         toValue: 1,
-        duration: 1500,
+        duration: 1800,
         easing: Easing.linear,
         useNativeDriver: true,
       })

@@ -53,6 +53,10 @@ export class AppUrl {
     `${this.BASE_URL}/notes/pin/${noteId}`;
   public static getSingleNote = (noteId: string) =>
     `${this.BASE_URL}/notes/note/${noteId}`;
+  public static addNoteComment = (noteId: string) =>
+    `${this.BASE_URL}/notes/${noteId}/comment`; // POST /notes/:id/comment
+  public static getNoteComments = (noteId: string) =>
+    `${this.BASE_URL}/notes/${noteId}/comments`; // GET /notes/:id/comments
 
   // 🔹 Lists APIs
   public static getAllLists = `${this.BASE_URL}/lists`; // e.g. GET /lists/:ownerUserId
@@ -67,6 +71,10 @@ export class AppUrl {
     `${this.BASE_URL}/lists/pin/${listId}`; // PATCH /lists/pin/:id
   public static toggleListItem = (listId: string, itemIndex: number) =>
     `${this.BASE_URL}/lists/toggle-item/${listId}/${itemIndex}`; // PATCH /lists/toggle-item/:listId/:itemIndex
+  public static addListComment = (listId: string) =>
+    `${this.BASE_URL}/lists/${listId}/comment`; // POST /lists/:id/comment
+  public static getListComments = (listId: string) =>
+    `${this.BASE_URL}/lists/${listId}/comments`; // GET /lists/:id/comments
 
   // 🔹 Videos APIs
   public static getAllVideos = `${this.BASE_URL}/videos`;

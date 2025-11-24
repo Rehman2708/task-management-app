@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Alert, Pressable, FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../infrastructure/theme";
@@ -11,24 +11,40 @@ import CollapsibleHeader from "../../components/collapsibleHeader";
 import { useHelper } from "../../utils/helper";
 import { useViewListViewModel } from "./useListDetailViewModel";
 import EmptyState from "../../components/emptyState";
+import Ionicons from "@expo/vector-icons/build/Ionicons";
+import { AppUrl } from "../../utils/appUrl";
+import CommentsModal from "../../components/comments/commentModal";
 
 interface ViewListScreenProps {
   route: {
     params?: {
       listId: string;
+      showComments?: boolean;
     };
   };
 }
 
 export default function ViewListScreen({ route }: ViewListScreenProps) {
-  const { listId } = route.params || {};
+  const { listId, showComments } = route.params || {};
+  const {
+    list,
+    loading,
+    updating,
+    error,
+    deleteList,
+    toggleItemCompletion,
+    totalComments,
+    setTotalComments,
+  } = useViewListViewModel(listId);
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
   const navigation: any = useNavigation();
   const { formatDate } = useHelper();
+  const [commentsModalVisible, setCommentsModalVisible] = useState(
+    showComments ?? false
+  );
 
-  const { list, loading, updating, error, deleteList, toggleItemCompletion } =
-    useViewListViewModel(listId);
+  const handleOpenComments = () => setCommentsModalVisible(true);
 
   const handleDelete = () => {
     Alert.alert("Delete List", "Are you sure you want to delete this list?", [
@@ -97,14 +113,30 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
           />
         ) : (
           <>
-            <Column>
-              <Text numberOfLines={3} style={commonStyles.titleText}>
-                {list?.title}
-              </Text>
-              <Text numberOfLines={3} style={commonStyles.tinyText}>
-                {formatDate(list?.createdAt!) ?? ""}
-              </Text>
-            </Column>
+            <Row justifyContent="space-between" alignItems="center">
+              <Column>
+                <Text numberOfLines={3} style={commonStyles.titleText}>
+                  {list?.title}
+                </Text>
+                <Text numberOfLines={3} style={commonStyles.tinyText}>
+                  {formatDate(list?.createdAt!) ?? ""}
+                </Text>
+              </Column>
+              <Spacer size={6} position="right" />
+              <Pressable onPress={() => handleOpenComments()}>
+                <Row alignItems="center" gap={6}>
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={20}
+                    color={theme.colors.text}
+                  />
+                  <Text style={commonStyles.smallText}>
+                    {totalComments ?? 0} Comment
+                    {totalComments > 1 ? "s" : ""}
+                  </Text>
+                </Row>
+              </Pressable>
+            </Row>
             <Spacer size={12} />
             <Text style={[commonStyles.basicText]}>{list?.description}</Text>
             <Spacer size={16} />
@@ -142,6 +174,16 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
           loading={updating}
         />
       </Row>
+      {listId && (
+        <CommentsModal
+          visible={commentsModalVisible}
+          onClose={() => setCommentsModalVisible(false)}
+          fetchUrl={`${AppUrl.getListComments(listId)}`}
+          postUrl={`${AppUrl.addListComment(listId)}`}
+          entityId={listId}
+          setCount={setTotalComments}
+        />
+      )}
     </View>
   );
 }

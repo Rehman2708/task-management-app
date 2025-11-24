@@ -1,11 +1,5 @@
-import React, { useEffect } from "react";
-import {
-  View,
-  FlatList,
-  Pressable,
-  Text,
-  ActivityIndicator,
-} from "react-native";
+import React, { useEffect, useCallback, useMemo } from "react";
+import { View, FlatList, Pressable, Text } from "react-native";
 import FloatingAdd from "../../components/FloatingAdd";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { useCommonStyles } from "../../styles/commonstyles";
@@ -39,21 +33,39 @@ export default function HomeScreen({ navigation }: any) {
   const commonStyles = useCommonStyles(theme);
   const { fetchingTask } = useUtilStore();
 
+  // 🔥 Always fresh data on tab change or when new task created
   useEffect(() => {
     fetchTasks(1, true);
   }, [fetchingTask, tab]);
 
-  const tabs = [
-    { title: "Active", onPress: () => setTab("Active") },
-    { title: "History", onPress: () => setTab("History") },
-  ];
+  // 🔥 Memoized tabs
+  const tabs = useMemo(
+    () => [
+      { title: "Active", value: "Active" as const },
+      { title: "History", value: "History" as const },
+    ],
+    []
+  );
 
-  const renderFooter = () =>
-    tab === "History" && loadingMore ? (
-      <ScreenLoader type={LoaderTypes.TaskScreen} count={5} />
-    ) : (
-      <Spacer size={100} />
-    );
+  // Memoized renderItem
+  const renderItem = useCallback(
+    ({ item }: any) => (
+      <TasksCard
+        item={item}
+        handleDelete={() => deleteTask(item._id!)}
+        isCompleted={tab === "History"}
+      />
+    ),
+    [tab, deleteTask]
+  );
+
+  // Footer Loader
+  const renderFooter = useCallback(() => {
+    if (tab === "History" && loadingMore) {
+      return <ScreenLoader type={LoaderTypes.TaskScreen} count={5} />;
+    }
+    return <Spacer size={100} />;
+  }, [loadingMore, tab]);
 
   return (
     <ScreenWrapper
@@ -63,11 +75,11 @@ export default function HomeScreen({ navigation }: any) {
     >
       {/* Tabs */}
       <Row>
-        {tabs.map((item, index) => (
+        {tabs.map((item) => (
           <Pressable
-            key={index}
+            key={item.value}
             style={[commonStyles.fullFlex, { paddingVertical: 10 }]}
-            onPress={item.onPress}
+            onPress={() => setTab(item.value)}
           >
             <Text
               style={[
@@ -75,10 +87,10 @@ export default function HomeScreen({ navigation }: any) {
                 {
                   textAlign: "center",
                   color:
-                    tab === item.title ? themeColor.dark : theme.colors.text,
-                  borderBottomWidth: tab === item.title ? 2 : 0,
+                    tab === item.value ? themeColor.dark : theme.colors.text,
+                  borderBottomWidth: tab === item.value ? 2 : 0,
                   borderBottomColor:
-                    tab === item.title ? themeColor.dark : "transparent",
+                    tab === item.value ? themeColor.dark : "transparent",
                   paddingBottom: 6,
                 },
               ]}
@@ -90,8 +102,8 @@ export default function HomeScreen({ navigation }: any) {
       </Row>
 
       <View style={[commonStyles.screenWrapper]}>
-        {/* Empty State */}
-        {tasks?.length === 0 || loading ? (
+        {/* Empty / Loader */}
+        {loading || tasks.length === 0 ? (
           <EmptyState
             text={tab === "Active" ? "No active tasks" : "Nothing to show"}
             button={() => fetchTasks(1, true)}
@@ -104,22 +116,22 @@ export default function HomeScreen({ navigation }: any) {
           <FlatList
             data={tasks}
             keyExtractor={(item) => String(item._id)}
-            renderItem={({ item }) => (
-              <TasksCard
-                item={item}
-                handleDelete={() => deleteTask(item._id!)}
-                isCompleted={tab === "History"}
-              />
-            )}
+            renderItem={renderItem}
             refreshing={loading}
             onRefresh={() => fetchTasks(1, true)}
             onEndReached={tab === "History" ? loadMoreTasks : undefined}
             onEndReachedThreshold={0.5}
             ListFooterComponent={renderFooter}
             showsVerticalScrollIndicator={false}
+            removeClippedSubviews
+            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={50}
+            initialNumToRender={10}
+            windowSize={8}
           />
         )}
       </View>
+
       {tab === "Active" && (
         <FloatingAdd onPress={() => navigation.navigate(ROUTES.CREATE_TASK)} />
       )}

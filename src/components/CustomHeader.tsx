@@ -34,7 +34,16 @@ const CustomHeader = ({
   const { loggedInUser, triggerVibration } = useHelper();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
+  const tickerTextParts = [];
 
+  if (loggedInUser?.about) {
+    tickerTextParts.push(loggedInUser.about);
+  }
+  if (loggedInUser?.partner?.about) {
+    tickerTextParts.push(`Partner: ${loggedInUser.partner.about}`);
+  }
+
+  const tickerText = tickerTextParts.join("   |    ");
   return (
     <>
       <Row
@@ -98,18 +107,12 @@ const CustomHeader = ({
                 <>
                   <View style={{ width: dimensions.width - 150 }}>
                     <TextTicker
-                      duration={
-                        (loggedInUser?.partner?.about
-                          ? loggedInUser.partner.about.length
-                          : loggedInUser?.about?.length ?? 0) * 120
-                      }
+                      duration={tickerText.length * 100}
                       loop
-                      bounce
-                      repeatSpacer={50}
-                      marqueeDelay={1000}
+                      marqueeDelay={0}
                       style={[commonStyles.smallText, commonStyles.whiteText]}
                     >
-                      {loggedInUser.partner.about ?? loggedInUser.about}
+                      {tickerText}
                     </TextTicker>
                   </View>
                 </>

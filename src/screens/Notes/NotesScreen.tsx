@@ -118,7 +118,7 @@ export default function NotesScreen() {
                 )}
               </Row>
               <Text
-                numberOfLines={swiper ? 28 : 3}
+                numberOfLines={swiper ? 27 : 3}
                 style={[
                   commonStyles.tinyText,
                   swiper && commonStyles.basicText,

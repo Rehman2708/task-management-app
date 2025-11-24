@@ -79,13 +79,9 @@ const NotificationScreen = () => {
   );
 
   // ------------------ Refetch on screen focus ------------------ //
-  useEffect(
-    useCallback(() => {
-      if (notifications.length === 0) {
-        fetchNotifications(1, true);
-      }
-    }, [fetchNotifications, notifications.length])
-  );
+  useEffect(() => {
+    fetchNotifications(1, true);
+  }, [fetchNotifications]);
 
   // ------------------ Pull to refresh ------------------ //
   const onRefresh = () => {
@@ -95,7 +91,12 @@ const NotificationScreen = () => {
 
   // ------------------ Load more pagination ------------------ //
   const loadMore = () => {
-    if (page < totalPages && !loadingMore && !loading) {
+    if (
+      notifications.length > 0 && // <-- prevent loading when no notifications
+      page < totalPages &&
+      !loadingMore &&
+      !loading
+    ) {
       fetchNotifications(page + 1);
     }
   };
@@ -194,7 +195,7 @@ const NotificationScreen = () => {
           data={notifications}
           keyExtractor={(item, index) => String(index)}
           renderItem={renderItem}
-          onEndReached={loadMore}
+          onEndReached={notifications.length > 0 ? loadMore : undefined}
           onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
