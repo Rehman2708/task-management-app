@@ -84,13 +84,19 @@ export const handleNotificationNavigation = (data?: any) => {
   switch (data.type) {
     case "note":
       data.noteId
-        ? navigate(ROUTES.VIEW_NOTE, { noteId: data.noteId })
+        ? navigate(ROUTES.VIEW_NOTE, {
+            noteId: data.noteId,
+            showComments: data.isComment,
+          })
         : navigate(ROUTES.NOTES);
       break;
 
     case "list":
       data.listId
-        ? navigate(ROUTES.VIEW_LIST, { listId: data.listId })
+        ? navigate(ROUTES.VIEW_LIST, {
+            listId: data.listId,
+            showComments: data.isComment,
+          })
         : navigate(ROUTES.LISTS);
       break;
 
