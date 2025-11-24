@@ -66,6 +66,7 @@ const UpdateProfileScreen = () => {
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
         <ImageModal
           onChange={updateProfilePicture}
+          defaultImage={userImage}
           button={
             <Row
               justifyContent="center"

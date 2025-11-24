@@ -6,11 +6,10 @@ import {
   StyleSheet,
   Pressable,
   Image,
-  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import CustomInput from "./customInput";
-import { Column, Row } from "../tools";
+import { Row, Spacer } from "../tools";
 import { useCommonStyles } from "../styles/commonstyles";
 import axios from "axios";
 import CustomButton from "./customButton";
@@ -19,6 +18,7 @@ import ImageView from "react-native-image-viewing";
 import { useHelper } from "../utils/helper";
 import EmptyState from "./emptyState";
 import { LoaderTypes } from "./screenLoader";
+import { UploadMediaButton } from "./UploadMediaButton";
 
 const ImageModal = ({
   onChange,
@@ -157,14 +157,25 @@ const ImageModal = ({
                 }}
               />
             )}
-
-            <CustomButton
-              title="Close"
-              small
-              rounded
-              onPress={() => setShowModal(false)}
-              error
-            />
+            <Row alignItems="center" justifyContent="center">
+              <UploadMediaButton
+                currentUrl={defaultImage ?? undefined}
+                onUploadSuccess={(uri) => {
+                  setSelectedImage(uri);
+                  onChange?.(uri);
+                  setShowModal(false);
+                }}
+              />
+              <Spacer position="right" size={8} />
+              <CustomButton
+                title="Close"
+                small
+                rounded
+                onPress={() => setShowModal(false)}
+                error
+                customStyle={{ flex: 1 }}
+              />
+            </Row>
           </View>
         </View>
         <ImageView

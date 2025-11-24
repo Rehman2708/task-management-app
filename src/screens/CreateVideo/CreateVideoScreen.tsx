@@ -25,6 +25,7 @@ import CommentCard from "../../components/commentCard";
 import { Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
 import { createVideoStyle } from "./styles";
+import { UploadMediaButton } from "../../components/UploadMediaButton";
 
 export default function CreateVideoScreen() {
   const theme = useTheme();
@@ -56,14 +57,14 @@ export default function CreateVideoScreen() {
     }
   }, [videoUrl]);
 
-  const handleSave = async () => {
+  const handleSave = async (uri?: string) => {
     setLoading(true);
     setError(null);
     setSuccess(null);
 
     const payload: CreateVideoPayload = {
       title,
-      url: videoUrl,
+      url: uri ?? videoUrl,
       createdBy: loggedInUser?.userId ?? "RehmanK",
     };
 
@@ -127,12 +128,25 @@ export default function CreateVideoScreen() {
             multiline
             inputStyle={{ maxHeight: 100, minHeight: 100 }}
           />
-
-          <CustomButton
-            title="Test"
-            onPress={handleTest}
-            disabled={videoUrl.length === 0}
-          />
+          <Row alignItems="center">
+            {videoUrl?.length === 0 && (
+              <>
+                <UploadMediaButton
+                  isVideo
+                  onUploadSuccess={(url) => {
+                    handleSave(url);
+                  }}
+                />
+                <Spacer size={8} position="right" />
+              </>
+            )}
+            <CustomButton
+              title="Test"
+              onPress={handleTest}
+              disabled={videoUrl.length === 0}
+              customStyle={commonStyles.fullFlex}
+            />
+          </Row>
 
           {isTested && (
             <View style={styles.videoContainer}>

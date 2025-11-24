@@ -90,4 +90,9 @@ export class AppUrl {
   // 🔹 Notification APIs
   public static getNotifications = `${this.BASE_URL}/notifications`;
   public static markNotificationsRead = `${this.BASE_URL}/notifications/mark-read`;
+
+  // 🔹 File Upload APIs (Images & Videos)
+  public static uploadFile = `${this.BASE_URL}/file/upload`;
+  public static deleteFile = (uri: string) =>
+    `${this.BASE_URL}/file/delete?uri=${encodeURIComponent(uri)}`;
 }

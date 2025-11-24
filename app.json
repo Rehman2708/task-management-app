@@ -45,6 +45,15 @@
           "vibrationPattern": [0, 100, 50, 300, 100, 300],
           "sounds": ["./assets/audio/notification.wav"]
         }
+      ],
+      ["expo-image-picker"],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
       ]
     ],
     "runtimeVersion": {

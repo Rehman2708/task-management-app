@@ -74,8 +74,8 @@ const CommentCard = ({
           <View
             style={{
               backgroundColor: isMyChat
-                ? `${themeColor.light}`
-                : `${themeColor.dark}`,
+                ? `${themeColor.dark}`
+                : `${theme.colors.border}`,
               paddingHorizontal: 14,
               paddingVertical: 6,
               borderRadius: 16,
