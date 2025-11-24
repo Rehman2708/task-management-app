@@ -20,7 +20,6 @@ const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
   const styles = getStyles(theme, !!duration);
 
   useEffect(() => {
-    // 🟢 CASE 1: Manual duration-based progress
     if (typeof duration === "number" && typeof currentTime === "number") {
       const progress = duration > 0 ? currentTime / duration : 0;
       const clamped = Math.min(Math.max(progress, 0), 1);
@@ -43,16 +42,6 @@ const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
 
       return;
     }
-
-    // 🟢 CASE 2: Time-based progress
-
-    // 🔴 Gap too large → keep empty
-    // if (totalDuration > twelveHours || end <= start) {
-    //   animatedValue.setValue(0);
-    //   colorValue.setValue(0);
-    //   setPercentage(0);
-    //   return;
-    // }
 
     const calculateProgress = () => {
       let progress = 0;

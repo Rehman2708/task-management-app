@@ -67,7 +67,7 @@ export default function CreateVideoScreen() {
       url: uri ?? videoUrl,
       createdBy: loggedInUser?.userId ?? "RehmanK",
     };
-
+    console.log(payload);
     try {
       await VideoRepo.createVideo(payload);
       setSuccess("Video uploaded successfully");
@@ -136,6 +136,7 @@ export default function CreateVideoScreen() {
                   onUploadSuccess={(url) => {
                     handleSave(url);
                   }}
+                  disabled={title.length < 1}
                 />
                 <Spacer size={8} position="right" />
               </>
@@ -180,7 +181,7 @@ export default function CreateVideoScreen() {
             <CustomButton
               title="Upload Video"
               loading={loading}
-              onPress={handleSave}
+              onPress={() => handleSave(undefined)}
             />
           )}
 

@@ -80,12 +80,14 @@ const CustomButton = ({
           alignItems="center"
           style={[
             {
-              padding: 12,
+              padding: outlined ? 10 : 12,
               borderRadius: 100,
               backgroundColor: themeColor?.dark ?? theme.colors.primary,
             },
             success && styles.success,
             error && styles.error,
+            outlined && styles.outlined,
+            disabled && styles.disabled,
           ]}
         >
           {loading ? (
@@ -101,7 +103,7 @@ const CustomButton = ({
             <Ionicons
               name={iconName ?? "send-outline"}
               size={20}
-              color={theme.colors.white}
+              color={outlined ? themeColor.dark : theme.colors.white}
             />
           )}
         </Row>
@@ -133,8 +135,9 @@ const CustomButton = ({
 
 export default CustomButton;
 
-const customButtonStyle = (theme: any) =>
-  StyleSheet.create({
+const customButtonStyle = (theme: any) => {
+  const { themeColor } = useHelper();
+  return StyleSheet.create({
     button: {
       flexDirection: "row",
       alignItems: "center",
@@ -151,7 +154,7 @@ const customButtonStyle = (theme: any) =>
     outlined: {
       backgroundColor: theme.colors.transparent,
       borderWidth: 2,
-      borderColor: theme.colors.primary,
+      borderColor: themeColor.dark ?? theme.colors.primary,
     },
     secondary: {
       backgroundColor: theme.colors.secondary,
@@ -179,3 +182,4 @@ const customButtonStyle = (theme: any) =>
       color: theme.colors.white,
     },
   });
+};

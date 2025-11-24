@@ -1,133 +1,263 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Animated, Easing } from "react-native";
-import { useTheme } from "../infrastructure/theme";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { View, Pressable, Text, StyleSheet } from "react-native";
+import Video from "react-native-video";
+import { Ionicons } from "@expo/vector-icons";
+import { IVideo } from "../types/videos";
+import Avatar from "./avatar";
+import { Column, Row, Spacer } from "../tools";
+import { useCommonStyles } from "../styles/commonstyles";
 import { useHelper } from "../utils/helper";
+import { useNavigation } from "@react-navigation/native";
+import { useAuthStore } from "../store/authStore";
+import { VideoRepo } from "../repositories/videos";
+import { useTheme } from "../infrastructure/theme";
+import ProgressBar from "./timeLeftProgress";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CommentsModal from "./comments/commentModal";
+import { AppUrl } from "../utils/appUrl";
+import VideoTimeProgressBar from "./videoTimeProgress";
 
-interface ProgressBarProps {
-  duration?: number; // optional manual duration (e.g., video length)
-  currentTime?: number; // optional manual current time (e.g., video currentTime)
-}
+type Props = {
+  item: IVideo;
+  index?: number;
+  currentIndex?: number;
+  isFocused?: boolean;
+  muted: boolean;
+  mutedIcon: boolean;
+  windowHeight: number;
+  longPressedIndex?: number | null;
+  setMuted: React.Dispatch<React.SetStateAction<boolean>>;
+  setMutedIcon: React.Dispatch<React.SetStateAction<boolean>>;
+  setLongPressedIndex?: React.Dispatch<React.SetStateAction<number | null>>;
+  deleteVideo?: (id: string) => void;
+  showDelete?: boolean;
+  singleScreen?: boolean;
+  playAlways?: boolean;
+  showComments?: boolean;
+};
 
-const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
-  duration,
-  currentTime,
-}) => {
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  const colorValue = useRef(new Animated.Value(0)).current;
-  const [percentage, setPercentage] = useState(0);
-
-  const { themeColor } = useHelper();
+export default function VideoItem({
+  item,
+  index = 0,
+  currentIndex = 0,
+  isFocused = true,
+  muted,
+  mutedIcon,
+  windowHeight,
+  longPressedIndex,
+  setMuted,
+  setMutedIcon,
+  setLongPressedIndex,
+  deleteVideo,
+  showDelete = true,
+  playAlways = false,
+  singleScreen,
+  showComments,
+}: Props) {
+  const videoRef = useRef<IVideo | null>(null);
+  const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
+  const [commentsModalVisible, setCommentsModalVisible] = useState(
+    showComments ?? false
+  );
+  const [totalComments, setTotalComments] = useState(
+    item?.comments?.length ?? 0
+  );
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
   const theme = useTheme();
-  const styles = getStyles(theme, !!duration);
+  const commonStyles = useCommonStyles(theme);
+  const navigation: any = useNavigation();
+  const { user } = useAuthStore();
+  const { formatDate } = useHelper();
+  const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+  const shouldPlay =
+    playAlways || (Math.abs(currentIndex - index) <= 0 && isFocused);
+  const paused = !shouldPlay || longPressedIndex === index;
 
-    // ------------------------------
-    // CASE 1: Manual progress (duration + currentTime)
-    // ------------------------------
-    if (typeof duration === "number" && typeof currentTime === "number") {
-      const progress = duration > 0 ? currentTime / duration : 0;
-      const clamped = Math.min(Math.max(progress, 0), 1);
-
-      setPercentage(Math.round(clamped * 100));
-
-      Animated.parallel([
-        Animated.timing(animatedValue, {
-          toValue: clamped,
-          duration: 350,
-          easing: Easing.ease,
-          useNativeDriver: false,
-        }),
-        Animated.timing(colorValue, {
-          toValue: clamped,
-          duration: 350,
-          easing: Easing.ease,
-          useNativeDriver: false,
-        }),
-      ]).start();
-
-      return; // stop here
+  const handleViewed = useCallback(async () => {
+    try {
+      setIsViewed(true);
+      await VideoRepo.markVideoAsViewed(item._id);
+    } catch (err) {
+      console.error("markRead video error:", err);
     }
-
-    // ------------------------------
-    // CASE 2: Auto progress (1-second interval)
-    // ------------------------------
-
-    let autoProgress = 0;
-
-    const updateProgress = () => {
-      autoProgress += 0.01; // 1% per second
-      if (autoProgress >= 1) autoProgress = 1;
-
-      setPercentage(Math.round(autoProgress * 100));
-
-      Animated.parallel([
-        Animated.timing(animatedValue, {
-          toValue: autoProgress,
-          duration: 400,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(colorValue, {
-          toValue: autoProgress,
-          duration: 400,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ]).start();
-    };
-
-    updateProgress(); // initial start
-    interval = setInterval(updateProgress, 1000);
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [duration, currentTime]);
-
-  // Interpolations
-  const widthInterpolated = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0%", "100%"],
-  });
-
-  const barColor = colorValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [
-      duration ? themeColor.dark : themeColor.light,
-      themeColor.dark,
-    ],
-  });
-
+  }, [item._id]);
+  useEffect(() => {
+    setCommentsModalVisible(showComments ?? false);
+  }, [item._id]);
   return (
-    <View style={styles.progressBackground}>
-      <Animated.View
-        style={[
-          styles.progressFill,
-          {
-            width: widthInterpolated,
-            backgroundColor: barColor,
-          },
-        ]}
+    <View style={[styles.videoContainer, { height: windowHeight }]}>
+      {shouldPlay && (
+        <>
+          <Video
+            ref={(ref) => (videoRef.current = ref)}
+            source={{ uri: item.url }}
+            style={styles.video}
+            resizeMode="contain"
+            repeat
+            muted={muted}
+            controls={false}
+            paused={paused}
+            onError={(err) => console.warn("Video error:", item._id, err)}
+            onEnd={() => {
+              videoRef.current = null;
+            }}
+            onLoad={(data) => setDuration(data.duration)}
+            onProgress={(data) => setCurrentTime(data.currentTime)}
+          />
+          <View style={styles.overlayBackground} />
+        </>
+      )}
+
+      <Pressable
+        style={styles.overlay}
+        onPress={() => {
+          setMuted((m) => !m);
+          setMutedIcon(true);
+        }}
+        onLongPress={() => setLongPressedIndex?.(index)}
+        onPressOut={() => setLongPressedIndex?.(null)}
+      >
+        <Spacer size={insets.top} />
+        {/* Top Row: Back + Title + Duration */}
+        <Row
+          alignItems="center"
+          justifyContent="space-between"
+          style={{ padding: 12 }}
+        >
+          <Row alignItems="center" gap={8}>
+            {singleScreen && (
+              <Ionicons
+                onPress={() => navigation.goBack()}
+                name="chevron-back-outline"
+                color={theme.colors.white}
+                size={30}
+              />
+            )}
+            <Column gap={2}>
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
+                {item.title}
+              </Text>
+            </Column>
+          </Row>
+        </Row>
+
+        {/* Center Mute Icon */}
+        <Column
+          style={commonStyles.fullFlex}
+          justifyContent="center"
+          alignItems="center"
+        >
+          {mutedIcon && (
+            <Ionicons
+              name={muted ? "volume-mute-outline" : "volume-high-outline"}
+              size={50}
+              color={theme.colors.white}
+            />
+          )}
+        </Column>
+
+        {/* Bottom Row */}
+        <Row
+          justifyContent="space-between"
+          alignItems="flex-end"
+          style={{ padding: 12 }}
+        >
+          <Row alignItems="center" gap={8}>
+            <Avatar
+              size={45}
+              name={item.createdByDetails?.name}
+              image={item.createdByDetails?.image}
+            />
+            <Column gap={2}>
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
+                {item.createdByDetails?.name}
+              </Text>
+              <Text
+                style={[commonStyles.smallText, { color: theme.colors.white }]}
+              >
+                {formatDate(item.createdAt)}
+              </Text>
+            </Column>
+          </Row>
+          <Column gap={20}>
+            <Column alignItems="center" gap={4}>
+              <Ionicons
+                onPress={() => setCommentsModalVisible(true)}
+                name="chatbubble-outline"
+                color={theme.colors.white}
+                size={35}
+              />
+              <Text
+                style={[
+                  commonStyles.subTitleText,
+                  { color: theme.colors.white },
+                ]}
+              >
+                {totalComments}
+              </Text>
+            </Column>
+
+            {user?.userId !== item.createdBy && !isViewed ? (
+              <Ionicons
+                onPress={handleViewed}
+                name="eye-outline"
+                color={theme.colors.white}
+                size={35}
+              />
+            ) : (
+              <Ionicons
+                name={isViewed ? "eye" : "eye-off"}
+                color={theme.colors.white}
+                size={35}
+              />
+            )}
+            {user?.userId === item.createdBy && showDelete && (
+              <Ionicons
+                onPress={() => deleteVideo?.(item._id)}
+                name="trash"
+                color={theme.colors.error}
+                size={35}
+              />
+            )}
+          </Column>
+        </Row>
+        <View style={{ height: 4 }}>
+          <VideoTimeProgressBar currentTime={currentTime} duration={duration} />
+        </View>
+      </Pressable>
+
+      {/* Comments Modal */}
+      <CommentsModal
+        visible={commentsModalVisible}
+        onClose={() => setCommentsModalVisible(false)}
+        fetchUrl={`${AppUrl.getVideoComments(item._id)}`}
+        postUrl={`${AppUrl.addVideoComment(item._id)}`}
+        entityId={item._id}
+        setCount={setTotalComments}
       />
     </View>
   );
-};
+}
 
-const getStyles = (theme: any, isFlat: boolean) =>
-  StyleSheet.create({
-    progressBackground: {
-      height: 8,
-      borderRadius: isFlat ? 0 : 10,
-      backgroundColor: theme.colors.background,
-      overflow: "hidden",
-      flex: 1,
-    },
-    progressFill: {
-      height: "100%",
-      borderRadius: isFlat ? 0 : 10,
-    },
-  });
-
-export default VideoTimeProgressBar;
+const styles = StyleSheet.create({
+  videoContainer: { width: "100%" },
+  video: { ...StyleSheet.absoluteFillObject },
+  overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
+  overlayBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#00000033",
+    zIndex: 1,
+  },
+});
