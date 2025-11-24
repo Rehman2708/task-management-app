@@ -4,8 +4,8 @@ import { useTheme } from "../infrastructure/theme";
 import { useHelper } from "../utils/helper";
 
 interface ProgressBarProps {
-  duration?: number; // optional manual duration (e.g., video length)
-  currentTime?: number; // optional manual current time (e.g., video currentTime)
+  duration?: number; // optional manual duration
+  currentTime?: number; // optional manual current time
 }
 
 const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
@@ -15,78 +15,76 @@ const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
   const animatedValue = useRef(new Animated.Value(0)).current;
   const colorValue = useRef(new Animated.Value(0)).current;
   const [percentage, setPercentage] = useState(0);
-
   const { themeColor } = useHelper();
   const theme = useTheme();
   const styles = getStyles(theme, !!duration);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    // ------------------------------
-    // CASE 1: Manual progress (duration + currentTime)
-    // ------------------------------
+    // 🟢 CASE 1: Manual duration-based progress
     if (typeof duration === "number" && typeof currentTime === "number") {
       const progress = duration > 0 ? currentTime / duration : 0;
       const clamped = Math.min(Math.max(progress, 0), 1);
-
       setPercentage(Math.round(clamped * 100));
 
       Animated.parallel([
         Animated.timing(animatedValue, {
           toValue: clamped,
-          duration: 350,
-          easing: Easing.ease,
+          duration: 400,
+          easing: Easing.out(Easing.ease),
           useNativeDriver: false,
         }),
         Animated.timing(colorValue, {
           toValue: clamped,
-          duration: 350,
-          easing: Easing.ease,
+          duration: 400,
+          easing: Easing.out(Easing.ease),
           useNativeDriver: false,
         }),
       ]).start();
 
-      return; // stop here
+      return;
     }
 
-    // ------------------------------
-    // CASE 2: Auto progress (1-second interval)
-    // ------------------------------
+    // 🟢 CASE 2: Time-based progress
 
-    let autoProgress = 0;
+    // 🔴 Gap too large → keep empty
+    // if (totalDuration > twelveHours || end <= start) {
+    //   animatedValue.setValue(0);
+    //   colorValue.setValue(0);
+    //   setPercentage(0);
+    //   return;
+    // }
 
-    const updateProgress = () => {
-      autoProgress += 0.01; // 1% per second
-      if (autoProgress >= 1) autoProgress = 1;
+    const calculateProgress = () => {
+      let progress = 0;
 
-      setPercentage(Math.round(autoProgress * 100));
+      const clamped = Math.min(Math.max(progress, 0), 1);
+      setPercentage(Math.round(clamped * 100));
 
       Animated.parallel([
         Animated.timing(animatedValue, {
-          toValue: autoProgress,
-          duration: 400,
+          toValue: clamped,
+          duration: 500,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: false,
         }),
         Animated.timing(colorValue, {
-          toValue: autoProgress,
-          duration: 400,
+          toValue: clamped,
+          duration: 500,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: false,
         }),
       ]).start();
     };
 
-    updateProgress(); // initial start
-    interval = setInterval(updateProgress, 1000);
+    // Initial call
+    calculateProgress();
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    // Update every 1 second
+    const interval = setInterval(calculateProgress, 1000);
+
+    return () => clearInterval(interval);
   }, [duration, currentTime]);
 
-  // Interpolations
   const widthInterpolated = animatedValue.interpolate({
     inputRange: [0, 1],
     outputRange: ["0%", "100%"],
@@ -105,10 +103,7 @@ const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
       <Animated.View
         style={[
           styles.progressFill,
-          {
-            width: widthInterpolated,
-            backgroundColor: barColor,
-          },
+          { width: widthInterpolated, backgroundColor: barColor },
         ]}
       />
     </View>

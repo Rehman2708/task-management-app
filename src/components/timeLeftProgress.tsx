@@ -19,8 +19,7 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
     const end = new Date(endTime).getTime();
     const now = Date.now();
 
-    // 2-Day window
-    const twoDays = 2 * 24 * 60 * 60 * 1000;
+    const twoDays = 2 * 12 * 60 * 60 * 1000; // 12 hours * 2
     const start = end - twoDays;
 
     if (now < start) {
@@ -30,30 +29,22 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
     }
 
     const totalDuration = twoDays;
-    const timeLeft = end - now;
 
-    // Progress Animation
     const progress = (now - start) / totalDuration;
     const clamped = Math.min(Math.max(progress, 0), 1);
 
     Animated.timing(animatedValue, {
       toValue: clamped,
-      duration: 600,
+      duration: 1500,
       easing: Easing.out(Easing.quad),
       useNativeDriver: false,
     }).start();
 
-    // Color Stage
     let stage = 0;
-    if (timeLeft > 24 * 60 * 60 * 1000) {
-      stage = 0; // Green
-    } else if (timeLeft > 12 * 60 * 60 * 1000) {
-      stage = 0.5; // Orange
-    } else {
-      stage = 1; // Red
-    }
+    if (clamped < 0.33) stage = 0;
+    else if (clamped < 0.66) stage = 0.5;
+    else stage = 1;
 
-    // Smooth color transition
     Animated.timing(colorValue, {
       toValue: stage,
       duration: 500,
@@ -61,27 +52,29 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
       useNativeDriver: false,
     }).start();
 
-    // 🔥 Pulse Animation based on urgency
+    // 🛑 Stop ANY previously running pulse animations
+    pulseValue.stopAnimation();
+    pulseValue.setValue(1);
+
+    // 🔥 Restart correct pulse animation
     if (stage === 1) {
-      // Red zone → Fast pulse
       Animated.loop(
         Animated.sequence([
           Animated.timing(pulseValue, {
             toValue: 1.15,
-            duration: 600,
+            duration: 1500,
             easing: Easing.inOut(Easing.ease),
             useNativeDriver: false,
           }),
           Animated.timing(pulseValue, {
             toValue: 1,
-            duration: 600,
+            duration: 1500,
             easing: Easing.inOut(Easing.ease),
             useNativeDriver: false,
           }),
         ])
       ).start();
     } else if (stage === 0.5) {
-      // Orange zone → Gentle breathing
       Animated.loop(
         Animated.sequence([
           Animated.timing(pulseValue, {
@@ -98,9 +91,6 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
           }),
         ])
       ).start();
-    } else {
-      // Green zone → No pulse
-      pulseValue.setValue(1);
     }
   }, [endTime]);
 
