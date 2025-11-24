@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CommentsModal from "./comments/commentModal";
 import { AppUrl } from "../utils/appUrl";
 import VideoTimeProgressBar from "./videoTimeProgress";
+import { UploadRepo } from "../repositories/upload";
 
 type Props = {
   item: IVideo;
@@ -29,7 +30,7 @@ type Props = {
   setMuted: React.Dispatch<React.SetStateAction<boolean>>;
   setMutedIcon: React.Dispatch<React.SetStateAction<boolean>>;
   setLongPressedIndex?: React.Dispatch<React.SetStateAction<number | null>>;
-  deleteVideo?: (id: string) => void;
+  deleteVideo?: (id: string, url: string) => void;
   showDelete?: boolean;
   singleScreen?: boolean;
   playAlways?: boolean;
@@ -225,7 +226,9 @@ export default function VideoItem({
             )}
             {user?.userId === item.createdBy && showDelete && (
               <Ionicons
-                onPress={() => deleteVideo?.(item._id)}
+                onPress={() => {
+                  deleteVideo?.(item._id, item.url);
+                }}
                 name="trash"
                 color={theme.colors.error}
                 size={35}

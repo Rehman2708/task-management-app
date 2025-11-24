@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Priority } from "../enums/tasks";
 import { useAuthStore } from "../store/authStore";
 import { useTheme } from "../infrastructure/theme";
-import { Vibration } from "react-native";
+import { Vibration, Image } from "react-native";
 import { isAndroid } from "../tools";
 
 export function useHelper() {
@@ -73,6 +73,18 @@ export function useHelper() {
     Vibration.vibrate(type === "medium" ? 50 : type === "heavy" ? 100 : 15);
   };
 
+  const getImageSize = (
+    url: string
+  ): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      Image.getSize(
+        url,
+        (width, height) => resolve({ width, height }),
+        (error) => reject(error)
+      );
+    });
+  };
+
   return {
     loggedInUser,
     getInitials,
@@ -80,5 +92,6 @@ export function useHelper() {
     formatDate,
     getPriorityColor,
     triggerVibration,
+    getImageSize,
   };
 }

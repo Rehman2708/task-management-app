@@ -8,7 +8,8 @@ import { HttpMethods } from "../../data/network/httpMethods";
 
 export interface IComment {
   _id?: string;
-  text: string;
+  text?: string;
+  image?: string;
   createdBy: string;
   by: string;
   createdAt?: string;
@@ -81,8 +82,8 @@ export function useCommentsViewModel(
     }
   };
 
-  const handleAddComment = async () => {
-    if (!newComment.trim() || !user?.userId || addingComment) return;
+  const handleAddComment = async (image?: string) => {
+    if (!user?.userId || addingComment) return;
 
     // Keyboard.dismiss();
     setAddingComment(true);
@@ -94,12 +95,14 @@ export function useCommentsViewModel(
             subtaskId: subtask,
             userId: user.userId,
             text: newComment.trim(),
+            image: image ?? undefined,
           }
         : {
             createdBy: user.userId,
             by: user.userId,
             text: newComment.trim(),
             entityId,
+            image: image ?? undefined,
           };
       const res = await ApiService.getApiResponse(
         postUrl,

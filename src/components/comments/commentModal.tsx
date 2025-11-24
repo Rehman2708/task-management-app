@@ -18,6 +18,7 @@ import CustomButton from "../customButton";
 import { useCommentsViewModel } from "./useCommentsViewModel";
 import { useEffect, useState } from "react";
 import { LoaderTypes } from "../screenLoader";
+import { UploadMediaButton } from "../UploadMediaButton";
 
 type Props = {
   visible: boolean;
@@ -151,7 +152,8 @@ export default function GlobalCommentsModal({
                   return (
                     <CommentCard
                       image={c.createdByDetails?.image}
-                      text={c.text}
+                      url={c.image}
+                      text={c?.text}
                       name={c.createdByDetails?.name ?? c.createdBy ?? c.by}
                       userId={c.createdBy || c.by}
                       time={formatDate(c.createdAt!)}
@@ -172,6 +174,18 @@ export default function GlobalCommentsModal({
                 paddingHorizontal: 8,
               }}
             >
+              {newComment?.length < 1 && (
+                <Row>
+                  <UploadMediaButton
+                    onUploadSuccess={async (url) => {
+                      if (url) {
+                        console.log(url);
+                        await handleAddComment(url);
+                      }
+                    }}
+                  />
+                </Row>
+              )}
               <CustomInput
                 placeholder="Add comment..."
                 value={newComment}
@@ -186,7 +200,7 @@ export default function GlobalCommentsModal({
                 }}
               />
               <CustomButton
-                onPress={handleAddComment}
+                onPress={() => handleAddComment(undefined)}
                 title="Send"
                 sendButton
                 loading={addingComment}

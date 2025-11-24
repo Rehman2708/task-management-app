@@ -5,6 +5,7 @@ import { dimensions } from "../../tools";
 import { IVideo } from "../../types/videos";
 import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
+import { UploadRepo } from "../../repositories/upload";
 
 export const useReelsViewModal = () => {
   const { user } = useAuthStore();
@@ -50,10 +51,13 @@ export const useReelsViewModal = () => {
     }
   }, []);
 
-  const handleDelete = useCallback(async (id: string) => {
+  const handleDelete = useCallback(async (id: string, url?: string) => {
     try {
       const success = await VideoRepo.deleteVideo(id);
       if (success) {
+        if (url) {
+          UploadRepo.deleteFile(url);
+        }
         setVideos((prev) => prev.filter((video) => video._id !== id));
       }
     } catch (err) {
@@ -63,7 +67,7 @@ export const useReelsViewModal = () => {
   }, []);
 
   const deleteVideo = useCallback(
-    (id: string) => {
+    (id: string, url?: string) => {
       Alert.alert(
         "Delete Video",
         "Are you sure you want to delete this video?",
@@ -72,7 +76,7 @@ export const useReelsViewModal = () => {
           {
             text: "Delete",
             style: "destructive",
-            onPress: () => handleDelete(id),
+            onPress: () => handleDelete(id, url),
           },
         ]
       );

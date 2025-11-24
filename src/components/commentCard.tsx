@@ -1,10 +1,12 @@
-import { Text, View } from "react-native";
+import { Text, View, Image, Pressable } from "react-native";
 import { dimensions, Row, Spacer } from "../tools";
 import { useHelper } from "../utils/helper";
 import Avatar from "./avatar";
 import { useCommonStyles } from "../styles/commonstyles";
 import Swiper from "./swiper";
 import { useTheme } from "../infrastructure/theme";
+import ImageView from "react-native-image-viewing";
+import { useEffect, useState } from "react";
 
 const CommentCard = ({
   text,
@@ -13,15 +15,17 @@ const CommentCard = ({
   time,
   userId,
   repeated,
+  url,
 }: {
-  text: string;
+  text?: string;
   image?: string;
   name: string;
   userId: string;
   time: string;
   repeated?: boolean;
+  url?: string;
 }) => {
-  const { loggedInUser, themeColor } = useHelper();
+  const { loggedInUser, themeColor, getImageSize } = useHelper();
   const isMyChat = loggedInUser?.userId === userId;
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -30,7 +34,29 @@ const CommentCard = ({
     const emojiRegex = /^(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)$/u;
     return emojiRegex.test(text.trim());
   };
+  const [imgSize, setImgSize] = useState<{ w: number; h: number }>({
+    w: dimensions.width * 0.5,
+    h: 250,
+  });
 
+  useEffect(() => {
+    if (url) {
+      getImageSize(url)
+        .then(({ width, height }) => {
+          const maxWidth = dimensions.width * 0.55;
+          const scale = maxWidth / width;
+          setImgSize({
+            w: maxWidth,
+            h: height * scale,
+          });
+        })
+        .catch(() => {
+          setImgSize({ w: dimensions.width * 0.55, h: 250 }); // fallback
+        });
+    }
+  }, [url]);
+
+  const [showImage, setShowImage] = useState(false);
   const renderAction = () => (
     <View
       style={{
@@ -68,28 +94,67 @@ const CommentCard = ({
             )}
           </>
         )}
-        {isSingleEmoji() ? (
-          <Text style={[{ fontSize: 36 }]}>{text}</Text>
-        ) : (
-          <View
+        {url ? (
+          <Pressable
+            onPress={() => setShowImage(true)}
             style={{
+              aspectRatio: imgSize.w / imgSize.h,
+              maxHeight: 250,
+              borderRadius: 10,
+              overflow: "hidden",
               backgroundColor: isMyChat
                 ? `${themeColor.dark}`
                 : `${theme.colors.border}`,
-              paddingHorizontal: 14,
-              paddingVertical: 6,
-              borderRadius: 16,
-              maxWidth: dimensions.width - 120,
-              borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
-              borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
+              padding: 4,
             }}
           >
-            <Text
-              style={[commonStyles.smallText, { color: theme.colors.white }]}
-            >
-              {text}
-            </Text>
-          </View>
+            <Image
+              source={{ uri: url }}
+              style={{
+                flex: 1,
+                resizeMode: "contain",
+                borderRadius: 10,
+              }}
+            />
+            <ImageView
+              images={[{ uri: url }]}
+              visible={showImage}
+              onRequestClose={() => setShowImage(false)}
+              presentationStyle="overFullScreen"
+              swipeToCloseEnabled
+              backgroundColor={theme.colors.background}
+              imageIndex={0}
+            />
+          </Pressable>
+        ) : (
+          <>
+            {isSingleEmoji() ? (
+              <Text style={[{ fontSize: 36 }]}>{text}</Text>
+            ) : (
+              <View
+                style={{
+                  backgroundColor: isMyChat
+                    ? `${themeColor.dark}`
+                    : `${theme.colors.border}`,
+                  paddingHorizontal: 14,
+                  paddingVertical: 6,
+                  borderRadius: 16,
+                  maxWidth: dimensions.width - 120,
+                  borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
+                  borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
+                }}
+              >
+                <Text
+                  style={[
+                    commonStyles.smallText,
+                    { color: theme.colors.white },
+                  ]}
+                >
+                  {text}
+                </Text>
+              </View>
+            )}
+          </>
         )}
         {isMyChat && (
           <>
