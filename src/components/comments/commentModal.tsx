@@ -108,7 +108,7 @@ export default function GlobalCommentsModal({
         >
           <Row
             justifyContent="space-between"
-            style={{ paddingHorizontal: 6, paddingVertical: 16 }}
+            style={{ paddingHorizontal: 12, paddingVertical: 16 }}
           >
             <Text style={commonStyles.subTitleText}>Comments</Text>
             <Ionicons
@@ -179,7 +179,6 @@ export default function GlobalCommentsModal({
                   <UploadMediaButton
                     onUploadSuccess={async (url) => {
                       if (url) {
-                        console.log(url);
                         await handleAddComment(url);
                       }
                     }}

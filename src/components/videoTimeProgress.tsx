@@ -1,90 +1,54 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated, Easing } from "react-native";
 import { useTheme } from "../infrastructure/theme";
 import { useHelper } from "../utils/helper";
 
 interface ProgressBarProps {
-  duration?: number; // optional manual duration
-  currentTime?: number; // optional manual current time
+  duration?: number; // video duration in seconds
+  currentTime?: number; // current playback time in seconds
 }
 
 const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
-  duration,
-  currentTime,
+  duration = 0,
+  currentTime = 0,
 }) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
-  const colorValue = useRef(new Animated.Value(0)).current;
-  const [percentage, setPercentage] = useState(0);
   const { themeColor } = useHelper();
   const theme = useTheme();
-  const styles = getStyles(theme, !!duration);
+  const styles = getStyles(theme);
+
+  // Keep track of previous progress
+  const previousProgress = useRef(0);
 
   useEffect(() => {
-    if (typeof duration === "number" && typeof currentTime === "number") {
-      const progress = duration > 0 ? currentTime / duration : 0;
-      const clamped = Math.min(Math.max(progress, 0), 1);
-      setPercentage(Math.round(clamped * 100));
+    if (duration <= 0) return;
 
-      Animated.parallel([
-        Animated.timing(animatedValue, {
-          toValue: clamped,
-          duration: 400,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(colorValue, {
-          toValue: clamped,
-          duration: 400,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ]).start();
+    let progress = Math.min(currentTime / duration, 1);
 
-      return;
+    // If video looped (progress < previous), reset instantly
+    if (progress < previousProgress.current) {
+      animatedValue.setValue(0);
     }
 
-    const calculateProgress = () => {
-      let progress = 0;
+    // Animate smoothly from current value to new progress
+    Animated.timing(animatedValue, {
+      toValue: progress,
+      duration: 300, // smooth duration
+      easing: Easing.linear, // linear motion
+      useNativeDriver: false,
+    }).start();
 
-      const clamped = Math.min(Math.max(progress, 0), 1);
-      setPercentage(Math.round(clamped * 100));
-
-      Animated.parallel([
-        Animated.timing(animatedValue, {
-          toValue: clamped,
-          duration: 500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(colorValue, {
-          toValue: clamped,
-          duration: 500,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ]).start();
-    };
-
-    // Initial call
-    calculateProgress();
-
-    // Update every 1 second
-    const interval = setInterval(calculateProgress, 1000);
-
-    return () => clearInterval(interval);
-  }, [duration, currentTime]);
+    previousProgress.current = progress;
+  }, [currentTime, duration]);
 
   const widthInterpolated = animatedValue.interpolate({
     inputRange: [0, 1],
     outputRange: ["0%", "100%"],
   });
 
-  const barColor = colorValue.interpolate({
+  const barColor = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [
-      duration ? themeColor.dark : themeColor.light,
-      themeColor.dark,
-    ],
+    outputRange: [themeColor.light, themeColor.dark],
   });
 
   return (
@@ -99,18 +63,18 @@ const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
   );
 };
 
-const getStyles = (theme: any, isFlat: boolean) =>
+const getStyles = (theme: any) =>
   StyleSheet.create({
     progressBackground: {
-      height: 8,
-      borderRadius: isFlat ? 0 : 10,
+      height: 6,
+      borderRadius: 10,
       backgroundColor: theme.colors.background,
       overflow: "hidden",
       flex: 1,
     },
     progressFill: {
       height: "100%",
-      borderRadius: isFlat ? 0 : 10,
+      borderRadius: 10,
     },
   });
 

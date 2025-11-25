@@ -119,7 +119,12 @@ export default function CreateVideoScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <CustomInput title="Title" value={title} onChangeText={setTitle} />
+          <CustomInput
+            title="Title"
+            value={title}
+            onChangeText={setTitle}
+            editable={!loading}
+          />
           <CustomInput
             title="Video URL"
             value={videoUrl}
@@ -127,6 +132,7 @@ export default function CreateVideoScreen() {
             placeholder="Enter video URL"
             multiline
             inputStyle={{ maxHeight: 100, minHeight: 100 }}
+            editable={!loading}
           />
           <Row alignItems="center">
             {videoUrl?.length === 0 && (

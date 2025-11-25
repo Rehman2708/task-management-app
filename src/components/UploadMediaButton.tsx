@@ -80,13 +80,21 @@ export const UploadMediaButton: React.FC<Props> = ({
       if (res.url) {
         onUploadSuccess(res.url);
 
-        // delete previous file if exists
         if (currentUrl) {
           await UploadRepo.deleteFile(currentUrl);
         }
       }
-    } catch (err) {
-      Alert.alert("Upload Failed", "Something went wrong");
+    } catch (err: any) {
+      if (err.message === "NETWORK") {
+        Alert.alert(
+          "Upload Failed",
+          "No internet connection. Please try again."
+        );
+      } else if (err.message === "TIMEOUT") {
+        Alert.alert("Upload Failed", "Server took too long. Try again later.");
+      } else {
+        Alert.alert("Upload Failed", "Something went wrong - try again.");
+      }
       console.log("[UPLOAD ERROR]", err);
     }
   };

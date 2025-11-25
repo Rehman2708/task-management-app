@@ -111,7 +111,6 @@ export class NotesRepo {
     payload: { createdBy: string; text: string }
   ) {
     const url = AppUrl.addNoteComment(noteId);
-    console.log(url);
     return ApiService.getApiResponse(url, HttpMethods.POST, payload);
   }
 
