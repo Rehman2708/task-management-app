@@ -81,11 +81,11 @@ function VideoItemComponent({
   const { formatDate } = useHelper();
   const insets = useSafeAreaInsets();
 
-  const shouldPlay =
-    playAlways || (Math.abs(currentIndex - index) === 0 && isFocused);
+  // Determine if video should play
+  const shouldPlay = playAlways || (currentIndex === index && isFocused);
   const paused = !shouldPlay || longPressedIndex === index;
 
-  // Throttle progress updates to avoid re-renders on every frame
+  // Throttle progress updates
   const throttledSetCurrentTime = useCallback(
     throttle((time: number) => {
       setCurrentTime(time);
@@ -93,7 +93,7 @@ function VideoItemComponent({
     []
   );
 
-  // Mark video as viewed (only once)
+  // Mark video as viewed
   const handleViewed = useCallback(async () => {
     if (isViewed) return;
     try {
@@ -104,9 +104,25 @@ function VideoItemComponent({
     }
   }, [item._id, isViewed]);
 
+  // Reset video when screen/tab loses focus
+  useEffect(() => {
+    if (!isFocused && videoRef.current) {
+      videoRef.current.seek(0);
+      setCurrentTime(0);
+    }
+  }, [isFocused]);
+
+  // Sync comments modal visibility
   useEffect(() => {
     setCommentsModalVisible(showComments ?? false);
-  }, [item._id]);
+  }, [item._id, showComments]);
+
+  // Hide mute icon after 2s
+  useEffect(() => {
+    if (!mutedIcon) return;
+    const timer = setTimeout(() => setMutedIcon(false), 2000);
+    return () => clearTimeout(timer);
+  }, [mutedIcon, setMutedIcon]);
 
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
@@ -291,7 +307,8 @@ export default React.memo(VideoItemComponent, (prev, next) => {
     prev.muted === next.muted &&
     prev.mutedIcon === next.mutedIcon &&
     prev.longPressedIndex === next.longPressedIndex &&
-    prev.item._id === next.item._id
+    prev.item._id === next.item._id &&
+    prev.isFocused === next.isFocused // Important for tab focus
   );
 });
 

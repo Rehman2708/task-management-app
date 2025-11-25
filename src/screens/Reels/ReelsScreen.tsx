@@ -1,7 +1,7 @@
 import React, {
-  useRef,
   useCallback,
   useEffect,
+  useRef,
   useState,
   useMemo,
 } from "react";
@@ -12,9 +12,9 @@ import {
   ListRenderItem,
   RefreshControl,
   SafeAreaView,
+  View,
 } from "react-native";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
-import { useReelsViewModal } from "./useViewModal";
 import { IVideo } from "../../types/videos";
 import VideoItem from "../../components/VideoItem";
 import EmptyState from "../../components/emptyState";
@@ -22,6 +22,7 @@ import { Spacer } from "../../tools";
 import { LoaderTypes } from "../../components/screenLoader";
 import { useUtilStore } from "../../store/utils";
 import { useHelper } from "../../utils/helper";
+import { useReelsViewModal } from "./useViewModal";
 
 export default function ReelsScreen() {
   const {
@@ -51,10 +52,12 @@ export default function ReelsScreen() {
   const isFocused = useIsFocused();
   const [longPressedIndex, setLongPressedIndex] = useState<number | null>(null);
 
+  // Initial fetch
   useEffect(() => {
     fetchVideos(1, false);
   }, [fetchVideos, fetchingReels]);
 
+  // Scroll to current index on focus
   useFocusEffect(
     useCallback(() => {
       if (currentIndex >= 0) {
@@ -73,15 +76,18 @@ export default function ReelsScreen() {
     return () => clearTimeout(timer);
   }, [mutedIcon, setMutedIcon]);
 
+  // Update currentIndex when visible items change
   const onViewRef = useCallback(
     ({ viewableItems }: { viewableItems: any[] }) => {
-      if (viewableItems.length === 0) return;
+      if (!isFocused || viewableItems.length === 0) return;
+
       const visibleItem = viewableItems.find((item) => item.isViewable);
       if (!visibleItem) return;
+
       const newIndex = visibleItem.index ?? 0;
       if (newIndex !== currentIndex) setCurrentIndex(newIndex);
     },
-    [currentIndex, setCurrentIndex]
+    [currentIndex, setCurrentIndex, isFocused]
   );
 
   const viewConfig = useMemo(
@@ -89,14 +95,17 @@ export default function ReelsScreen() {
     []
   );
 
+  // Load more videos when reaching end
   const handleLoadMore = () => {
     if (!isFetchingMore && currentPage < totalPages) {
       fetchVideos(currentPage + 1, true);
     }
   };
 
+  // Render each video item
   const renderItem: ListRenderItem<IVideo> = useCallback(
     ({ item, index }) => {
+      // Preload videos one before and after current index
       const preload =
         index >= currentIndex - 1 &&
         index <= currentIndex + 1 &&
@@ -107,7 +116,7 @@ export default function ReelsScreen() {
           item={item}
           index={index}
           currentIndex={currentIndex}
-          isFocused={isFocused}
+          isFocused={isFocused} // Respect tab focus
           muted={muted}
           mutedIcon={mutedIcon}
           windowHeight={windowHeight}
@@ -122,11 +131,11 @@ export default function ReelsScreen() {
       );
     },
     [
-      windowHeight,
-      muted,
-      mutedIcon,
       currentIndex,
       isFocused,
+      muted,
+      mutedIcon,
+      windowHeight,
       longPressedIndex,
       setMuted,
       setMutedIcon,
@@ -135,6 +144,7 @@ export default function ReelsScreen() {
     ]
   );
 
+  // Show empty state if no videos
   if (error || loading || videos.length === 0) {
     return (
       <SafeAreaView style={[styles.container]}>
@@ -156,15 +166,15 @@ export default function ReelsScreen() {
       <FlatList
         ref={flatListRef}
         data={videos}
-        keyExtractor={(item) => item._id.toString() + item.createdAt}
+        keyExtractor={(item) => item._id + item.createdAt}
         renderItem={renderItem}
-        snapToInterval={windowHeight}
+        snapToInterval={windowHeight} // Snap to each video
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
         initialNumToRender={3}
         maxToRenderPerBatch={3}
-        windowSize={5} // Reduce memory usage
-        removeClippedSubviews={true} // Keep memory lower
+        windowSize={5} // Preload surrounding videos
+        removeClippedSubviews={true} // Free memory for offscreen videos
         onViewableItemsChanged={onViewRef}
         viewabilityConfig={viewConfig}
         onEndReached={handleLoadMore}
