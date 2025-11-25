@@ -3,7 +3,6 @@ import { dimensions, Row, Spacer } from "../tools";
 import { useHelper } from "../utils/helper";
 import Avatar from "./avatar";
 import { useCommonStyles } from "../styles/commonstyles";
-import Swiper from "./swiper";
 import { useTheme } from "../infrastructure/theme";
 import ImageView from "react-native-image-viewing";
 import { useEffect, useState } from "react";
@@ -54,124 +53,124 @@ const CommentCard = ({
   }, [url]);
 
   const [showImage, setShowImage] = useState(false);
-  const renderAction = () => (
-    <View
-      style={{
-        height: 26,
-        justifyContent: "center",
-        marginRight: !isMyChat ? 12 : 0,
-        marginLeft: isMyChat ? 12 : 0,
-      }}
-    >
-      <Text style={[commonStyles.tTinyText]}>{time}</Text>
-    </View>
-  );
 
   return (
-    <Swiper
-      rightAction={isMyChat ? renderAction : undefined}
-      leftAction={!isMyChat ? renderAction : undefined}
-      containerStyle={{ marginTop: repeated ? 2 : 8 }}
+    <Row
+      gap={8}
+      justifyContent={isMyChat ? "flex-end" : "flex-start"}
+      alignItems={isSingleEmoji() ? "center" : "flex-start"}
+      style={{ marginTop: repeated ? 2 : 8 }}
     >
-      <Row
-        gap={8}
-        justifyContent={isMyChat ? "flex-end" : "flex-start"}
-        alignItems={isSingleEmoji() ? "center" : "flex-start"}
-      >
-        {!isMyChat && (
-          <>
-            {repeated ? (
-              <Spacer size={26} position="right" />
-            ) : (
-              <Avatar
-                size={26}
-                name={loggedInUser?.partner?.name}
-                image={loggedInUser?.partner?.image}
-              />
-            )}
-          </>
-        )}
-        {url ? (
-          <>
-            {imgSize && (
-              <Pressable
-                onPress={() => setShowImage(true)}
+      {!isMyChat && (
+        <>
+          {repeated ? (
+            <Spacer size={26} position="right" />
+          ) : (
+            <Avatar
+              size={26}
+              name={loggedInUser?.partner?.name}
+              image={loggedInUser?.partner?.image}
+            />
+          )}
+        </>
+      )}
+      {url ? (
+        <>
+          {imgSize && (
+            <Pressable
+              onPress={() => setShowImage(true)}
+              style={{
+                aspectRatio: imgSize.w / (imgSize.h + 16),
+                maxHeight: 290,
+                borderRadius: 10,
+                overflow: "hidden",
+                backgroundColor: isMyChat
+                  ? `${themeColor.dark}`
+                  : `${theme.colors.border}`,
+                padding: 4,
+              }}
+            >
+              <Image
+                source={{ uri: url }}
                 style={{
-                  aspectRatio: imgSize.w / imgSize.h,
-                  maxHeight: 250,
-                  borderRadius: 10,
-                  overflow: "hidden",
-                  backgroundColor: isMyChat
-                    ? `${themeColor.dark}`
-                    : `${theme.colors.border}`,
-                  padding: 4,
+                  flex: 1,
+                  resizeMode: "contain",
+                  borderRadius: 6,
                 }}
-              >
-                <Image
-                  source={{ uri: url }}
-                  style={{
-                    flex: 1,
-                    resizeMode: "contain",
-                    borderRadius: 10,
-                  }}
-                />
-                <ImageView
-                  images={[{ uri: url }]}
-                  visible={showImage}
-                  onRequestClose={() => setShowImage(false)}
-                  presentationStyle="overFullScreen"
-                  swipeToCloseEnabled
-                  backgroundColor={theme.colors.background}
-                  imageIndex={0}
-                />
-              </Pressable>
-            )}
-          </>
-        ) : (
-          <>
-            {isSingleEmoji() ? (
-              <Text style={[{ fontSize: 36 }]}>{text}</Text>
-            ) : (
-              <View
-                style={{
-                  backgroundColor: isMyChat
-                    ? `${themeColor.dark}`
-                    : `${theme.colors.border}`,
-                  paddingHorizontal: 14,
-                  paddingVertical: 6,
-                  borderRadius: 16,
-                  maxWidth: dimensions.width - 120,
-                  borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
-                  borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
-                }}
-              >
-                <Text
-                  style={[
-                    commonStyles.smallText,
-                    { color: theme.colors.white },
-                  ]}
-                >
-                  {text}
-                </Text>
-              </View>
-            )}
-          </>
-        )}
-        {isMyChat && (
-          <>
-            {repeated ? (
-              <Spacer size={26} position="right" />
-            ) : (
-              <Avatar
-                size={26}
-                name={loggedInUser?.name}
-                image={loggedInUser?.image}
               />
-            )}
-          </>
-        )}
-      </Row>
-    </Swiper>
+              <ImageView
+                images={[{ uri: url }]}
+                visible={showImage}
+                onRequestClose={() => setShowImage(false)}
+                presentationStyle="overFullScreen"
+                swipeToCloseEnabled
+                backgroundColor={theme.colors.background}
+                imageIndex={0}
+              />
+              <Text
+                style={[
+                  commonStyles.tTinyText,
+                  {
+                    color: theme.colors.white,
+                    textAlign: "right",
+                    marginTop: 6,
+                  },
+                ]}
+              >
+                {time}
+              </Text>
+            </Pressable>
+          )}
+        </>
+      ) : (
+        <>
+          {isSingleEmoji() ? (
+            <Text style={[{ fontSize: 36 }]}>{text}</Text>
+          ) : (
+            <View
+              style={{
+                backgroundColor: isMyChat
+                  ? `${themeColor.dark}`
+                  : `${theme.colors.border}`,
+                paddingHorizontal: 14,
+                paddingVertical: 6,
+                borderRadius: 16,
+                maxWidth: dimensions.width - 120,
+                borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
+                borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
+              }}
+            >
+              <Text
+                style={[commonStyles.smallText, { color: theme.colors.white }]}
+              >
+                {text}
+              </Text>
+              <Text
+                style={[
+                  commonStyles.tTinyText,
+                  { color: theme.colors.white, textAlign: "right" },
+                ]}
+              >
+                {time}
+              </Text>
+            </View>
+          )}
+        </>
+      )}
+      {isMyChat && (
+        <>
+          {repeated ? (
+            <Spacer size={26} position="right" />
+          ) : (
+            <Avatar
+              size={26}
+              name={loggedInUser?.name}
+              image={loggedInUser?.image}
+            />
+          )}
+        </>
+      )}
+    </Row>
   );
 };
 

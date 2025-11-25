@@ -15,10 +15,11 @@ import CommentCard from "../commentCard";
 import EmptyState from "../emptyState";
 import CustomInput from "../customInput";
 import CustomButton from "../customButton";
-import { useCommentsViewModel } from "./useCommentsViewModel";
+import { IComment, useCommentsViewModel } from "./useCommentsViewModel";
 import { useEffect, useState } from "react";
 import { LoaderTypes } from "../screenLoader";
 import { UploadMediaButton } from "../UploadMediaButton";
+import { useHelper } from "../../utils/helper";
 
 type Props = {
   visible: boolean;
@@ -31,6 +32,10 @@ type Props = {
   subtask?: string;
   setCount?: (count: number) => void;
 };
+type GroupedComments = {
+  date: string;
+  comments: IComment[];
+};
 
 export default function GlobalCommentsModal({
   visible,
@@ -38,12 +43,13 @@ export default function GlobalCommentsModal({
   fetchUrl,
   postUrl,
   entityId,
-  autoRefresh,
-  refreshInterval,
+  autoRefresh = true,
+  refreshInterval = 5000,
   subtask,
   setCount,
 }: Props) {
   const theme = useTheme();
+  const { themeColor } = useHelper();
   const commonStyles = useCommonStyles(theme);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -68,7 +74,7 @@ export default function GlobalCommentsModal({
     setCount
   );
 
-  // 👇 Listen to keyboard open/close events
+  // Listen to keyboard show/hide events
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", () =>
       setKeyboardVisible(true)
@@ -82,6 +88,25 @@ export default function GlobalCommentsModal({
       hideSub.remove();
     };
   }, []);
+
+  const groupCommentsByDate = (comments: IComment[]) =>
+    comments.reduce<Record<string, IComment[]>>((acc, comment) => {
+      const dateKey = new Date(comment.date ?? comment.createdAt ?? new Date())
+        .toISOString()
+        .split("T")[0];
+
+      if (!acc[dateKey]) acc[dateKey] = [];
+      acc[dateKey].push(comment);
+      return acc;
+    }, {});
+
+  const groupedComments = groupCommentsByDate(comments);
+  const groupedArray = Object.entries(groupedComments).map(
+    ([date, comments]) => ({
+      date,
+      comments,
+    })
+  );
 
   return (
     <Modal
@@ -102,7 +127,7 @@ export default function GlobalCommentsModal({
             backgroundColor: theme.colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
-            height: keyboardVisible ? "100%" : "70%", // ✅ instantly reacts
+            height: keyboardVisible ? "100%" : "70%",
             paddingTop: 10,
           }}
         >
@@ -124,43 +149,69 @@ export default function GlobalCommentsModal({
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}
           >
-            {initialLoading || !comments?.length ? (
+            {initialLoading || comments.length === 0 ? (
               <EmptyState
                 text="No Comments"
                 loading={initialLoading}
                 type={LoaderTypes.Comment}
               />
             ) : (
-              <FlatList
-                ref={flatListRef}
-                data={comments}
-                extraData={comments}
-                keyExtractor={(item, index) =>
-                  item._id ? item._id.toString() : `${item.by}-${index}`
-                }
+              <FlatList<GroupedComments>
+                ref={flatListRef as any}
+                data={groupedArray}
+                keyExtractor={(item) => item.date}
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{
-                  paddingHorizontal: 12,
-                  flexGrow: 1,
-                }}
+                contentContainerStyle={{ paddingHorizontal: 12, flexGrow: 1 }}
                 showsVerticalScrollIndicator={false}
-                renderItem={({ item: c, index }) => {
-                  const prev = comments[index - 1];
-                  const sameUser =
-                    index > 0 &&
-                    (c.createdBy || c.by) === (prev?.createdBy || prev?.by);
-                  return (
-                    <CommentCard
-                      image={c.createdByDetails?.image}
-                      url={c.image}
-                      text={c?.text}
-                      name={c.createdByDetails?.name ?? c.createdBy ?? c.by}
-                      userId={c.createdBy || c.by}
-                      time={formatDate(c.createdAt!)}
-                      repeated={sameUser}
-                    />
-                  );
-                }}
+                renderItem={({ item }) => (
+                  <View>
+                    {/* Date Header */}
+                    <Row alignItems="center" style={{ marginVertical: 16 }}>
+                      <View
+                        style={{
+                          height: 1,
+                          backgroundColor: themeColor.dark,
+                          flex: 1,
+                          marginHorizontal: 8,
+                        }}
+                      />
+                      <Text style={commonStyles.basicText}>
+                        {formatDate(String(item.date), "date")}
+                      </Text>
+                      <View
+                        style={{
+                          height: 1,
+                          backgroundColor: themeColor.dark,
+                          flex: 1,
+                          marginHorizontal: 8,
+                        }}
+                      />
+                    </Row>
+
+                    {/* Comments */}
+                    {item.comments.map((c, index) => {
+                      const prev = item.comments[index - 1];
+                      const sameUser =
+                        index > 0 &&
+                        (c.createdBy || c.by) === (prev?.createdBy || prev?.by);
+                      return (
+                        <CommentCard
+                          key={c._id ?? `${c.by}-${index}`}
+                          image={c.createdByDetails?.image}
+                          url={c.image}
+                          text={c.text}
+                          name={c.createdByDetails?.name ?? c.createdBy ?? c.by}
+                          userId={c.createdBy ?? c.by}
+                          time={formatDate(
+                            c.date ?? c.createdAt ?? new Date(),
+                            "time"
+                          )}
+                          repeated={sameUser}
+                        />
+                      );
+                    })}
+                  </View>
+                )}
                 ListEmptyComponent={<EmptyState text="No Comments" />}
               />
             )}
@@ -174,13 +225,11 @@ export default function GlobalCommentsModal({
                 paddingHorizontal: 8,
               }}
             >
-              {newComment?.length < 1 && (
+              {newComment.length < 1 && (
                 <Row>
                   <UploadMediaButton
                     onUploadSuccess={async (url) => {
-                      if (url) {
-                        await handleAddComment(url);
-                      }
+                      if (url) await handleAddComment(url);
                     }}
                   />
                 </Row>
@@ -199,7 +248,7 @@ export default function GlobalCommentsModal({
                 }}
               />
               <CustomButton
-                onPress={() => handleAddComment(undefined)}
+                onPress={() => handleAddComment()}
                 title="Send"
                 sendButton
                 loading={addingComment}

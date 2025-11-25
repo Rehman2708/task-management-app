@@ -10,9 +10,10 @@ export interface IComment {
   _id?: string;
   text?: string;
   image?: string;
-  createdBy: string;
+  createdBy?: string;
   by: string;
   createdAt?: string;
+  date?: Date;
   createdByDetails?: {
     name?: string;
     image?: string;
@@ -26,11 +27,12 @@ export function useCommentsViewModel(
   visible: boolean,
   autoRefresh: boolean = true,
   refreshInterval: number = 5000,
-  subtask: string | undefined,
-  setCount: ((count: number) => void) | undefined
+  subtask?: string,
+  setCount?: (count: number) => void
 ) {
   const { user } = useAuthStore();
   const { formatDate, triggerVibration } = useHelper();
+
   const [initialLoading, setInitialLoading] = useState(true);
   const [comments, setComments] = useState<IComment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -38,54 +40,43 @@ export function useCommentsViewModel(
   const [isFetching, setIsFetching] = useState(false);
 
   const flatListRef = useRef<FlatList<IComment>>(null);
+  const fetchingRef = useRef(false);
 
-  // Fetch comments initially and set interval if needed
+  // Fetch comments
   useEffect(() => {
-    setComments([]);
     let interval: NodeJS.Timer;
     if (visible && fetchUrl) {
       fetchComments();
-      if (autoRefresh) {
-        interval = setInterval(fetchComments, refreshInterval);
-      }
+      if (autoRefresh) interval = setInterval(fetchComments, refreshInterval);
     }
     return () => clearInterval(Number(interval));
   }, [visible, fetchUrl, subtask]);
-  useEffect(() => {
-    if (comments.length > 0) {
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }
-  }, [comments]);
 
-  const fetchingRef = useRef(false);
+  // Scroll to end on new comments
+  useEffect(() => {
+    if (comments.length > 0)
+      flatListRef.current?.scrollToEnd({ animated: true });
+  }, [comments]);
 
   const fetchComments = async () => {
     if (fetchingRef.current) return;
     fetchingRef.current = true;
 
     try {
-      const response = await fetch(fetchUrl);
-      const res = await response.json();
-
-      if (Array.isArray(res)) {
-        setComments(res);
-        if (setCount) setCount(res.length ?? 0);
-      } else if (res?.comments) {
-        setComments(res.comments);
-        if (setCount) setCount(res.comments.length ?? 0);
-      }
+      const res = await (await fetch(fetchUrl)).json();
+      const data = Array.isArray(res) ? res : res?.comments ?? [];
+      setComments(data);
+      if (setCount) setCount(data.length);
     } catch (err) {
       console.error("fetchComments error:", err);
     } finally {
       fetchingRef.current = false;
-      setInitialLoading(false); // ✅ only affects first load
+      setInitialLoading(false);
     }
   };
 
   const handleAddComment = async (image?: string) => {
     if (!user?.userId || addingComment) return;
-
-    // Keyboard.dismiss();
     setAddingComment(true);
 
     try {
@@ -95,32 +86,34 @@ export function useCommentsViewModel(
             subtaskId: subtask,
             userId: user.userId,
             text: newComment.trim(),
-            image: image ?? undefined,
+            image,
           }
         : {
             createdBy: user.userId,
             by: user.userId,
-            text: newComment.trim(),
             entityId,
-            image: image ?? undefined,
+            text: newComment.trim(),
+            image,
           };
+
       const res = await ApiService.getApiResponse(
         postUrl,
         HttpMethods.POST,
         body
       );
 
+      let updatedComments: IComment[] = [];
       if (subtask && res?.subtasks) {
-        const comments = [
-          ...res.subtasks.find((item: Subtask) => item._id === subtask)
-            .comments,
+        updatedComments = [
+          ...(res.subtasks.find((t: Subtask) => t._id === subtask)?.comments ??
+            []),
         ];
-        setComments(comments);
-        if (setCount) setCount(comments.length ?? 0);
       } else if (res?.comments) {
-        setComments([...res.comments]);
-        if (setCount) setCount([...res.comments].length ?? 0);
+        updatedComments = [...res.comments];
       }
+
+      setComments(updatedComments);
+      if (setCount) setCount(updatedComments.length);
     } catch (err) {
       console.error("addComment error:", err);
     } finally {

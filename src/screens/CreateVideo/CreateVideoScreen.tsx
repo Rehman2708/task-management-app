@@ -67,7 +67,6 @@ export default function CreateVideoScreen() {
       url: uri ?? videoUrl,
       createdBy: loggedInUser?.userId ?? "RehmanK",
     };
-    console.log(payload);
     try {
       await VideoRepo.createVideo(payload);
       setSuccess("Video uploaded successfully");
@@ -246,7 +245,7 @@ export default function CreateVideoScreen() {
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.5}
                 ListEmptyComponent={
-                  <Text style={commonStyles.errorText}>No songs found</Text>
+                  <Text style={commonStyles.errorText}>No videos found</Text>
                 }
                 ListFooterComponent={
                   isFetchingMore ? (
