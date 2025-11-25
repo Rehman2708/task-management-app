@@ -74,11 +74,23 @@ const CustomHeader = ({
             <TouchableOpacity
               onPress={() => navigation.navigate(ROUTES.PROFILE)}
             >
-              <Avatar
-                name={loggedInUser?.name}
-                size={36}
-                image={loggedInUser?.image}
-              />
+              <Row alignItems="center">
+                <Avatar
+                  name={loggedInUser?.name}
+                  size={34}
+                  image={loggedInUser?.image}
+                />
+                {loggedInUser.partner && (
+                  <Row alignItems="center">
+                    <Ionicons name="heart" color={"red"} size={16} />
+                    <Avatar
+                      name={loggedInUser?.partner?.name}
+                      size={34}
+                      image={loggedInUser?.partner?.image}
+                    />
+                  </Row>
+                )}
+              </Row>
             </TouchableOpacity>
           )}
           <Column>
@@ -105,9 +117,9 @@ const CustomHeader = ({
             {showImage &&
               (loggedInUser?.about || loggedInUser?.partner?.about) && (
                 <>
-                  <View style={{ width: dimensions.width - 150 }}>
+                  <View style={{ width: dimensions.width - 190 }}>
                     <TextTicker
-                      duration={tickerText.length * 100}
+                      duration={tickerText.length * 120}
                       loop
                       marqueeDelay={0}
                       style={[commonStyles.smallText, commonStyles.whiteText]}

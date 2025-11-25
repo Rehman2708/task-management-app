@@ -37,47 +37,45 @@ export const RegisterScreen = () => {
   const Login = () => navigate(ROUTES.LOGIN);
   return (
     <AuthBgContainer>
-      <Column style={commonStyles.screenWrapper} justifyContent="center">
+      <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={[
+          commonStyles.screenWrapper,
+          { justifyContent: "center" },
+        ]}
+      >
         <Logo height={150} />
         <Text style={commonStyles.titleText}>Register</Text>
         <Spacer size={20} />
-        <KeyboardAwareScrollView
-          keyboardShouldPersistTaps="handled"
-          style={{ maxHeight: 540 }}
-        >
-          <CustomInput title="Name" value={name} onChangeText={setName} />
-          <CustomInput
-            title="User ID"
-            value={userId}
-            onChangeText={setUserId}
-          />
-          <CustomInput
-            title="Password"
-            value={password}
-            secureTextEntry
-            onChangeText={setPassword}
-          />
-          <CustomInput
-            title="Partner User ID (Optional)"
-            value={partnerUserId}
-            onChangeText={setPartnerUserId}
-          />
 
-          {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
+        <CustomInput title="Name" value={name} onChangeText={setName} />
+        <CustomInput title="User ID" value={userId} onChangeText={setUserId} />
+        <CustomInput
+          title="Password"
+          value={password}
+          secureTextEntry
+          onChangeText={setPassword}
+        />
+        <CustomInput
+          title="Partner User ID (Optional)"
+          value={partnerUserId}
+          onChangeText={setPartnerUserId}
+        />
 
-          <CustomButton
-            title="Register"
-            onPress={handleRegister}
-            loading={loading}
-          />
-          <CustomButton
-            customStyle={{ borderWidth: 0 }}
-            title="Login"
-            onPress={Login}
-            outlined
-          />
-        </KeyboardAwareScrollView>
-      </Column>
+        {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
+
+        <CustomButton
+          title="Register"
+          onPress={handleRegister}
+          loading={loading}
+        />
+        <CustomButton
+          customStyle={{ borderWidth: 0 }}
+          title="Login"
+          onPress={Login}
+          outlined
+        />
+      </KeyboardAwareScrollView>
     </AuthBgContainer>
   );
 };

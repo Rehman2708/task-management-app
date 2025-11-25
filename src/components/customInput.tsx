@@ -160,7 +160,7 @@ const customInputStyle = (theme: any) =>
     passwordInput: {
       paddingRight: 50,
     },
-    rounded: { borderRadius: 100 },
+    rounded: { borderRadius: 26 },
     iconWrapper: {
       position: "absolute",
       right: 12,

@@ -15,6 +15,7 @@ const CommentCard = ({
   userId,
   repeated,
   url,
+  noImage,
 }: {
   text?: string;
   image?: string;
@@ -22,6 +23,7 @@ const CommentCard = ({
   userId: string;
   time: string;
   repeated?: boolean;
+  noImage?: boolean;
   url?: string;
 }) => {
   const { loggedInUser, themeColor, getImageSize } = useHelper();
@@ -59,9 +61,9 @@ const CommentCard = ({
       gap={8}
       justifyContent={isMyChat ? "flex-end" : "flex-start"}
       alignItems={isSingleEmoji() ? "center" : "flex-start"}
-      style={{ marginTop: repeated ? 2 : 8 }}
+      style={{ marginTop: repeated ? 3 : 8 }}
     >
-      {!isMyChat && (
+      {!isMyChat && !noImage && (
         <>
           {repeated ? (
             <Spacer size={26} position="right" />
@@ -148,7 +150,11 @@ const CommentCard = ({
               <Text
                 style={[
                   commonStyles.tTinyText,
-                  { color: theme.colors.white, textAlign: "right" },
+                  {
+                    color: theme.colors.textLight,
+                    textAlign: "right",
+                    marginTop: 2,
+                  },
                 ]}
               >
                 {time}
@@ -157,7 +163,7 @@ const CommentCard = ({
           )}
         </>
       )}
-      {isMyChat && (
+      {isMyChat && !noImage && (
         <>
           {repeated ? (
             <Spacer size={26} position="right" />

@@ -238,6 +238,7 @@ export default function CreateVideoScreen() {
                       time={formatDate(item.createdAt)}
                       userId=""
                       repeated
+                      noImage
                     />
                   </Pressable>
                 )}
