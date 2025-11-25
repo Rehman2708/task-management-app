@@ -8,7 +8,10 @@ export interface UploadResponse {
 }
 
 export class UploadRepo {
-  static async uploadFile(file: any): Promise<UploadResponse> {
+  static async uploadFile(
+    file: any,
+    onProgress?: (percent: number) => void
+  ): Promise<UploadResponse> {
     const formData = new FormData();
     formData.append("file", {
       uri: file.uri,
@@ -19,35 +22,28 @@ export class UploadRepo {
     try {
       const res = await axios.post(AppUrl.uploadFile, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        timeout: 20000, // 20 sec timeout
+        timeout: 300000, // 5 min for large files
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && progressEvent.total)
+            onProgress(
+              Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            );
+        },
       });
 
       return res.data as UploadResponse;
     } catch (error: any) {
-      // Handle no internet
-      if (error.message === "Network Error") {
-        throw new Error("NETWORK");
-      }
-
-      // Handle timeout
-      if (error.code === "ECONNABORTED") {
-        throw new Error("TIMEOUT");
-      }
-
+      if (error.message === "Network Error") throw new Error("NETWORK");
+      if (error.code === "ECONNABORTED") throw new Error("TIMEOUT");
       throw new Error("UNKNOWN");
     }
   }
 
   static async deleteFile(uri: string) {
-    try {
-      const url = AppUrl.deleteFile(uri);
-      const res = await axios.delete(url);
-      return res.data;
-    } catch (error: any) {
-      console.error("Delete error: ", error.response?.data || error.message);
-      throw error;
-    }
+    const url = AppUrl.deleteFile(uri);
+    const res = await axios.delete(url);
+    return res.data;
   }
 }

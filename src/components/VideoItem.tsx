@@ -1,5 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { View, Pressable, Text, StyleSheet } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  View,
+  Pressable,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
 import { IVideo } from "../types/videos";
@@ -11,12 +17,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "../store/authStore";
 import { VideoRepo } from "../repositories/videos";
 import { useTheme } from "../infrastructure/theme";
-import ProgressBar from "./timeLeftProgress";
+import VideoTimeProgressBar from "./videoTimeProgress";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CommentsModal from "./comments/commentModal";
 import { AppUrl } from "../utils/appUrl";
-import VideoTimeProgressBar from "./videoTimeProgress";
-import { UploadRepo } from "../repositories/upload";
+import throttle from "lodash.throttle";
 
 type Props = {
   item: IVideo;
@@ -32,12 +37,13 @@ type Props = {
   setLongPressedIndex?: React.Dispatch<React.SetStateAction<number | null>>;
   deleteVideo?: (id: string, url: string) => void;
   showDelete?: boolean;
-  singleScreen?: boolean;
   playAlways?: boolean;
   showComments?: boolean;
+  singleScreen?: boolean;
+  preload?: boolean;
 };
 
-export default function VideoItem({
+function VideoItemComponent({
   item,
   index = 0,
   currentIndex = 0,
@@ -52,10 +58,12 @@ export default function VideoItem({
   deleteVideo,
   showDelete = true,
   playAlways = false,
-  singleScreen,
   showComments,
+  singleScreen,
+  preload = false,
 }: Props) {
-  const videoRef = useRef<IVideo | null>(null);
+  const videoRef = useRef<IVideo>(null);
+  const [isReady, setIsReady] = useState(false);
   const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
   const [commentsModalVisible, setCommentsModalVisible] = useState(
     showComments ?? false
@@ -65,6 +73,7 @@ export default function VideoItem({
   );
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
   const navigation: any = useNavigation();
@@ -73,26 +82,38 @@ export default function VideoItem({
   const insets = useSafeAreaInsets();
 
   const shouldPlay =
-    playAlways || (Math.abs(currentIndex - index) <= 0 && isFocused);
+    playAlways || (Math.abs(currentIndex - index) === 0 && isFocused);
   const paused = !shouldPlay || longPressedIndex === index;
 
+  // Throttle progress updates to avoid re-renders on every frame
+  const throttledSetCurrentTime = useCallback(
+    throttle((time: number) => {
+      setCurrentTime(time);
+    }, 250),
+    []
+  );
+
+  // Mark video as viewed (only once)
   const handleViewed = useCallback(async () => {
+    if (isViewed) return;
     try {
       setIsViewed(true);
       await VideoRepo.markVideoAsViewed(item._id);
     } catch (err) {
       console.error("markRead video error:", err);
     }
-  }, [item._id]);
+  }, [item._id, isViewed]);
+
   useEffect(() => {
     setCommentsModalVisible(showComments ?? false);
   }, [item._id]);
+
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
-      {shouldPlay && (
+      {(shouldPlay || preload) && (
         <>
           <Video
-            ref={(ref) => (videoRef.current = ref)}
+            ref={videoRef as any}
             source={{ uri: item.url }}
             style={styles.video}
             resizeMode="contain"
@@ -101,16 +122,38 @@ export default function VideoItem({
             controls={false}
             paused={paused}
             onError={(err) => console.warn("Video error:", item._id, err)}
-            onEnd={() => {
-              videoRef.current = null;
+            onLoad={(data) => {
+              setIsReady(true);
+              setDuration(data.duration);
             }}
-            onLoad={(data) => setDuration(data.duration)}
-            onProgress={(data) => setCurrentTime(data.currentTime)}
+            onProgress={(data) => throttledSetCurrentTime(data.currentTime)}
+            poster={user?.image ?? ""}
+            posterResizeMode="cover"
           />
-          <View style={styles.overlayBackground} />
+          {!isReady && !preload && (
+            <View style={styles.loaderOverlay}>
+              <ActivityIndicator size="large" color="#fff" />
+            </View>
+          )}
         </>
       )}
 
+      {/* Center Mute Icon */}
+      <Column
+        style={[styles.overlay]}
+        justifyContent="center"
+        alignItems="center"
+      >
+        {mutedIcon && (
+          <Ionicons
+            name={muted ? "volume-mute-outline" : "volume-high-outline"}
+            size={50}
+            color={theme.colors.white}
+          />
+        )}
+      </Column>
+
+      {/* Pressable Overlay */}
       <Pressable
         style={styles.overlay}
         onPress={() => {
@@ -121,11 +164,12 @@ export default function VideoItem({
         onPressOut={() => setLongPressedIndex?.(null)}
       >
         <Spacer size={insets.top} />
-        {/* Top Row: Back + Title + Duration */}
+
+        {/* Top Row */}
         <Row
           alignItems="center"
           justifyContent="space-between"
-          style={{ padding: 12 }}
+          style={styles.topRow}
         >
           <Row alignItems="center" gap={8}>
             {singleScreen && (
@@ -149,26 +193,13 @@ export default function VideoItem({
           </Row>
         </Row>
 
-        {/* Center Mute Icon */}
-        <Column
-          style={commonStyles.fullFlex}
-          justifyContent="center"
-          alignItems="center"
-        >
-          {mutedIcon && (
-            <Ionicons
-              name={muted ? "volume-mute-outline" : "volume-high-outline"}
-              size={50}
-              color={theme.colors.white}
-            />
-          )}
-        </Column>
+        <View style={[commonStyles.fullFlex]} />
 
         {/* Bottom Row */}
         <Row
           justifyContent="space-between"
           alignItems="flex-end"
-          style={{ padding: 12 }}
+          style={styles.bottomRow}
         >
           <Row alignItems="center" gap={8}>
             <Avatar
@@ -192,6 +223,7 @@ export default function VideoItem({
               </Text>
             </Column>
           </Row>
+
           <Column gap={20}>
             <Column alignItems="center" gap={4}>
               <Ionicons
@@ -224,11 +256,10 @@ export default function VideoItem({
                 size={35}
               />
             )}
+
             {user?.userId === item.createdBy && showDelete && (
               <Ionicons
-                onPress={() => {
-                  deleteVideo?.(item._id, item.url);
-                }}
+                onPress={() => deleteVideo?.(item._id, item.url)}
                 name="trash"
                 color={theme.colors.error}
                 size={35}
@@ -236,12 +267,12 @@ export default function VideoItem({
             )}
           </Column>
         </Row>
+
         <View style={{ height: 4 }}>
           <VideoTimeProgressBar currentTime={currentTime} duration={duration} />
         </View>
       </Pressable>
 
-      {/* Comments Modal */}
       <CommentsModal
         visible={commentsModalVisible}
         onClose={() => setCommentsModalVisible(false)}
@@ -254,13 +285,27 @@ export default function VideoItem({
   );
 }
 
+export default React.memo(VideoItemComponent, (prev, next) => {
+  return (
+    prev.currentIndex === next.currentIndex &&
+    prev.muted === next.muted &&
+    prev.mutedIcon === next.mutedIcon &&
+    prev.longPressedIndex === next.longPressedIndex &&
+    prev.item._id === next.item._id
+  );
+});
+
 const styles = StyleSheet.create({
   videoContainer: { width: "100%" },
   video: { ...StyleSheet.absoluteFillObject },
   overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
-  overlayBackground: {
+  loaderOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#00000033",
-    zIndex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#00000077",
+    zIndex: 2,
   },
+  topRow: { padding: 12 },
+  bottomRow: { padding: 12 },
 });

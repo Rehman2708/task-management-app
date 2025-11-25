@@ -1,4 +1,10 @@
-import { useRef, useCallback, useEffect, useState, useMemo } from "react";
+import React, {
+  useRef,
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
 import {
   StyleSheet,
   ActivityIndicator,
@@ -10,13 +16,12 @@ import {
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { useReelsViewModal } from "./useViewModal";
 import { IVideo } from "../../types/videos";
-import { useHelper } from "../../utils/helper";
 import VideoItem from "../../components/VideoItem";
 import EmptyState from "../../components/emptyState";
 import { Spacer } from "../../tools";
-import { useTheme } from "../../infrastructure/theme";
 import { LoaderTypes } from "../../components/screenLoader";
 import { useUtilStore } from "../../store/utils";
+import { useHelper } from "../../utils/helper";
 
 export default function ReelsScreen() {
   const {
@@ -39,17 +44,15 @@ export default function ReelsScreen() {
     refreshing,
     onRefresh,
   } = useReelsViewModal();
+
   const { themeColor } = useHelper();
   const { fetchingReels } = useUtilStore();
-  const theme = useTheme();
-  const styles = reelsScreenStyles(theme);
   const flatListRef = useRef<FlatList<IVideo>>(null);
   const isFocused = useIsFocused();
   const [longPressedIndex, setLongPressedIndex] = useState<number | null>(null);
-  const videoRefs = useRef<Record<string, IVideo | null>>({});
 
   useEffect(() => {
-    fetchVideos(1, false); // initial load
+    fetchVideos(1, false);
   }, [fetchVideos, fetchingReels]);
 
   useFocusEffect(
@@ -63,6 +66,7 @@ export default function ReelsScreen() {
     }, [currentIndex])
   );
 
+  // Hide muted icon after 2s
   useEffect(() => {
     if (!mutedIcon) return;
     const timer = setTimeout(() => setMutedIcon(false), 2000);
@@ -71,45 +75,52 @@ export default function ReelsScreen() {
 
   const onViewRef = useCallback(
     ({ viewableItems }: { viewableItems: any[] }) => {
-      if (viewableItems.length > 0) {
-        // Only update currentIndex when the visible item changes
-        const newIndex = viewableItems[0].index ?? 0;
-        if (newIndex !== currentIndex) setCurrentIndex(newIndex);
-      }
+      if (viewableItems.length === 0) return;
+      const visibleItem = viewableItems.find((item) => item.isViewable);
+      if (!visibleItem) return;
+      const newIndex = visibleItem.index ?? 0;
+      if (newIndex !== currentIndex) setCurrentIndex(newIndex);
     },
     [currentIndex, setCurrentIndex]
   );
-
-  const handleLoadMore = () => {
-    if (!isFetchingMore && currentPage < totalPages) {
-      // Append new videos without resetting FlatList or currentIndex
-      fetchVideos(currentPage + 1, true);
-    }
-  };
 
   const viewConfig = useMemo(
     () => ({ viewAreaCoveragePercentThreshold: 80 }),
     []
   );
 
+  const handleLoadMore = () => {
+    if (!isFetchingMore && currentPage < totalPages) {
+      fetchVideos(currentPage + 1, true);
+    }
+  };
+
   const renderItem: ListRenderItem<IVideo> = useCallback(
-    ({ item, index }) => (
-      <VideoItem
-        item={item}
-        index={index}
-        currentIndex={currentIndex}
-        isFocused={isFocused}
-        muted={muted}
-        mutedIcon={mutedIcon}
-        windowHeight={windowHeight}
-        longPressedIndex={longPressedIndex}
-        setMuted={setMuted}
-        setMutedIcon={setMutedIcon}
-        setLongPressedIndex={setLongPressedIndex}
-        deleteVideo={deleteVideo}
-        showDelete
-      />
-    ),
+    ({ item, index }) => {
+      const preload =
+        index >= currentIndex - 1 &&
+        index <= currentIndex + 1 &&
+        index !== currentIndex;
+
+      return (
+        <VideoItem
+          item={item}
+          index={index}
+          currentIndex={currentIndex}
+          isFocused={isFocused}
+          muted={muted}
+          mutedIcon={mutedIcon}
+          windowHeight={windowHeight}
+          longPressedIndex={longPressedIndex}
+          setMuted={setMuted}
+          setMutedIcon={setMutedIcon}
+          setLongPressedIndex={setLongPressedIndex}
+          deleteVideo={deleteVideo}
+          showDelete
+          preload={preload}
+        />
+      );
+    },
     [
       windowHeight,
       muted,
@@ -123,15 +134,6 @@ export default function ReelsScreen() {
       deleteVideo,
     ]
   );
-
-  // Cleanup all refs when component unmounts
-  useEffect(() => {
-    return () => {
-      Object.keys(videoRefs.current).forEach((key) => {
-        videoRefs.current[key] = null;
-      });
-    };
-  }, []);
 
   if (error || loading || videos.length === 0) {
     return (
@@ -148,6 +150,7 @@ export default function ReelsScreen() {
       </SafeAreaView>
     );
   }
+
   return (
     <SafeAreaView style={[styles.container, { paddingBottom: insets.bottom }]}>
       <FlatList
@@ -158,10 +161,10 @@ export default function ReelsScreen() {
         snapToInterval={windowHeight}
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
-        windowSize={5}
-        removeClippedSubviews
-        initialNumToRender={1}
-        maxToRenderPerBatch={2}
+        initialNumToRender={3}
+        maxToRenderPerBatch={3}
+        windowSize={5} // Reduce memory usage
+        removeClippedSubviews={true} // Keep memory lower
         onViewableItemsChanged={onViewRef}
         viewabilityConfig={viewConfig}
         onEndReached={handleLoadMore}
@@ -190,18 +193,6 @@ export default function ReelsScreen() {
   );
 }
 
-const reelsScreenStyles = (theme: any) =>
-  StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#0e0e0e" },
-    videoContainer: {
-      width: "100%",
-    },
-    video: { ...StyleSheet.absoluteFillObject },
-    overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
-    loaderOverlay: {
-      ...StyleSheet.absoluteFillObject,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "#000",
-    },
-  });
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#0e0e0e" },
+});

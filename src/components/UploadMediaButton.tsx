@@ -1,36 +1,42 @@
 import React, { useState } from "react";
-import { Alert, Platform } from "react-native";
+import { Alert, Platform, Text, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 import CustomButton from "./customButton";
-import { Spacer } from "../tools";
+import { Row, Spacer } from "../tools";
 import { UploadRepo } from "../repositories/upload";
+import { useCommonStyles } from "../styles/commonstyles";
+import { useTheme } from "../infrastructure/theme";
 
-interface Props {
+interface UploadMediaButtonProps {
   onUploadSuccess: (url: string) => void;
   isVideo?: boolean;
-  disabled?: boolean;
   currentUrl?: string;
-  maxVideoSizeMB?: number; // optional: limit video size
+  disabled?: boolean;
+  maxVideoSizeMB?: number;
 }
 
-export const UploadMediaButton: React.FC<Props> = ({
+export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
   onUploadSuccess,
   isVideo = false,
   currentUrl,
   disabled = false,
-  maxVideoSizeMB = 100, // default 200MB
+  maxVideoSizeMB = 100,
 }) => {
-  const [loadingCamera, setLoadingCamera] = useState(false);
-  const [loadingGallery, setLoadingGallery] = useState(false);
-
-  const isAnyLoading = loadingCamera || loadingGallery;
-
+  const [cameraLoading, setCameraLoading] = useState(false);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+  const [cameraProgress, setCameraProgress] = useState(0);
+  const [galleryProgress, setGalleryProgress] = useState(0);
+  const theme = useTheme();
+  const commonStyles = useCommonStyles(theme);
   const selectMedia = async (fromCamera: boolean) => {
-    try {
-      fromCamera ? setLoadingCamera(true) : setLoadingGallery(true);
+    const setLoading = fromCamera ? setCameraLoading : setGalleryLoading;
+    const setProgress = fromCamera ? setCameraProgress : setGalleryProgress;
 
-      // Camera permission if needed
+    try {
+      setLoading(true);
+      setProgress(0);
+
       if (fromCamera) {
         const { status } = await Camera.requestCameraPermissionsAsync();
         if (status !== "granted") {
@@ -44,122 +50,123 @@ export const UploadMediaButton: React.FC<Props> = ({
             mediaTypes: isVideo
               ? ImagePicker.MediaTypeOptions.Videos
               : ImagePicker.MediaTypeOptions.Images,
-            quality: 0.8,
-            videoMaxDuration: 300,
-            allowsEditing: isVideo ? false : true,
+            videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium,
+            quality: isVideo ? 0.7 : 1,
           })
         : await ImagePicker.launchImageLibraryAsync({
             mediaTypes: isVideo
               ? ImagePicker.MediaTypeOptions.Videos
               : ImagePicker.MediaTypeOptions.Images,
-            quality: 0.8,
-            allowsEditing: isVideo ? false : true,
+            videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium,
+            quality: isVideo ? 0.7 : 1,
           });
 
       if (pickerResult.canceled) return;
 
       const asset = pickerResult.assets[0];
 
-      // Check video size limit
       if (
         isVideo &&
         asset.fileSize &&
         asset.fileSize > maxVideoSizeMB * 1024 * 1024
       ) {
-        Alert.alert(
+        return Alert.alert(
           "Video too large",
           `Please select a video smaller than ${maxVideoSizeMB} MB.`
         );
-        return;
       }
 
-      await uploadMedia(asset);
+      await uploadMedia(asset, fromCamera);
     } catch (err) {
-      console.log("[MEDIA PICK ERROR]", err);
-      Alert.alert("Error", "Something went wrong while picking media");
+      console.log("[SELECT MEDIA ERROR]", err);
+      Alert.alert("Upload Error", "Something went wrong");
     } finally {
-      setLoadingCamera(false);
-      setLoadingGallery(false);
+      // Do not reset progress here; uploadMedia will handle
     }
   };
 
-  const uploadMedia = async (asset: any) => {
+  const uploadMedia = async (asset: any, fromCamera: boolean) => {
+    const setLoading = fromCamera ? setCameraLoading : setGalleryLoading;
+    const setProgress = fromCamera ? setCameraProgress : setGalleryProgress;
+
+    let uri = asset.uri;
+    if (Platform.OS === "android" && !uri.startsWith("file://"))
+      uri = "file://" + uri;
+
+    const file = {
+      uri,
+      type: isVideo ? "video/mp4" : "image/jpeg",
+      name: `file_${Date.now()}.${isVideo ? "mp4" : "jpg"}`,
+    };
+
     try {
-      const extension = isVideo ? "mp4" : "jpg";
-      const mimeType = isVideo ? "video/mp4" : "image/jpeg";
+      setLoading(true);
+      setProgress(0);
 
-      let uri = asset.uri;
-
-      // Ensure file:// prefix on Android/iOS
-      if (Platform.OS === "android" && !uri.startsWith("file://")) {
-        uri = "file://" + uri;
-      }
-
-      const file = {
-        uri,
-        type: mimeType,
-        name: `file_${Date.now()}.${extension}`,
-      };
-
-      const res = await UploadRepo.uploadFile(file);
+      const res = await UploadRepo.uploadFile(file, (percent) => {
+        setProgress(Math.floor(percent));
+      });
 
       if (res.url) {
-        onUploadSuccess(res.url);
+        // Wait for onUploadSuccess API to complete before stopping loader
+        await onUploadSuccess(res.url);
 
         // Delete previous file if exists
         if (currentUrl) {
           try {
             await UploadRepo.deleteFile(currentUrl);
           } catch (err) {
-            console.log("[DELETE OLD FILE ERROR]", err);
+            console.log("Old file delete failed", err);
           }
         }
       }
     } catch (err: any) {
       console.log("[UPLOAD ERROR]", err);
-
-      if (err.message === "NETWORK") {
-        Alert.alert(
-          "Upload Failed",
-          "No internet connection. Please try again."
-        );
-      } else if (err.message === "TIMEOUT") {
-        Alert.alert("Upload Failed", "Server took too long. Try again later.");
-      } else {
-        Alert.alert(
-          "Upload Failed",
-          isVideo
-            ? "Video upload failed. Try a smaller file or check your connection."
-            : "Something went wrong - try again."
-        );
-      }
+      Alert.alert(
+        "Upload Failed",
+        isVideo
+          ? "Video upload failed. Try a smaller file or check your connection."
+          : "Something went wrong - try again."
+      );
+    } finally {
+      setLoading(false);
+      setProgress(0);
     }
   };
 
   return (
-    <>
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      {/* Camera Button */}
       <CustomButton
         onPress={() => selectMedia(true)}
-        loading={loadingCamera}
+        loading={cameraLoading}
         title="Camera"
-        rounded
-        small
+        disabled={disabled || cameraLoading || galleryLoading}
         sendButton
         iconName="camera-outline"
-        outlined
-        disabled={disabled || isAnyLoading}
       />
+      {cameraLoading && isVideo && (
+        <Row justifyContent="center" style={{ width: 50 }}>
+          <Text style={commonStyles.errorText}>{cameraProgress}%</Text>
+        </Row>
+      )}
+
       <Spacer position="right" size={8} />
+
+      {/* Gallery Button */}
       <CustomButton
         onPress={() => selectMedia(false)}
-        loading={loadingGallery}
+        loading={galleryLoading}
         title="Gallery"
-        rounded
-        small
+        disabled={disabled || cameraLoading || galleryLoading}
         sendButton
         iconName="image-outline"
-        disabled={disabled || isAnyLoading}
       />
-    </>
+      {galleryLoading && isVideo && (
+        <Row justifyContent="center" style={{ width: 50 }}>
+          <Text style={commonStyles.errorText}>{galleryProgress}%</Text>
+        </Row>
+      )}
+    </View>
   );
 };
