@@ -27,6 +27,7 @@ export interface Note {
   updatedAt: string;
   pinned?: boolean;
   comments?: INoteComment[];
+  totalComments?: string;
 }
 
 export interface CreateNotePayload {

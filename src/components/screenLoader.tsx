@@ -282,12 +282,11 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
           <ShimmerBlock height={80} width="100%" radius={0} />
           <View style={styles.notesContent}>
             {renderLines(isList ? 4 : 6, [
-              "100%",
-              "100%",
-              "50%",
-              "80%",
-              "60%",
-              "80%",
+              `${getRandomInt(80, 100)}%`,
+              `${getRandomInt(50, 100)}%`,
+              `${getRandomInt(20, 100)}%`,
+              `${getRandomInt(10, 100)}%`,
+              `${getRandomInt(40, 100)}%`,
             ])}
           </View>
         </View>

@@ -17,7 +17,7 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import FloatingAdd from "../../components/FloatingAdd";
 import EmptyState from "../../components/emptyState";
 import { ROUTES } from "../../enums/routes";
-import { Column, Row, Spacer } from "../../tools";
+import { Column, isDarkMode, Row, Spacer } from "../../tools";
 import { Ionicons } from "@expo/vector-icons";
 import CardWrapper from "../../components/cardWrapper";
 import CustomInput from "../../components/customInput";
@@ -100,6 +100,7 @@ export default function ListsScreen() {
                   style={[
                     commonStyles.basicText,
                     swiper && commonStyles.titleText,
+                    swiper && commonStyles.whiteText,
                   ]}
                 >
                   {item.title}
@@ -117,6 +118,7 @@ export default function ListsScreen() {
                 style={[
                   commonStyles.tinyText,
                   swiper && commonStyles.basicText,
+                  swiper && commonStyles.whiteText,
                 ]}
               >
                 {item.description}
@@ -124,11 +126,19 @@ export default function ListsScreen() {
               {swiper &&
                 item.items.map((item, index) => (
                   <Row key={index}>
-                    <Text style={commonStyles.smallText}>{index + 1}. </Text>
+                    <Text
+                      style={[
+                        commonStyles.smallText,
+                        swiper && commonStyles.whiteText,
+                      ]}
+                    >
+                      {index + 1}.{" "}
+                    </Text>
                     <Text
                       style={[
                         commonStyles.smallText,
                         commonStyles.fullFlex,
+                        swiper && commonStyles.whiteText,
                         item.completed && {
                           textDecorationLine: "line-through",
                           color: theme.colors.success,
@@ -139,21 +149,55 @@ export default function ListsScreen() {
                     </Text>
                   </Row>
                 ))}
-              <Row alignItems="center" gap={4}>
-                <Ionicons
-                  name="checkmark-circle-outline"
-                  size={swiper ? 16 : 12}
-                  color={theme.colors.success}
-                />
-                <Text
-                  numberOfLines={2}
-                  style={[
-                    commonStyles.tinyText,
-                    swiper && commonStyles.smallText,
-                  ]}
-                >
-                  {completedCount}/{totalCount} items completed
-                </Text>
+              <Row alignItems="center" justifyContent="space-between" gap={4}>
+                {totalCount > 0 ? (
+                  <Row alignItems="center" gap={4}>
+                    <Ionicons
+                      name="checkmark-circle-outline"
+                      size={swiper ? 16 : 12}
+                      color={theme.colors.success}
+                    />
+                    <Text
+                      numberOfLines={2}
+                      style={[
+                        commonStyles.tinyText,
+                        swiper && commonStyles.smallText,
+                        swiper && commonStyles.whiteText,
+                      ]}
+                    >
+                      {completedCount}/{totalCount} items completed
+                    </Text>
+                  </Row>
+                ) : (
+                  <Text
+                    numberOfLines={2}
+                    style={[
+                      commonStyles.tinyText,
+                      swiper && commonStyles.smallText,
+                      swiper && commonStyles.whiteText,
+                    ]}
+                  >
+                    No items added
+                  </Text>
+                )}
+                <Row alignItems="center" gap={6}>
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={swiper ? 16 : 12}
+                    color={
+                      !swiper ? theme.colors.textLight : theme.colors.white
+                    }
+                  />
+                  <Text
+                    style={[
+                      commonStyles.tTinyText,
+                      swiper && commonStyles.tinyText,
+                      swiper && commonStyles.whiteText,
+                    ]}
+                  >
+                    {item.totalComments ?? 0}
+                  </Text>
+                </Row>
               </Row>
             </Column>
 
@@ -163,6 +207,7 @@ export default function ListsScreen() {
                   style={[
                     commonStyles.tTinyText,
                     swiper && commonStyles.tinyText,
+                    swiper && commonStyles.whiteText,
                   ]}
                 >
                   Creator:{" "}
@@ -182,13 +227,14 @@ export default function ListsScreen() {
                 <Ionicons
                   name="time-outline"
                   size={swiper ? 16 : 12}
-                  color={theme.colors.textLight}
+                  color={swiper ? theme.colors.white : theme.colors.textLight}
                 />
                 <Text
                   numberOfLines={1}
                   style={[
                     commonStyles.tTinyText,
                     swiper && commonStyles.tinyText,
+                    swiper && commonStyles.whiteText,
                   ]}
                 >
                   {formatDate(item?.createdAt)}

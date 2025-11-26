@@ -104,6 +104,7 @@ export default function NotesScreen() {
                     style={[
                       commonStyles.basicText,
                       swiper && commonStyles.titleText,
+                      swiper && commonStyles.whiteText,
                     ]}
                   >
                     {item.title}
@@ -122,6 +123,7 @@ export default function NotesScreen() {
                 style={[
                   commonStyles.tinyText,
                   swiper && commonStyles.basicText,
+                  swiper && commonStyles.whiteText,
                 ]}
               >
                 {item.note}
@@ -133,6 +135,7 @@ export default function NotesScreen() {
                   style={[
                     commonStyles.tTinyText,
                     swiper && commonStyles.tinyText,
+                    swiper && commonStyles.whiteText,
                   ]}
                 >
                   Creator:{" "}
@@ -148,21 +151,42 @@ export default function NotesScreen() {
                   size={swiper ? 20 : undefined}
                 />
               </Row>
-              <Row alignItems="center" gap={4}>
-                <Ionicons
-                  name="time-outline"
-                  size={swiper ? 16 : 12}
-                  color={theme.colors.textLight}
-                />
-                <Text
-                  numberOfLines={1}
-                  style={[
-                    commonStyles.tTinyText,
-                    swiper && commonStyles.tinyText,
-                  ]}
-                >
-                  {formatDate(item?.createdAt)}
-                </Text>
+              <Row alignItems="center" justifyContent="space-between" gap={4}>
+                <Row alignItems="center" gap={4}>
+                  <Ionicons
+                    name="time-outline"
+                    size={swiper ? 16 : 12}
+                    color={swiper ? theme.colors.white : theme.colors.textLight}
+                  />
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      commonStyles.tTinyText,
+                      swiper && commonStyles.tinyText,
+                      swiper && commonStyles.whiteText,
+                    ]}
+                  >
+                    {formatDate(item?.createdAt)}
+                  </Text>
+                </Row>
+                <Row alignItems="center" gap={6}>
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={swiper ? 16 : 12}
+                    color={
+                      !swiper ? theme.colors.textLight : theme.colors.white
+                    }
+                  />
+                  <Text
+                    style={[
+                      commonStyles.tTinyText,
+                      swiper && commonStyles.tinyText,
+                      swiper && commonStyles.whiteText,
+                    ]}
+                  >
+                    {item.totalComments ?? 0}
+                  </Text>
+                </Row>
               </Row>
             </Column>
           </Column>

@@ -33,6 +33,7 @@ export interface List {
   createdAt: string | Date;
   updatedAt: string;
   comments?: IListComment[];
+  totalComments?: string;
 }
 
 export interface CreateListPayload {

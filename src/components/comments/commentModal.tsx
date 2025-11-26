@@ -252,6 +252,7 @@ export default function GlobalCommentsModal({
                 title="Send"
                 sendButton
                 loading={addingComment}
+                disabled={newComment?.length < 1}
               />
             </View>
           </KeyboardAvoidingView>

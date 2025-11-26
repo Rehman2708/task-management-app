@@ -134,7 +134,7 @@ export default function CreateVideoScreen() {
             editable={!loading}
           />
           <Row alignItems="center">
-            {/* {videoUrl?.length === 0 && (
+            {videoUrl?.length === 0 && (
               <>
                 <UploadMediaButton
                   isVideo
@@ -145,7 +145,7 @@ export default function CreateVideoScreen() {
                 />
                 <Spacer size={8} position="right" />
               </>
-            )} */}
+            )}
             <CustomButton
               title="Test"
               onPress={handleTest}

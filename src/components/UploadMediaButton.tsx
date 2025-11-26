@@ -50,18 +50,22 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
             mediaTypes: isVideo
               ? ImagePicker.MediaTypeOptions.Videos
               : ImagePicker.MediaTypeOptions.Images,
-            videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium,
-            quality: isVideo ? 0.7 : 1,
+            videoQuality: ImagePicker.UIImagePickerControllerQualityType.Low,
+            quality: isVideo ? 0.6 : 1,
           })
         : await ImagePicker.launchImageLibraryAsync({
             mediaTypes: isVideo
               ? ImagePicker.MediaTypeOptions.Videos
               : ImagePicker.MediaTypeOptions.Images,
-            videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium,
-            quality: isVideo ? 0.7 : 1,
+            videoQuality: ImagePicker.UIImagePickerControllerQualityType.Low,
+            quality: isVideo ? 0.6 : 1,
           });
 
-      if (pickerResult.canceled) return;
+      if (pickerResult.canceled) {
+        setLoading(false);
+        setProgress(0);
+        return;
+      }
 
       const asset = pickerResult.assets[0];
 
