@@ -143,8 +143,6 @@ function VideoItemComponent({
               setDuration(data.duration);
             }}
             onProgress={(data) => throttledSetCurrentTime(data.currentTime)}
-            poster={user?.image ?? ""}
-            posterResizeMode="cover"
           />
           {!isReady && !preload && (
             <View style={styles.loaderOverlay}>
