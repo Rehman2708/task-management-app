@@ -91,4 +91,4 @@ const statusBarHeight = StatusBar.currentHeight || 0;
 export const dimensions = { width, height, statusBarHeight };
 export const isAndroid = Platform.OS === "android";
 const colorScheme = Appearance.getColorScheme();
-export const isDarkMode = colorScheme !== "dark";
+export const isDarkMode = colorScheme === "dark";
