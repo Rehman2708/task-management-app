@@ -1,4 +1,4 @@
-import { Text, View, Image, Pressable } from "react-native";
+import { Text, View, Image, Pressable, ActivityIndicator } from "react-native";
 import { dimensions, Row, Spacer } from "../tools";
 import { useHelper } from "../utils/helper";
 import Avatar from "./avatar";
@@ -6,6 +6,7 @@ import { useCommonStyles } from "../styles/commonstyles";
 import { useTheme } from "../infrastructure/theme";
 import ImageView from "react-native-image-viewing";
 import { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 
 const CommentCard = ({
   text,
@@ -16,6 +17,7 @@ const CommentCard = ({
   repeated,
   url,
   noImage,
+  loading,
 }: {
   text?: string;
   image?: string;
@@ -24,18 +26,20 @@ const CommentCard = ({
   time: string;
   repeated?: boolean;
   noImage?: boolean;
+  loading?: boolean;
   url?: string;
 }) => {
   const { loggedInUser, themeColor, getImageSize } = useHelper();
   const isMyChat = loggedInUser?.userId === userId;
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-  const isSingleEmoji = (): boolean => {
-    if (!text) return false;
-    const emojiRegex = /^(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)$/u;
-    return emojiRegex.test(text.trim());
-  };
+
+  const isSingleEmoji = () =>
+    !!text && /^(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)$/u.test(text.trim());
+
   const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [showImage, setShowImage] = useState(false);
 
   useEffect(() => {
     if (url) {
@@ -43,18 +47,13 @@ const CommentCard = ({
         .then(({ width, height }) => {
           const maxWidth = dimensions.width * 0.55;
           const scale = maxWidth / width;
-          setImgSize({
-            w: maxWidth,
-            h: height * scale,
-          });
+          setImgSize({ w: maxWidth, h: height * scale });
         })
         .catch(() => {
-          setImgSize({ w: dimensions.width * 0.55, h: 250 }); // fallback
+          setImgSize({ w: dimensions.width * 0.55, h: 250 });
         });
     }
   }, [url]);
-
-  const [showImage, setShowImage] = useState(false);
 
   return (
     <Row
@@ -63,119 +62,128 @@ const CommentCard = ({
       alignItems={isSingleEmoji() ? "center" : "flex-start"}
       style={{ marginTop: repeated ? 3 : 8 }}
     >
-      {!isMyChat && !noImage && (
-        <>
-          {repeated ? (
-            <Spacer size={26} position="right" />
-          ) : (
-            <Avatar
-              size={26}
-              name={loggedInUser?.partner?.name}
-              image={loggedInUser?.partner?.image}
-            />
-          )}
-        </>
-      )}
+      {!isMyChat &&
+        !noImage &&
+        (repeated ? (
+          <Spacer size={26} position="right" />
+        ) : (
+          <Avatar
+            size={26}
+            name={loggedInUser?.partner?.name}
+            image={loggedInUser?.partner?.image}
+          />
+        ))}
+
       {url ? (
-        <>
+        <Pressable
+          onPress={() => setShowImage(true)}
+          style={{
+            width: imgSize?.w ?? dimensions.width * 0.55,
+            height: imgSize?.h ?? 220, // RESERVE SPACE
+            borderRadius: 10,
+            overflow: "hidden",
+            backgroundColor: isMyChat
+              ? `${themeColor.dark}`
+              : `${theme.colors.border}`,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 4,
+          }}
+        >
+          {!imgLoaded && <ActivityIndicator size="small" color="#999" />}
+
           {imgSize && (
-            <Pressable
-              onPress={() => setShowImage(true)}
+            <Image
+              source={{ uri: url }}
               style={{
-                aspectRatio: imgSize.w / (imgSize.h + 16),
-                maxHeight: 290,
-                borderRadius: 10,
-                overflow: "hidden",
-                backgroundColor: isMyChat
-                  ? `${themeColor.dark}`
-                  : `${theme.colors.border}`,
-                padding: 4,
+                width: "100%",
+                height: "100%",
+                opacity: imgLoaded ? 1 : 0,
+                borderRadius: 6,
               }}
-            >
-              <Image
-                source={{ uri: url }}
-                style={{
-                  flex: 1,
-                  resizeMode: "contain",
-                  borderRadius: 6,
-                }}
-              />
-              <ImageView
-                images={[{ uri: url }]}
-                visible={showImage}
-                onRequestClose={() => setShowImage(false)}
-                presentationStyle="overFullScreen"
-                swipeToCloseEnabled
-                backgroundColor={theme.colors.background}
-                imageIndex={0}
-              />
-              <Text
-                style={[
-                  commonStyles.tTinyText,
-                  {
-                    color: theme.colors.white,
-                    textAlign: "right",
-                    marginTop: 6,
-                  },
-                ]}
-              >
-                {time}
-              </Text>
-            </Pressable>
-          )}
-        </>
-      ) : (
-        <>
-          {isSingleEmoji() ? (
-            <Text style={[{ fontSize: 36 }]}>{text}</Text>
-          ) : (
-            <View
-              style={{
-                backgroundColor: isMyChat
-                  ? `${themeColor.dark}`
-                  : `${theme.colors.border}`,
-                paddingHorizontal: 14,
-                paddingVertical: 6,
-                borderRadius: 16,
-                maxWidth: dimensions.width - 120,
-                borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
-                borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
-              }}
-            >
-              <Text
-                style={[commonStyles.smallText, { color: theme.colors.white }]}
-              >
-                {text}
-              </Text>
-              <Text
-                style={[
-                  commonStyles.tTinyText,
-                  {
-                    color: theme.colors.textLight,
-                    textAlign: "right",
-                    marginTop: 2,
-                  },
-                ]}
-              >
-                {time}
-              </Text>
-            </View>
-          )}
-        </>
-      )}
-      {isMyChat && !noImage && (
-        <>
-          {repeated ? (
-            <Spacer size={26} position="right" />
-          ) : (
-            <Avatar
-              size={26}
-              name={loggedInUser?.name}
-              image={loggedInUser?.image}
+              resizeMode="contain"
+              onLoad={() => setImgLoaded(true)}
             />
           )}
-        </>
+
+          <Text
+            style={[
+              commonStyles.tTinyText,
+              {
+                color: theme.colors.white,
+                textAlign: "right",
+                position: "absolute",
+                bottom: 8,
+                right: 10,
+              },
+            ]}
+          >
+            {time}
+          </Text>
+
+          <ImageView
+            images={[{ uri: url }]}
+            visible={showImage}
+            onRequestClose={() => setShowImage(false)}
+            presentationStyle="overFullScreen"
+            swipeToCloseEnabled
+            backgroundColor={theme.colors.background}
+            imageIndex={0}
+          />
+        </Pressable>
+      ) : isSingleEmoji() ? (
+        <Text style={{ fontSize: 36 }}>{text}</Text>
+      ) : (
+        <View
+          style={{
+            backgroundColor: isMyChat ? themeColor.dark : theme.colors.border,
+            paddingHorizontal: 14,
+            paddingVertical: 6,
+            borderRadius: 16,
+            maxWidth: dimensions.width - 120,
+            borderBottomLeftRadius: isMyChat ? 16 : repeated ? 16 : 6,
+            borderBottomRightRadius: !isMyChat ? 16 : repeated ? 16 : 6,
+          }}
+        >
+          <Text style={[commonStyles.smallText, { color: theme.colors.white }]}>
+            {text}
+          </Text>
+          <Text
+            style={[
+              commonStyles.tTinyText,
+              {
+                color: theme.colors.textLight,
+                textAlign: "right",
+                marginTop: 2,
+              },
+            ]}
+          >
+            {time}
+            {loading && (
+              <>
+                {`  `}
+                <Ionicons
+                  name="time-outline"
+                  size={10}
+                  color={theme.colors.textLight}
+                />
+              </>
+            )}
+          </Text>
+        </View>
       )}
+
+      {isMyChat &&
+        !noImage &&
+        (repeated ? (
+          <Spacer size={26} position="right" />
+        ) : (
+          <Avatar
+            size={26}
+            name={loggedInUser?.name}
+            image={loggedInUser?.image}
+          />
+        ))}
     </Row>
   );
 };

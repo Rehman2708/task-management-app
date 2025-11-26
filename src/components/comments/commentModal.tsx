@@ -207,6 +207,7 @@ export default function GlobalCommentsModal({
                             "time"
                           )}
                           repeated={sameUser}
+                          loading={c.loading}
                         />
                       );
                     })}

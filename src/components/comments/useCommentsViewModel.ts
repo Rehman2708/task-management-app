@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Keyboard, FlatList } from "react-native";
+import { FlatList } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 import { useHelper } from "../../utils/helper";
 import { Subtask } from "../../types/task";
@@ -18,6 +18,8 @@ export interface IComment {
     name?: string;
     image?: string;
   };
+  loading?: boolean; // ← NEW (optimistic bubble)
+  failed?: boolean; // ← NEW (API failed)
 }
 
 export function useCommentsViewModel(
@@ -52,10 +54,12 @@ export function useCommentsViewModel(
     return () => clearInterval(Number(interval));
   }, [visible, fetchUrl, subtask]);
 
-  // Scroll to end on new comments
+  // Smooth autoscroll
   useEffect(() => {
     if (comments.length > 0)
-      flatListRef.current?.scrollToEnd({ animated: true });
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 80);
   }, [comments]);
 
   const fetchComments = async () => {
@@ -77,7 +81,27 @@ export function useCommentsViewModel(
 
   const handleAddComment = async (image?: string) => {
     if (!user?.userId || addingComment) return;
+
+    const trimmed = newComment.trim();
+    if (!trimmed && !image) return;
+
     setAddingComment(true);
+
+    // ★ OPTIMISTIC COMMENT
+    const tempId = `temp-${Date.now()}`;
+    const tempComment: IComment = {
+      _id: tempId,
+      text: trimmed,
+      image,
+      by: user.userId,
+      createdBy: user.userId,
+      createdAt: new Date().toISOString(),
+      createdByDetails: { name: user.name, image: user.image },
+      loading: true,
+    };
+
+    setComments((prev) => [...prev, tempComment]);
+    setNewComment("");
 
     try {
       const body = subtask?.length
@@ -85,14 +109,14 @@ export function useCommentsViewModel(
             taskId: entityId,
             subtaskId: subtask,
             userId: user.userId,
-            text: newComment.trim(),
+            text: trimmed,
             image,
           }
         : {
             createdBy: user.userId,
             by: user.userId,
             entityId,
-            text: newComment.trim(),
+            text: trimmed,
             image,
           };
 
@@ -103,6 +127,7 @@ export function useCommentsViewModel(
       );
 
       let updatedComments: IComment[] = [];
+
       if (subtask && res?.subtasks) {
         updatedComments = [
           ...(res.subtasks.find((t: Subtask) => t._id === subtask)?.comments ??
@@ -112,13 +137,25 @@ export function useCommentsViewModel(
         updatedComments = [...res.comments];
       }
 
-      setComments(updatedComments);
+      // Replace optimistic temp bubble with real one
+      setComments((prev) =>
+        prev.map((c) =>
+          c._id === tempId ? updatedComments[updatedComments.length - 1] : c
+        )
+      );
+
       if (setCount) setCount(updatedComments.length);
     } catch (err) {
       console.error("addComment error:", err);
+
+      // mark temp bubble as failed
+      setComments((prev) =>
+        prev.map((c) =>
+          c._id === tempId ? { ...c, loading: false, failed: true } : c
+        )
+      );
     } finally {
       triggerVibration("medium");
-      setNewComment("");
       setAddingComment(false);
     }
   };

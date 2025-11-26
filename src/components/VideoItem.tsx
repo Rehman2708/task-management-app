@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#00000077",
-    zIndex: 2,
+    zIndex: 1,
   },
   topRow: { padding: 12 },
   bottomRow: { padding: 12 },

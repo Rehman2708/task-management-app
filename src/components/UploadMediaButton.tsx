@@ -51,14 +51,14 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
               ? ImagePicker.MediaTypeOptions.Videos
               : ImagePicker.MediaTypeOptions.Images,
             videoQuality: ImagePicker.UIImagePickerControllerQualityType.Low,
-            quality: isVideo ? 0.6 : 1,
+            quality: isVideo ? 0.4 : 0.8,
           })
         : await ImagePicker.launchImageLibraryAsync({
             mediaTypes: isVideo
               ? ImagePicker.MediaTypeOptions.Videos
               : ImagePicker.MediaTypeOptions.Images,
             videoQuality: ImagePicker.UIImagePickerControllerQualityType.Low,
-            quality: isVideo ? 0.6 : 1,
+            quality: isVideo ? 0.4 : 0.8,
           });
 
       if (pickerResult.canceled) {
