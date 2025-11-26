@@ -16,6 +16,7 @@ export interface IVideo {
   url: string;
   createdBy: string;
   partnerWatched?: boolean;
+  isLiked?: boolean;
   createdByDetails?: {
     name: string;
     image?: string;

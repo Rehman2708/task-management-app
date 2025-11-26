@@ -82,6 +82,8 @@ export class AppUrl {
   public static deleteVideo = (id: string) => `${this.BASE_URL}/videos/${id}`;
   public static markVideoAsViewed = (videoId: string) =>
     `${this.BASE_URL}/videos/${videoId}/viewed`;
+  public static toggleLiked = (videoId: string) =>
+    `${this.BASE_URL}/videos/${videoId}/like`;
   public static addVideoComment = (videoId: string) =>
     `${this.BASE_URL}/videos/${videoId}/comment`;
   public static getVideoComments = (videoId: string) =>

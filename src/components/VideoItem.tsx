@@ -73,6 +73,8 @@ function VideoItemComponent({
   );
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isLiking, setIsLiking] = useState(false);
+  const [isViewing, setIsViewing] = useState(false);
 
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -95,14 +97,38 @@ function VideoItemComponent({
 
   // Mark video as viewed
   const handleViewed = useCallback(async () => {
-    if (isViewed) return;
+    if (isViewing || isViewed) return;
+    setIsViewing(true);
+
+    setIsViewed(true); // instant UI update
+
     try {
-      setIsViewed(true);
       await VideoRepo.markVideoAsViewed(item._id);
     } catch (err) {
-      console.error("markRead video error:", err);
+      setIsViewed(false); // revert if failed
+      console.error("mark viewed error:", err);
+    } finally {
+      setIsViewing(false);
     }
-  }, [item._id, isViewed]);
+  }, [item._id, isViewing, isViewed]);
+
+  // Mark video as liked or liked
+  const handleLiked = useCallback(async () => {
+    if (isLiking) return; // prevent double click
+    setIsLiking(true);
+
+    const prev = item.isLiked;
+    item.isLiked = !prev; // instant UI update
+
+    try {
+      await VideoRepo.toggleLiked(item._id);
+    } catch (err) {
+      item.isLiked = prev; // revert if failed
+      console.error("toggle like error:", err);
+    } finally {
+      setIsLiking(false);
+    }
+  }, [item, isLiking]);
 
   // Reset video when screen/tab loses focus
   useEffect(() => {
@@ -143,6 +169,11 @@ function VideoItemComponent({
               setDuration(data.duration);
             }}
             onProgress={(data) => throttledSetCurrentTime(data.currentTime)}
+            onEnd={
+              user?.userId !== item.createdBy && !isViewed
+                ? handleViewed
+                : undefined
+            }
           />
           {!isReady && !preload && (
             <View style={styles.loaderOverlay}>
@@ -239,6 +270,13 @@ function VideoItemComponent({
           </Row>
 
           <Column gap={20}>
+            <Ionicons
+              onPress={!isLiking ? handleLiked : undefined}
+              name={item.isLiked ? "heart" : "heart-outline"}
+              color={item.isLiked ? theme.colors.error : theme.colors.white}
+              size={35}
+              style={{ opacity: isLiking ? 0.5 : 1 }}
+            />
             <Column alignItems="center" gap={4}>
               <Ionicons
                 onPress={() => setCommentsModalVisible(true)}
@@ -256,20 +294,22 @@ function VideoItemComponent({
               </Text>
             </Column>
 
-            {user?.userId !== item.createdBy && !isViewed ? (
+            {/* {user?.userId !== item.createdBy && !isViewed ? (
               <Ionicons
-                onPress={handleViewed}
-                name="eye-outline"
+                onPress={!isViewing && !isViewed ? handleViewed : undefined}
+                name={isViewed ? "eye" : "eye-outline"}
                 color={theme.colors.white}
                 size={35}
               />
-            ) : (
+            ) : ( */}
+            {user?.userId === item.createdBy && (
               <Ionicons
                 name={isViewed ? "eye" : "eye-off"}
                 color={theme.colors.white}
                 size={35}
               />
             )}
+            {/* // )} */}
 
             {user?.userId === item.createdBy && showDelete && (
               <Ionicons

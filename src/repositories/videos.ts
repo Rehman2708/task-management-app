@@ -52,6 +52,12 @@ export class VideoRepo {
     return ApiService.getApiResponse(url, HttpMethods.PATCH);
   }
 
+  // Toggle like
+  static async toggleLiked(videoId: string) {
+    const url = `${AppUrl.toggleLiked(videoId)}`;
+    return ApiService.getApiResponse(url, HttpMethods.PATCH);
+  }
+
   // Add a comment to a video
   static async addVideoComment(
     videoId: string,
