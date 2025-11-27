@@ -73,8 +73,6 @@ function VideoItemComponent({
   );
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [isLiking, setIsLiking] = useState(false);
-  const [isViewing, setIsViewing] = useState(false);
 
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -83,72 +81,73 @@ function VideoItemComponent({
   const { formatDate } = useHelper();
   const insets = useSafeAreaInsets();
 
-  // Determine if video should play
   const shouldPlay = playAlways || (currentIndex === index && isFocused);
   const paused = !shouldPlay || longPressedIndex === index;
 
-  // Throttle progress updates
   const throttledSetCurrentTime = useCallback(
-    throttle((time: number) => {
-      setCurrentTime(time);
-    }, 250),
+    throttle((time: number) => setCurrentTime(time), 200),
     []
   );
 
-  // Mark video as viewed
   const handleViewed = useCallback(async () => {
-    if (isViewing || isViewed) return;
-    setIsViewing(true);
-
-    setIsViewed(true); // instant UI update
-
+    if (isViewed) return;
+    setIsViewed(true);
     try {
       await VideoRepo.markVideoAsViewed(item._id);
-    } catch (err) {
-      setIsViewed(false); // revert if failed
-      console.error("mark viewed error:", err);
-    } finally {
-      setIsViewing(false);
+    } catch {
+      setIsViewed(false);
     }
-  }, [item._id, isViewing, isViewed]);
+  }, [isViewed, item._id]);
 
-  // Mark video as liked or liked
   const handleLiked = useCallback(async () => {
-    if (isLiking) return; // prevent double click
-    setIsLiking(true);
-
     const prev = item.isLiked;
-    item.isLiked = !prev; // instant UI update
-
+    item.isLiked = !prev;
     try {
       await VideoRepo.toggleLiked(item._id);
-    } catch (err) {
-      item.isLiked = prev; // revert if failed
-      console.error("toggle like error:", err);
-    } finally {
-      setIsLiking(false);
+    } catch {
+      item.isLiked = prev;
     }
-  }, [item, isLiking]);
+  }, [item]);
 
-  // Reset video when screen/tab loses focus
   useEffect(() => {
-    if (!isFocused && videoRef.current) {
-      videoRef.current.seek(0);
-      setCurrentTime(0);
-    }
+    if (!isFocused) setCurrentTime(0);
   }, [isFocused]);
 
-  // Sync comments modal visibility
   useEffect(() => {
     setCommentsModalVisible(showComments ?? false);
   }, [item._id, showComments]);
 
-  // Hide mute icon after 2s
   useEffect(() => {
     if (!mutedIcon) return;
     const timer = setTimeout(() => setMutedIcon(false), 2000);
     return () => clearTimeout(timer);
-  }, [mutedIcon, setMutedIcon]);
+  }, [mutedIcon]);
+
+  // 🔥 ICON LIST (removes repeated code)
+  const iconActions = [
+    {
+      name: item.isLiked ? "heart" : "heart-outline",
+      color: item.isLiked ? theme.colors.error : theme.colors.white,
+      onPress: handleLiked,
+    },
+    {
+      name: "chatbubble-outline",
+      color: theme.colors.white,
+      onPress: () => setCommentsModalVisible(true),
+      label: totalComments,
+    },
+    user?.userId === item.createdBy && {
+      name: isViewed ? "eye" : "eye-off",
+      color: theme.colors.white,
+      onPress: undefined,
+    },
+    user?.userId === item.createdBy &&
+      showDelete && {
+        name: "trash",
+        color: theme.colors.error,
+        onPress: () => deleteVideo?.(item._id, item.url),
+      },
+  ].filter(Boolean);
 
   return (
     <View style={[styles.videoContainer, { height: windowHeight }]}>
@@ -161,12 +160,20 @@ function VideoItemComponent({
             resizeMode="contain"
             repeat
             muted={muted}
-            controls={false}
             paused={paused}
-            onError={(err) => console.warn("Video error:", item._id, err)}
+            controls={false}
+            useTextureView
+            preferredDecoder="hardware"
+            maxBitRate={1200_000}
+            bufferConfig={{
+              minBufferMs: 5000,
+              maxBufferMs: 35000,
+              bufferForPlaybackMs: 1500,
+              bufferForPlaybackAfterRebufferMs: 2000,
+            }}
             onLoad={(data) => {
-              setIsReady(true);
               setDuration(data.duration);
+              setIsReady(true);
             }}
             onProgress={(data) => throttledSetCurrentTime(data.currentTime)}
             onEnd={
@@ -183,9 +190,9 @@ function VideoItemComponent({
         </>
       )}
 
-      {/* Center Mute Icon */}
+      {/* Mute icon */}
       <Column
-        style={[styles.overlay]}
+        style={styles.overlay}
         justifyContent="center"
         alignItems="center"
       >
@@ -198,7 +205,7 @@ function VideoItemComponent({
         )}
       </Column>
 
-      {/* Pressable Overlay */}
+      {/* Tap area */}
       <Pressable
         style={styles.overlay}
         onPress={() => {
@@ -209,13 +216,7 @@ function VideoItemComponent({
         onPressOut={() => setLongPressedIndex?.(null)}
       >
         <Spacer size={insets.top} />
-
-        {/* Top Row */}
-        <Row
-          alignItems="center"
-          justifyContent="space-between"
-          style={styles.topRow}
-        >
+        <Row justifyContent="space-between" style={styles.topRow}>
           <Row alignItems="center" gap={8}>
             {singleScreen && (
               <Ionicons
@@ -225,22 +226,16 @@ function VideoItemComponent({
                 size={30}
               />
             )}
-            <Column gap={2}>
-              <Text
-                style={[
-                  commonStyles.subTitleText,
-                  { color: theme.colors.white },
-                ]}
-              >
-                {item.title}
-              </Text>
-            </Column>
+            <Text
+              style={[commonStyles.subTitleText, { color: theme.colors.white }]}
+            >
+              {item.title}
+            </Text>
           </Row>
         </Row>
 
-        <View style={[commonStyles.fullFlex]} />
+        <View style={{ flex: 1 }} />
 
-        {/* Bottom Row */}
         <Row
           justifyContent="space-between"
           alignItems="flex-end"
@@ -252,7 +247,7 @@ function VideoItemComponent({
               name={item.createdByDetails?.name}
               image={item.createdByDetails?.image}
             />
-            <Column gap={2}>
+            <Column>
               <Text
                 style={[
                   commonStyles.subTitleText,
@@ -269,59 +264,29 @@ function VideoItemComponent({
             </Column>
           </Row>
 
-          <Column gap={20}>
-            <Ionicons
-              onPress={!isLiking ? handleLiked : undefined}
-              name={item.isLiked ? "heart" : "heart-outline"}
-              color={item.isLiked ? theme.colors.error : theme.colors.white}
-              size={35}
-              style={{ opacity: isLiking ? 0.5 : 1 }}
-            />
-            <Column alignItems="center" gap={4}>
-              <Ionicons
-                onPress={() => setCommentsModalVisible(true)}
-                name="chatbubble-outline"
-                color={theme.colors.white}
-                size={35}
-              />
-              <Text
-                style={[
-                  commonStyles.subTitleText,
-                  { color: theme.colors.white },
-                ]}
-              >
-                {totalComments}
-              </Text>
-            </Column>
-
-            {/* {user?.userId !== item.createdBy && !isViewed ? (
-              <Ionicons
-                onPress={!isViewing && !isViewed ? handleViewed : undefined}
-                name={isViewed ? "eye" : "eye-outline"}
-                color={theme.colors.white}
-                size={35}
-              />
-            ) : ( */}
-            {user?.userId === item.createdBy && (
-              <Ionicons
-                name={isViewed ? "eye" : "eye-off"}
-                color={theme.colors.white}
-                size={35}
-              />
-            )}
-            {/* // )} */}
-
-            {user?.userId === item.createdBy && showDelete && (
-              <Ionicons
-                onPress={() => deleteVideo?.(item._id, item.url)}
-                name="trash"
-                color={theme.colors.error}
-                size={35}
-              />
-            )}
+          <Column gap={20} alignItems="center">
+            {iconActions.map((icon: any, i: number) => (
+              <Column key={i} alignItems="center">
+                <Ionicons
+                  onPress={icon.onPress}
+                  name={icon.name}
+                  color={icon.color}
+                  size={35}
+                />
+                {icon.label != null && (
+                  <Text
+                    style={[
+                      commonStyles.subTitleText,
+                      { color: theme.colors.white },
+                    ]}
+                  >
+                    {icon.label}
+                  </Text>
+                )}
+              </Column>
+            ))}
           </Column>
         </Row>
-
         <View style={{ height: 4 }}>
           <VideoTimeProgressBar currentTime={currentTime} duration={duration} />
         </View>
@@ -330,8 +295,8 @@ function VideoItemComponent({
       <CommentsModal
         visible={commentsModalVisible}
         onClose={() => setCommentsModalVisible(false)}
-        fetchUrl={`${AppUrl.getVideoComments(item._id)}`}
-        postUrl={`${AppUrl.addVideoComment(item._id)}`}
+        fetchUrl={AppUrl.getVideoComments(item._id)}
+        postUrl={AppUrl.addVideoComment(item._id)}
         entityId={item._id}
         setCount={setTotalComments}
       />
@@ -339,16 +304,7 @@ function VideoItemComponent({
   );
 }
 
-export default React.memo(VideoItemComponent, (prev, next) => {
-  return (
-    prev.currentIndex === next.currentIndex &&
-    prev.muted === next.muted &&
-    prev.mutedIcon === next.mutedIcon &&
-    prev.longPressedIndex === next.longPressedIndex &&
-    prev.item._id === next.item._id &&
-    prev.isFocused === next.isFocused // Important for tab focus
-  );
-});
+export default React.memo(VideoItemComponent);
 
 const styles = StyleSheet.create({
   videoContainer: { width: "100%" },

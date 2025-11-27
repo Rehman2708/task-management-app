@@ -171,9 +171,9 @@ export default function ReelsScreen() {
         snapToInterval={windowHeight} // Snap to each video
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
-        initialNumToRender={3}
-        maxToRenderPerBatch={3}
-        windowSize={5} // Preload surrounding videos
+        initialNumToRender={2}
+        maxToRenderPerBatch={2}
+        windowSize={3} // Preload surrounding videos
         removeClippedSubviews={true} // Free memory for offscreen videos
         onViewableItemsChanged={onViewRef}
         viewabilityConfig={viewConfig}
@@ -197,6 +197,7 @@ export default function ReelsScreen() {
             colors={["#fff"]}
           />
         }
+        updateCellsBatchingPeriod={50}
       />
       <Spacer size={80} />
     </SafeAreaView>
