@@ -9,7 +9,7 @@ const Logo = ({ height }: { height?: number }) => {
         marginBottom: 20,
       }}
       resizeMode="contain"
-      source={require("../../assets/images/androidLogo1.png")}
+      source={require("../../assets/images/androidLogo.png")}
     />
   );
 };

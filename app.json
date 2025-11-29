@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "♥️ 𝑅𝑀𝒦",
+    "name": "♥️ RMK",
     "slug": "rmk",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/androidLogo1.png",
+    "icon": "./assets/images/androidLogo.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/androidLogo1.png",
+      "image": "./assets/images/androidLogo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#0E0E0E"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -20,8 +20,8 @@
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/androidLogo1.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/images/androidLogo.png",
+        "backgroundColor": "#0E0E0E"
       }
     },
     "ios": {
@@ -37,8 +37,8 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/androidLogo1.png",
-          "color": "#00000000",
+          "icon": "./assets/images/androidLogo.png",
+          "color": "#0E0E0E00",
           "vibrationPattern": [0, 100, 50, 300, 100, 300],
           "sounds": ["./assets/audio/notification.wav"]
         }

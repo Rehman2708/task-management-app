@@ -37,7 +37,6 @@ const ResetPasswordScreen = () => {
     } catch (err: any) {
       Alert.alert("Error", err.message);
     } finally {
-      setForm({ oldPassword: "", newPassword: "" });
       setLoading(false);
     }
   };

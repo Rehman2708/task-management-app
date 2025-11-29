@@ -3,10 +3,14 @@ import { View, Animated, Easing } from "react-native";
 import { useTheme } from "../infrastructure/theme";
 
 interface ProgressBarProps {
+  startTime?: string;
   endTime?: string;
 }
 
-const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
+const TimeProgressBar: React.FC<ProgressBarProps> = ({
+  startTime,
+  endTime,
+}) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const colorValue = useRef(new Animated.Value(0)).current;
   const pulseValue = useRef(new Animated.Value(1)).current;
@@ -14,23 +18,27 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
   const theme = useTheme();
 
   useEffect(() => {
-    if (!endTime) return;
+    if (!startTime || !endTime) return;
 
+    const start = new Date(startTime).getTime();
     const end = new Date(endTime).getTime();
     const now = Date.now();
 
-    const twoDays = 2 * 12 * 60 * 60 * 1000; // 12 hours * 2
-    const start = end - twoDays;
+    const fullWindow = 1 * 24 * 60 * 60 * 1000; // true 1 day in ms
 
-    if (now < start) {
+    const duration = end - start;
+
+    const effectiveDuration = duration > fullWindow ? fullWindow : duration;
+
+    const effectiveStart = duration > fullWindow ? end - fullWindow : start;
+
+    if (now < effectiveStart) {
       animatedValue.setValue(0);
       colorValue.setValue(0);
       return;
     }
 
-    const totalDuration = twoDays;
-
-    const progress = (now - start) / totalDuration;
+    const progress = (now - effectiveStart) / effectiveDuration;
     const clamped = Math.min(Math.max(progress, 0), 1);
 
     Animated.timing(animatedValue, {
@@ -40,6 +48,7 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
       useNativeDriver: false,
     }).start();
 
+    // stage transitions: green → orange → red
     let stage = 0;
     if (clamped < 0.33) stage = 0;
     else if (clamped < 0.66) stage = 0.5;
@@ -52,11 +61,10 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
       useNativeDriver: false,
     }).start();
 
-    // 🛑 Stop ANY previously running pulse animations
+    // Pulse animation based on urgency
     pulseValue.stopAnimation();
     pulseValue.setValue(1);
 
-    // 🔥 Restart correct pulse animation
     if (stage === 1) {
       Animated.loop(
         Animated.sequence([
@@ -92,7 +100,7 @@ const TimeProgressBar: React.FC<ProgressBarProps> = ({ endTime }) => {
         ])
       ).start();
     }
-  }, [endTime]);
+  }, [startTime, endTime]);
 
   const widthInterpolated = animatedValue.interpolate({
     inputRange: [0, 1],
