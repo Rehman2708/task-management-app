@@ -62,7 +62,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { user } = useAuthStore();
-  const { triggerVibration } = useHelper();
+  const { triggerVibration, themeColor } = useHelper();
 
   const scrollY = useSharedValue(0);
   const [refreshing, setRefreshing] = useState(false);
@@ -152,13 +152,13 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
     const interval = setInterval(() => {
       RNAnimated.timing(fadeAnim, {
         toValue: 0,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }).start(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
         RNAnimated.timing(fadeAnim, {
           toValue: 1,
-          duration: 300,
+          duration: 200,
           useNativeDriver: true,
         }).start();
       });
@@ -264,6 +264,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={handleRefresh}
+                colors={[themeColor.dark]}
               />
             )
           }

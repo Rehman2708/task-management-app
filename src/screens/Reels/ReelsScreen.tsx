@@ -193,8 +193,7 @@ export default function ReelsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#fff"
-            colors={["#fff"]}
+            colors={[themeColor.dark]}
           />
         }
         updateCellsBatchingPeriod={50}

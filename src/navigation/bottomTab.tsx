@@ -61,7 +61,9 @@ const TabIcon: React.FC<TabIconProps> = ({
       }}
       onPress={onPress}
     >
-      <Animated.View style={[{ paddingHorizontal: 6,paddingVertical:2 }, animatedStyle]}>
+      <Animated.View
+        style={[{ paddingHorizontal: 6, paddingVertical: 2 }, animatedStyle]}
+      >
         <Ionicons
           name={iconName}
           size={26}

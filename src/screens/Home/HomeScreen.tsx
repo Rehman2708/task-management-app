@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useMemo } from "react";
-import { View, FlatList, Pressable, Text } from "react-native";
+import { View, FlatList, Pressable, Text, RefreshControl } from "react-native";
 import FloatingAdd from "../../components/FloatingAdd";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { useCommonStyles } from "../../styles/commonstyles";
@@ -117,8 +117,13 @@ export default function HomeScreen({ navigation }: any) {
             data={tasks}
             keyExtractor={(item) => String(item._id)}
             renderItem={renderItem}
-            refreshing={loading}
-            onRefresh={() => fetchTasks(1, true)}
+            refreshControl={
+              <RefreshControl
+                onRefresh={() => fetchTasks(1, true)}
+                refreshing={loading}
+                colors={[themeColor.dark]}
+              />
+            }
             onEndReached={tab === "History" ? loadMoreTasks : undefined}
             onEndReachedThreshold={0.5}
             ListFooterComponent={renderFooter}

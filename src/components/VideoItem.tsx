@@ -78,7 +78,7 @@ function VideoItemComponent({
   const commonStyles = useCommonStyles(theme);
   const navigation: any = useNavigation();
   const { user } = useAuthStore();
-  const { formatDate } = useHelper();
+  const { formatDate, themeColor } = useHelper();
   const insets = useSafeAreaInsets();
 
   const shouldPlay = playAlways || (currentIndex === index && isFocused);
@@ -186,7 +186,7 @@ function VideoItemComponent({
           />
           {!isReady && !preload && (
             <View style={styles.loaderOverlay}>
-              <ActivityIndicator size="large" color="#fff" />
+              <ActivityIndicator size="large" color={themeColor.dark} />
             </View>
           )}
         </>

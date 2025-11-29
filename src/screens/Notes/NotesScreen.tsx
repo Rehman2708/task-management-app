@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ImageBackground,
   Pressable,
+  RefreshControl,
 } from "react-native";
 import { useNotesListViewModel } from "./notesViewModal";
 import FloatingAdd from "../../components/FloatingAdd";
@@ -239,8 +240,13 @@ export default function NotesScreen() {
                 data={notes}
                 keyExtractor={(item) => item._id!}
                 renderItem={renderItem}
-                refreshing={initialLoading}
-                onRefresh={() => fetchNotes(1, true)}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={initialLoading}
+                    onRefresh={() => fetchNotes(1, true)}
+                    colors={[themeColor.dark]}
+                  />
+                }
                 onEndReached={loadMoreNotes}
                 onEndReachedThreshold={0.5}
                 ListFooterComponent={renderFooter}

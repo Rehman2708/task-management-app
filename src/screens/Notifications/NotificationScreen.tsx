@@ -198,7 +198,11 @@ const NotificationScreen = () => {
           onEndReached={notifications.length > 0 ? loadMore : undefined}
           onEndReachedThreshold={0.5}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[themeColor.dark]}
+            />
           }
           ListFooterComponent={
             loadingMore ? (

@@ -70,11 +70,6 @@ export default function ProfileScreen() {
       title: "Add video",
       onPress: createVideoScreen,
     },
-    {
-      title: "Logout",
-      onPress: logout,
-      error: true,
-    },
   ];
   return (
     <ScreenWrapper title="Profile">
@@ -87,7 +82,7 @@ export default function ProfileScreen() {
               <RefreshControl
                 refreshing={loadingUserDetail}
                 onRefresh={fetchUserDetails}
-                colors={[theme.colors.primary]}
+                colors={[themeColor.dark]}
               />
             }
             showsVerticalScrollIndicator={false}
@@ -284,6 +279,21 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 );
               })}
+              <TouchableOpacity onPress={logout}>
+                <Row
+                  style={[commonStyles.cardContainer, { borderWidth: 0 }]}
+                  justifyContent="center"
+                >
+                  <Text
+                    style={[
+                      commonStyles.subTitleText,
+                      { color: theme.colors.error },
+                    ]}
+                  >
+                    Logout
+                  </Text>
+                </Row>
+              </TouchableOpacity>
             </Column>
           </ScrollView>
           <Spacer size={100} />

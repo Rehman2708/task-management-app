@@ -7,6 +7,7 @@ import {
   Image,
   ImageBackground,
   Pressable,
+  RefreshControl,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../infrastructure/theme";
@@ -291,8 +292,13 @@ export default function ListsScreen() {
                 data={lists}
                 keyExtractor={(item) => item._id!}
                 renderItem={renderItem}
-                refreshing={initialLoading}
-                onRefresh={() => fetchLists(1, true)}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={initialLoading}
+                    onRefresh={() => fetchLists(1, true)}
+                    colors={[themeColor.dark]}
+                  />
+                }
                 onEndReached={loadMoreLists}
                 onEndReachedThreshold={0.5}
                 ListFooterComponent={renderFooter}
