@@ -4,10 +4,10 @@
     "slug": "rmk",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/androidLogo1.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/logo.png",
+      "image": "./assets/images/androidLogo1.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -20,16 +20,13 @@
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/androidLogo.png",
+        "foregroundImage": "./assets/images/androidLogo1.png",
         "backgroundColor": "#000000"
       }
     },
     "ios": {
       "bundleIdentifier": "com.abdul2708.tasksfrontendts",
       "supportsTablet": true
-    },
-    "web": {
-      "favicon": "./assets/images/logo.png"
     },
     "extra": {
       "eas": {
@@ -40,7 +37,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/logo.png",
+          "icon": "./assets/images/androidLogo1.png",
           "color": "#00000000",
           "vibrationPattern": [0, 100, 50, 300, 100, 300],
           "sounds": ["./assets/audio/notification.wav"]
