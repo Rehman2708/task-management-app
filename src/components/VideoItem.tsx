@@ -35,7 +35,7 @@ type Props = {
   setMuted: React.Dispatch<React.SetStateAction<boolean>>;
   setMutedIcon: React.Dispatch<React.SetStateAction<boolean>>;
   setLongPressedIndex?: React.Dispatch<React.SetStateAction<number | null>>;
-  deleteVideo?: (id: string, url: string) => void;
+  deleteVideo?: (id: string) => void;
   showDelete?: boolean;
   playAlways?: boolean;
   showComments?: boolean;
@@ -145,7 +145,7 @@ function VideoItemComponent({
       showDelete && {
         name: "trash",
         color: theme.colors.error,
-        onPress: () => deleteVideo?.(item._id, item.url),
+        onPress: () => deleteVideo?.(item._id),
       },
   ].filter(Boolean);
 
@@ -181,6 +181,8 @@ function VideoItemComponent({
                 ? handleViewed
                 : undefined
             }
+            poster={item?.thumbnail}
+            posterResizeMode="contain"
           />
           {!isReady && !preload && (
             <View style={styles.loaderOverlay}>
@@ -249,34 +251,31 @@ function VideoItemComponent({
             />
             <Column>
               <Text
-                style={[
-                  commonStyles.subTitleText,
-                  { color: theme.colors.white },
-                ]}
+                style={[commonStyles.basicText, { color: theme.colors.white }]}
               >
                 {item.createdByDetails?.name}
               </Text>
               <Text
-                style={[commonStyles.smallText, { color: theme.colors.white }]}
+                style={[commonStyles.tinyText, { color: theme.colors.white }]}
               >
                 {formatDate(item.createdAt)}
               </Text>
             </Column>
           </Row>
 
-          <Column gap={20} alignItems="center">
+          <Column gap={16} alignItems="center">
             {iconActions.map((icon: any, i: number) => (
               <Column key={i} alignItems="center">
                 <Ionicons
                   onPress={icon.onPress}
                   name={icon.name}
                   color={icon.color}
-                  size={35}
+                  size={28}
                 />
                 {icon.label != null && (
                   <Text
                     style={[
-                      commonStyles.subTitleText,
+                      commonStyles.basicText,
                       { color: theme.colors.white },
                     ]}
                   >

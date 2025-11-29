@@ -7,6 +7,8 @@ import {
   FlatList,
   Pressable,
   Keyboard,
+  Platform,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -26,7 +28,8 @@ import { Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
 import { createVideoStyle } from "./styles";
 import { UploadMediaButton } from "../../components/UploadMediaButton";
-
+import * as VideoThumbnails from "expo-video-thumbnails";
+import { UploadRepo } from "../../repositories/upload";
 export default function CreateVideoScreen() {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -62,12 +65,17 @@ export default function CreateVideoScreen() {
     setError(null);
     setSuccess(null);
 
-    const payload: CreateVideoPayload = {
-      title,
-      url: uri ?? videoUrl,
-      createdBy: loggedInUser?.userId ?? "RehmanK",
-    };
     try {
+      const asset = await VideoThumbnails.getThumbnailAsync(uri ?? videoUrl, {
+        time: 2000,
+      });
+      const thumbnail = await generateThumbnail(asset);
+      const payload: CreateVideoPayload = {
+        title: title.trim(),
+        url: uri ?? videoUrl,
+        createdBy: loggedInUser?.userId ?? "RehmanK",
+        thumbnail,
+      };
       await VideoRepo.createVideo(payload);
       setSuccess("Video uploaded successfully");
       setTitle("");
@@ -81,8 +89,26 @@ export default function CreateVideoScreen() {
       setLoading(false);
     }
   };
-
-  const handleTest = () => {
+  const generateThumbnail = async (asset: any) => {
+    let uri = asset.uri;
+    if (Platform.OS === "android" && !uri.startsWith("file://"))
+      uri = "file://" + uri;
+    const file = {
+      uri,
+      type: "image/jpeg",
+      name: `file_${Date.now()}.${"jpg"}`,
+    };
+    try {
+      const res = await UploadRepo.uploadFile(file, (percent) => {});
+      if (res.url) {
+        return res.url;
+      }
+    } catch (err: any) {
+      console.log("[UPLOAD ERROR]", err);
+    } finally {
+    }
+  };
+  const handleTest = async () => {
     if (Keyboard.isVisible()) {
       Keyboard.dismiss();
     }
@@ -123,6 +149,7 @@ export default function CreateVideoScreen() {
             value={title}
             onChangeText={setTitle}
             editable={!loading}
+            maxLength={50}
           />
           <CustomInput
             title="Video URL"

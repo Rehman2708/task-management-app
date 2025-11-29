@@ -51,13 +51,10 @@ export const useReelsViewModal = () => {
     }
   }, []);
 
-  const handleDelete = useCallback(async (id: string, url?: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     try {
       const success = await VideoRepo.deleteVideo(id);
       if (success) {
-        if (url) {
-          UploadRepo.deleteFile(url);
-        }
         setVideos((prev) => prev.filter((video) => video._id !== id));
       }
     } catch (err) {
@@ -67,7 +64,7 @@ export const useReelsViewModal = () => {
   }, []);
 
   const deleteVideo = useCallback(
-    (id: string, url?: string) => {
+    (id: string) => {
       Alert.alert(
         "Delete Video",
         "Are you sure you want to delete this video?",
@@ -76,7 +73,7 @@ export const useReelsViewModal = () => {
           {
             text: "Delete",
             style: "destructive",
-            onPress: () => handleDelete(id, url),
+            onPress: () => handleDelete(id),
           },
         ]
       );

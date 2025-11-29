@@ -175,7 +175,7 @@ export default function GlobalCommentsModal({
                           marginHorizontal: 8,
                         }}
                       />
-                      <Text style={commonStyles.basicText}>
+                      <Text style={commonStyles.smallText}>
                         {formatDate(String(item.date), "date")}
                       </Text>
                       <View

@@ -20,6 +20,7 @@ export type CustomInputProps = {
   placeholder?: string;
   value?: string;
   onChangeText: (text: string) => void;
+  onValidate?: (isValid: boolean) => void;
   keyboardType?: KeyboardTypeOptions;
   numberOfLines?: number;
   error?: boolean;
@@ -37,6 +38,7 @@ const CustomInput = ({
   placeholder = "Enter here...",
   value = "",
   onChangeText,
+  onValidate,
   keyboardType = "default",
   numberOfLines = 1,
   editable = true,
@@ -50,13 +52,29 @@ const CustomInput = ({
 }: CustomInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [maxChar, setMaxChar] = useState<number | undefined>(maxLength);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
   const { themeColor } = useHelper();
   const theme = useTheme();
   const styles = customInputStyle(theme);
   const commonStyles = useCommonStyles(theme);
 
+  const [isDirty, setIsDirty] = useState(false); // NEW
+
+  const validatePassword = (text: string) => {
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{}[\]|;:",.<>?/]).{8,}$/;
+
+    const isValid = regex.test(text);
+    setPasswordError(isValid ? null : "Weak password");
+
+    onValidate?.(isValid);
+  };
   useEffect(() => {
-    // Dynamically set maxChar if title contains specific keywords
+    if (secureTextEntry && value.length > 0) validatePassword(value);
+  }, [value]);
+
+  useEffect(() => {
     if (title?.toLowerCase().includes("title")) {
       setMaxChar(maxLength ?? 30);
     } else if (title?.toLowerCase().includes("description")) {
@@ -77,7 +95,7 @@ const CustomInput = ({
         <TextInput
           style={[
             styles.input,
-            error && styles.errorInput,
+            (error || (passwordError && onValidate)) && styles.errorInput,
             multiline && styles.multiline,
             secureTextEntry && styles.passwordInput,
             rounded && styles.rounded,
@@ -88,7 +106,11 @@ const CustomInput = ({
           editable={editable}
           numberOfLines={numberOfLines}
           keyboardType={keyboardType}
-          onChangeText={onChangeText}
+          onChangeText={(text) => {
+            setIsDirty(true);
+            onChangeText(text);
+            if (secureTextEntry) validatePassword(text);
+          }}
           value={value}
           secureTextEntry={secureTextEntry && !isPasswordVisible}
           multiline={multiline}
@@ -108,6 +130,13 @@ const CustomInput = ({
           </TouchableOpacity>
         )}
       </View>
+
+      {secureTextEntry && isDirty && passwordError && onValidate && (
+        <Text style={[commonStyles.errorText]}>
+          Password must be at least 8 characters and include uppercase,
+          lowercase, number and special character.
+        </Text>
+      )}
 
       {maxChar && (
         <Row justifyContent="flex-end">

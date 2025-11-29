@@ -14,6 +14,7 @@ export interface IVideo {
   _id: string;
   title: string;
   url: string;
+  thumbnail?: string;
   createdBy: string;
   partnerWatched?: boolean;
   isLiked?: boolean;
@@ -31,11 +32,7 @@ export interface CreateVideoPayload {
   title: string;
   url: string; // URL or path of the uploaded video
   createdBy: string;
-}
-
-export interface UpdateVideoPayload {
-  title?: string;
-  url?: string; // updated field name consistent with IVideo
+  thumbnail?: string;
 }
 
 export interface AddVideoCommentPayload {

@@ -152,7 +152,7 @@ const CommentCard = ({
             style={[
               commonStyles.tTinyText,
               {
-                color: theme.colors.textLight,
+                color: theme.colors.white,
                 textAlign: "right",
                 marginTop: 2,
               },
@@ -165,7 +165,7 @@ const CommentCard = ({
                 <Ionicons
                   name="time-outline"
                   size={10}
-                  color={theme.colors.textLight}
+                  color={theme.colors.white}
                 />
               </>
             )}

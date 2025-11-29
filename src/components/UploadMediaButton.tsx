@@ -51,7 +51,7 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
               ? ImagePicker.MediaTypeOptions.Videos
               : ImagePicker.MediaTypeOptions.Images,
             videoQuality: ImagePicker.UIImagePickerControllerQualityType.Low,
-            quality: isVideo ? 0.4 : 0.8,
+            quality: isVideo ? 0.1 : 0.8,
           })
         : await ImagePicker.launchImageLibraryAsync({
             mediaTypes: isVideo
@@ -148,6 +148,7 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
         disabled={disabled || cameraLoading || galleryLoading}
         sendButton
         iconName="camera-outline"
+        outlined
       />
       {cameraLoading && isVideo && (
         <Row justifyContent="center" style={{ width: 50 }}>

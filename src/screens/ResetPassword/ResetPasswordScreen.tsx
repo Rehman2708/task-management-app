@@ -10,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 const ResetPasswordScreen = () => {
   const [form, setForm] = useState({ oldPassword: "", newPassword: "" });
   const [loading, setLoading] = useState(false);
+  const [isValidPassword, setIsValidPassword] = useState(false);
   const { user, updateUser } = useAuthStore();
   const navigation: any = useNavigation();
   const handleChange = (key: string, value: string) => {
@@ -54,9 +55,15 @@ const ResetPasswordScreen = () => {
         value={form.newPassword}
         secureTextEntry
         onChangeText={(value) => handleChange("newPassword", value)}
+        onValidate={setIsValidPassword}
       />
       <View style={{ flex: 1 }} />
-      <CustomButton title="Reset" onPress={resetPassword} loading={loading} />
+      <CustomButton
+        title="Reset"
+        onPress={resetPassword}
+        loading={loading}
+        disabled={!isValidPassword}
+      />
     </ScreenWrapper>
   );
 };

@@ -19,6 +19,7 @@ export function useRegisterViewModel() {
   const [partnerUserId, setPartnerUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isValidPassword, setIsValidPassword] = useState(false);
   const navigation = useNavigation();
   const registerUser = async () => {
     if (!name || !userId || !password) {
@@ -69,5 +70,7 @@ export function useRegisterViewModel() {
     loading,
     error,
     registerUser,
+    setIsValidPassword,
+    isValidPassword,
   };
 }

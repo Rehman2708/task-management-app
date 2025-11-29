@@ -24,6 +24,8 @@ export const RegisterScreen = () => {
     loading,
     error,
     registerUser,
+    setIsValidPassword,
+    isValidPassword,
   } = useRegisterViewModel();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -33,7 +35,7 @@ export const RegisterScreen = () => {
       await registerUser();
     } catch (err) {}
   };
-  const { navigate } = useNavigation();
+  const { navigate }: { navigate: any } = useNavigation();
   const Login = () => navigate(ROUTES.LOGIN);
   return (
     <AuthBgContainer>
@@ -55,6 +57,7 @@ export const RegisterScreen = () => {
           value={password}
           secureTextEntry
           onChangeText={setPassword}
+          onValidate={setIsValidPassword}
         />
         <CustomInput
           title="Partner User ID (Optional)"
@@ -68,6 +71,7 @@ export const RegisterScreen = () => {
           title="Register"
           onPress={handleRegister}
           loading={loading}
+          disabled={!isValidPassword}
         />
         <CustomButton
           customStyle={{ borderWidth: 0 }}

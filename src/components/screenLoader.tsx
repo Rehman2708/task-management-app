@@ -200,9 +200,10 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
           <View>{renderLines(2, [150, 100])}</View>
         </Row>
         <Column alignItems="center" gap={16}>
-          <ShimmerBlock height={50} width={50} radius={100} />
-          <ShimmerBlock height={50} width={50} radius={100} />
-          <ShimmerBlock height={50} width={50} radius={100} />
+          <ShimmerBlock height={40} width={40} radius={100} />
+          <ShimmerBlock height={40} width={40} radius={100} />
+          <ShimmerBlock height={40} width={40} radius={100} />
+          <ShimmerBlock height={40} width={40} radius={100} />
         </Column>
       </Row>
     </View>

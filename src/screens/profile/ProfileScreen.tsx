@@ -90,6 +90,7 @@ export default function ProfileScreen() {
                 colors={[theme.colors.primary]}
               />
             }
+            showsVerticalScrollIndicator={false}
           >
             <Column
               gap={isAndroid ? 6 : 8}
@@ -106,6 +107,7 @@ export default function ProfileScreen() {
                     {
                       backgroundColor: `${themeColor.light}20`,
                       borderColor: user?.theme.dark,
+                      borderRadius: 100,
                     },
                   ]}
                 >
@@ -147,6 +149,7 @@ export default function ProfileScreen() {
                       {
                         backgroundColor: `${user?.partner?.theme?.light}20`,
                         borderColor: user?.partner?.theme?.light,
+                        borderRadius: 100,
                       },
                     ]}
                   >

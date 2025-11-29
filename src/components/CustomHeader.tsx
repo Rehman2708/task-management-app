@@ -119,7 +119,7 @@ const CustomHeader = ({
                 <>
                   <View style={{ width: dimensions.width - 190 }}>
                     <TextTicker
-                      duration={tickerText.length * 120}
+                      duration={tickerText.length * 130}
                       loop
                       marqueeDelay={0}
                       style={[commonStyles.smallText, commonStyles.whiteText]}
