@@ -67,6 +67,36 @@ export const FontAsset = {
   SpaceGroteskMedium: require("./SpaceGrotesk-Medium.ttf"),
   SpaceGroteskRegular: require("./SpaceGrotesk-Regular.ttf"),
   SpaceGroteskSemiBold: require("./SpaceGrotesk-SemiBold.ttf"),
+
+  AlegreyaSemiBold: require("./Alegreya-SemiBold.ttf"),
+  AlegreyaBold: require("./Alegreya-Bold.ttf"),
+  AlegreyaLight: require("./Alegreya-Medium.ttf"),
+  AlegreyaMedium: require("./Alegreya-Medium.ttf"),
+  AlegreyaRegular: require("./Alegreya-Regular.ttf"),
+
+  GrapeNutsRegular: require("./GrapeNuts-Regular.ttf"),
+  GrapeNutsBold: require("./GrapeNuts-Regular.ttf"),
+  GrapeNutsSemiBold: require("./GrapeNuts-Regular.ttf"),
+  GrapeNutsMedium: require("./GrapeNuts-Regular.ttf"),
+  GrapeNutsLight: require("./GrapeNuts-Regular.ttf"),
+
+  MateSCLight: require("./MateSC-Regular.ttf"),
+  MateSCMedium: require("./MateSC-Regular.ttf"),
+  MateSCBold: require("./MateSC-Regular.ttf"),
+  MateSCSemiBold: require("./MateSC-Regular.ttf"),
+  MateSCRegular: require("./MateSC-Regular.ttf"),
+
+  MomoSignatureRegular: require("./MomoSignature-Regular.ttf"),
+  MomoSignatureBold: require("./MomoSignature-Regular.ttf"),
+  MomoSignatureSemiBold: require("./MomoSignature-Regular.ttf"),
+  MomoSignatureMedium: require("./MomoSignature-Regular.ttf"),
+  MomoSignatureLight: require("./MomoSignature-Regular.ttf"),
+
+  PlaywriteNOLight: require("./PlaywriteNO-Light.ttf"),
+  PlaywriteNORegular: require("./PlaywriteNO-Light.ttf"),
+  PlaywriteNOMedium: require("./PlaywriteNO-Regular.ttf"),
+  PlaywriteNOBold: require("./PlaywriteNO-Regular.ttf"),
+  PlaywriteNOSemiBold: require("./PlaywriteNO-Regular.ttf"),
 };
 
 export const fontMap = {
@@ -154,6 +184,45 @@ export const fontMap = {
     medium: "SpaceGroteskMedium",
     semibold: "SpaceGroteskSemiBold",
     bold: "SpaceGroteskBold",
+  },
+  Alegreya: {
+    light: "AlegreyaLight",
+    regular: "AlegreyaRegular",
+    medium: "AlegreyaMedium",
+    semibold: "AlegreyaSemiBold",
+    bold: "AlegreyaBold",
+  },
+
+  GrapeNuts: {
+    light: "GrapeNutsLight",
+    regular: "GrapeNutsRegular",
+    medium: "GrapeNutsMedium",
+    semibold: "GrapeNutsSemiBold",
+    bold: "GrapeNutsBold",
+  },
+
+  MateSC: {
+    light: "MateSCLight",
+    regular: "MateSCRegular",
+    medium: "MateSCMedium",
+    semibold: "MateSCSemiBold",
+    bold: "MateSCBold",
+  },
+
+  MomoSignature: {
+    light: "MomoSignatureLight",
+    regular: "MomoSignatureRegular",
+    medium: "MomoSignatureMedium",
+    semibold: "MomoSignatureSemiBold",
+    bold: "MomoSignatureBold",
+  },
+
+  PlaywriteNO: {
+    light: "PlaywriteNOLight",
+    regular: "PlaywriteNORegular",
+    medium: "PlaywriteNOMedium",
+    semibold: "PlaywriteNOSemiBold",
+    bold: "PlaywriteNOBold",
   },
 } as const;
 
