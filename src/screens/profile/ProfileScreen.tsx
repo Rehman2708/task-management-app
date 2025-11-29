@@ -325,22 +325,23 @@ export default function ProfileScreen() {
 export const styles = (theme: any) =>
   StyleSheet.create({
     imageContainer: {
-      width: 120,
-      height: 120,
+      width: 140,
+      height: 140,
       marginVertical: 20,
       position: "relative",
     },
     deleteIcon: {
       position: "absolute",
-      right: -3,
-      top: -3,
-      borderRadius: 100,
-      backgroundColor: theme.colors.error,
-      padding: 8,
+      bottom: 0,
+      backgroundColor: "#00000060",
+      padding: 6,
+      left: 0,
+      right: 0,
+      alignItems: "center",
     },
     image: {
-      height: 120,
-      width: 120,
+      height: 140,
+      width: 140,
     },
     nameText: {
       fontSize: 50,

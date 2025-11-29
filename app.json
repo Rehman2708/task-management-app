@@ -37,7 +37,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/androidLogo.png",
+          "icon": "./assets/images/notification.png",
           "color": "#0E0E0E00",
           "vibrationPattern": [0, 100, 50, 300, 100, 300],
           "sounds": ["./assets/audio/notification.wav"]

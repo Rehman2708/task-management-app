@@ -156,7 +156,7 @@ export default function ReelsScreen() {
           button={() => fetchVideos(1, false)}
           type={LoaderTypes.VideoScreen}
         />
-        <Spacer size={100} />
+        <Spacer size={80} />
       </SafeAreaView>
     );
   }

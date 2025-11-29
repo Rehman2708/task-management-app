@@ -139,7 +139,7 @@ function VideoItemComponent({
     user?.userId === item.createdBy && {
       name: isViewed ? "eye" : "eye-off",
       color: theme.colors.white,
-      onPress: undefined,
+      onPress: !isViewed ? handleViewed : undefined,
     },
     user?.userId === item.createdBy &&
       showDelete && {
@@ -308,12 +308,16 @@ export default React.memo(VideoItemComponent);
 const styles = StyleSheet.create({
   videoContainer: { width: "100%" },
   video: { ...StyleSheet.absoluteFillObject },
-  overlay: { ...StyleSheet.absoluteFillObject, zIndex: 1 },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+    backgroundColor: "#00000010",
+  },
   loaderOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#00000077",
+    backgroundColor: "#00000080",
     zIndex: 1,
   },
   topRow: { padding: 12 },
