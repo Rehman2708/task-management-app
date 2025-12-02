@@ -9,7 +9,7 @@ import { useCommonStyles } from "../styles/commonstyles";
 import { useTheme } from "../infrastructure/theme";
 
 interface UploadMediaButtonProps {
-  onUploadSuccess: (url: string) => void;
+  onUploadSuccess: (url: string) => Promise<void | "">;
   isVideo?: boolean;
   currentUrl?: string;
   disabled?: boolean;
@@ -147,7 +147,7 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
         title="Camera"
         disabled={disabled || cameraLoading || galleryLoading}
         sendButton
-        iconName="camera-outline"
+        iconName={isVideo ? "videocam-outline" : "camera-outline"}
         outlined
       />
       {cameraLoading && isVideo && (

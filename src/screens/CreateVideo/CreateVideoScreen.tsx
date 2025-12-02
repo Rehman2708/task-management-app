@@ -165,8 +165,8 @@ export default function CreateVideoScreen() {
               <>
                 <UploadMediaButton
                   isVideo
-                  onUploadSuccess={(url) => {
-                    handleSave(url);
+                  onUploadSuccess={async (url) => {
+                    await handleSave(url);
                   }}
                   disabled={title.length < 1}
                 />

@@ -78,8 +78,8 @@ const ImageModal = ({
   }, []);
 
   const onSelect = () => {
-    setSelectedImage(currentImage.uri);
-    onChange?.(currentImage.uri);
+    setSelectedImage(currentImage?.uri);
+    onChange?.(currentImage?.uri);
     setShowModal(false);
   };
 
@@ -160,7 +160,7 @@ const ImageModal = ({
             <Row alignItems="center" justifyContent="center">
               <UploadMediaButton
                 currentUrl={defaultImage ?? undefined}
-                onUploadSuccess={(uri) => {
+                onUploadSuccess={async (uri) => {
                   setSelectedImage(uri);
                   onChange?.(uri);
                   setShowModal(false);

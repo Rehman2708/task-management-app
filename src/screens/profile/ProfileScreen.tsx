@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import { useTheme } from "../../infrastructure/theme";
 import { useProfileViewModel } from "./profileViewModal";
@@ -279,19 +280,27 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 );
               })}
-              <TouchableOpacity onPress={logout}>
+              <TouchableOpacity disabled={loggingOut} onPress={logout}>
                 <Row
-                  style={[commonStyles.cardContainer, { borderWidth: 0 }]}
+                  style={[{ height: 50 }]}
                   justifyContent="center"
+                  alignItems="center"
                 >
-                  <Text
-                    style={[
-                      commonStyles.subTitleText,
-                      { color: theme.colors.error },
-                    ]}
-                  >
-                    Logout
-                  </Text>
+                  {loggingOut ? (
+                    <ActivityIndicator
+                      size={"small"}
+                      color={theme.colors.error}
+                    />
+                  ) : (
+                    <Text
+                      style={[
+                        commonStyles.subTitleText,
+                        { color: theme.colors.error },
+                      ]}
+                    >
+                      Logout
+                    </Text>
+                  )}
                 </Row>
               </TouchableOpacity>
             </Column>

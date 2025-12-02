@@ -14,6 +14,8 @@ import { useTheme } from "./src/infrastructure/theme";
 import { StatusBar } from "react-native";
 import * as Notifications from "expo-notifications";
 import { useNotificationStore } from "./src/store/notificationStore";
+import { useNetwork } from "./src/utils/useNetwork";
+import OfflineScreen from "./src/screens/OfflineScreen/OfflineScreen";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -27,7 +29,7 @@ export default function App() {
   const [fontsLoaded] = useFonts(FontAsset);
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
-
+  const isConnected = useNetwork();
   const {
     launchedFromNotification,
     setLaunchedFromNotification,
@@ -83,7 +85,7 @@ export default function App() {
         }}
       >
         <StatusBar backgroundColor={"#00000030"} translucent />
-        <AppNavigator />
+        {!isConnected ? <OfflineScreen /> : <AppNavigator />}
       </NavigationContainer>
     </GestureHandlerRootView>
   );

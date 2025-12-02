@@ -9,6 +9,7 @@ import ScreenLoader, { LoaderTypes } from "./screenLoader";
 const EmptyState = ({
   image = Images.noData,
   text,
+  subtext,
   button,
   loading,
   error,
@@ -16,6 +17,7 @@ const EmptyState = ({
 }: {
   image?: ImageSourcePropType;
   text: string;
+  subtext?: string;
   button?: () => void;
   loading?: boolean;
   error?: boolean;
@@ -39,9 +41,12 @@ const EmptyState = ({
         resizeMode="contain"
         source={error ? errorImage : image}
       />
-      <Text style={commonStyles.subTitleText}>
-        {error ? "Something went wrong!" : text}
-      </Text>
+      <Column alignItems="center">
+        <Text style={commonStyles.subTitleText}>
+          {text ?? "Something went wrong!"}
+        </Text>
+        {subtext && <Text style={commonStyles.smallText}>{subtext}</Text>}
+      </Column>
       {button && (
         <Row style={commonStyles.fullWidth}>
           <CustomButton

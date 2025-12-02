@@ -165,19 +165,6 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
             ]}
             pointerEvents="none"
           />
-          {/* extra subtle highlight on top-right */}
-          <Animated.View
-            style={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              height: 6,
-              width: 30,
-              borderRadius: 4,
-              backgroundColor: highlightColor,
-              opacity: 0.04,
-            }}
-          />
         </Animated.View>
       );
     }
