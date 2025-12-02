@@ -14,6 +14,7 @@ interface UploadMediaButtonProps {
   currentUrl?: string;
   disabled?: boolean;
   maxVideoSizeMB?: number;
+  setLoader?: (loading: boolean) => void;
 }
 
 export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
@@ -22,6 +23,7 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
   currentUrl,
   disabled = false,
   maxVideoSizeMB = 100,
+  setLoader,
 }) => {
   const [cameraLoading, setCameraLoading] = useState(false);
   const [galleryLoading, setGalleryLoading] = useState(false);
@@ -34,6 +36,9 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
     const setProgress = fromCamera ? setCameraProgress : setGalleryProgress;
 
     try {
+      if (setLoader) {
+        setLoader(true);
+      }
       setLoading(true);
       setProgress(0);
 
@@ -85,7 +90,6 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
       console.log("[SELECT MEDIA ERROR]", err);
       Alert.alert("Upload Error", "Something went wrong");
     } finally {
-      // Do not reset progress here; uploadMedia will handle
     }
   };
 
@@ -134,6 +138,9 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
       );
     } finally {
       setLoading(false);
+      if (setLoader) {
+        setLoader(false);
+      }
       setProgress(0);
     }
   };

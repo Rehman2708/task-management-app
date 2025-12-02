@@ -66,7 +66,7 @@ export const useCommonStyles = (theme: any) =>
     },
     screenWrapper: {
       flex: 1,
-      paddingHorizontal: isAndroid ? 6 : 16,
+      paddingHorizontal: isAndroid ? 10 : 16,
     },
     blurView: {
       position: "absolute",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthRepo } from "../../repositories/auth";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
@@ -69,24 +69,53 @@ export function useProfileViewModel() {
   const createVideoScreen = () => navigation.navigate(ROUTES.CREATE_VIDEO);
   const resetPasswordScreen = () => navigation.navigate(ROUTES.RESET_PASSWORD);
   const updateProfileScreen = () => navigation.navigate(ROUTES.UPDATE_PROFILE);
-  function getTimeLeft(targetDate = "2026-04-27") {
-    const now = new Date();
-    const endDate = new Date(targetDate);
 
-    // Total difference in milliseconds
-    const diffMs = endDate - now;
+  function startCountdown(
+    targetDate: Date | string,
+    callback: (text: string) => void
+  ) {
+    function update() {
+      const now: Date = new Date();
+      const endDate: Date = new Date(targetDate);
 
-    if (diffMs <= 0) return "Date has already passed";
+      const diffMs = Number(endDate) - Number(now);
+      if (diffMs <= 0) {
+        callback("Date has already passed");
+        return;
+      }
 
-    // Convert total milliseconds to total days
-    const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const seconds = totalSeconds % 60;
 
-    // Approximate months and remaining days
-    const months = Math.floor(totalDays / 30); // approximate month as 30 days
-    const days = totalDays % 30;
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const minutes = totalMinutes % 60;
 
-    return `${months} month ${days} day left, i.e: ${totalDays} days`;
+      const totalHours = Math.floor(totalMinutes / 60);
+      const hours = totalHours % 24;
+
+      const totalDays = Math.floor(totalHours / 24);
+
+      const months = Math.floor(totalDays / 30);
+      const days = totalDays % 30;
+
+      const output = `${months} month ${days} day ${hours}h ${minutes}m ${seconds}s left. i.e ${totalDays} days`;
+      callback(output);
+    }
+
+    update();
+    return setInterval(update, 1000);
   }
+  const [timeLeft, setTimeLeft] = useState("");
+
+  useEffect(() => {
+    const timer = startCountdown("2026-04-27", setTimeLeft);
+
+    return () => clearInterval(timer); // cleanup
+  }, []);
+  function getTimeLeft() {
+    return `${timeLeft}`;
+  }
+
   const partnerId = user?.partner?.userId;
   const partnerImage = user?.partner?.image;
 

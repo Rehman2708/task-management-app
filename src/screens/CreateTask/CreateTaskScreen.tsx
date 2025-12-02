@@ -44,6 +44,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
       title={task ? "Edit Task" : "Create Task"}
       showBackbutton
       image={vm.image.length ? vm.image : undefined}
+      noPadding
       // subTitle={task ? "Edit" : "Home > Create Task"}
     >
       <View style={[commonStyles.screenWrapper]}>

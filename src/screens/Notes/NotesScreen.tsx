@@ -59,7 +59,15 @@ export default function NotesScreen() {
     fetchNotes(1, true);
   }, [fetchingNotes]);
 
-  const renderItem = ({ item, swiper }: { item: Note; swiper?: boolean }) => {
+  const renderItem = ({
+    item,
+    swiper,
+    index,
+  }: {
+    item: Note;
+    swiper?: boolean;
+    index: number;
+  }) => {
     const Container = swiper ? Pressable : TouchableOpacity;
     return (
       <Container
@@ -67,7 +75,17 @@ export default function NotesScreen() {
         onPress={() =>
           navigation.navigate(ROUTES.VIEW_NOTE, { noteId: item._id })
         }
-        style={{ flex: 1, marginHorizontal: 4 }}
+        style={[
+          {
+            flex: 1,
+            marginLeft: index % 2 ? 4 : 0,
+            marginRight: index % 2 ? 0 : 4,
+          },
+          swiper && {
+            paddingLeft: index % 2 ? 0 : 4,
+            paddingRight: index % 2 ? 4 : 0,
+          },
+        ]}
       >
         <CardWrapper
           // image={item?.image}
@@ -208,6 +226,7 @@ export default function NotesScreen() {
       title="Notes"
       image={noteImages}
       // onSearchPress={toggleSearch}
+      noPadding
       rightIcon={
         <TouchableOpacity onPress={toggleView}>
           <Ionicons
@@ -278,7 +297,7 @@ export default function NotesScreen() {
                       fetchNotes(1, true);
                     }
                   }}
-                  renderCard={(note) => {
+                  renderCard={(note, index) => {
                     if (!note) return null;
                     return (
                       <ImageBackground
@@ -291,7 +310,7 @@ export default function NotesScreen() {
                           colors={["#00000099", "#00000099"]}
                           style={styles.overlay}
                         />
-                        {renderItem({ item: note, swiper: true })}
+                        {renderItem({ item: note, swiper: true, index })}
                       </ImageBackground>
                     );
                   }}

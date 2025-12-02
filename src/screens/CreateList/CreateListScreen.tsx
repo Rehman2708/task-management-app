@@ -52,6 +52,7 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
       title={list ? "Edit List" : "Create List"}
       showBackbutton
       image={image.length ? image : undefined}
+      noPadding
     >
       <View style={commonStyles.screenWrapper}>
         <KeyboardAwareScrollView

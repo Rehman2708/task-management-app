@@ -54,6 +54,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
       title={note ? "Edit Note" : "Create Note"}
       showBackbutton
       image={noteImage.length ? noteImage : undefined}
+      noPadding
       // subTitle={`Notes > ${note ? "Edit Note" : "Create Note"}`}
     >
       <View style={commonStyles.screenWrapper}>

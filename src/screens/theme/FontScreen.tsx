@@ -57,7 +57,7 @@ const FontScreen = () => {
   }, [user]);
 
   return (
-    <ScreenWrapper title="Font" showBackbutton>
+    <ScreenWrapper title="Font" showBackbutton noPadding>
       <ScrollView>
         <Column gap={16} style={commonStyles.screenWrapper}>
           {fonts.map((font) => {

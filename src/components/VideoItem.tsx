@@ -62,7 +62,7 @@ function VideoItemComponent({
   singleScreen,
   preload = false,
 }: Props) {
-  const videoRef = useRef<IVideo>(null);
+  const videoRef = useRef<typeof Video>(null);
   const [isReady, setIsReady] = useState(false);
   const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
   const [commentsModalVisible, setCommentsModalVisible] = useState(
@@ -199,11 +199,19 @@ function VideoItemComponent({
         alignItems="center"
       >
         {mutedIcon && (
-          <Ionicons
-            name={muted ? "volume-mute-outline" : "volume-high-outline"}
-            size={50}
-            color={theme.colors.white}
-          />
+          <Row
+            style={{
+              backgroundColor: "#00000060",
+              padding: 20,
+              borderRadius: 100,
+            }}
+          >
+            <Ionicons
+              name={muted ? "volume-mute-outline" : "volume-high-outline"}
+              size={40}
+              color={theme.colors.white}
+            />
+          </Row>
         )}
       </Column>
 
@@ -286,9 +294,7 @@ function VideoItemComponent({
             ))}
           </Column>
         </Row>
-        <View style={{ height: 4 }}>
-          <VideoTimeProgressBar currentTime={currentTime} duration={duration} />
-        </View>
+        <VideoTimeProgressBar currentTime={currentTime} duration={duration} />
       </Pressable>
 
       <CommentsModal

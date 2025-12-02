@@ -32,7 +32,7 @@ import { useTheme } from "../infrastructure/theme";
 import { useAuthStore } from "../store/authStore";
 import { useCommonStyles } from "../styles/commonstyles";
 import CustomHeader from "./CustomHeader";
-import { dimensions, isDarkMode, Spacer } from "../tools";
+import { dimensions, isAndroid, isDarkMode, Spacer } from "../tools";
 import { useHelper } from "../utils/helper";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -342,6 +342,6 @@ const createStyles = (theme: any) =>
       marginTop: -100,
       backgroundColor: theme.colors.background,
       paddingTop: 16,
-      paddingHorizontal: 10,
+      paddingHorizontal: isAndroid ? 10 : 16,
     },
   });

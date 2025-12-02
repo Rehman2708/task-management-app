@@ -60,7 +60,15 @@ export default function ListsScreen() {
     fetchLists(1, true);
   }, [fetchingLists]);
 
-  const renderItem = ({ item, swiper }: { item: List; swiper?: boolean }) => {
+  const renderItem = ({
+    item,
+    swiper,
+    index,
+  }: {
+    item: List;
+    swiper?: boolean;
+    index: number;
+  }) => {
     const completedCount = item.items.filter((i) => i.completed).length;
     const totalCount = item.items.length;
     const Container = swiper ? Pressable : TouchableOpacity;
@@ -70,7 +78,10 @@ export default function ListsScreen() {
         onPress={() =>
           navigation.navigate(ROUTES.VIEW_LIST, { listId: item._id })
         }
-        style={{ flex: 1, marginHorizontal: 4 }}
+        style={{
+          flex: 1,
+          paddingHorizontal: swiper ? 4 : 0,
+        }}
       >
         <CardWrapper
           style={[
@@ -259,6 +270,7 @@ export default function ListsScreen() {
     <ScreenWrapper
       title="Lists"
       image={listImages}
+      noPadding
       // onSearchPress={toggleSearch}
       rightIcon={
         <TouchableOpacity onPress={toggleView}>
@@ -332,7 +344,7 @@ export default function ListsScreen() {
                         fetchLists(1, true);
                       }
                     }}
-                    renderCard={(list) => {
+                    renderCard={(list, index) => {
                       if (!list) return null;
                       return (
                         <ImageBackground
@@ -345,7 +357,7 @@ export default function ListsScreen() {
                             colors={["#00000099", "#00000099"]}
                             style={styles.overlay}
                           />
-                          {renderItem({ item: list, swiper: true })}
+                          {renderItem({ item: list, swiper: true, index })}
                         </ImageBackground>
                       );
                     }}

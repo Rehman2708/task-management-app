@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View } from "react-native";
-import { Column, dimensions, Row, Spacer } from "../tools";
+import { Column, dimensions, isAndroid, Row, Spacer } from "../tools";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useCommonStyles } from "../styles/commonstyles";
@@ -49,7 +49,7 @@ const CustomHeader = ({
       <Row
         justifyContent="space-between"
         alignItems="center"
-        style={{ paddingHorizontal: 16, height: 50 }}
+        style={{ paddingHorizontal: isAndroid ? 10 : 16, height: 50 }}
       >
         <Row alignItems="center" gap={10}>
           {showBackbutton && (

@@ -84,7 +84,7 @@ const ThemeScreen = () => {
   }, [user]);
 
   return (
-    <ScreenWrapper title="Theme" showBackbutton>
+    <ScreenWrapper title="Theme" showBackbutton noPadding>
       <ScrollView>
         <Column gap={12} style={[commonStyles.screenWrapper]}>
           {colors.map((item, index) => (

@@ -54,10 +54,9 @@ export default function CreateVideoScreen() {
 
   // Reset preview if URL changes after being tested
   useEffect(() => {
-    if (isTested) {
-      setIsTested(false);
-      setIsPlayable(false);
-    }
+    setIsTested(false);
+    setIsPlayable(false);
+    setError(null);
   }, [videoUrl]);
 
   const handleSave = async (uri?: string) => {
@@ -121,12 +120,16 @@ export default function CreateVideoScreen() {
   const filteredVideos = videosList.filter((item: IVideo) =>
     item.title.toLowerCase().includes(search.toLowerCase())
   );
-
+  const isTitleValid = title.trim().length >= 3;
+  const isVideoUrlValid = videoUrl.trim().length > 0;
+  const canTest = isTitleValid && isVideoUrlValid;
+  const canUpload = isPlayable && !loading;
   return (
     <ScreenWrapper
       title="Add Video"
       showBackbutton
       // subTitle="Videos > Add Video"
+      noPadding
     >
       <Row justifyContent="flex-end">
         <Text
@@ -160,25 +163,29 @@ export default function CreateVideoScreen() {
             inputStyle={{ maxHeight: 100, minHeight: 100 }}
             editable={!loading}
           />
-          <Row alignItems="center">
-            {videoUrl?.length === 0 && (
-              <>
-                <UploadMediaButton
-                  isVideo
-                  onUploadSuccess={async (url) => {
-                    await handleSave(url);
-                  }}
-                  disabled={title.length < 1}
-                />
-                <Spacer size={8} position="right" />
-              </>
-            )}
-            <CustomButton
-              title="Test"
-              onPress={handleTest}
-              disabled={videoUrl.length === 0}
-              customStyle={commonStyles.fullFlex}
+          <Row alignItems="center" style={{ height: 60 }}>
+            <UploadMediaButton
+              isVideo
+              onUploadSuccess={async (url) => {
+                setVideoUrl(url);
+                setIsTested(true);
+                setIsPlayable(true);
+              }}
+              disabled={!isTitleValid}
+              setLoader={setLoading}
+              currentUrl={videoUrl}
             />
+
+            <Spacer size={8} position="right" />
+
+            {isVideoUrlValid && (
+              <CustomButton
+                title="Test"
+                onPress={handleTest}
+                disabled={!canTest}
+                customStyle={commonStyles.fullFlex}
+              />
+            )}
           </Row>
 
           {isTested && (
@@ -188,12 +195,12 @@ export default function CreateVideoScreen() {
                 style={styles.videoPlayer}
                 controls
                 resizeMode="contain"
-                onError={(e) => {
-                  console.error("Video error:", e);
-                  setError("Video failed to load. Please check the URL.");
+                onError={() => {
+                  setError("Invalid or unreachable video URL.");
                   setIsPlayable(false);
                 }}
                 onLoad={() => {
+                  setError(null);
                   setIsPlayable(true);
                 }}
               />
@@ -203,7 +210,7 @@ export default function CreateVideoScreen() {
           {error && <Text style={commonStyles.errorText}>{error}</Text>}
           {success && (
             <Text
-              style={{ ...commonStyles.errorText, color: theme.colors.success }}
+              style={[commonStyles.errorText, { color: theme.colors.success }]}
             >
               {success}
             </Text>
@@ -212,8 +219,9 @@ export default function CreateVideoScreen() {
           {isPlayable && (
             <CustomButton
               title="Upload Video"
+              onPress={() => handleSave()}
               loading={loading}
-              onPress={() => handleSave(undefined)}
+              disabled={!canUpload}
             />
           )}
 

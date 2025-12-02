@@ -66,15 +66,12 @@ const VideoTimeProgressBar: React.FC<ProgressBarProps> = ({
 const getStyles = (theme: any) =>
   StyleSheet.create({
     progressBackground: {
-      height: 6,
-      borderRadius: 10,
+      height: 3,
       backgroundColor: theme.colors.background,
       overflow: "hidden",
-      flex: 1,
     },
     progressFill: {
       height: "100%",
-      borderRadius: 10,
     },
   });
 

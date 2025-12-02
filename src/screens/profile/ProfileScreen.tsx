@@ -73,7 +73,7 @@ export default function ProfileScreen() {
     },
   ];
   return (
-    <ScreenWrapper title="Profile">
+    <ScreenWrapper title="Profile" noPadding>
       {loading ? (
         <ScreenLoader />
       ) : (

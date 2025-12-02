@@ -115,6 +115,7 @@ const CustomInput = ({
           secureTextEntry={secureTextEntry && !isPasswordVisible}
           multiline={multiline}
           maxLength={maxChar}
+          cursorColor={theme.colors.text}
         />
 
         {secureTextEntry && (

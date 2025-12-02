@@ -72,6 +72,7 @@ export default function HomeScreen({ navigation }: any) {
       image={taskImages}
       showImage
       title={`Hey, ${loggedInUser?.name?.trim()}!`}
+      noPadding
     >
       {/* Tabs */}
       <Row>
