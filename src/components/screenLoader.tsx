@@ -398,7 +398,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
           width="40%"
           style={{ marginBottom: 16 }}
         />
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 10 }).map((_, i) => (
           <Row
             alignItems="center"
             style={[
@@ -427,11 +427,11 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
       <View style={{ marginTop: 10 }}>
         {renderLines(2, ["100%", "50%"])}
         <View style={{ marginVertical: 20 }}>
-          {renderLines(isList ? 4 : 30, ["100%", "80%", "60%", "90%"])}
+          {renderLines(isList ? 6 : 30, ["100%", "80%", "60%", "90%"])}
         </View>
 
         {isList &&
-          Array.from({ length: 4 }).map((_, i) => (
+          Array.from({ length: 10 }).map((_, i) => (
             <Row
               alignItems="center"
               style={[

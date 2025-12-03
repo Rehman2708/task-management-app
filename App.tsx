@@ -16,7 +16,8 @@ import * as Notifications from "expo-notifications";
 import { useNotificationStore } from "./src/store/notificationStore";
 import { useNetwork } from "./src/utils/useNetwork";
 import OfflineScreen from "./src/screens/OfflineScreen/OfflineScreen";
-
+import * as NavigationBar from "expo-navigation-bar";
+import { isAndroid } from "./src/tools";
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -62,7 +63,10 @@ export default function App() {
         responseListener.remove();
       };
     };
-
+    if (isAndroid) {
+      NavigationBar.setVisibilityAsync("hidden");
+      NavigationBar.setBehaviorAsync("overlay-swipe");
+    }
     setupNotifications();
   }, []);
 
