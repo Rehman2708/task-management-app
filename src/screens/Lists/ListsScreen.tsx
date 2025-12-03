@@ -29,6 +29,7 @@ import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import { LinearGradient } from "expo-linear-gradient";
 import Swiper from "react-native-deck-swiper";
 import { cardStyle } from "../Notes/NotesScreen";
+import AnimatedListItem from "../../components/animatedListItem";
 
 export default function ListsScreen() {
   const theme = useTheme();
@@ -73,102 +74,115 @@ export default function ListsScreen() {
     const totalCount = item.items.length;
     const Container = swiper ? Pressable : TouchableOpacity;
     return (
-      <Container
-        onLongPress={() => pinUnpinList(item._id, item.pinned ?? false)}
-        onPress={() =>
-          navigation.navigate(ROUTES.VIEW_LIST, { listId: item._id })
-        }
-        style={{
-          flex: 1,
-          paddingHorizontal: swiper ? 4 : 0,
-        }}
-      >
-        <CardWrapper
-          style={[
-            commonStyles.cardContainer,
-            commonStyles.fullFlex,
-            { padding: 0 },
-          ]}
+      <AnimatedListItem index={index}>
+        <Container
+          onLongPress={() => pinUnpinList(item._id, item.pinned ?? false)}
+          onPress={() =>
+            navigation.navigate(ROUTES.VIEW_LIST, { listId: item._id })
+          }
+          style={{
+            flex: 1,
+            paddingHorizontal: swiper ? 4 : 0,
+          }}
         >
-          {item.image && !swiper && (
-            <Image
-              source={{ uri: item.image }}
-              style={{
-                width: "100%",
-                height: swiper ? 200 : 80,
-                backgroundColor: theme.colors.loaderBg,
-              }}
-            />
-          )}
-          <Column
-            gap={6}
-            style={[commonStyles.fullFlex, { padding: 12 }]}
-            justifyContent="space-between"
+          <CardWrapper
+            style={[
+              commonStyles.cardContainer,
+              commonStyles.fullFlex,
+              { padding: 0 },
+            ]}
           >
-            <Column gap={6}>
-              <Row justifyContent="space-between" alignItems="center">
+            {item.image && !swiper && (
+              <Image
+                source={{ uri: item.image }}
+                style={{
+                  width: "100%",
+                  height: swiper ? 200 : 80,
+                  backgroundColor: theme.colors.loaderBg,
+                }}
+              />
+            )}
+            <Column
+              gap={6}
+              style={[commonStyles.fullFlex, { padding: 12 }]}
+              justifyContent="space-between"
+            >
+              <Column gap={6}>
+                <Row justifyContent="space-between" alignItems="center">
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      commonStyles.basicText,
+                      swiper && commonStyles.titleText,
+                      swiper && commonStyles.whiteText,
+                    ]}
+                  >
+                    {item.title}
+                  </Text>
+                  {item.pinned && (
+                    <Ionicons
+                      size={swiper ? 20 : 16}
+                      color={swiper ? themeColor.light : themeColor.dark}
+                      name="pricetag"
+                    />
+                  )}
+                </Row>
                 <Text
-                  numberOfLines={1}
+                  numberOfLines={swiper ? 5 : 2}
                   style={[
-                    commonStyles.basicText,
-                    swiper && commonStyles.titleText,
+                    commonStyles.tinyText,
+                    swiper && commonStyles.basicText,
                     swiper && commonStyles.whiteText,
                   ]}
                 >
-                  {item.title}
+                  {item.description}
                 </Text>
-                {item.pinned && (
-                  <Ionicons
-                    size={swiper ? 20 : 16}
-                    color={swiper ? themeColor.light : themeColor.dark}
-                    name="pricetag"
-                  />
-                )}
-              </Row>
-              <Text
-                numberOfLines={swiper ? 5 : 2}
-                style={[
-                  commonStyles.tinyText,
-                  swiper && commonStyles.basicText,
-                  swiper && commonStyles.whiteText,
-                ]}
-              >
-                {item.description}
-              </Text>
-              {swiper &&
-                item.items.map((item, index) => (
-                  <Row key={index}>
-                    <Text
-                      style={[
-                        commonStyles.smallText,
-                        swiper && commonStyles.whiteText,
-                      ]}
-                    >
-                      {index + 1}.{" "}
-                    </Text>
-                    <Text
-                      style={[
-                        commonStyles.smallText,
-                        commonStyles.fullFlex,
-                        swiper && commonStyles.whiteText,
-                        item.completed && {
-                          textDecorationLine: "line-through",
-                          color: theme.colors.success,
-                        },
-                      ]}
-                    >
-                      {item.text}
-                    </Text>
-                  </Row>
-                ))}
-              <Row alignItems="center" justifyContent="space-between" gap={4}>
-                {totalCount > 0 ? (
-                  <Row alignItems="center" gap={4}>
-                    <Ionicons
-                      name="checkmark-circle-outline"
-                      size={swiper ? 16 : 12}
-                      color={theme.colors.success}
-                    />
+                {swiper &&
+                  item.items.map((item, index) => (
+                    <Row key={index}>
+                      <Text
+                        style={[
+                          commonStyles.smallText,
+                          swiper && commonStyles.whiteText,
+                        ]}
+                      >
+                        {index + 1}.{" "}
+                      </Text>
+                      <Text
+                        style={[
+                          commonStyles.smallText,
+                          commonStyles.fullFlex,
+                          swiper && commonStyles.whiteText,
+                          item.completed && {
+                            textDecorationLine: "line-through",
+                            color: theme.colors.success,
+                          },
+                        ]}
+                      >
+                        {item.text}
+                      </Text>
+                    </Row>
+                  ))}
+                <Row alignItems="center" justifyContent="space-between" gap={4}>
+                  {totalCount > 0 ? (
+                    <Row alignItems="center" gap={4}>
+                      <Ionicons
+                        name="checkmark-circle-outline"
+                        size={swiper ? 16 : 12}
+                        color={theme.colors.success}
+                      />
+                      <Text
+                        numberOfLines={2}
+                        style={[
+                          commonStyles.tinyText,
+                          swiper && commonStyles.smallText,
+                          swiper && commonStyles.whiteText,
+                        ]}
+                      >
+                        {completedCount}/{totalCount} items completed
+                      </Text>
+                    </Row>
+                  ) : (
                     <Text
                       numberOfLines={2}
                       style={[
@@ -177,29 +191,32 @@ export default function ListsScreen() {
                         swiper && commonStyles.whiteText,
                       ]}
                     >
-                      {completedCount}/{totalCount} items completed
+                      No items added
+                    </Text>
+                  )}
+                  <Row alignItems="center" gap={6}>
+                    <Ionicons
+                      name="chatbubble-outline"
+                      size={swiper ? 16 : 12}
+                      color={
+                        !swiper ? theme.colors.textLight : theme.colors.white
+                      }
+                    />
+                    <Text
+                      style={[
+                        commonStyles.tTinyText,
+                        swiper && commonStyles.tinyText,
+                        swiper && commonStyles.whiteText,
+                      ]}
+                    >
+                      {item.totalComments ?? 0}
                     </Text>
                   </Row>
-                ) : (
-                  <Text
-                    numberOfLines={2}
-                    style={[
-                      commonStyles.tinyText,
-                      swiper && commonStyles.smallText,
-                      swiper && commonStyles.whiteText,
-                    ]}
-                  >
-                    No items added
-                  </Text>
-                )}
-                <Row alignItems="center" gap={6}>
-                  <Ionicons
-                    name="chatbubble-outline"
-                    size={swiper ? 16 : 12}
-                    color={
-                      !swiper ? theme.colors.textLight : theme.colors.white
-                    }
-                  />
+                </Row>
+              </Column>
+
+              <Row justifyContent="space-between" alignItems="center" gap={6}>
+                <Row alignItems="center">
                   <Text
                     style={[
                       commonStyles.tTinyText,
@@ -207,55 +224,41 @@ export default function ListsScreen() {
                       swiper && commonStyles.whiteText,
                     ]}
                   >
-                    {item.totalComments ?? 0}
+                    Creator:{" "}
+                  </Text>
+                  <Avatar
+                    name={
+                      item?.createdByDetails
+                        ? item.createdByDetails.name.split(" ")[0]
+                        : item.createdBy
+                    }
+                    image={item?.createdByDetails?.image}
+                    withName
+                    size={swiper ? 20 : undefined}
+                  />
+                </Row>
+                <Row alignItems="center" gap={4}>
+                  <Ionicons
+                    name="time-outline"
+                    size={swiper ? 16 : 12}
+                    color={swiper ? theme.colors.white : theme.colors.textLight}
+                  />
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      commonStyles.tTinyText,
+                      swiper && commonStyles.tinyText,
+                      swiper && commonStyles.whiteText,
+                    ]}
+                  >
+                    {formatDate(item?.createdAt)}
                   </Text>
                 </Row>
               </Row>
             </Column>
-
-            <Row justifyContent="space-between" alignItems="center" gap={6}>
-              <Row alignItems="center">
-                <Text
-                  style={[
-                    commonStyles.tTinyText,
-                    swiper && commonStyles.tinyText,
-                    swiper && commonStyles.whiteText,
-                  ]}
-                >
-                  Creator:{" "}
-                </Text>
-                <Avatar
-                  name={
-                    item?.createdByDetails
-                      ? item.createdByDetails.name.split(" ")[0]
-                      : item.createdBy
-                  }
-                  image={item?.createdByDetails?.image}
-                  withName
-                  size={swiper ? 20 : undefined}
-                />
-              </Row>
-              <Row alignItems="center" gap={4}>
-                <Ionicons
-                  name="time-outline"
-                  size={swiper ? 16 : 12}
-                  color={swiper ? theme.colors.white : theme.colors.textLight}
-                />
-                <Text
-                  numberOfLines={1}
-                  style={[
-                    commonStyles.tTinyText,
-                    swiper && commonStyles.tinyText,
-                    swiper && commonStyles.whiteText,
-                  ]}
-                >
-                  {formatDate(item?.createdAt)}
-                </Text>
-              </Row>
-            </Row>
-          </Column>
-        </CardWrapper>
-      </Container>
+          </CardWrapper>
+        </Container>
+      </AnimatedListItem>
     );
   };
 

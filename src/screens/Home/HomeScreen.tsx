@@ -13,6 +13,7 @@ import { useUtilStore } from "../../store/utils";
 import { Row, Spacer } from "../../tools";
 import { useHomeScreenViewModel } from "./homeViewModel";
 import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
+import AnimatedListItem from "../../components/animatedListItem";
 
 export default function HomeScreen({ navigation }: any) {
   const {
@@ -49,12 +50,14 @@ export default function HomeScreen({ navigation }: any) {
 
   // Memoized renderItem
   const renderItem = useCallback(
-    ({ item }: any) => (
-      <TasksCard
-        item={item}
-        handleDelete={() => deleteTask(item._id!)}
-        isCompleted={tab === "History"}
-      />
+    ({ item, index }: any) => (
+      <AnimatedListItem index={index}>
+        <TasksCard
+          item={item}
+          handleDelete={() => deleteTask(item._id!)}
+          isCompleted={tab === "History"}
+        />
+      </AnimatedListItem>
     ),
     [tab, deleteTask]
   );

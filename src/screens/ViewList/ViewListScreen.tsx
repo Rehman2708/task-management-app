@@ -14,6 +14,7 @@ import EmptyState from "../../components/emptyState";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { AppUrl } from "../../utils/appUrl";
 import CommentsModal from "../../components/comments/commentModal";
+import AnimatedListItem from "../../components/animatedListItem";
 
 interface ViewListScreenProps {
   route: {
@@ -54,44 +55,48 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
   };
 
   const renderListItem = ({ item, index }: { item: any; index: number }) => (
-    <Row
-      alignItems="center"
-      justifyContent="space-between"
-      style={[
-        commonStyles.cardContainer,
-        {
-          backgroundColor: item.completed
-            ? theme.colors.success + "20"
-            : theme.colors.error + "20",
-        },
-      ]}
-    >
-      <Text style={[commonStyles.subTitleText]}>
-        {index + 1}.{`  `}
-      </Text>
-      <Text
+    <AnimatedListItem index={index}>
+      <Row
+        alignItems="center"
+        justifyContent="space-between"
         style={[
-          commonStyles.smallText,
-          commonStyles.fullFlex,
+          commonStyles.cardContainer,
           {
-            textDecorationLine: item.completed ? "line-through" : "none",
-            color: item.completed ? theme.colors.textLight : theme.colors.text,
+            backgroundColor: item.completed
+              ? theme.colors.success + "20"
+              : theme.colors.error + "20",
           },
         ]}
       >
-        {item.text}
-      </Text>
-      <Spacer size={6} position="right" />
-      {!item.completed && (
-        <CustomButton
-          onPress={() => toggleItemCompletion(index)}
-          iconName="checkmark-done-outline"
-          title="Send"
-          sendButton
-          success
-        />
-      )}
-    </Row>
+        <Text style={[commonStyles.subTitleText]}>
+          {index + 1}.{`  `}
+        </Text>
+        <Text
+          style={[
+            commonStyles.smallText,
+            commonStyles.fullFlex,
+            {
+              textDecorationLine: item.completed ? "line-through" : "none",
+              color: item.completed
+                ? theme.colors.textLight
+                : theme.colors.text,
+            },
+          ]}
+        >
+          {item.text}
+        </Text>
+        <Spacer size={6} position="right" />
+        {!item.completed && (
+          <CustomButton
+            onPress={() => toggleItemCompletion(index)}
+            iconName="checkmark-done-outline"
+            title="Send"
+            sendButton
+            success
+          />
+        )}
+      </Row>
+    </AnimatedListItem>
   );
   return (
     <View

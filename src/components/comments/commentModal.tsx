@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { LoaderTypes } from "../screenLoader";
 import { UploadMediaButton } from "../UploadMediaButton";
 import { useHelper } from "../../utils/helper";
+import AnimatedListItem from "../animatedListItem";
 
 type Props = {
   visible: boolean;
@@ -195,20 +196,26 @@ export default function GlobalCommentsModal({
                         index > 0 &&
                         (c.createdBy || c.by) === (prev?.createdBy || prev?.by);
                       return (
-                        <CommentCard
+                        <AnimatedListItem
                           key={c._id ?? `${c.by}-${index}`}
-                          image={c.createdByDetails?.image}
-                          url={c.image}
-                          text={c.text}
-                          name={c.createdByDetails?.name ?? c.createdBy ?? c.by}
-                          userId={c.createdBy ?? c.by}
-                          time={formatDate(
-                            c.date ?? c.createdAt ?? new Date(),
-                            "time"
-                          )}
-                          repeated={sameUser}
-                          loading={c.loading}
-                        />
+                          index={index}
+                        >
+                          <CommentCard
+                            image={c.createdByDetails?.image}
+                            url={c.image}
+                            text={c.text}
+                            name={
+                              c.createdByDetails?.name ?? c.createdBy ?? c.by
+                            }
+                            userId={c.createdBy ?? c.by}
+                            time={formatDate(
+                              c.date ?? c.createdAt ?? new Date(),
+                              "time"
+                            )}
+                            repeated={sameUser}
+                            loading={c.loading}
+                          />
+                        </AnimatedListItem>
                       );
                     })}
                   </View>

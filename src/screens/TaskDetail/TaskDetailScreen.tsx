@@ -18,6 +18,7 @@ import { TaskDetailStyles } from "./styles";
 import { AssignedIcon } from "../CreateTask/components/subtaskItem";
 import CommentsModal from "../../components/comments/commentModal";
 import { Subtask } from "../../types/task";
+import AnimatedListItem from "../../components/animatedListItem";
 
 export default function TaskDetailScreen({ route }: any) {
   const {
@@ -117,7 +118,7 @@ export default function TaskDetailScreen({ route }: any) {
   const hasMultipleDates = uniqueDates.length > 1;
 
   const renderSubtask = useCallback(
-    ({ item }: { item: Subtask }) => {
+    ({ item, index }: { item: Subtask; index: number }) => {
       const backgroundColor =
         item.status === SubtaskStatus.Completed
           ? `${theme.colors.success}20`
@@ -144,79 +145,81 @@ export default function TaskDetailScreen({ route }: any) {
       const highlightToday = hasMultipleDates && isToday;
 
       return (
-        <Column
-          gap={8}
-          style={[
-            commonStyles.cardContainer,
-            {
-              backgroundColor,
-              borderColor: highlightToday ? borderColor : backgroundColor,
-              borderWidth: highlightToday ? 2 : 1,
-            },
-          ]}
-        >
-          <Row justifyContent="space-between" alignItems="center">
-            <Column gap={6} style={commonStyles.fullFlex}>
-              <Text style={commonStyles.basicText}>{item.title}</Text>
-              {item.dueDateTime && (
-                <Row alignItems="center">
-                  <Ionicons
-                    name="timer-outline"
-                    size={12}
-                    color={theme.colors.textLight}
+        <AnimatedListItem index={index}>
+          <Column
+            gap={8}
+            style={[
+              commonStyles.cardContainer,
+              {
+                backgroundColor,
+                borderColor: highlightToday ? borderColor : backgroundColor,
+                borderWidth: highlightToday ? 2 : 1,
+              },
+            ]}
+          >
+            <Row justifyContent="space-between" alignItems="center">
+              <Column gap={6} style={commonStyles.fullFlex}>
+                <Text style={commonStyles.basicText}>{item.title}</Text>
+                {item.dueDateTime && (
+                  <Row alignItems="center">
+                    <Ionicons
+                      name="timer-outline"
+                      size={12}
+                      color={theme.colors.textLight}
+                    />
+                    <Text style={commonStyles.tTinyText}>
+                      {" "}
+                      Due: {formatDate(item.dueDateTime)}
+                    </Text>
+                  </Row>
+                )}
+              </Column>
+            </Row>
+
+            {!readOnly &&
+              item.status === SubtaskStatus.Pending &&
+              task?.createdAt && (
+                <Row alignItems="center" style={commonStyles.fullFlex}>
+                  <Text style={commonStyles.tTinyText}>Time left: </Text>
+                  <TimeLeftProgress
+                    startTime={task.createdAt}
+                    endTime={item.dueDateTime}
                   />
-                  <Text style={commonStyles.tTinyText}>
-                    {" "}
-                    Due: {formatDate(item.dueDateTime)}
-                  </Text>
                 </Row>
               )}
-            </Column>
-          </Row>
 
-          {!readOnly &&
-            item.status === SubtaskStatus.Pending &&
-            task?.createdAt && (
-              <Row alignItems="center" style={commonStyles.fullFlex}>
-                <Text style={commonStyles.tTinyText}>Time left: </Text>
-                <TimeLeftProgress
-                  startTime={task.createdAt}
-                  endTime={item.dueDateTime}
+            <Row alignItems="center" justifyContent="space-between">
+              <Pressable
+                onPress={() => handleOpenComments(item._id)}
+                style={{ paddingTop: theme.spacing.sm }}
+              >
+                <Row alignItems="center" gap={4}>
+                  <Animated.View style={{ transform: [{ scale }] }}>
+                    <Ionicons
+                      name="chatbubble-outline"
+                      size={20}
+                      color={theme.colors.text}
+                    />
+                  </Animated.View>
+                  <Text style={commonStyles.smallText}>
+                    {commentCount} Comment{commentCount > 1 ? "s" : ""}
+                  </Text>
+                </Row>
+              </Pressable>
+
+              {!readOnly && item.status === SubtaskStatus.Pending && (
+                <CustomButton
+                  onPress={() => handleUpdateStatus(item._id)}
+                  iconName="checkmark-done-outline"
+                  title="Send"
+                  sendButton
+                  loading={subtaskStatusLoading === item._id}
+                  success
                 />
-              </Row>
-            )}
-
-          <Row alignItems="center" justifyContent="space-between">
-            <Pressable
-              onPress={() => handleOpenComments(item._id)}
-              style={{ paddingTop: theme.spacing.sm }}
-            >
-              <Row alignItems="center" gap={4}>
-                <Animated.View style={{ transform: [{ scale }] }}>
-                  <Ionicons
-                    name="chatbubble-outline"
-                    size={20}
-                    color={theme.colors.text}
-                  />
-                </Animated.View>
-                <Text style={commonStyles.smallText}>
-                  {commentCount} Comment{commentCount > 1 ? "s" : ""}
-                </Text>
-              </Row>
-            </Pressable>
-
-            {!readOnly && item.status === SubtaskStatus.Pending && (
-              <CustomButton
-                onPress={() => handleUpdateStatus(item._id)}
-                iconName="checkmark-done-outline"
-                title="Send"
-                sendButton
-                loading={subtaskStatusLoading === item._id}
-                success
-              />
-            )}
-          </Row>
-        </Column>
+              )}
+            </Row>
+          </Column>
+        </AnimatedListItem>
       );
     },
     [

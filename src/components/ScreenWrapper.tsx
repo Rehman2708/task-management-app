@@ -1,4 +1,4 @@
-import { SafeAreaView, View } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import { useCommonStyles } from "../styles/commonstyles";
 import LinearHeader from "./LinearHeader";
