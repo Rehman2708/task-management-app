@@ -55,6 +55,7 @@ export default function ListsScreen() {
     listImages,
     toggleView,
     cardView,
+    pageSize,
   } = useListsViewModel();
 
   useEffect(() => {
@@ -73,8 +74,9 @@ export default function ListsScreen() {
     const completedCount = item.items.filter((i) => i.completed).length;
     const totalCount = item.items.length;
     const Container = swiper ? Pressable : TouchableOpacity;
+    const animate = index < pageSize;
     return (
-      <AnimatedListItem index={index}>
+      <AnimatedListItem index={index} animate={animate}>
         <Container
           onLongPress={() => pinUnpinList(item._id, item.pinned ?? false)}
           onPress={() =>

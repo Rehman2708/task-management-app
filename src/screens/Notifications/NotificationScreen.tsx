@@ -129,8 +129,9 @@ const NotificationScreen = () => {
     index: number;
   }) => {
     const bgColor = item.isRead ? "transparent" : `${themeColor.light}30`;
+    const animate = index < PAGE_SIZE;
     return (
-      <AnimatedListItem index={index}>
+      <AnimatedListItem index={index} animate={animate}>
         <Swiper
           closeInstant
           onEnded={() => markAsRead(item._id)}

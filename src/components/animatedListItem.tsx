@@ -5,14 +5,17 @@ const { width, height } = Dimensions.get("window");
 
 const directions = ["left", "right", "top", "bottom"];
 
-export default function AnimatedListItem({ index, children }: any) {
+export default function AnimatedListItem({
+  index,
+  children,
+  animate = true,
+}: any) {
   const translate = useRef(new Animated.ValueXY()).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
   const randomDirection =
     directions[Math.floor(Math.random() * directions.length)];
 
-  // Random starting offsets
   const offsets: any = {
     left: { x: -width, y: 0 },
     right: { x: width, y: 0 },
@@ -21,13 +24,20 @@ export default function AnimatedListItem({ index, children }: any) {
   };
 
   useEffect(() => {
+    if (!animate) {
+      // Instant appearance for pagination items
+      opacity.setValue(1);
+      translate.setValue({ x: 0, y: 0 });
+      return;
+    }
+
     translate.setValue(offsets[randomDirection]);
 
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
         duration: 300,
-        delay: index * 80, // stagger
+        delay: index * 80,
         useNativeDriver: true,
       }),
       Animated.spring(translate, {
@@ -38,7 +48,7 @@ export default function AnimatedListItem({ index, children }: any) {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [animate]);
 
   return (
     <Animated.View

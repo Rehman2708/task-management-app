@@ -130,5 +130,6 @@ export function useListsViewModel(userId?: string) {
     listImages,
     toggleView,
     cardView,
+    pageSize,
   };
 }

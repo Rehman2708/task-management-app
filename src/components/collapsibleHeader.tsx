@@ -324,8 +324,8 @@ const createStyles = (theme: any) =>
     },
     topBar: {
       position: "absolute",
-      left: 16,
-      right: 16,
+      left: isAndroid ? 10 : 16,
+      right: isAndroid ? 10 : 16,
       zIndex: 30,
       flexDirection: "row",
       alignItems: "center",

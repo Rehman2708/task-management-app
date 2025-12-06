@@ -132,5 +132,6 @@ export function useNotesListViewModel(userId?: string) {
     noteImages,
     toggleView,
     cardView,
+    pageSize,
   };
 }

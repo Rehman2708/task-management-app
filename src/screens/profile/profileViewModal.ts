@@ -108,7 +108,7 @@ export function useProfileViewModel() {
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
-    const timer = startCountdown("2026-04-27", setTimeLeft);
+    const timer = startCountdown("2026-04-27T00:00:00+05:30", setTimeLeft);
 
     return () => clearInterval(timer); // cleanup
   }, []);

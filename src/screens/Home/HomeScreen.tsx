@@ -14,6 +14,7 @@ import { Row, Spacer } from "../../tools";
 import { useHomeScreenViewModel } from "./homeViewModel";
 import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import AnimatedListItem from "../../components/animatedListItem";
+import { Task } from "../../types/task";
 
 export default function HomeScreen({ navigation }: any) {
   const {
@@ -27,6 +28,7 @@ export default function HomeScreen({ navigation }: any) {
     tab,
     setTab,
     taskImages,
+    pageSize,
   } = useHomeScreenViewModel();
 
   const { loggedInUser, themeColor } = useHelper();
@@ -50,16 +52,19 @@ export default function HomeScreen({ navigation }: any) {
 
   // Memoized renderItem
   const renderItem = useCallback(
-    ({ item, index }: any) => (
-      <AnimatedListItem index={index}>
-        <TasksCard
-          item={item}
-          handleDelete={() => deleteTask(item._id!)}
-          isCompleted={tab === "History"}
-        />
-      </AnimatedListItem>
-    ),
-    [tab, deleteTask]
+    ({ item, index }: { item: Task; index: number }) => {
+      const animate = index < pageSize;
+      return (
+        <AnimatedListItem index={index} animate={animate}>
+          <TasksCard
+            item={item}
+            handleDelete={() => deleteTask(item._id!)}
+            isCompleted={tab === "History"}
+          />
+        </AnimatedListItem>
+      );
+    },
+    [tab, deleteTask, loadingMore]
   );
 
   // Footer Loader

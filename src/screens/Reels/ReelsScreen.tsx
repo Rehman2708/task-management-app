@@ -105,10 +105,10 @@ export default function ReelsScreen() {
   // Render each video item
   const renderItem: ListRenderItem<IVideo> = useCallback(
     ({ item, index }) => {
-      // Preload videos one before and after current index
+      // Preload videos one before and 3 after current index
       const preload =
         index >= currentIndex - 1 &&
-        index <= currentIndex + 1 &&
+        index <= currentIndex + 3 &&
         index !== currentIndex;
 
       return (

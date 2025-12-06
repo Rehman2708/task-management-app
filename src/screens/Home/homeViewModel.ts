@@ -113,5 +113,6 @@ export function useHomeScreenViewModel() {
     loadMoreTasks,
     deleteTask,
     taskImages,
+    pageSize,
   };
 }

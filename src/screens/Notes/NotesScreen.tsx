@@ -53,6 +53,7 @@ export default function NotesScreen() {
     noteImages,
     toggleView,
     cardView,
+    pageSize,
   } = useNotesListViewModel();
   const navigation: any = useNavigation();
 
@@ -70,8 +71,9 @@ export default function NotesScreen() {
     index: number;
   }) => {
     const Container = swiper ? Pressable : TouchableOpacity;
+    const animate = index < pageSize;
     return (
-      <AnimatedListItem index={index}>
+      <AnimatedListItem index={index} animate={animate}>
         <Container
           onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
           onPress={() =>
