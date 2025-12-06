@@ -4,7 +4,6 @@ import { useHelper } from "../utils/helper";
 import Avatar from "./avatar";
 import { useCommonStyles } from "../styles/commonstyles";
 import { useTheme } from "../infrastructure/theme";
-import ImageView from "react-native-image-viewing";
 import { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -16,8 +15,8 @@ const CommentCard = ({
   userId,
   repeated,
   url,
-  noImage,
   loading,
+  onImagePress,
 }: {
   text?: string;
   image?: string;
@@ -25,9 +24,9 @@ const CommentCard = ({
   userId: string;
   time: string;
   repeated?: boolean;
-  noImage?: boolean;
   loading?: boolean;
   url?: string;
+  onImagePress?: () => void;
 }) => {
   const { loggedInUser, themeColor, getImageSize } = useHelper();
   const isMyChat = loggedInUser?.userId === userId;
@@ -39,7 +38,6 @@ const CommentCard = ({
 
   const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
   const [imgLoaded, setImgLoaded] = useState(false);
-  const [showImage, setShowImage] = useState(false);
 
   useEffect(() => {
     if (url) {
@@ -63,7 +61,7 @@ const CommentCard = ({
       style={{ marginTop: repeated ? 3 : 8 }}
     >
       {!isMyChat &&
-        !noImage &&
+        !image &&
         (repeated ? (
           <Spacer size={26} position="right" />
         ) : (
@@ -73,13 +71,13 @@ const CommentCard = ({
             image={loggedInUser?.partner?.image}
           />
         ))}
-
+      {image && <Avatar size={40} image={image} />}
       {url ? (
         <Pressable
-          onPress={() => setShowImage(true)}
+          onPress={onImagePress}
           style={{
             width: imgSize?.w ?? dimensions.width * 0.55,
-            height: imgSize?.h ?? 220, // RESERVE SPACE
+            height: imgSize?.h ?? 220,
             borderRadius: 10,
             overflow: "hidden",
             backgroundColor: isMyChat
@@ -120,16 +118,6 @@ const CommentCard = ({
           >
             {time}
           </Text>
-
-          <ImageView
-            images={[{ uri: url }]}
-            visible={showImage}
-            onRequestClose={() => setShowImage(false)}
-            presentationStyle="overFullScreen"
-            swipeToCloseEnabled
-            backgroundColor={theme.colors.background}
-            imageIndex={0}
-          />
         </Pressable>
       ) : isSingleEmoji() ? (
         <Text style={{ fontSize: 36 }}>{text}</Text>
@@ -174,7 +162,7 @@ const CommentCard = ({
       )}
 
       {isMyChat &&
-        !noImage &&
+        !image &&
         (repeated ? (
           <Spacer size={26} position="right" />
         ) : (

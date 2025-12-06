@@ -12,6 +12,7 @@ export default function AnimatedListItem({
 }: any) {
   const translate = useRef(new Animated.ValueXY()).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(1)).current; // DEFAULT 1 for normal animation
 
   const randomDirection =
     directions[Math.floor(Math.random() * directions.length)];
@@ -25,11 +26,29 @@ export default function AnimatedListItem({
 
   useEffect(() => {
     if (!animate) {
-      // Instant appearance for pagination items
-      opacity.setValue(1);
+      // Only bounce + fade (no slide)
       translate.setValue({ x: 0, y: 0 });
+      scale.setValue(0.8); // only shrink for bounce mode
+
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 120,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scale, {
+          toValue: 1,
+          speed: 14,
+          bounciness: 8,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
       return;
     }
+
+    // For animate = true → NO SCALE ANIMATION, keep size normal
+    scale.setValue(1);
 
     translate.setValue(offsets[randomDirection]);
 
@@ -55,7 +74,11 @@ export default function AnimatedListItem({
       style={{
         flex: 1,
         opacity,
-        transform: [{ translateX: translate.x }, { translateY: translate.y }],
+        transform: [
+          { translateX: translate.x },
+          { translateY: translate.y },
+          { scale }, // stays 1 for animate=true
+        ],
       }}
     >
       {children}

@@ -66,7 +66,7 @@ export default function CreateVideoScreen() {
 
     try {
       const asset = await VideoThumbnails.getThumbnailAsync(uri ?? videoUrl, {
-        time: 2000,
+        time: 3000,
       });
       const thumbnail = await generateThumbnail(asset);
       const payload: CreateVideoPayload = {
@@ -268,12 +268,11 @@ export default function CreateVideoScreen() {
                   >
                     <CommentCard
                       text={item.title}
-                      image={item?.createdByDetails?.image}
+                      image={item?.thumbnail}
                       name={item?.createdByDetails?.name!}
                       time={formatDate(item.createdAt)}
                       userId=""
                       repeated
-                      noImage
                     />
                   </Pressable>
                 )}

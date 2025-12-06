@@ -21,7 +21,7 @@ import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
 import ScreenLoader from "../../components/screenLoader";
 import ImageView from "react-native-image-viewing";
-import TextTicker from "react-native-text-ticker";
+import AnimatedListItem from "../../components/animatedListItem";
 
 export default function ProfileScreen() {
   const {
@@ -48,8 +48,27 @@ export default function ProfileScreen() {
   const ProfileScreenStyles = styles(theme);
   const { getInitials, themeColor } = useHelper();
   const [visible, setIsVisible] = useState(false);
-  const [currentImage, setCurrentImage] = useState({});
-  const [footerText, setFooterText] = useState(user?.about);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [footerText, setFooterText] = useState(
+    currentImageIndex === 0 ? user?.about : user?.partner?.about
+  );
+  const imageItems = [];
+
+  if (user?.image) {
+    imageItems.push({ uri: user.image });
+  }
+
+  if (partnerImage) {
+    imageItems.push({ uri: partnerImage });
+  }
+  const handleIndexChange = (index: number) => {
+    if (index === 0 && user?.image) {
+      setFooterText(user?.about ?? "");
+    } else if (index === 1 && partnerImage) {
+      setFooterText(user?.partner?.about ?? "");
+    }
+  };
+
   const tabs = [
     {
       title: "Update profile",
@@ -109,11 +128,10 @@ export default function ProfileScreen() {
                 >
                   <Pressable
                     onPress={() => {
-                      if (user?.image) {
-                        setCurrentImage({ uri: user.image });
-                        setFooterText(user.about);
-                        setIsVisible(true);
-                      }
+                      if (!user?.image) return;
+                      setCurrentImageIndex(0);
+                      setFooterText(user.about);
+                      setIsVisible(true);
                     }}
                   >
                     {user?.image ? (
@@ -152,7 +170,9 @@ export default function ProfileScreen() {
                     {partnerImage ? (
                       <Pressable
                         onPress={() => {
-                          setCurrentImage({ uri: partnerImage });
+                          if (!partnerImage) return;
+                          const index = user?.image ? 1 : 0;
+                          setCurrentImageIndex(index);
                           setFooterText(user?.partner?.about);
                           setIsVisible(true);
                         }}
@@ -252,32 +272,24 @@ export default function ProfileScreen() {
 
               {tabs.map((item, index) => {
                 return (
-                  <TouchableOpacity key={index} onPress={item.onPress}>
-                    <Row
-                      style={[
-                        commonStyles.cardContainer,
-                        item.error ? { borderColor: theme.colors.error } : {},
-                      ]}
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Text
-                        style={[
-                          commonStyles.basicText,
-                          item.error && { color: theme.colors.error },
-                        ]}
+                  <AnimatedListItem key={index}>
+                    <TouchableOpacity onPress={item.onPress}>
+                      <Row
+                        style={[commonStyles.cardContainer]}
+                        justifyContent="space-between"
+                        alignItems="center"
                       >
-                        {item.title}
-                      </Text>
-                      <Ionicons
-                        name="chevron-forward-outline"
-                        size={20}
-                        color={
-                          item.error ? theme.colors.error : theme.colors.text
-                        }
-                      />
-                    </Row>
-                  </TouchableOpacity>
+                        <Text style={[commonStyles.basicText]}>
+                          {item.title}
+                        </Text>
+                        <Ionicons
+                          name="chevron-forward-outline"
+                          size={20}
+                          color={theme.colors.text}
+                        />
+                      </Row>
+                    </TouchableOpacity>
+                  </AnimatedListItem>
                 );
               })}
               <TouchableOpacity disabled={loggingOut} onPress={logout}>
@@ -309,12 +321,13 @@ export default function ProfileScreen() {
         </>
       )}
       <ImageView
-        images={[currentImage]}
-        swipeToCloseEnabled
-        backgroundColor={theme.colors.background}
-        imageIndex={0}
+        images={imageItems}
         visible={visible}
+        imageIndex={currentImageIndex}
+        backgroundColor={theme.colors.background}
+        swipeToCloseEnabled
         onRequestClose={() => setIsVisible(false)}
+        onImageIndexChange={handleIndexChange}
         presentationStyle="overFullScreen"
         FooterComponent={() => (
           <Text

@@ -21,6 +21,7 @@ import { LoaderTypes } from "../screenLoader";
 import { UploadMediaButton } from "../UploadMediaButton";
 import { useHelper } from "../../utils/helper";
 import AnimatedListItem from "../animatedListItem";
+import ImageView from "react-native-image-viewing";
 
 type Props = {
   visible: boolean;
@@ -53,6 +54,8 @@ export default function GlobalCommentsModal({
   const { themeColor } = useHelper();
   const commonStyles = useCommonStyles(theme);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [galleryVisible, setGalleryVisible] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
 
   const {
     comments,
@@ -108,6 +111,16 @@ export default function GlobalCommentsModal({
       comments,
     })
   );
+  const imageUrls = comments.filter((c) => c.image).map((c) => c.image);
+  const imageIndexMap = {};
+  let currentIndex = 0;
+
+  comments.forEach((c) => {
+    if (c.image) {
+      imageIndexMap[c._id] = currentIndex;
+      currentIndex++;
+    }
+  });
 
   return (
     <Modal
@@ -201,7 +214,6 @@ export default function GlobalCommentsModal({
                           index={index}
                         >
                           <CommentCard
-                            image={c.createdByDetails?.image}
                             url={c.image}
                             text={c.text}
                             name={
@@ -214,6 +226,11 @@ export default function GlobalCommentsModal({
                             )}
                             repeated={sameUser}
                             loading={c.loading}
+                            onImagePress={() => {
+                              const selectedIndex = imageIndexMap[c._id];
+                              setGalleryIndex(selectedIndex);
+                              setGalleryVisible(true);
+                            }}
                           />
                         </AnimatedListItem>
                       );
@@ -266,6 +283,15 @@ export default function GlobalCommentsModal({
           </KeyboardAvoidingView>
         </View>
       </View>
+      <ImageView
+        images={imageUrls.map((u) => ({ uri: u }))}
+        visible={galleryVisible}
+        imageIndex={galleryIndex}
+        onRequestClose={() => setGalleryVisible(false)}
+        swipeToCloseEnabled
+        presentationStyle="fullScreen"
+        backgroundColor={theme.colors.background}
+      />
     </Modal>
   );
 }

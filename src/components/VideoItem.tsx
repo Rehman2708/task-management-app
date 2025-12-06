@@ -202,13 +202,13 @@ function VideoItemComponent({
           <Row
             style={{
               backgroundColor: "#00000060",
-              padding: 20,
+              padding: 16,
               borderRadius: 100,
             }}
           >
             <Ionicons
               name={muted ? "volume-mute-outline" : "volume-high-outline"}
-              size={40}
+              size={36}
               color={theme.colors.white}
             />
           </Row>
