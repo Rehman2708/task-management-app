@@ -13,6 +13,7 @@ export function useProfileViewModel() {
   const [loading, setLoading] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [partnerInput, setPartnerInput] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
 
   const addPartner = async (partner: string) => {
     setLoading(true);
@@ -53,16 +54,7 @@ export function useProfileViewModel() {
       setLoggingOut(false);
     }
   };
-  const logout = () => {
-    Alert.alert("Logout", "Are you sure you want to Logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: handleLogout,
-      },
-    ]);
-  };
+
   const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
   const changeFontScreen = () => navigation.navigate(ROUTES.FONT);
 
@@ -141,7 +133,9 @@ export function useProfileViewModel() {
     loading,
     partnerId,
     addPartner,
-    logout,
+    setShowAlert,
+    showAlert,
+    handleLogout,
     changeThemeScreen,
     changeFontScreen,
     createVideoScreen,

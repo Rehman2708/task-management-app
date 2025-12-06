@@ -15,6 +15,7 @@ import { useHomeScreenViewModel } from "./homeViewModel";
 import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import AnimatedListItem from "../../components/animatedListItem";
 import { Task } from "../../types/task";
+import AlertModal from "../../components/AlertModal";
 
 export default function HomeScreen({ navigation }: any) {
   const {
@@ -24,7 +25,9 @@ export default function HomeScreen({ navigation }: any) {
     error,
     fetchTasks,
     loadMoreTasks,
-    deleteTask,
+    showAlert,
+    setShowAlert,
+    handleDeleteTask,
     tab,
     setTab,
     taskImages,
@@ -58,13 +61,22 @@ export default function HomeScreen({ navigation }: any) {
         <AnimatedListItem index={index} animate={animate}>
           <TasksCard
             item={item}
-            handleDelete={() => deleteTask(item._id!)}
+            handleDelete={() => setShowAlert(item._id)}
             isCompleted={tab === "History"}
+          />
+          <AlertModal
+            isVisible={showAlert === item._id}
+            loading={loading}
+            onClose={() => setShowAlert(undefined)}
+            onConfirm={() => handleDeleteTask(item._id!)}
+            title={"Delete Task"}
+            subTitle={"Are you sure you want to delete this task?"}
+            error
           />
         </AnimatedListItem>
       );
     },
-    [tab, deleteTask, loadingMore]
+    [tab, handleDeleteTask, loadingMore]
   );
 
   // Footer Loader

@@ -156,7 +156,7 @@ export default function ReelsScreen() {
           button={() => fetchVideos(1, false)}
           type={LoaderTypes.VideoScreen}
         />
-        <Spacer size={60} />
+        <Spacer size={96} />
       </SafeAreaView>
     );
   }
@@ -198,7 +198,7 @@ export default function ReelsScreen() {
         }
         updateCellsBatchingPeriod={50}
       />
-      <Spacer size={80} />
+      <Spacer size={96} />
     </SafeAreaView>
   );
 }

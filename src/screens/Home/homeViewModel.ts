@@ -13,7 +13,7 @@ export function useHomeScreenViewModel() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [showAlert, setShowAlert] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
@@ -83,18 +83,8 @@ export function useHomeScreenViewModel() {
       setError(err.message || "Failed to delete task");
     } finally {
       setLoading(false);
+      setShowAlert(undefined);
     }
-  };
-
-  const deleteTask = (taskId: string) => {
-    Alert.alert("Delete Task", "Are you sure you want to delete this task?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => handleDeleteTask(taskId),
-      },
-    ]);
   };
 
   const taskImages: string[] = tasks
@@ -111,7 +101,9 @@ export function useHomeScreenViewModel() {
     setTab,
     fetchTasks,
     loadMoreTasks,
-    deleteTask,
+    showAlert,
+    setShowAlert,
+    handleDeleteTask,
     taskImages,
     pageSize,
   };

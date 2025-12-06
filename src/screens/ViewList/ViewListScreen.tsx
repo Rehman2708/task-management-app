@@ -15,6 +15,7 @@ import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { AppUrl } from "../../utils/appUrl";
 import CommentsModal from "../../components/comments/commentModal";
 import AnimatedListItem from "../../components/animatedListItem";
+import AlertModal from "../../components/AlertModal";
 
 interface ViewListScreenProps {
   route: {
@@ -46,13 +47,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
   );
 
   const handleOpenComments = () => setCommentsModalVisible(true);
-
-  const handleDelete = () => {
-    Alert.alert("Delete List", "Are you sure you want to delete this list?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: deleteList },
-    ]);
-  };
+  const [showAlert, setShowAlert] = useState(false);
 
   const renderListItem = ({ item, index }: { item: any; index: number }) => (
     <AnimatedListItem index={index}>
@@ -172,7 +167,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
         />
         <CustomButton
           title="Delete"
-          onPress={handleDelete}
+          onPress={() => setShowAlert(true)}
           rounded
           halfWidth
           error
@@ -187,6 +182,17 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
           postUrl={`${AppUrl.addListComment(listId)}`}
           entityId={listId}
           setCount={setTotalComments}
+        />
+      )}
+      {showAlert && (
+        <AlertModal
+          isVisible={showAlert}
+          onClose={() => setShowAlert(false)}
+          onConfirm={deleteList}
+          title={"Delete List"}
+          subTitle={"Are you sure you want to delete this list?"}
+          error
+          loading={loading}
         />
       )}
     </View>

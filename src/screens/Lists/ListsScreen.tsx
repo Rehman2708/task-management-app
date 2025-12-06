@@ -30,6 +30,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Swiper from "react-native-deck-swiper";
 import { cardStyle } from "../Notes/NotesScreen";
 import AnimatedListItem from "../../components/animatedListItem";
+import AlertModal from "../../components/AlertModal";
 
 export default function ListsScreen() {
   const theme = useTheme();
@@ -48,7 +49,9 @@ export default function ListsScreen() {
     loadMoreLists,
     page,
     totalPages,
-    pinUnpinList,
+    handlePinUnpinList,
+    setShowAlert,
+    showAlert,
     toggleSearch,
     showSearch,
     searchLists,
@@ -78,7 +81,7 @@ export default function ListsScreen() {
     return (
       <AnimatedListItem index={index} animate={animate}>
         <Container
-          onLongPress={() => pinUnpinList(item._id, item.pinned ?? false)}
+          onLongPress={() => setShowAlert(item._id)}
           onPress={() =>
             navigation.navigate(ROUTES.VIEW_LIST, { listId: item._id })
           }
@@ -260,6 +263,14 @@ export default function ListsScreen() {
             </Column>
           </CardWrapper>
         </Container>
+        <AlertModal
+          isVisible={item._id === showAlert}
+          loading={initialLoading}
+          onClose={() => setShowAlert(undefined)}
+          onConfirm={() => handlePinUnpinList(item._id, item.pinned ?? false)}
+          title={`${!item.pinned ? "Pin" : "Unpin"} List?`}
+          subTitle={`${!item.pinned ? "Pin" : "Unpin"} this list?`}
+        />
       </AnimatedListItem>
     );
   };

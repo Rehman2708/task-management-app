@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
@@ -136,6 +137,7 @@ export default function GlobalCommentsModal({
           justifyContent: "flex-end",
         }}
       >
+        <Pressable onPress={onClose} style={{ flex: 1 }} />
         <View
           style={{
             backgroundColor: theme.colors.background,

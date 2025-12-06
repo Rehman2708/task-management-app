@@ -16,6 +16,7 @@ export function useNotesListViewModel(userId?: string) {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [showAlert, setShowAlert] = useState<string | undefined>(undefined);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
   const toggleView = () => setCardView((prev) => !prev);
@@ -79,22 +80,8 @@ export function useNotesListViewModel(userId?: string) {
       setError(err.message || "Failed to pin/unpin note");
     } finally {
       setInitialLoading(false);
+      setShowAlert(undefined);
     }
-  };
-
-  const pinUnpinNote = (noteId: string, pinned: boolean) => {
-    Alert.alert(
-      `${!pinned ? "Pin" : "Unpin"} Note?`,
-      `${!pinned ? "Pin" : "Unpin"} this note?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Confirm",
-          style: "destructive",
-          onPress: () => handlePinUnpinNote(noteId, pinned),
-        },
-      ]
-    );
   };
 
   const searchNotes = (searchText: string) => {
@@ -123,7 +110,9 @@ export function useNotesListViewModel(userId?: string) {
     error,
     fetchNotes,
     loadMoreNotes,
-    pinUnpinNote,
+    handlePinUnpinNote,
+    showAlert,
+    setShowAlert,
     searchNotes,
     page,
     totalPages,

@@ -30,6 +30,7 @@ import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import Swiper from "react-native-deck-swiper";
 import { LinearGradient } from "expo-linear-gradient";
 import AnimatedListItem from "../../components/animatedListItem";
+import AlertModal from "../../components/AlertModal";
 
 export default function NotesScreen() {
   const { formatDate, themeColor, loggedInUser } = useHelper();
@@ -43,7 +44,9 @@ export default function NotesScreen() {
     loadingMore,
     error,
     fetchNotes,
-    pinUnpinNote,
+    handlePinUnpinNote,
+    showAlert,
+    setShowAlert,
     searchNotes,
     loadMoreNotes,
     page,
@@ -75,7 +78,7 @@ export default function NotesScreen() {
     return (
       <AnimatedListItem index={index} animate={animate}>
         <Container
-          onLongPress={() => pinUnpinNote(item._id, item.pinned ?? false)}
+          onLongPress={() => setShowAlert(item._id)}
           onPress={() =>
             navigation.navigate(ROUTES.VIEW_NOTE, { noteId: item._id })
           }
@@ -217,6 +220,14 @@ export default function NotesScreen() {
             </Column>
           </CardWrapper>
         </Container>
+        <AlertModal
+          isVisible={showAlert === item._id}
+          loading={initialLoading}
+          onClose={() => setShowAlert(undefined)}
+          onConfirm={() => handlePinUnpinNote(item._id, item.pinned ?? false)}
+          title={`${!item.pinned ? "Pin" : "Unpin"} Note?`}
+          subTitle={`${!item.pinned ? "Pin" : "Unpin"} this note?`}
+        />
       </AnimatedListItem>
     );
   };

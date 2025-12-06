@@ -22,6 +22,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ScreenLoader from "../../components/screenLoader";
 import ImageView from "react-native-image-viewing";
 import AnimatedListItem from "../../components/animatedListItem";
+import AlertModal from "../../components/AlertModal";
 
 export default function ProfileScreen() {
   const {
@@ -29,7 +30,9 @@ export default function ProfileScreen() {
     loading,
     partnerId,
     addPartner,
-    logout,
+    setShowAlert,
+    showAlert,
+    handleLogout,
     changeThemeScreen,
     changeFontScreen,
     createVideoScreen,
@@ -292,7 +295,10 @@ export default function ProfileScreen() {
                   </AnimatedListItem>
                 );
               })}
-              <TouchableOpacity disabled={loggingOut} onPress={logout}>
+              <TouchableOpacity
+                disabled={loggingOut}
+                onPress={() => setShowAlert(true)}
+              >
                 <Row
                   style={[{ height: 50 }]}
                   justifyContent="center"
@@ -340,6 +346,17 @@ export default function ProfileScreen() {
           </Text>
         )}
       />
+      {showAlert && (
+        <AlertModal
+          isVisible={showAlert}
+          onClose={() => setShowAlert(false)}
+          onConfirm={handleLogout}
+          title={"Logout"}
+          subTitle={"Are you sure you want to Logout?"}
+          error
+          loading={loggingOut}
+        />
+      )}
     </ScreenWrapper>
   );
 }

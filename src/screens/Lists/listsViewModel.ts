@@ -17,6 +17,7 @@ export function useListsViewModel(userId?: string) {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [showAlert, setShowAlert] = useState<string | undefined>(undefined);
 
   const toggleSearch = () => setShowSearch((prev) => !prev);
   const toggleView = () => setCardView((prev) => !prev);
@@ -76,22 +77,8 @@ export function useListsViewModel(userId?: string) {
       setError(err.message || "Failed to pin/unpin list");
     } finally {
       setInitialLoading(false);
+      setShowAlert(undefined);
     }
-  };
-
-  const pinUnpinList = (listId: string, pinned: boolean) => {
-    Alert.alert(
-      `${!pinned ? "Pin" : "Unpin"} List?`,
-      `${!pinned ? "Pin" : "Unpin"} this list?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Confirm",
-          style: "destructive",
-          onPress: () => handlePinUnpinList(listId, pinned),
-        },
-      ]
-    );
   };
 
   const searchLists = (searchText: string) => {
@@ -121,7 +108,9 @@ export function useListsViewModel(userId?: string) {
     error,
     fetchLists,
     loadMoreLists,
-    pinUnpinList,
+    handlePinUnpinList,
+    showAlert,
+    setShowAlert,
     searchLists,
     page,
     totalPages,

@@ -16,6 +16,7 @@ import EmptyState from "../../components/emptyState";
 import { AppUrl } from "../../utils/appUrl";
 import CommentsModal from "../../components/comments/commentModal";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
+import AlertModal from "../../components/AlertModal";
 
 interface NoteDetailScreenProps {
   route: {
@@ -39,6 +40,7 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState<Note>();
   const [gettingNote, setGettingNote] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [commentsModalVisible, setCommentsModalVisible] = useState(
     showComments ?? false
   );
@@ -74,16 +76,6 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
     }
   };
 
-  const handleDelete = () => {
-    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: deleteNote,
-      },
-    ]);
-  };
   useEffect(() => {});
   useEffect(() => {
     getNote();
@@ -153,7 +145,7 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
           />
           <CustomButton
             title="Delete"
-            onPress={handleDelete}
+            onPress={() => setShowAlert(true)}
             halfWidth
             rounded
             error
@@ -169,6 +161,17 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
           postUrl={`${AppUrl.addNoteComment(note._id)}`}
           entityId={note._id}
           setCount={setTotalComments}
+        />
+      )}
+      {showAlert && (
+        <AlertModal
+          isVisible={showAlert}
+          onClose={() => setShowAlert(false)}
+          onConfirm={deleteNote}
+          title={"Delete Note"}
+          subTitle={"Are you sure you want to delete this note?"}
+          error
+          loading={loading}
         />
       )}
     </View>
