@@ -50,7 +50,7 @@ const ScreenWrapper = ({
           noPadding && { paddingHorizontal: 0 },
         ]}
       >
-        <Spacer size={isAndroid ? (subTitle ? 10 : 20) : 0} />
+        <Spacer size={isAndroid ? (subTitle ? 10 : 16) : 0} />
 
         <View style={{ height: title ? 80 + insets.top : 0 }}>
           <Spacer size={insets.top} />
