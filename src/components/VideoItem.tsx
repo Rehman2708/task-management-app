@@ -233,7 +233,7 @@ function VideoItemComponent({
                 onPress={() => navigation.goBack()}
                 name="chevron-back-outline"
                 color={theme.colors.white}
-                size={30}
+                size={26}
               />
             )}
             <Text

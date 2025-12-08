@@ -23,6 +23,12 @@ export class VideoRepo {
     return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 
+  // Get single video
+  static async getSingleVideo(videoId: string) {
+    const url = AppUrl.getSingleVideo(videoId);
+    return ApiService.getApiResponse(url, HttpMethods.GET);
+  }
+
   // get all videos list
   static async getAllVideosList(ownerUserId: string) {
     const url = `${AppUrl.getAllVideos}/all/${ownerUserId}`;

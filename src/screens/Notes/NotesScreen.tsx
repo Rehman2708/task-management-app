@@ -249,7 +249,7 @@ export default function NotesScreen() {
         <TouchableOpacity onPress={toggleView}>
           <Ionicons
             name={cardView ? "grid-outline" : "tablet-portrait-outline"}
-            size={30}
+            size={26}
             color={theme.colors.white}
           />
         </TouchableOpacity>

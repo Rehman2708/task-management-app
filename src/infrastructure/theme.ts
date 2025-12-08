@@ -38,7 +38,7 @@ export function useTheme() {
       sm: 14,
       md: 15,
       lg: 17,
-      xl: 20,
+      xl: 19,
     },
     radius: {
       sm: 4,

@@ -78,6 +78,8 @@ export class AppUrl {
 
   // 🔹 Videos APIs
   public static getAllVideos = `${this.BASE_URL}/videos`;
+  public static getSingleVideo = (id: string) =>
+    `${this.BASE_URL}/videos/video/${id}`;
   public static createVideo = `${this.BASE_URL}/videos`;
   public static deleteVideo = (id: string) => `${this.BASE_URL}/videos/${id}`;
   public static markVideoAsViewed = (videoId: string) =>

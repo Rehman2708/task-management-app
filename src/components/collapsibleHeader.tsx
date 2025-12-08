@@ -217,7 +217,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
         >
           <Ionicons
             name="arrow-back-outline"
-            size={30}
+            size={26}
             color={theme.colors.white}
           />
         </TouchableOpacity>
@@ -225,7 +225,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
           <TouchableOpacity onPress={() => setShowImage(true)}>
             <Ionicons
               name="expand-outline"
-              size={30}
+              size={26}
               color={theme.colors.white}
             />
           </TouchableOpacity>

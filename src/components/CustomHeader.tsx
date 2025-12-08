@@ -65,7 +65,7 @@ const CustomHeader = ({
             >
               <Ionicons
                 name="arrow-back-outline"
-                size={30}
+                size={26}
                 color={whiteBg ? theme.colors.text : theme.colors.white}
               />
             </TouchableOpacity>
@@ -136,7 +136,7 @@ const CustomHeader = ({
             <TouchableOpacity onPress={onSearchPress}>
               <Ionicons
                 name="search"
-                size={30}
+                size={26}
                 color={whiteBg ? theme.colors.text : theme.colors.white}
               />
             </TouchableOpacity>
@@ -155,7 +155,7 @@ const CustomHeader = ({
               >
                 <Ionicons
                   name="notifications-outline"
-                  size={30}
+                  size={26}
                   color={whiteBg ? theme.colors.text : theme.colors.white}
                 />
               </TouchableOpacity>
