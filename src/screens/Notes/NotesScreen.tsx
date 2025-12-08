@@ -169,7 +169,7 @@ export default function NotesScreen() {
                   <Avatar
                     name={
                       item?.createdByDetails
-                        ? item.createdByDetails.name.split(" ")[0]
+                        ? item.createdByDetails.name
                         : item.createdBy
                     }
                     image={item?.createdByDetails?.image}

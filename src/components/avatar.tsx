@@ -82,7 +82,7 @@ const Avatar: React.FC<AvatarProps> = ({
               style={[commonStyles.tTinyText, { fontSize: size * 0.6 }]}
               numberOfLines={1}
             >
-              {name}
+              {getInitials(name, true)}
             </Text>
           </>
         )}

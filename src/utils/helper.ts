@@ -15,10 +15,16 @@ export function useHelper() {
 
   const loggedInUser = user;
 
-  function getInitials(name = "") {
+  function getInitials(name = "", returnFullFirstName = false) {
     if (!name || typeof name !== "string") return "";
     const parts = name.trim().split(" ").filter(Boolean);
     if (parts.length === 0) return "";
+    if (returnFullFirstName) {
+      if (parts.length >= 2) {
+        return `${parts[0]} ${parts[1]}`.trim();
+      }
+      return parts[0];
+    }
     if (parts.length === 1) {
       return parts[0].substring(0, 2).toUpperCase();
     }
