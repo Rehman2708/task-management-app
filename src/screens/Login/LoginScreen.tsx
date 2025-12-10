@@ -11,8 +11,8 @@ import { useTheme } from "../../infrastructure/theme";
 
 export const LoginScreen = () => {
   const {
-    userId,
-    setUserId,
+    identifier,
+    setIdentifier,
     password,
     setPassword,
     loading,
@@ -42,9 +42,9 @@ export const LoginScreen = () => {
           <Text style={commonStyles.titleText}>Login</Text>
           <Spacer size={20} />
           <CustomInput
-            title="User ID"
-            value={userId}
-            onChangeText={setUserId}
+            title="Email or User ID"
+            value={identifier}
+            onChangeText={setIdentifier}
           />
           <CustomInput
             title="Password"
@@ -57,7 +57,10 @@ export const LoginScreen = () => {
 
           <CustomButton title="Login" onPress={handleLogin} loading={loading} />
           <CustomButton
-            customStyle={{ borderWidth: 0 }}
+            customStyle={{
+              borderWidth: 0,
+              height: 30,
+            }}
             title="Register"
             outlined
             onPress={Register}

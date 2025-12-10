@@ -18,12 +18,16 @@ export function useProfileViewModel() {
   const addPartner = async (partner: string) => {
     setLoading(true);
     try {
-      if (!user) return;
+      if (!user) {
+        Alert.alert("Error", "User not found");
+        return false;
+      }
+
       const response = await AuthRepo.connectPartner({
         userId: user.userId,
         partnerUserId: partner,
       });
-      if (response.success) {
+      if (response?.success && response?.user) {
         updateUser(response.user);
       }
     } catch (err) {
@@ -61,6 +65,7 @@ export function useProfileViewModel() {
   const createVideoScreen = () => navigation.navigate(ROUTES.CREATE_VIDEO);
   const resetPasswordScreen = () => navigation.navigate(ROUTES.RESET_PASSWORD);
   const updateProfileScreen = () => navigation.navigate(ROUTES.UPDATE_PROFILE);
+  const addEmailScreen = () => navigation.navigate(ROUTES.ADD_EMAIL);
 
   function startCountdown(
     targetDate: Date | string,
@@ -148,5 +153,6 @@ export function useProfileViewModel() {
     loadingUserDetail,
     fetchUserDetails,
     resetPasswordScreen,
+    addEmailScreen,
   };
 }

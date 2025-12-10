@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   Pressable,
@@ -45,6 +45,7 @@ export default function ProfileScreen() {
     loadingUserDetail,
     fetchUserDetails,
     resetPasswordScreen,
+    addEmailScreen,
   } = useProfileViewModel();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -55,6 +56,11 @@ export default function ProfileScreen() {
   const [footerText, setFooterText] = useState(
     currentImageIndex === 0 ? user?.about : user?.partner?.about
   );
+
+  // Update footer text when user or partner data changes
+  useEffect(() => {
+    setFooterText(currentImageIndex === 0 ? user?.about : user?.partner?.about);
+  }, [user?.about, user?.partner?.about, currentImageIndex]);
   const imageItems = [];
 
   if (user?.image) {
@@ -77,6 +83,15 @@ export default function ProfileScreen() {
       title: "Update profile",
       onPress: updateProfileScreen,
     },
+    // Show "Add Email" option only for users without email
+    ...(!user?.email
+      ? [
+          {
+            title: "Add Email",
+            onPress: addEmailScreen,
+          },
+        ]
+      : []),
     {
       title: "Change theme",
       onPress: changeThemeScreen,
@@ -96,7 +111,7 @@ export default function ProfileScreen() {
   ];
   return (
     <ScreenWrapper title="Profile" noPadding>
-      {loading ? (
+      {loadingUserDetail ? (
         <ScreenLoader />
       ) : (
         <>
@@ -205,6 +220,12 @@ export default function ProfileScreen() {
                   {user?.name || "N/A"}
                 </Text>
               </Row>
+              {user?.email && (
+                <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
+                  <Text style={[commonStyles.smallText]}>Email:</Text>
+                  <Text style={[commonStyles.subTitleText]}>{user.email}</Text>
+                </Row>
+              )}
               {user?.about && (
                 <Row gap={isAndroid ? 6 : 8}>
                   <Text style={[commonStyles.smallText]}>About me:</Text>
@@ -258,13 +279,16 @@ export default function ProfileScreen() {
                   <CustomButton
                     title="Add"
                     outlined
-                    onPress={() => {
+                    loading={loading}
+                    onPress={async () => {
                       if (!partnerInput) {
                         Alert.alert("Error", "Please enter Partner ID");
                         return;
                       }
-                      addPartner(partnerInput);
-                      setPartnerInput("");
+                      const success = await addPartner(partnerInput);
+                      if (success) {
+                        setPartnerInput("");
+                      }
                     }}
                   />
                 </Column>

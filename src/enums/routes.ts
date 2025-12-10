@@ -21,5 +21,6 @@ export enum ROUTES {
   FONT = "Font",
   SINGLE_VIDEO = "SingleVideo",
   UPDATE_PROFILE = "UpdateProfile",
+  ADD_EMAIL = "AddEmail",
   NOTIFICATION = "Notification",
 }

@@ -15,28 +15,42 @@ export const RegisterScreen = () => {
   const {
     name,
     setName,
-    userId,
-    setUserId,
+    email,
+    setEmail,
     password,
     setPassword,
     partnerUserId,
     setPartnerUserId,
+    otp,
+    setOtp,
     loading,
+    otpLoading,
     error,
-    registerUser,
+    otpSent,
+    sendOTP,
+    verifyOTPAndRegister,
+    resendOTP,
     setIsValidPassword,
     isValidPassword,
   } = useRegisterViewModel();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
 
-  const handleRegister = async () => {
+  const handleSendOTP = async () => {
     try {
-      await registerUser();
+      await sendOTP();
     } catch (err) {}
   };
+
+  const handleVerifyOTP = async () => {
+    try {
+      await verifyOTPAndRegister();
+    } catch (err) {}
+  };
+
   const { navigate }: { navigate: any } = useNavigation();
   const Login = () => navigate(ROUTES.LOGIN);
+
   return (
     <AuthBgContainer>
       <KeyboardAwareScrollView
@@ -50,31 +64,82 @@ export const RegisterScreen = () => {
         <Text style={commonStyles.titleText}>Register</Text>
         <Spacer size={20} />
 
-        <CustomInput title="Name" value={name} onChangeText={setName} />
-        <CustomInput title="User ID" value={userId} onChangeText={setUserId} />
-        <CustomInput
-          title="Password"
-          value={password}
-          secureTextEntry
-          onChangeText={setPassword}
-          onValidate={setIsValidPassword}
-        />
-        <CustomInput
-          title="Partner User ID (Optional)"
-          value={partnerUserId}
-          onChangeText={setPartnerUserId}
-        />
+        {!otpSent ? (
+          <>
+            <CustomInput title="Name" value={name} onChangeText={setName} />
+            <CustomInput
+              title="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+            <CustomInput
+              title="Password"
+              value={password}
+              secureTextEntry
+              onChangeText={setPassword}
+              onValidate={setIsValidPassword}
+            />
+            <CustomInput
+              title="Partner User ID (Optional)"
+              value={partnerUserId}
+              onChangeText={setPartnerUserId}
+            />
 
-        {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
+            {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
+
+            <CustomButton
+              title="Send OTP"
+              onPress={handleSendOTP}
+              loading={otpLoading}
+              disabled={!isValidPassword}
+            />
+          </>
+        ) : (
+          <>
+            <Text
+              style={[
+                commonStyles.basicText,
+                { textAlign: "center", marginBottom: 20 },
+              ]}
+            >
+              We've sent a 6-digit OTP to {email}
+            </Text>
+
+            <CustomInput
+              title="Enter OTP"
+              value={otp}
+              onChangeText={setOtp}
+              keyboardType="numeric"
+              maxLength={6}
+            />
+
+            {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
+
+            <CustomButton
+              title="Verify & Register"
+              onPress={handleVerifyOTP}
+              loading={loading}
+            />
+
+            <CustomButton
+              customStyle={{
+                borderWidth: 0,
+                height: 30,
+              }}
+              title="Resend OTP"
+              onPress={resendOTP}
+              outlined
+              loading={otpLoading}
+            />
+          </>
+        )}
 
         <CustomButton
-          title="Register"
-          onPress={handleRegister}
-          loading={loading}
-          disabled={!isValidPassword}
-        />
-        <CustomButton
-          customStyle={{ borderWidth: 0 }}
+          customStyle={{
+            borderWidth: 0,
+            height: 30,
+          }}
           title="Login"
           onPress={Login}
           outlined

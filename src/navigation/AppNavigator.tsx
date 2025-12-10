@@ -19,6 +19,7 @@ import FontScreen from "../screens/theme/FontScreen";
 import CreateListScreen from "../screens/CreateList/CreateListScreen";
 import ViewListScreen from "../screens/ViewList/ViewListScreen";
 import ResetPasswordScreen from "../screens/ResetPassword/ResetPasswordScreen";
+import { AddEmailScreen } from "../screens/AddEmail/AddEmailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -53,6 +54,7 @@ export default function AppNavigator() {
         name={ROUTES.RESET_PASSWORD}
         component={ResetPasswordScreen}
       />
+      <Stack.Screen name={ROUTES.ADD_EMAIL} component={AddEmailScreen} />
     </Stack.Navigator>
   );
 }
