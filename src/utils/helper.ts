@@ -34,6 +34,8 @@ export function useHelper() {
     return (first + last).toUpperCase();
   }
   const formatDate = (date: string | Date, formatType = "both") => {
+    if (!date) return "";
+
     const months = [
       "Jan",
       "Feb",
@@ -50,20 +52,40 @@ export function useHelper() {
     ];
 
     const d = new Date(date);
-    const day = d.getDate(); // Day of month
-    const month = months[d.getMonth()]; // Month short name
-    const year = String(d.getFullYear()).slice(-2); // Last 2 digits of year
+    const day = d.getDate();
+    const month = months[d.getMonth()];
+    const year = String(d.getFullYear()).slice(-2);
     const hours = d.getHours().toString().padStart(2, "0");
     const minutes = d.getMinutes().toString().padStart(2, "0");
 
     const formattedDate = `${day} ${month} ${year}`;
     const formattedTime = `${hours}:${minutes}`;
-    if (!date) return "";
-    if (formatType === "date") return formattedDate;
-    if (formatType === "time") return formattedTime;
-    if (formatType === "both") return `${formattedDate}, ${formattedTime}`;
 
-    return formattedDate; // fallback
+    // TODAY / YESTERDAY LOGIC
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const isSameDay = (a: Date, b: Date) =>
+      a.getDate() === b.getDate() &&
+      a.getMonth() === b.getMonth() &&
+      a.getFullYear() === b.getFullYear();
+
+    let relativeText = formattedDate;
+    if (isSameDay(d, today)) relativeText = "Today";
+    else if (isSameDay(d, yesterday)) relativeText = "Yesterday";
+
+    // FINAL FORMATS
+    if (formatType === "date") {
+      return relativeText;
+    }
+
+    if (formatType === "time") {
+      return formattedTime;
+    }
+
+    // formatType === "both"
+    return `${relativeText}, ${formattedTime}`;
   };
 
   const getPriorityColor = (priority: Priority): string => {

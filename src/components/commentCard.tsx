@@ -77,7 +77,7 @@ const CommentCard = ({
           onPress={onImagePress}
           style={{
             width: imgSize?.w ?? dimensions.width * 0.55,
-            height: imgSize?.h ?? 220,
+            height: imgSize?.h ?? dimensions.width * 0.7,
             borderRadius: 10,
             overflow: "hidden",
             backgroundColor: isMyChat

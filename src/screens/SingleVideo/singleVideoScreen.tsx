@@ -46,7 +46,7 @@ const SingleVideoScreen = () => {
             text={"Something went wrong"}
             type={LoaderTypes.VideoScreen}
           />
-          <Spacer size={24} />
+          <Spacer size={18} />
         </>
       ) : (
         <VideoItem
