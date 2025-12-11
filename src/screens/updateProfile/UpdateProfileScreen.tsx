@@ -13,6 +13,7 @@ import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { useTheme } from "../../infrastructure/theme";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import ToastService from "../../utils/toastService";
 
 const UpdateProfileScreen = () => {
   const { user, updateUser } = useAuthStore();
@@ -48,9 +49,17 @@ const UpdateProfileScreen = () => {
       });
 
       if (res?.user) {
+        ToastService.success({
+          title: "Profile updated",
+          message: "Profile updated successfully!",
+        });
         updateUser(res.user);
       }
     } catch (error) {
+      ToastService.error({
+        title: "Update profile error",
+        message: error as string,
+      });
       console.log("Update profile error:", error);
     } finally {
       setLoading(false);

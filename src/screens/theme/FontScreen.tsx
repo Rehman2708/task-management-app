@@ -8,13 +8,14 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { useCommonStyles } from "../../styles/commonstyles";
-import { Column, Row } from "../../tools";
+import { Column, Row, Spacer } from "../../tools";
 import { useAuthStore } from "../../store/authStore";
 import { AuthRepo } from "../../repositories/auth";
 import { useHelper } from "../../utils/helper";
 import { useTheme } from "../../infrastructure/theme";
 import { fontMap, FontName } from "../../../assets/fonts";
 import { ROUTES } from "../../enums/routes";
+import ToastService from "../../utils/toastService";
 
 const FontScreen = () => {
   const navigation: any = useNavigation();
@@ -39,6 +40,10 @@ const FontScreen = () => {
         const res = await AuthRepo.updateFont({ userId: user.userId, font });
         if (res?.user) {
           updateUser(res.user);
+          ToastService.success({
+            title: "Font updated",
+            message: "Font updated successfully!",
+          });
           navigation.navigate(ROUTES.SPLASH);
         }
       } catch (error) {
@@ -104,6 +109,7 @@ const FontScreen = () => {
             );
           })}
         </Column>
+        <Spacer size={50} />
       </ScrollView>
     </ScreenWrapper>
   );
