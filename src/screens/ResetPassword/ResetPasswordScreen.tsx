@@ -6,6 +6,7 @@ import CustomButton from "../../components/customButton";
 import { AuthRepo } from "../../repositories/auth";
 import { useAuthStore } from "../../store/authStore";
 import { useNavigation } from "@react-navigation/native";
+import ToastService from "../../utils/toastService";
 
 const ResetPasswordScreen = () => {
   const [form, setForm] = useState({ oldPassword: "", newPassword: "" });
@@ -19,7 +20,10 @@ const ResetPasswordScreen = () => {
 
   const resetPassword = async () => {
     if (!form.oldPassword || !form.newPassword) {
-      Alert.alert("Missing Information", "Please fill in all fields.");
+      ToastService.error({
+        title: "Missing Information",
+        message: "Please fill in all fields",
+      });
       return;
     }
 
@@ -32,10 +36,17 @@ const ResetPasswordScreen = () => {
       });
       if (response.user) {
         updateUser(response.user);
+        ToastService.success({
+          title: "Password updated",
+          message: "Password updated successfully!",
+        });
         navigation.goBack();
       }
     } catch (err: any) {
-      Alert.alert("Error", err.message);
+      ToastService.error({
+        title: "Error",
+        message: err.message,
+      });
     } finally {
       setLoading(false);
     }

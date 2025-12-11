@@ -23,6 +23,7 @@ import ScreenLoader from "../../components/screenLoader";
 import ImageView from "react-native-image-viewing";
 import AnimatedListItem from "../../components/animatedListItem";
 import AlertModal from "../../components/AlertModal";
+import ToastService from "../../utils/toastService";
 
 export default function ProfileScreen() {
   const {
@@ -282,7 +283,10 @@ export default function ProfileScreen() {
                     loading={loading}
                     onPress={async () => {
                       if (!partnerInput) {
-                        Alert.alert("Error", "Please enter Partner ID");
+                        ToastService.error({
+                          title: "Error",
+                          message: "Please enter Partner ID",
+                        });
                         return;
                       }
                       const success = await addPartner(partnerInput);

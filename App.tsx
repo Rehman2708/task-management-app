@@ -11,13 +11,16 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useCommonStyles } from "./src/styles/commonstyles";
 import { FontAsset } from "./assets/fonts";
 import { useTheme } from "./src/infrastructure/theme";
-import { StatusBar } from "react-native";
+import { StatusBar, TextInput, Text } from "react-native";
 import * as Notifications from "expo-notifications";
 import { useNotificationStore } from "./src/store/notificationStore";
 import { useNetwork } from "./src/utils/useNetwork";
 import OfflineScreen from "./src/screens/OfflineScreen/OfflineScreen";
 import * as NavigationBar from "expo-navigation-bar";
 import { isAndroid } from "./src/tools";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "./src/utils/toastConfig";
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -70,6 +73,12 @@ export default function App() {
     setupNotifications();
   }, []);
 
+  (Text as any).defaultProps = (Text as any).defaultProps || {};
+  (Text as any).defaultProps.allowFontScaling = false;
+
+  (TextInput as any).defaultProps = (TextInput as any).defaultProps || {};
+  (TextInput as any).defaultProps.allowFontScaling = false;
+
   if (!fontsLoaded) return null;
 
   return (
@@ -91,6 +100,7 @@ export default function App() {
         <StatusBar backgroundColor={"#00000030"} translucent />
         {!isConnected ? <OfflineScreen /> : <AppNavigator />}
       </NavigationContainer>
+      <Toast config={toastConfig} />
     </GestureHandlerRootView>
   );
 }

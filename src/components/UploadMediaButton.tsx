@@ -7,6 +7,7 @@ import { Row, Spacer } from "../tools";
 import { UploadRepo } from "../repositories/upload";
 import { useCommonStyles } from "../styles/commonstyles";
 import { useTheme } from "../infrastructure/theme";
+import ToastService from "../utils/toastService";
 
 interface UploadMediaButtonProps {
   onUploadSuccess: (url: string) => Promise<void | "">;
@@ -45,7 +46,10 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
       if (fromCamera) {
         const { status } = await Camera.requestCameraPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert("Permission Denied", "Camera access is required");
+          ToastService.error({
+            title: "Permission Denied",
+            message: "Camera access is required",
+          });
           return;
         }
       }
@@ -79,16 +83,19 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
         asset.fileSize &&
         asset.fileSize > maxVideoSizeMB * 1024 * 1024
       ) {
-        return Alert.alert(
-          "Video too large",
-          `Please select a video smaller than ${maxVideoSizeMB} MB.`
-        );
+        return ToastService.error({
+          title: "Video too large",
+          message: `Please select a video smaller than ${maxVideoSizeMB} MB.`,
+        });
       }
 
       await uploadMedia(asset, fromCamera);
     } catch (err) {
       console.log("[SELECT MEDIA ERROR]", err);
-      Alert.alert("Upload Error", "Something went wrong");
+      ToastService.error({
+        title: "Upload Error",
+        message: "Something went wrong",
+      });
     } finally {
     }
   };
@@ -130,12 +137,12 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
       }
     } catch (err: any) {
       console.log("[UPLOAD ERROR]", err);
-      Alert.alert(
-        "Upload Failed",
-        isVideo
-          ? "Video upload failed. Try a smaller file or check your connection."
-          : "Something went wrong - try again."
-      );
+      ToastService.error({
+        title: "Upload Failed",
+        message: isVideo
+          ? "Video upload failed. Try a smaller file or check your connection"
+          : "Something went wrong - try again",
+      });
     } finally {
       setLoading(false);
       if (setLoader) {

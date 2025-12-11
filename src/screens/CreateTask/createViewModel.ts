@@ -13,6 +13,7 @@ import {
 } from "../../types/task";
 import { useAuthStore } from "../../store/authStore";
 import { useUtilStore } from "../../store/utils";
+import ToastService from "../../utils/toastService";
 
 export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
   const { user } = useAuthStore();
@@ -91,7 +92,10 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
 
   const saveTask = async () => {
     if (!title) {
-      console.warn("Title is required");
+      ToastService.warning({
+        title: "Title missing",
+        message: "Title is required",
+      });
       return;
     }
 
@@ -127,6 +131,10 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
       let response;
       if (initialTask?._id && !repeat) {
         response = await TaskRepo.updateTask(initialTask._id, payload);
+        ToastService.success({
+          title: "Task updated",
+          message: "Task updated successfully!",
+        });
       } else {
         response = await TaskRepo.createTask(payload);
       }

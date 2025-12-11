@@ -6,6 +6,7 @@ import { IUser } from "../../types/auth";
 import * as Device from "expo-device";
 import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
+import ToastService from "../../utils/toastService";
 
 export function useProfileViewModel() {
   const { updateUser, user, logout: storeLogout } = useAuthStore();
@@ -19,7 +20,10 @@ export function useProfileViewModel() {
     setLoading(true);
     try {
       if (!user) {
-        Alert.alert("Error", "User not found");
+        ToastService.error({
+          title: "Error",
+          message: "User not found",
+        });
         return false;
       }
 

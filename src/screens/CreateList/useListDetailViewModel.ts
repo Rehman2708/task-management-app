@@ -9,6 +9,7 @@ import {
 import { useUtilStore } from "../../store/utils";
 import { useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
+import ToastService from "../../utils/toastService";
 
 export function useListDetailViewModel(list?: List) {
   const { refetchLists } = useUtilStore();
@@ -63,6 +64,10 @@ export function useListDetailViewModel(list?: List) {
           userId: loggedInUser?.userId ?? "",
         };
         const updated = await ListsRepo.updateList(list._id, payload);
+        ToastService.success({
+          title: "List updated",
+          message: "List updated successfully!",
+        });
         setItems(updated.items);
       } else {
         const payload: CreateListPayload = {
