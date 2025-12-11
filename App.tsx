@@ -72,9 +72,14 @@ export default function App() {
                 const actionIdentifier = response?.actionIdentifier;
                 const userText = response?.userText;
 
-                console.log("📱 Notification response:", {
+                console.log("📱 Notification response received:", {
                   actionIdentifier,
+                  userText: userText
+                    ? `"${userText.substring(0, 30)}..."`
+                    : null,
                   hasData: !!data,
+                  dataType: data?.type,
+                  dataKeys: data ? Object.keys(data) : [],
                 });
 
                 // Handle notification action buttons
@@ -95,9 +100,19 @@ export default function App() {
                   const userId = useAuthStore.getState().user?.userId;
 
                   if (userId) {
+                    console.log("📱 Sending comment reply for user:", userId);
                     await handleCommentReply(userText, data, userId);
                   } else {
                     console.warn("❌ No user ID found for comment reply");
+                    // Show error notification
+                    await Notifications.scheduleNotificationAsync({
+                      content: {
+                        title: "❌ Error",
+                        body: "Please log in to reply to comments.",
+                        data: { type: "error" },
+                      },
+                      trigger: null,
+                    });
                   }
                 } else if (actionIdentifier?.startsWith("view")) {
                   // Handle view actions (view_task, view_note, view_list, view_video)

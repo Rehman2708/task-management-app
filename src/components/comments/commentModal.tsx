@@ -8,6 +8,7 @@ import {
   Keyboard,
   Pressable,
 } from "react-native";
+import { memo, useMemo, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
@@ -40,6 +41,51 @@ type GroupedComments = {
   comments: IComment[];
 };
 
+// Memoized Comment Item Component for better performance
+const CommentItem = memo(
+  ({
+    comment,
+    index,
+    prevComment,
+    formatDate,
+    onImagePress,
+  }: {
+    comment: IComment;
+    index: number;
+    prevComment?: IComment;
+    formatDate: (date: string | Date, type: string) => string;
+    onImagePress: () => void;
+  }) => {
+    const sameUser =
+      index > 0 &&
+      (comment.createdBy || comment.by) ===
+        (prevComment?.createdBy || prevComment?.by);
+
+    return (
+      <AnimatedListItem
+        key={comment._id ?? `${comment.by}-${index}`}
+        index={index}
+      >
+        <CommentCard
+          url={comment.image}
+          text={comment.text}
+          name={
+            comment.createdByDetails?.name ?? comment.createdBy ?? comment.by
+          }
+          userId={comment.createdBy ?? comment.by}
+          time={formatDate(
+            comment.date ?? comment.createdAt ?? new Date(),
+            "time"
+          )}
+          repeated={sameUser}
+          loading={comment.loading}
+          onImagePress={onImagePress}
+        />
+      </AnimatedListItem>
+    );
+  }
+);
+
 export default function GlobalCommentsModal({
   visible,
   onClose,
@@ -64,7 +110,6 @@ export default function GlobalCommentsModal({
     setNewComment,
     addingComment,
     handleAddComment,
-    flatListRef,
     formatDate,
     isFetching,
     initialLoading,
@@ -94,34 +139,57 @@ export default function GlobalCommentsModal({
     };
   }, []);
 
-  const groupCommentsByDate = (comments: IComment[]) =>
-    comments.reduce<Record<string, IComment[]>>((acc, comment) => {
-      const dateKey = new Date(comment.date ?? comment.createdAt ?? new Date())
-        .toISOString()
-        .split("T")[0];
+  // Memoized data processing for better performance
+  const { groupedArray, imageUrls, imageIndexMap } = useMemo(() => {
+    const groupCommentsByDate = (comments: IComment[]) =>
+      comments.reduce<Record<string, IComment[]>>((acc, comment) => {
+        const dateKey = new Date(
+          comment.date ?? comment.createdAt ?? new Date()
+        )
+          .toISOString()
+          .split("T")[0];
 
-      if (!acc[dateKey]) acc[dateKey] = [];
-      acc[dateKey].push(comment);
-      return acc;
-    }, {});
+        if (!acc[dateKey]) acc[dateKey] = [];
+        acc[dateKey].push(comment);
+        return acc;
+      }, {});
 
-  const groupedComments = groupCommentsByDate(comments);
-  const groupedArray = Object.entries(groupedComments).map(
-    ([date, comments]) => ({
-      date,
-      comments,
-    })
+    const groupedComments = groupCommentsByDate(comments);
+    const groupedArray = Object.entries(groupedComments)
+      .map(([date, comments]) => ({
+        date,
+        comments, // Keep original order within each date group
+      }))
+      .reverse(); // Reverse date groups for inverted FlatList
+
+    const imageUrls = comments.filter((c) => c.image).map((c) => c.image);
+    const imageIndexMap: Record<string, number> = {};
+    let currentIndex = 0;
+
+    comments.forEach((c) => {
+      if (c.image && c._id) {
+        imageIndexMap[c._id] = currentIndex;
+        currentIndex++;
+      }
+    });
+
+    return { groupedArray, imageUrls, imageIndexMap };
+  }, [comments]);
+
+  // Memoized handlers
+  const handleImagePress = useCallback(
+    (commentId: string) => {
+      if (commentId && imageIndexMap[commentId] !== undefined) {
+        setGalleryIndex(imageIndexMap[commentId]);
+        setGalleryVisible(true);
+      }
+    },
+    [imageIndexMap]
   );
-  const imageUrls = comments.filter((c) => c.image).map((c) => c.image);
-  const imageIndexMap = {};
-  let currentIndex = 0;
 
-  comments.forEach((c) => {
-    if (c.image) {
-      imageIndexMap[c._id] = currentIndex;
-      currentIndex++;
-    }
-  });
+  const handleSendComment = useCallback(() => {
+    handleAddComment();
+  }, [handleAddComment]);
 
   return (
     <Modal
@@ -173,12 +241,17 @@ export default function GlobalCommentsModal({
               />
             ) : (
               <FlatList<GroupedComments>
-                ref={flatListRef as any}
                 data={groupedArray}
                 keyExtractor={(item) => item.date}
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={{ paddingHorizontal: 12, flexGrow: 1 }}
                 showsVerticalScrollIndicator={false}
+                inverted
+                removeClippedSubviews={true}
+                maxToRenderPerBatch={10}
+                windowSize={10}
+                initialNumToRender={15}
+                getItemLayout={undefined} // Let FlatList handle dynamic heights
                 renderItem={({ item }) => (
                   <View>
                     {/* Date Header */}
@@ -205,38 +278,16 @@ export default function GlobalCommentsModal({
                     </Row>
 
                     {/* Comments */}
-                    {item.comments.map((c, index) => {
-                      const prev = item.comments[index - 1];
-                      const sameUser =
-                        index > 0 &&
-                        (c.createdBy || c.by) === (prev?.createdBy || prev?.by);
-                      return (
-                        <AnimatedListItem
-                          key={c._id ?? `${c.by}-${index}`}
-                          index={index}
-                        >
-                          <CommentCard
-                            url={c.image}
-                            text={c.text}
-                            name={
-                              c.createdByDetails?.name ?? c.createdBy ?? c.by
-                            }
-                            userId={c.createdBy ?? c.by}
-                            time={formatDate(
-                              c.date ?? c.createdAt ?? new Date(),
-                              "time"
-                            )}
-                            repeated={sameUser}
-                            loading={c.loading}
-                            onImagePress={() => {
-                              const selectedIndex = imageIndexMap[c._id];
-                              setGalleryIndex(selectedIndex);
-                              setGalleryVisible(true);
-                            }}
-                          />
-                        </AnimatedListItem>
-                      );
-                    })}
+                    {item.comments.map((c, index) => (
+                      <CommentItem
+                        key={c._id ?? `${c.by}-${index}`}
+                        comment={c}
+                        index={index}
+                        prevComment={item.comments[index - 1]}
+                        formatDate={formatDate}
+                        onImagePress={() => handleImagePress(c._id || "")}
+                      />
+                    ))}
                   </View>
                 )}
                 ListEmptyComponent={<EmptyState text="No Comments" />}
@@ -275,7 +326,7 @@ export default function GlobalCommentsModal({
                 }}
               />
               <CustomButton
-                onPress={() => handleAddComment()}
+                onPress={handleSendComment}
                 title="Send"
                 sendButton
                 loading={addingComment}

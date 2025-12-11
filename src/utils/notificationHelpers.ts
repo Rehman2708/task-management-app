@@ -13,7 +13,8 @@ export const clearNotificationGroup = async (groupId: string) => {
         data?.groupId === groupId ||
         data?.taskId === groupId ||
         data?.noteId === groupId ||
-        data?.listId === groupId
+        data?.listId === groupId ||
+        data?.videoData?.id === groupId
       ) {
         await Notifications.dismissNotificationAsync(
           notification.request.identifier
@@ -24,6 +25,38 @@ export const clearNotificationGroup = async (groupId: string) => {
     console.log(`🧹 Cleared notifications for group: ${groupId}`);
   } catch (error) {
     console.error("Error clearing notification group:", error);
+  }
+};
+
+/**
+ * Clear all comment notifications for a specific item
+ */
+export const clearCommentNotifications = async (
+  itemId: string,
+  itemType: string
+) => {
+  try {
+    const notifications = await Notifications.getPresentedNotificationsAsync();
+
+    for (const notification of notifications) {
+      const data = notification.request.content.data;
+      const isCommentNotification = data?.isComment === true;
+      const matchesItem =
+        (itemType === "task" && data?.taskId === itemId) ||
+        (itemType === "note" && data?.noteId === itemId) ||
+        (itemType === "list" && data?.listId === itemId) ||
+        (itemType === "video" && data?.videoData?.id === itemId);
+
+      if (isCommentNotification && matchesItem) {
+        await Notifications.dismissNotificationAsync(
+          notification.request.identifier
+        );
+      }
+    }
+
+    console.log(`🧹 Cleared comment notifications for ${itemType}: ${itemId}`);
+  } catch (error) {
+    console.error("Error clearing comment notifications:", error);
   }
 };
 

@@ -228,6 +228,7 @@ export async function getNotificationPermission() {
       return null;
     }
 
+    console.log("📱 Setting up notification channels and categories...");
     await Promise.all([setupAndroidChannels(), setupNotificationCategories()]);
 
     console.log("✅ Notification permissions and setup completed");
@@ -259,7 +260,7 @@ export function navigate(name: string, params?: any) {
   }
 }
 
-export const handleNotificationNavigation = (data?: any) => {
+export const handleNotificationNavigation = async (data?: any) => {
   if (!data) return;
 
   // Log grouped notification info for debugging
@@ -269,44 +270,67 @@ export const handleNotificationNavigation = (data?: any) => {
     );
   }
 
+  // Clear related notifications when opening the item
+  const { clearCommentNotifications, clearNotificationGroup } = await import(
+    "./src/utils/notificationHelpers"
+  );
+
   switch (data.type) {
     case "note":
-      data.noteId
-        ? navigate(ROUTES.VIEW_NOTE, {
-            noteId: data.noteId,
-            showComments: data.isComment || data.isGrouped,
-          })
-        : navigate(ROUTES.NOTES);
+      if (data.noteId) {
+        if (data.isComment || data.isGrouped) {
+          await clearCommentNotifications(data.noteId, "note");
+        }
+        navigate(ROUTES.VIEW_NOTE, {
+          noteId: data.noteId,
+          showComments: data.isComment || data.isGrouped,
+        });
+      } else {
+        navigate(ROUTES.NOTES);
+      }
       break;
 
     case "list":
-      data.listId
-        ? navigate(ROUTES.VIEW_LIST, {
-            listId: data.listId,
-            showComments: data.isComment || data.isGrouped,
-          })
-        : navigate(ROUTES.LISTS);
+      if (data.listId) {
+        if (data.isComment || data.isGrouped) {
+          await clearCommentNotifications(data.listId, "list");
+        }
+        navigate(ROUTES.VIEW_LIST, {
+          listId: data.listId,
+          showComments: data.isComment || data.isGrouped,
+        });
+      } else {
+        navigate(ROUTES.LISTS);
+      }
       break;
 
     case "task":
-      data.taskId
-        ? navigate(ROUTES.TASK_DETAIL, {
-            taskId: data.taskId,
-            readOnly: !data.isActive,
-            showComments: data.isComment || data.isGrouped,
-            commentSubtaskId: data.commentSubtaskId,
-          })
-        : navigate(ROUTES.TASKS);
+      if (data.taskId) {
+        if (data.isComment || data.isGrouped) {
+          await clearCommentNotifications(data.taskId, "task");
+        }
+        navigate(ROUTES.TASK_DETAIL, {
+          taskId: data.taskId,
+          readOnly: !data.isActive,
+          showComments: data.isComment || data.isGrouped,
+          commentSubtaskId: data.commentSubtaskId,
+        });
+      } else {
+        navigate(ROUTES.TASKS);
+      }
       break;
 
     case "subtask_reminder":
-      data.taskId
-        ? navigate(ROUTES.TASK_DETAIL, {
-            taskId: data.taskId,
-            readOnly: false,
-            commentSubtaskId: data.subtaskId,
-          })
-        : navigate(ROUTES.TASKS);
+      if (data.taskId) {
+        await clearNotificationGroup(data.taskId);
+        navigate(ROUTES.TASK_DETAIL, {
+          taskId: data.taskId,
+          readOnly: false,
+          commentSubtaskId: data.subtaskId,
+        });
+      } else {
+        navigate(ROUTES.TASKS);
+      }
       break;
 
     case "profile":
@@ -314,12 +338,17 @@ export const handleNotificationNavigation = (data?: any) => {
       break;
 
     case "video":
-      data.videoData
-        ? navigate(ROUTES.SINGLE_VIDEO, {
-            video: data.videoData,
-            showComments: data.isComment || data.isGrouped,
-          })
-        : navigate(ROUTES.REELS);
+      if (data.videoData) {
+        if (data.isComment || data.isGrouped) {
+          await clearCommentNotifications(data.videoData.id, "video");
+        }
+        navigate(ROUTES.SINGLE_VIDEO, {
+          video: data.videoData,
+          showComments: data.isComment || data.isGrouped,
+        });
+      } else {
+        navigate(ROUTES.REELS);
+      }
       break;
 
     default:
@@ -379,8 +408,21 @@ export const handleCommentReply = async (
   notificationData: any,
   userId: string
 ) => {
+  console.log("📱 handleCommentReply called with:", {
+    commentText: commentText?.substring(0, 50) + "...",
+    type: notificationData?.type,
+    userId,
+    hasTaskId: !!notificationData?.taskId,
+    hasNoteId: !!notificationData?.noteId,
+    hasListId: !!notificationData?.listId,
+    hasVideoData: !!notificationData?.videoData,
+  });
+
   if (!commentText?.trim() || !userId) {
-    console.warn("Invalid comment reply data");
+    console.warn("❌ Invalid comment reply data:", {
+      commentText: !!commentText,
+      userId: !!userId,
+    });
     return;
   }
 
@@ -391,20 +433,25 @@ export const handleCommentReply = async (
     let success = false;
     let successMessage = "";
 
+    console.log("📱 Processing comment reply for type:", type);
+
     switch (type) {
       case "task":
         if (taskId) {
+          console.log("📱 Adding task comment:", { taskId, commentSubtaskId });
           const { TaskRepo } = await import("./src/repositories/task");
 
           if (commentSubtaskId) {
             // Reply to subtask comment
+            console.log("📱 Adding subtask comment");
             await TaskRepo.addSubtaskComment(taskId, commentSubtaskId, {
-              by: userId,
+              userId: userId,
               text: commentText.trim(),
             });
             successMessage = "Reply sent to subtask!";
           } else {
             // Reply to task comment
+            console.log("📱 Adding task comment");
             await TaskRepo.addTaskComment(taskId, {
               by: userId,
               text: commentText.trim(),
@@ -412,11 +459,14 @@ export const handleCommentReply = async (
             successMessage = "Reply sent to task!";
           }
           success = true;
+        } else {
+          console.warn("❌ No taskId provided for task comment");
         }
         break;
 
       case "note":
         if (noteId) {
+          console.log("📱 Adding note comment:", { noteId });
           const { NotesRepo } = await import("./src/repositories/notes");
           await NotesRepo.addNoteComment(noteId, {
             createdBy: userId,
@@ -424,11 +474,14 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to note!";
+        } else {
+          console.warn("❌ No noteId provided for note comment");
         }
         break;
 
       case "list":
         if (listId) {
+          console.log("📱 Adding list comment:", { listId });
           const { ListsRepo } = await import("./src/repositories/lists");
           await ListsRepo.addListComment(listId, {
             createdBy: userId,
@@ -436,11 +489,14 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to list!";
+        } else {
+          console.warn("❌ No listId provided for list comment");
         }
         break;
 
       case "video":
         if (videoData?.id) {
+          console.log("📱 Adding video comment:", { videoId: videoData.id });
           const { VideoRepo } = await import("./src/repositories/videos");
           await VideoRepo.addVideoComment(videoData.id, {
             createdBy: userId,
@@ -448,6 +504,8 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to video!";
+        } else {
+          console.warn("❌ No videoData.id provided for video comment");
         }
         break;
 
@@ -456,6 +514,7 @@ export const handleCommentReply = async (
     }
 
     if (success) {
+      console.log("✅ Comment reply successful:", successMessage);
       // Show success notification
       await Notifications.scheduleNotificationAsync({
         content: {
@@ -466,10 +525,11 @@ export const handleCommentReply = async (
         trigger: null,
       });
     } else {
+      console.warn("❌ Comment reply failed - no success flag set");
       throw new Error("Failed to process reply");
     }
   } catch (error) {
-    console.error("Error sending comment reply:", error);
+    console.error("❌ Error sending comment reply:", error);
 
     // Show error notification
     await Notifications.scheduleNotificationAsync({

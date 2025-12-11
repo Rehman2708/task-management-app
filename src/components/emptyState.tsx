@@ -51,7 +51,7 @@ const EmptyState = ({
             isDark && { color: theme.colors.white },
           ]}
         >
-          {text ?? "Something went wrong!"}
+          {error ? "Something went wrong!" : text ?? "Something went wrong!"}
         </Text>
         {subtext && (
           <Text
