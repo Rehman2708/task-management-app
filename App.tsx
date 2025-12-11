@@ -5,6 +5,8 @@ import { useEffect } from "react";
 import {
   getNotificationPermission,
   handleNotificationNavigation,
+  handleCommentReply,
+  handleSubtaskCompletion,
   navigationRef,
 } from "./notification";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -46,31 +48,99 @@ export default function App() {
 
   // ✅ Handle notification taps (foreground, background, or killed state)
   useEffect(() => {
+    let responseListener: any;
+
     const setupNotifications = async () => {
-      const lastResponse =
-        await Notifications.getLastNotificationResponseAsync();
+      try {
+        // Check for notification that launched the app
+        const lastResponse =
+          await Notifications.getLastNotificationResponseAsync();
+        if (lastResponse?.notification) {
+          const data = lastResponse.notification.request.content.data;
+          if (data) {
+            console.log("📱 App launched from notification:", data);
+            setLaunchedFromNotification(data);
+          }
+        }
 
-      if (lastResponse?.notification) {
-        const data = lastResponse.notification.request.content.data;
-        if (data) setLaunchedFromNotification(data);
+        // Set up notification response listener
+        responseListener =
+          Notifications.addNotificationResponseReceivedListener(
+            async (response) => {
+              try {
+                const data = response?.notification?.request?.content?.data;
+                const actionIdentifier = response?.actionIdentifier;
+                const userText = response?.userText;
+
+                console.log("📱 Notification response:", {
+                  actionIdentifier,
+                  hasData: !!data,
+                });
+
+                // Handle notification action buttons
+                if (
+                  actionIdentifier === "complete" &&
+                  data?.type === "subtask_reminder"
+                ) {
+                  await handleSubtaskCompletion(
+                    data.taskId,
+                    data.subtaskId,
+                    data.userId
+                  );
+                } else if (actionIdentifier === "reply" && userText && data) {
+                  // Handle comment reply from notification
+                  const { useAuthStore } = await import(
+                    "./src/store/authStore"
+                  );
+                  const userId = useAuthStore.getState().user?.userId;
+
+                  if (userId) {
+                    await handleCommentReply(userText, data, userId);
+                  } else {
+                    console.warn("❌ No user ID found for comment reply");
+                  }
+                } else if (actionIdentifier?.startsWith("view")) {
+                  // Handle view actions (view_task, view_note, view_list, view_video)
+                  if (navigationRef.isReady()) {
+                    handleNotificationNavigation(data);
+                  } else {
+                    setLaunchedFromNotification(data);
+                  }
+                } else if (!actionIdentifier && data) {
+                  // Handle regular notification tap (no action button)
+                  if (navigationRef.isReady()) {
+                    handleNotificationNavigation(data);
+                  } else {
+                    setLaunchedFromNotification(data);
+                  }
+                }
+              } catch (error) {
+                console.error(
+                  "❌ Error handling notification response:",
+                  error
+                );
+              }
+            }
+          );
+      } catch (error) {
+        console.error("❌ Error setting up notifications:", error);
       }
-
-      const responseListener =
-        Notifications.addNotificationResponseReceivedListener((response) => {
-          const data = response?.notification?.request?.content?.data;
-          if (navigationRef.isReady()) handleNotificationNavigation(data);
-          else setLaunchedFromNotification(data);
-        });
-
-      return () => {
-        responseListener.remove();
-      };
     };
+
+    // Setup Android navigation bar
     if (isAndroid) {
-      NavigationBar.setVisibilityAsync("hidden");
-      NavigationBar.setBehaviorAsync("overlay-swipe");
+      NavigationBar.setVisibilityAsync("hidden").catch(console.warn);
+      NavigationBar.setBehaviorAsync("overlay-swipe").catch(console.warn);
     }
+
     setupNotifications();
+
+    // Cleanup function
+    return () => {
+      if (responseListener) {
+        responseListener.remove();
+      }
+    };
   }, []);
 
   (Text as any).defaultProps = (Text as any).defaultProps || {};

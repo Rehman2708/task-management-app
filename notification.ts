@@ -32,32 +32,214 @@ async function setupAndroidChannels() {
   if (Platform.OS !== "android") return;
 
   const channels = [
-    { id: "note", name: "Notes" },
-    { id: "task", name: "Tasks" },
-    { id: "video", name: "Videos" },
-    { id: "profile", name: "Profile Updates" },
-    { id: "list", name: "List" },
+    {
+      id: "note",
+      name: "Notes",
+      description: "Notifications for notes and note comments",
+    },
+    {
+      id: "task",
+      name: "Tasks",
+      description: "Notifications for tasks and task comments",
+    },
+    {
+      id: "video",
+      name: "Videos",
+      description: "Notifications for videos and video comments",
+    },
+    {
+      id: "profile",
+      name: "Profile Updates",
+      description: "Notifications for profile and partner updates",
+    },
+    {
+      id: "list",
+      name: "Lists",
+      description: "Notifications for lists and list comments",
+    },
+    {
+      id: "subtask_reminder",
+      name: "Subtask Reminders",
+      description: "Reminders for upcoming subtask due dates",
+    },
   ];
 
   for (const c of channels) {
     await Notifications.setNotificationChannelAsync(c.id, {
       name: c.name,
+      description: c.description,
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 100, 50, 300, 100, 300],
       sound: "notification.wav",
+      enableLights: true,
+      lightColor: "#FF0000",
+      enableVibrate: true,
+      showBadge: true,
     });
   }
 }
 
+async function setupNotificationCategories() {
+  try {
+    // Set up notification categories with action buttons
+    await Notifications.setNotificationCategoryAsync("subtask_reminder", [
+      {
+        identifier: "complete",
+        buttonTitle: "Mark Complete",
+        options: {
+          opensAppToForeground: false, // Action can be handled in background
+        },
+      },
+      {
+        identifier: "view",
+        buttonTitle: "View Task",
+        options: {
+          opensAppToForeground: true,
+        },
+      },
+    ]);
+
+    // Generic comment category (fallback)
+    await Notifications.setNotificationCategoryAsync("comment", [
+      {
+        identifier: "reply",
+        buttonTitle: "Reply",
+        options: {
+          opensAppToForeground: false,
+          isDestructive: false,
+        },
+        textInput: {
+          submitButtonTitle: "Send",
+          placeholder: "Type your reply...",
+        },
+      },
+      {
+        identifier: "view",
+        buttonTitle: "View",
+        options: {
+          opensAppToForeground: true,
+        },
+      },
+    ]);
+
+    // Task comment category
+    await Notifications.setNotificationCategoryAsync("task_comment", [
+      {
+        identifier: "reply",
+        buttonTitle: "Reply",
+        options: {
+          opensAppToForeground: false,
+          isDestructive: false,
+        },
+        textInput: {
+          submitButtonTitle: "Send",
+          placeholder: "Type your reply...",
+        },
+      },
+      {
+        identifier: "view_task",
+        buttonTitle: "View Task",
+        options: {
+          opensAppToForeground: true,
+        },
+      },
+    ]);
+
+    // Note comment category
+    await Notifications.setNotificationCategoryAsync("note_comment", [
+      {
+        identifier: "reply",
+        buttonTitle: "Reply",
+        options: {
+          opensAppToForeground: false,
+          isDestructive: false,
+        },
+        textInput: {
+          submitButtonTitle: "Send",
+          placeholder: "Type your reply...",
+        },
+      },
+      {
+        identifier: "view_note",
+        buttonTitle: "View Note",
+        options: {
+          opensAppToForeground: true,
+        },
+      },
+    ]);
+
+    // List comment category
+    await Notifications.setNotificationCategoryAsync("list_comment", [
+      {
+        identifier: "reply",
+        buttonTitle: "Reply",
+        options: {
+          opensAppToForeground: false,
+          isDestructive: false,
+        },
+        textInput: {
+          submitButtonTitle: "Send",
+          placeholder: "Type your reply...",
+        },
+      },
+      {
+        identifier: "view_list",
+        buttonTitle: "View List",
+        options: {
+          opensAppToForeground: true,
+        },
+      },
+    ]);
+
+    // Video comment category
+    await Notifications.setNotificationCategoryAsync("video_comment", [
+      {
+        identifier: "reply",
+        buttonTitle: "Reply",
+        options: {
+          opensAppToForeground: false,
+          isDestructive: false,
+        },
+        textInput: {
+          submitButtonTitle: "Send",
+          placeholder: "Type your reply...",
+        },
+      },
+      {
+        identifier: "view_video",
+        buttonTitle: "View Video",
+        options: {
+          opensAppToForeground: true,
+        },
+      },
+    ]);
+
+    console.log("✅ Notification categories setup completed");
+  } catch (error) {
+    console.error("❌ Failed to setup notification categories:", error);
+  }
+}
+
 export async function getNotificationPermission() {
-  const hasPermission = await ensurePermission();
-  if (!hasPermission) return null;
-  await setupAndroidChannels();
-  return true;
+  try {
+    const hasPermission = await ensurePermission();
+    if (!hasPermission) {
+      console.log("❌ Notification permission denied");
+      return null;
+    }
+
+    await Promise.all([setupAndroidChannels(), setupNotificationCategories()]);
+
+    console.log("✅ Notification permissions and setup completed");
+    return true;
+  } catch (error) {
+    console.error("❌ Failed to setup notifications:", error);
+    return null;
+  }
 }
 
 export async function registerForPushNotificationsAsync() {
-  const hasPermission = await ensurePermission();
+  const hasPermission = await getNotificationPermission();
   if (!hasPermission) return null;
 
   const token = (
@@ -66,13 +248,12 @@ export async function registerForPushNotificationsAsync() {
     })
   ).data;
 
-  await setupAndroidChannels();
   return token;
 }
 
 export function navigate(name: string, params?: any) {
   if (navigationRef.isReady()) {
-    navigationRef.navigate(name, params);
+    (navigationRef as any).navigate(name, params);
   } else {
     console.log("⏳ Navigation not ready yet, storing for later");
   }
@@ -81,12 +262,19 @@ export function navigate(name: string, params?: any) {
 export const handleNotificationNavigation = (data?: any) => {
   if (!data) return;
 
+  // Log grouped notification info for debugging
+  if (data.isGrouped && data.commentCount) {
+    console.log(
+      `📱 Opening grouped notification with ${data.commentCount} comments`
+    );
+  }
+
   switch (data.type) {
     case "note":
       data.noteId
         ? navigate(ROUTES.VIEW_NOTE, {
             noteId: data.noteId,
-            showComments: data.isComment,
+            showComments: data.isComment || data.isGrouped,
           })
         : navigate(ROUTES.NOTES);
       break;
@@ -95,7 +283,7 @@ export const handleNotificationNavigation = (data?: any) => {
       data.listId
         ? navigate(ROUTES.VIEW_LIST, {
             listId: data.listId,
-            showComments: data.isComment,
+            showComments: data.isComment || data.isGrouped,
           })
         : navigate(ROUTES.LISTS);
       break;
@@ -105,8 +293,18 @@ export const handleNotificationNavigation = (data?: any) => {
         ? navigate(ROUTES.TASK_DETAIL, {
             taskId: data.taskId,
             readOnly: !data.isActive,
-            showComments: data.isComment,
+            showComments: data.isComment || data.isGrouped,
             commentSubtaskId: data.commentSubtaskId,
+          })
+        : navigate(ROUTES.TASKS);
+      break;
+
+    case "subtask_reminder":
+      data.taskId
+        ? navigate(ROUTES.TASK_DETAIL, {
+            taskId: data.taskId,
+            readOnly: false,
+            commentSubtaskId: data.subtaskId,
           })
         : navigate(ROUTES.TASKS);
       break;
@@ -119,7 +317,7 @@ export const handleNotificationNavigation = (data?: any) => {
       data.videoData
         ? navigate(ROUTES.SINGLE_VIDEO, {
             video: data.videoData,
-            showComments: data.isComment,
+            showComments: data.isComment || data.isGrouped,
           })
         : navigate(ROUTES.REELS);
       break;
@@ -127,5 +325,160 @@ export const handleNotificationNavigation = (data?: any) => {
     default:
       console.log("Unhandled notification type:", data.type);
       break;
+  }
+};
+
+// Handle subtask completion from notification action
+export const handleSubtaskCompletion = async (
+  taskId: string,
+  subtaskId: string,
+  userId: string
+) => {
+  // Validate input
+  if (!taskId || !subtaskId || !userId) {
+    console.warn("Invalid subtask completion data");
+    return;
+  }
+
+  try {
+    const { TaskRepo } = await import("./src/repositories/task");
+    const { SubtaskStatus } = await import("./src/enums/tasks");
+
+    await TaskRepo.updateSubtaskStatus(taskId, subtaskId, {
+      userId,
+      status: SubtaskStatus.Completed,
+    });
+
+    // Show success notification
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "✅ Subtask Completed!",
+        body: "Great job! The subtask has been marked as completed.",
+        data: { type: "success" },
+      },
+      trigger: null,
+    });
+  } catch (error) {
+    console.error("Error completing subtask:", error);
+
+    // Show error notification
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "❌ Error",
+        body: "Failed to mark subtask as completed. Please try again.",
+        data: { type: "error" },
+      },
+      trigger: null,
+    });
+  }
+};
+
+// Handle comment reply from notification action
+export const handleCommentReply = async (
+  commentText: string,
+  notificationData: any,
+  userId: string
+) => {
+  if (!commentText?.trim() || !userId) {
+    console.warn("Invalid comment reply data");
+    return;
+  }
+
+  try {
+    const { type, taskId, noteId, listId, videoData, commentSubtaskId } =
+      notificationData;
+
+    let success = false;
+    let successMessage = "";
+
+    switch (type) {
+      case "task":
+        if (taskId) {
+          const { TaskRepo } = await import("./src/repositories/task");
+
+          if (commentSubtaskId) {
+            // Reply to subtask comment
+            await TaskRepo.addSubtaskComment(taskId, commentSubtaskId, {
+              by: userId,
+              text: commentText.trim(),
+            });
+            successMessage = "Reply sent to subtask!";
+          } else {
+            // Reply to task comment
+            await TaskRepo.addTaskComment(taskId, {
+              by: userId,
+              text: commentText.trim(),
+            });
+            successMessage = "Reply sent to task!";
+          }
+          success = true;
+        }
+        break;
+
+      case "note":
+        if (noteId) {
+          const { NotesRepo } = await import("./src/repositories/notes");
+          await NotesRepo.addNoteComment(noteId, {
+            createdBy: userId,
+            text: commentText.trim(),
+          });
+          success = true;
+          successMessage = "Reply sent to note!";
+        }
+        break;
+
+      case "list":
+        if (listId) {
+          const { ListsRepo } = await import("./src/repositories/lists");
+          await ListsRepo.addListComment(listId, {
+            createdBy: userId,
+            text: commentText.trim(),
+          });
+          success = true;
+          successMessage = "Reply sent to list!";
+        }
+        break;
+
+      case "video":
+        if (videoData?.id) {
+          const { VideoRepo } = await import("./src/repositories/videos");
+          await VideoRepo.addVideoComment(videoData.id, {
+            createdBy: userId,
+            text: commentText.trim(),
+          });
+          success = true;
+          successMessage = "Reply sent to video!";
+        }
+        break;
+
+      default:
+        throw new Error(`Unsupported comment type: ${type}`);
+    }
+
+    if (success) {
+      // Show success notification
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "💬 Reply Sent!",
+          body: successMessage,
+          data: { type: "success" },
+        },
+        trigger: null,
+      });
+    } else {
+      throw new Error("Failed to process reply");
+    }
+  } catch (error) {
+    console.error("Error sending comment reply:", error);
+
+    // Show error notification
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "❌ Error",
+        body: "Failed to send reply. Please try again.",
+        data: { type: "error" },
+      },
+      trigger: null,
+    });
   }
 };

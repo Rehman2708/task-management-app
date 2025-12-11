@@ -18,7 +18,7 @@ import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
-import ScreenLoader from "../../components/screenLoader";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import ImageView from "react-native-image-viewing";
 import AnimatedListItem from "../../components/animatedListItem";
 import AlertModal from "../../components/AlertModal";
@@ -112,7 +112,7 @@ export default function ProfileScreen() {
   return (
     <ScreenWrapper title="Profile" noPadding>
       {loadingUserDetail ? (
-        <ScreenLoader />
+        <ScreenLoader type={LoaderTypes.ProfileScreen} />
       ) : (
         <>
           <ScrollView
@@ -204,7 +204,11 @@ export default function ProfileScreen() {
                       <Text
                         style={[
                           ProfileScreenStyles.nameText,
-                          { color: themeColor?.dark ?? theme.colors.primary },
+                          {
+                            color:
+                              user?.partner?.theme?.dark ??
+                              theme.colors.primary,
+                          },
                         ]}
                       >
                         {getInitials(user?.partner?.name ?? "")}
@@ -238,12 +242,7 @@ export default function ProfileScreen() {
                 <>
                   <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
                     <Text style={[commonStyles.smallText]}>Partner:</Text>
-                    <Text
-                      style={[
-                        commonStyles.subTitleText,
-                        // { fontFamily: `${user?.partner?.font}SemiBold` },
-                      ]}
-                    >
+                    <Text style={[commonStyles.subTitleText]}>
                       {user?.partner?.name || "N/A"}
                     </Text>
                   </Row>
