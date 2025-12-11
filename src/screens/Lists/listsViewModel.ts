@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 import { ListsRepo, List } from "../../repositories/lists";
 

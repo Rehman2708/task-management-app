@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Text,
   Pressable,
-  Alert,
   TouchableOpacity,
   Image,
   StyleSheet,
@@ -208,7 +207,7 @@ export default function ProfileScreen() {
                           { color: themeColor?.dark ?? theme.colors.primary },
                         ]}
                       >
-                        {getInitials(partnerId ?? "")}
+                        {getInitials(user?.partner?.name ?? "")}
                       </Text>
                     )}
                   </Row>

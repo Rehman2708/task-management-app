@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Alert } from "react-native";
+import { View } from "react-native";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";

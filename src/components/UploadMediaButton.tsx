@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, Platform, Text, View } from "react-native";
+import { Platform, Text, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 import CustomButton from "./customButton";

@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import { AuthRepo } from "../../repositories/auth";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
-import { IUser } from "../../types/auth";
 import * as Device from "expo-device";
-import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 import ToastService from "../../utils/toastService";
 

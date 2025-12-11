@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Alert, Pressable, FlatList } from "react-native";
+import { View, Text, Pressable, FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";

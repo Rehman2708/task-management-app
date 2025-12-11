@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, Alert, View } from "react-native";
+import { Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
@@ -41,7 +41,7 @@ export const AddEmailScreen = () => {
 
       if (response?.user) {
         updateUser(response.user);
-        navigation.goBack()
+        navigation.goBack();
       }
     } catch (err: any) {
       setError(err?.message || "Failed to add email");

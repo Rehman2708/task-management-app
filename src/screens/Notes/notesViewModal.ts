@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { NotesRepo, Note } from "../../repositories/notes";
-import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 
 export function useNotesListViewModel(userId?: string) {

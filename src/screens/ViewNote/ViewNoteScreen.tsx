@@ -1,4 +1,4 @@
-import { View, Text, Alert, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import { Note, NotesRepo } from "../../repositories/notes";
 import { useHelper } from "../../utils/helper";

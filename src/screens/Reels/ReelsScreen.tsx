@@ -155,6 +155,7 @@ export default function ReelsScreen() {
           error={error?.trim()?.length > 0 && false}
           button={() => fetchVideos(1, false)}
           type={LoaderTypes.VideoScreen}
+          isDark={true}
         />
         <Spacer size={96} />
       </SafeAreaView>
