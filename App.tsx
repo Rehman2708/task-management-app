@@ -9,6 +9,10 @@ import {
   handleSubtaskCompletion,
   navigationRef,
 } from "./notification";
+import {
+  NotificationData,
+  NotificationAction,
+} from "./src/enums/notifications";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useCommonStyles } from "./src/styles/commonstyles";
 import { FontAsset } from "./assets/fonts";
@@ -34,11 +38,8 @@ Notifications.setNotificationHandler({
     const data = notification.request.content.data;
 
     // Check if app is in foreground and this is a comment notification
-    const { useNotificationStore } = await import(
-      "./src/store/notificationStore"
-    );
-    const store = useNotificationStore.getState();
-    const isAppInForeground = store.isAppInForeground;
+    const currentAppState = AppState.currentState;
+    const isAppInForeground = currentAppState === "active";
 
     const isComment = isCommentNotification(data);
 
@@ -92,7 +93,8 @@ export default function App() {
   // Track app state to determine if app is in foreground
   useEffect(() => {
     const handleAppStateChange = (nextAppState: string) => {
-      setAppInForeground(nextAppState === "active");
+      const isActive = nextAppState === "active";
+      setAppInForeground(isActive);
     };
 
     const subscription = AppState.addEventListener(
@@ -101,7 +103,8 @@ export default function App() {
     );
 
     // Set initial state
-    setAppInForeground(AppState.currentState === "active");
+    const initialState = AppState.currentState === "active";
+    setAppInForeground(initialState);
 
     return () => {
       subscription?.remove();
@@ -120,7 +123,6 @@ export default function App() {
         if (lastResponse?.notification) {
           const data = lastResponse.notification.request.content.data;
           if (data) {
-            console.log("📱 App launched from notification:", data);
             setLaunchedFromNotification(data);
           }
         }
@@ -134,27 +136,26 @@ export default function App() {
                 const actionIdentifier = response?.actionIdentifier;
                 const userText = response?.userText;
 
-                console.log("📱 Notification response received:", {
-                  actionIdentifier,
-                  userText: userText
-                    ? `"${userText.substring(0, 30)}..."`
-                    : null,
-                  hasData: !!data,
-                  dataType: data?.type,
-                  dataKeys: data ? Object.keys(data) : [],
-                });
-
                 // Handle notification action buttons
                 if (
-                  actionIdentifier === "complete" &&
-                  data?.type === "subtask_reminder"
+                  actionIdentifier === NotificationAction.Complete &&
+                  data?.type === NotificationData.SubtaskReminder
                 ) {
+                  console.log("📱 Handling subtask completion:", {
+                    taskId: data.taskId,
+                    subtaskId: data.subtaskId,
+                    userId: data.userId,
+                  });
                   await handleSubtaskCompletion(
                     data.taskId,
                     data.subtaskId,
                     data.userId
                   );
-                } else if (actionIdentifier === "reply" && userText && data) {
+                } else if (
+                  actionIdentifier === NotificationAction.Reply &&
+                  userText &&
+                  data
+                ) {
                   // Handle comment reply from notification
                   const { useAuthStore } = await import(
                     "./src/store/authStore"
@@ -162,17 +163,17 @@ export default function App() {
                   const userId = useAuthStore.getState().user?.userId;
 
                   if (userId) {
-                    console.log("📱 Sending comment reply for user:", userId);
                     await handleCommentReply(userText, data, userId);
                   } else {
-                    console.warn("❌ No user ID found for comment reply");
                     // Show error notification
                     await showErrorNotification(
                       "❌ Error",
                       "Please log in to reply to comments."
                     );
                   }
-                } else if (actionIdentifier?.startsWith("view")) {
+                } else if (
+                  actionIdentifier?.startsWith(NotificationAction.View)
+                ) {
                   // Handle view actions (view_task, view_note, view_list, view_video)
                   if (navigationRef.isReady()) {
                     handleNotificationNavigation(data);
