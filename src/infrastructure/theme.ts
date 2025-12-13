@@ -1,7 +1,7 @@
 // theme.ts
 import { fontMap, FontName } from "../../assets/fonts";
 import { useAuthStore } from "../store/authStore";
-import { isDarkMode } from "../tools";
+import { isAndroid, isDarkMode } from "../tools";
 
 export function useTheme() {
   const { user } = useAuthStore();
@@ -35,10 +35,10 @@ export function useTheme() {
     fontSizes: {
       xxs: 10,
       xs: 12,
-      sm: 14,
+      sm: isAndroid ? 13 : 14,
       md: 15,
-      lg: 17,
-      xl: 19,
+      lg: isAndroid ? 16 : 17,
+      xl: isAndroid ? 18 : 19,
     },
     radius: {
       sm: 4,
