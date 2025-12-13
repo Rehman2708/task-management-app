@@ -109,10 +109,10 @@ export default function ProfileScreen() {
       title: "🎥 Add video",
       onPress: createVideoScreen,
     },
-    {
-      title: "🧪 Test Toast",
-      onPress: testToastScreen,
-    },
+    // {
+    //   title: "🧪 Test Toast",
+    //   onPress: testToastScreen,
+    // },
   ];
   return (
     <ScreenWrapper title="Profile" noPadding>
