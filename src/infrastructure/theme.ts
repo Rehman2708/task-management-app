@@ -34,11 +34,11 @@ export function useTheme() {
     fonts: getFonts((user?.font as FontName) || "Montserrat"),
     fontSizes: {
       xxs: 10,
-      xs: 12,
+      xs: isAndroid ? 11 : 12,
       sm: isAndroid ? 13 : 14,
-      md: 15,
-      lg: isAndroid ? 16 : 17,
-      xl: isAndroid ? 18 : 19,
+      md: isAndroid ? 14 : 15,
+      lg: isAndroid ? 15 : 17,
+      xl: isAndroid ? 17 : 19,
     },
     radius: {
       sm: 4,

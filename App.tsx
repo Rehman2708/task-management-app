@@ -13,7 +13,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useCommonStyles } from "./src/styles/commonstyles";
 import { FontAsset } from "./assets/fonts";
 import { useTheme } from "./src/infrastructure/theme";
-import { StatusBar, TextInput, Text } from "react-native";
+import { StatusBar, TextInput, Text, AppState } from "react-native";
 import * as Notifications from "expo-notifications";
 import { useNotificationStore } from "./src/store/notificationStore";
 import { useNetwork } from "./src/utils/useNetwork";
@@ -22,13 +22,55 @@ import * as NavigationBar from "expo-navigation-bar";
 import { isAndroid } from "./src/tools";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "./src/utils/toastConfig";
+import ToastService from "./src/utils/toastService";
+import {
+  isCommentNotification,
+  getCommentNotificationTitle,
+  showErrorNotification,
+} from "./src/utils/notificationUtils";
 
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
+  handleNotification: async (notification) => {
+    const data = notification.request.content.data;
+
+    // Check if app is in foreground and this is a comment notification
+    const { useNotificationStore } = await import(
+      "./src/store/notificationStore"
+    );
+    const store = useNotificationStore.getState();
+    const isAppInForeground = store.isAppInForeground;
+
+    const isComment = isCommentNotification(data);
+
+    if (isAppInForeground && isComment) {
+      // Show toast instead of push notification for comment notifications when app is open
+      const title = getCommentNotificationTitle(
+        notification.request.content.title || "New Comment",
+        data
+      );
+
+      ToastService.commentNotification({
+        title,
+        message: notification.request.content.body || undefined,
+        notificationData: data,
+        duration: 5000,
+      });
+
+      // Don't show the push notification
+      return {
+        shouldShowAlert: false,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      };
+    }
+
+    // Show normal push notification for non-comment notifications or when app is in background
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    };
+  },
 });
 
 export default function App() {
@@ -40,11 +82,31 @@ export default function App() {
     launchedFromNotification,
     setLaunchedFromNotification,
     clearLaunchedFromNotification,
+    setAppInForeground,
   } = useNotificationStore();
 
   useEffect(() => {
     getNotificationPermission();
   }, []);
+
+  // Track app state to determine if app is in foreground
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      setAppInForeground(nextAppState === "active");
+    };
+
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
+    // Set initial state
+    setAppInForeground(AppState.currentState === "active");
+
+    return () => {
+      subscription?.remove();
+    };
+  }, [setAppInForeground]);
 
   // ✅ Handle notification taps (foreground, background, or killed state)
   useEffect(() => {
@@ -105,14 +167,10 @@ export default function App() {
                   } else {
                     console.warn("❌ No user ID found for comment reply");
                     // Show error notification
-                    await Notifications.scheduleNotificationAsync({
-                      content: {
-                        title: "❌ Error",
-                        body: "Please log in to reply to comments.",
-                        data: { type: "error" },
-                      },
-                      trigger: null,
-                    });
+                    await showErrorNotification(
+                      "❌ Error",
+                      "Please log in to reply to comments."
+                    );
                   }
                 } else if (actionIdentifier?.startsWith("view")) {
                   // Handle view actions (view_task, view_note, view_list, view_video)

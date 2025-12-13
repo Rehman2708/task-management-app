@@ -81,6 +81,32 @@ async function setupAndroidChannels() {
 
 async function setupNotificationCategories() {
   try {
+    // Helper function to create comment category actions
+    const createCommentActions = (
+      viewIdentifier: string,
+      viewTitle: string
+    ) => [
+      {
+        identifier: "reply",
+        buttonTitle: "Reply",
+        options: {
+          opensAppToForeground: false,
+          isDestructive: false,
+        },
+        textInput: {
+          submitButtonTitle: "Send",
+          placeholder: "Type your reply...",
+        },
+      },
+      {
+        identifier: viewIdentifier,
+        buttonTitle: viewTitle,
+        options: {
+          opensAppToForeground: true,
+        },
+      },
+    ];
+
     // Set up notification categories with action buttons
     await Notifications.setNotificationCategoryAsync("subtask_reminder", [
       {
@@ -99,120 +125,21 @@ async function setupNotificationCategories() {
       },
     ]);
 
-    // Generic comment category (fallback)
-    await Notifications.setNotificationCategoryAsync("comment", [
-      {
-        identifier: "reply",
-        buttonTitle: "Reply",
-        options: {
-          opensAppToForeground: false,
-          isDestructive: false,
-        },
-        textInput: {
-          submitButtonTitle: "Send",
-          placeholder: "Type your reply...",
-        },
-      },
-      {
-        identifier: "view",
-        buttonTitle: "View",
-        options: {
-          opensAppToForeground: true,
-        },
-      },
-    ]);
+    // Comment categories with consistent structure
+    const commentCategories = [
+      { id: "comment", viewId: "view", viewTitle: "View" },
+      { id: "task_comment", viewId: "view_task", viewTitle: "View Task" },
+      { id: "note_comment", viewId: "view_note", viewTitle: "View Note" },
+      { id: "list_comment", viewId: "view_list", viewTitle: "View List" },
+      { id: "video_comment", viewId: "view_video", viewTitle: "View Video" },
+    ];
 
-    // Task comment category
-    await Notifications.setNotificationCategoryAsync("task_comment", [
-      {
-        identifier: "reply",
-        buttonTitle: "Reply",
-        options: {
-          opensAppToForeground: false,
-          isDestructive: false,
-        },
-        textInput: {
-          submitButtonTitle: "Send",
-          placeholder: "Type your reply...",
-        },
-      },
-      {
-        identifier: "view_task",
-        buttonTitle: "View Task",
-        options: {
-          opensAppToForeground: true,
-        },
-      },
-    ]);
-
-    // Note comment category
-    await Notifications.setNotificationCategoryAsync("note_comment", [
-      {
-        identifier: "reply",
-        buttonTitle: "Reply",
-        options: {
-          opensAppToForeground: false,
-          isDestructive: false,
-        },
-        textInput: {
-          submitButtonTitle: "Send",
-          placeholder: "Type your reply...",
-        },
-      },
-      {
-        identifier: "view_note",
-        buttonTitle: "View Note",
-        options: {
-          opensAppToForeground: true,
-        },
-      },
-    ]);
-
-    // List comment category
-    await Notifications.setNotificationCategoryAsync("list_comment", [
-      {
-        identifier: "reply",
-        buttonTitle: "Reply",
-        options: {
-          opensAppToForeground: false,
-          isDestructive: false,
-        },
-        textInput: {
-          submitButtonTitle: "Send",
-          placeholder: "Type your reply...",
-        },
-      },
-      {
-        identifier: "view_list",
-        buttonTitle: "View List",
-        options: {
-          opensAppToForeground: true,
-        },
-      },
-    ]);
-
-    // Video comment category
-    await Notifications.setNotificationCategoryAsync("video_comment", [
-      {
-        identifier: "reply",
-        buttonTitle: "Reply",
-        options: {
-          opensAppToForeground: false,
-          isDestructive: false,
-        },
-        textInput: {
-          submitButtonTitle: "Send",
-          placeholder: "Type your reply...",
-        },
-      },
-      {
-        identifier: "view_video",
-        buttonTitle: "View Video",
-        options: {
-          opensAppToForeground: true,
-        },
-      },
-    ]);
+    for (const category of commentCategories) {
+      await Notifications.setNotificationCategoryAsync(
+        category.id,
+        createCommentActions(category.viewId, category.viewTitle)
+      );
+    }
 
     console.log("✅ Notification categories setup completed");
   } catch (error) {
@@ -379,26 +306,24 @@ export const handleSubtaskCompletion = async (
     });
 
     // Show success notification
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "✅ Subtask Completed!",
-        body: "Great job! The subtask has been marked as completed.",
-        data: { type: "success" },
-      },
-      trigger: null,
-    });
+    const { showSuccessNotification } = await import(
+      "./src/utils/notificationUtils"
+    );
+    await showSuccessNotification(
+      "✅ Subtask Completed!",
+      "Great job! The subtask has been marked as completed."
+    );
   } catch (error) {
     console.error("Error completing subtask:", error);
 
     // Show error notification
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "❌ Error",
-        body: "Failed to mark subtask as completed. Please try again.",
-        data: { type: "error" },
-      },
-      trigger: null,
-    });
+    const { showErrorNotification } = await import(
+      "./src/utils/notificationUtils"
+    );
+    await showErrorNotification(
+      "❌ Error",
+      "Failed to mark subtask as completed. Please try again."
+    );
   }
 };
 
@@ -516,14 +441,10 @@ export const handleCommentReply = async (
     if (success) {
       console.log("✅ Comment reply successful:", successMessage);
       // Show success notification
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "💬 Reply Sent!",
-          body: successMessage,
-          data: { type: "success" },
-        },
-        trigger: null,
-      });
+      const { showSuccessNotification } = await import(
+        "./src/utils/notificationUtils"
+      );
+      await showSuccessNotification("💬 Reply Sent!", successMessage);
     } else {
       console.warn("❌ Comment reply failed - no success flag set");
       throw new Error("Failed to process reply");
@@ -532,13 +453,12 @@ export const handleCommentReply = async (
     console.error("❌ Error sending comment reply:", error);
 
     // Show error notification
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "❌ Error",
-        body: "Failed to send reply. Please try again.",
-        data: { type: "error" },
-      },
-      trigger: null,
-    });
+    const { showErrorNotification } = await import(
+      "./src/utils/notificationUtils"
+    );
+    await showErrorNotification(
+      "❌ Error",
+      "Failed to send reply. Please try again."
+    );
   }
 };

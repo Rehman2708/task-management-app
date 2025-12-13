@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import { useTheme } from "../infrastructure/theme";
-import { dimensions, isAndroid } from "../tools";
+import CommentNotificationToast from "../components/CommentNotificationToast";
+import { createBaseToastStyles, getToastBorderColor } from "./toastStyles";
 
 // Custom toast component
 const CustomToast = ({
@@ -13,33 +14,14 @@ const CustomToast = ({
   text2?: string;
 }) => {
   const theme = useTheme();
-  const getBorderColor = () => {
-    switch (type) {
-      case "success":
-        return theme.colors.success;
-      case "error":
-        return theme.colors.error;
-      case "warning":
-        return theme.colors.warning;
-      case "info":
-        return theme.colors.primary;
-      default:
-        return theme.colors.primary;
-    }
-  };
-  const styles = toastStyles(theme);
+  const styles = createBaseToastStyles(theme);
+  const borderColor = getToastBorderColor(type, theme);
+
   return (
-    <View
-      style={[
-        styles.toastContainer,
-        {
-          borderColor: getBorderColor(),
-        },
-      ]}
-    >
+    <View style={[styles.baseToastContainer, { borderColor }]}>
       <View style={styles.contentContainer}>
-        <Text style={[styles.text1]}>{text1}</Text>
-        {text2 && <Text style={[styles.text2]}>{text2}</Text>}
+        <Text style={styles.title}>{text1}</Text>
+        {text2 && <Text style={styles.message}>{text2}</Text>}
       </View>
     </View>
   );
@@ -61,40 +43,13 @@ export const toastConfig = {
   warning: (props: any) => (
     <CustomToast type="warning" text1={props.text1} text2={props.text2} />
   ),
-};
 
-const toastStyles = (theme: any) =>
-  StyleSheet.create({
-    toastContainer: {
-      borderWidth: 1,
-      borderLeftWidth: 6, // Made thicker to be more visible
-      borderRadius: 8,
-      marginHorizontal: 16,
-      marginTop: 8,
-      padding: isAndroid ? 10 : 16,
-      elevation: 4,
-      shadowColor: "#000",
-      width: dimensions.width * 0.9,
-      backgroundColor: theme.colors.background,
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-    },
-    contentContainer: {
-      flex: 1,
-    },
-    text1: {
-      fontSize: theme.fontSizes.md,
-      fontFamily: theme.fonts.semibold,
-      color: theme.colors.text,
-    },
-    text2: {
-      fontSize: theme.fontSizes.sm,
-      fontFamily: theme.fonts.medium,
-      color: theme.colors.textLight,
-      lineHeight: 18,
-    },
-  });
+  commentNotification: (props: any) => (
+    <CommentNotificationToast
+      title={props.text1}
+      message={props.text2}
+      notificationData={props.props?.notificationData}
+      onPress={props.props?.onPress}
+    />
+  ),
+};

@@ -23,4 +23,5 @@ export enum ROUTES {
   UPDATE_PROFILE = "UpdateProfile",
   ADD_EMAIL = "AddEmail",
   NOTIFICATION = "Notification",
+  TEST_TOAST = "TestToast",
 }

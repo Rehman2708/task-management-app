@@ -68,6 +68,7 @@ export function useProfileViewModel() {
   const resetPasswordScreen = () => navigation.navigate(ROUTES.RESET_PASSWORD);
   const updateProfileScreen = () => navigation.navigate(ROUTES.UPDATE_PROFILE);
   const addEmailScreen = () => navigation.navigate(ROUTES.ADD_EMAIL);
+  const testToastScreen = () => navigation.navigate(ROUTES.TEST_TOAST);
 
   function startCountdown(
     targetDate: Date | string,
@@ -156,5 +157,6 @@ export function useProfileViewModel() {
     fetchUserDetails,
     resetPasswordScreen,
     addEmailScreen,
+    testToastScreen,
   };
 }

@@ -46,6 +46,7 @@ export default function ProfileScreen() {
     fetchUserDetails,
     resetPasswordScreen,
     addEmailScreen,
+    testToastScreen,
   } = useProfileViewModel();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -80,33 +81,37 @@ export default function ProfileScreen() {
 
   const tabs = [
     {
-      title: "Update profile",
+      title: "👤 Update profile",
       onPress: updateProfileScreen,
     },
     // Show "Add Email" option only for users without email
     ...(!user?.email
       ? [
           {
-            title: "Add Email",
+            title: "📧 Add Email",
             onPress: addEmailScreen,
           },
         ]
       : []),
     {
-      title: "Change theme",
+      title: "🎨 Change theme",
       onPress: changeThemeScreen,
     },
     {
-      title: "Change font",
+      title: "🔤 Change font",
       onPress: changeFontScreen,
     },
     {
-      title: "Reset password",
+      title: "🔒 Reset password",
       onPress: resetPasswordScreen,
     },
     {
-      title: "Add video",
+      title: "🎥 Add video",
       onPress: createVideoScreen,
+    },
+    {
+      title: "🧪 Test Toast",
+      onPress: testToastScreen,
     },
   ];
   return (
@@ -219,20 +224,20 @@ export default function ProfileScreen() {
               </Row>
 
               <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-                <Text style={[commonStyles.smallText]}>Name:</Text>
+                <Text style={[commonStyles.smallText]}>👤 Name:</Text>
                 <Text style={[commonStyles.subTitleText]}>
                   {user?.name || "N/A"}
                 </Text>
               </Row>
               {user?.email && (
                 <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-                  <Text style={[commonStyles.smallText]}>Email:</Text>
+                  <Text style={[commonStyles.smallText]}>📧 Email:</Text>
                   <Text style={[commonStyles.subTitleText]}>{user.email}</Text>
                 </Row>
               )}
               {user?.about && (
                 <Row gap={isAndroid ? 6 : 8}>
-                  <Text style={[commonStyles.smallText]}>About me:</Text>
+                  <Text style={[commonStyles.smallText]}>💭 About me:</Text>
                   <Text style={[commonStyles.subTitleText, { maxWidth: 300 }]}>
                     {user.about}
                   </Text>
@@ -241,7 +246,7 @@ export default function ProfileScreen() {
               {partnerId ? (
                 <>
                   <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-                    <Text style={[commonStyles.smallText]}>Partner:</Text>
+                    <Text style={[commonStyles.smallText]}>👥 Partner:</Text>
                     <Text style={[commonStyles.subTitleText]}>
                       {user?.partner?.name || "N/A"}
                     </Text>
@@ -249,7 +254,7 @@ export default function ProfileScreen() {
                   {user?.partner?.about && (
                     <Row gap={isAndroid ? 6 : 8}>
                       <Text style={[commonStyles.smallText]}>
-                        About partner:
+                        💭 About partner:
                       </Text>
                       <Text
                         style={[
@@ -268,7 +273,9 @@ export default function ProfileScreen() {
               ) : (
                 <Column>
                   <Spacer size={50} />
-                  <Text style={[commonStyles.basicText]}>Add Partner Id:</Text>
+                  <Text style={[commonStyles.basicText]}>
+                    👥 Add Partner Id:
+                  </Text>
 
                   <CustomInput
                     value={partnerInput}
@@ -276,7 +283,7 @@ export default function ProfileScreen() {
                   />
 
                   <CustomButton
-                    title="Add"
+                    title="➕ Add"
                     outlined
                     loading={loading}
                     onPress={async () => {
@@ -342,7 +349,7 @@ export default function ProfileScreen() {
                         { color: theme.colors.error },
                       ]}
                     >
-                      Logout
+                      🚪 Logout
                     </Text>
                   )}
                 </Row>
@@ -377,8 +384,8 @@ export default function ProfileScreen() {
           isVisible={showAlert}
           onClose={() => setShowAlert(false)}
           onConfirm={handleLogout}
-          title={"Logout"}
-          subTitle={"Are you sure you want to Logout?"}
+          title={"🚪 Logout"}
+          subTitle={"Are you sure you want to logout?"}
           error
           loading={loggingOut}
         />

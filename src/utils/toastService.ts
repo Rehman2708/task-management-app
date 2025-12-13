@@ -93,6 +93,29 @@ class ToastService {
   static quickWarning(message: string) {
     this.warning({ title: message });
   }
+
+  /**
+   * Show comment notification toast with navigation
+   */
+  static commentNotification(config: {
+    title: string;
+    message?: string;
+    notificationData?: any;
+    onPress?: () => void;
+    duration?: number;
+  }) {
+    Toast.show({
+      type: "commentNotification" as any,
+      text1: config.title,
+      text2: config.message,
+      visibilityTime: config.duration || 5000, // Longer duration for comment notifications
+      position: "top",
+      props: {
+        notificationData: config.notificationData,
+        onPress: config.onPress,
+      },
+    });
+  }
 }
 
 export default ToastService;

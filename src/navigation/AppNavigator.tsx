@@ -20,6 +20,7 @@ import CreateListScreen from "../screens/CreateList/CreateListScreen";
 import ViewListScreen from "../screens/ViewList/ViewListScreen";
 import ResetPasswordScreen from "../screens/ResetPassword/ResetPasswordScreen";
 import { AddEmailScreen } from "../screens/AddEmail/AddEmailScreen";
+import TestToastScreen from "../screens/TestToast/TestToastScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -55,6 +56,7 @@ export default function AppNavigator() {
         component={ResetPasswordScreen}
       />
       <Stack.Screen name={ROUTES.ADD_EMAIL} component={AddEmailScreen} />
+      <Stack.Screen name={ROUTES.TEST_TOAST} component={TestToastScreen} />
     </Stack.Navigator>
   );
 }
