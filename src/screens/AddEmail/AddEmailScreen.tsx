@@ -51,19 +51,19 @@ export const AddEmailScreen = () => {
   };
 
   return (
-    <ScreenWrapper title="Add Email" showBackbutton>
+    <ScreenWrapper title="📧 Add Email" showBackbutton>
       <CustomInput
-        title="Email Address"
+        title="📧 Email Address"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
-        placeholder="Enter your email"
+        placeholder="📧 Enter your email"
       />
 
       {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
       <View style={commonStyles.fullFlex} />
       <CustomButton
-        title="Add Email"
+        title="➕ Add Email"
         onPress={handleAddEmail}
         loading={loading}
       />

@@ -60,13 +60,13 @@ const AlertModal = ({
           <Row justifyContent="space-between">
             <CustomButton
               onPress={onClose}
-              title="Cancel"
+              title="❌ Cancel"
               halfWidth
               rounded
               outlined
             />
             <CustomButton
-              title="Confirm"
+              title="✅ Confirm"
               halfWidth
               rounded
               onPress={onConfirm}

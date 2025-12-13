@@ -51,7 +51,9 @@ const EmptyState = ({
             isDark && { color: theme.colors.white },
           ]}
         >
-          {error ? "Something went wrong!" : text ?? "Something went wrong!"}
+          {error
+            ? "⚠️ Something went wrong!"
+            : text ?? "⚠️ Something went wrong!"}
         </Text>
         {subtext && (
           <Text
@@ -68,7 +70,7 @@ const EmptyState = ({
         <Row style={commonStyles.fullWidth}>
           <CustomButton
             loading={loading}
-            title="Refresh"
+            title="🔄 Refresh"
             onPress={button}
             halfWidth
             rounded

@@ -150,7 +150,7 @@ export default function ReelsScreen() {
       <SafeAreaView style={[styles.container]}>
         <Spacer size={insets.top} />
         <EmptyState
-          text={"No videos"}
+          text={"🎥 No videos"}
           loading={loading}
           error={error?.trim()?.length > 0 && false}
           button={() => fetchVideos(1, false)}

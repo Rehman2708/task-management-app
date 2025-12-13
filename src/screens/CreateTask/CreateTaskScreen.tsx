@@ -41,7 +41,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
   };
   return (
     <ScreenWrapper
-      title={task ? "Edit Task" : "Create Task"}
+      title={task ? "✏️ Edit Task" : "➕ Create Task"}
       showBackbutton
       image={vm.image.length ? vm.image : undefined}
       noPadding
@@ -55,19 +55,19 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
         >
           <ImageModal onChange={vm.setImage} defaultImage={vm.image} />
           <CustomInput
-            title="Enter task title"
+            title="📝 Enter task title"
             value={vm.title}
             onChangeText={vm.setTitle}
           />
           <CustomInput
-            title="Enter description"
+            title="📄 Enter description"
             value={vm.description}
             onChangeText={vm.setDescription}
             multiline
           />
           {loggedInUser?.partner?.userId && (
             <>
-              <Text style={commonStyles.smallText}>For</Text>
+              <Text style={commonStyles.smallText}>👥 For</Text>
               <Row gap={isAndroid ? 14 : 16} alignItems="center">
                 {["Me", "Partner", "Both"].map((option, index) => (
                   <TouchableOpacity
@@ -134,7 +134,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
             ))}
           </Row> */}
 
-          <Text style={commonStyles.smallText}>Priority</Text>
+          <Text style={commonStyles.smallText}>🚨 Priority</Text>
           <Row gap={isAndroid ? 14 : 16} alignItems="center">
             {["Low", "High", "Urgent"].map((option) => (
               <TouchableOpacity
@@ -167,18 +167,18 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
               </TouchableOpacity>
             ))}
           </Row>
-          <Text style={styles.label}>Subtasks</Text>
+          <Text style={styles.label}>📋 Subtasks</Text>
           {vm.subtasks?.map((subtask, index) => (
             <View key={index} style={commonStyles.cardContainer}>
               <CustomInput
-                title="Subtask title"
+                title="✅ Subtask title"
                 value={subtask?.title}
                 onChangeText={(text) => vm.updateSubtask(index, "title", text)}
                 maxLength={50}
               />
               <Row justifyContent="space-between" alignItems="center">
                 <Row gap={isAndroid ? 5 : 6} alignItems="center">
-                  <Text style={commonStyles.smallText}>Due:</Text>
+                  <Text style={commonStyles.smallText}>📅 Due:</Text>
 
                   {Platform.OS === "ios" ? (
                     // iOS: Inline picker
@@ -204,7 +204,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 {vm.subtasks?.length > 1 && (
                   <CustomButton
                     small
-                    title="Remove"
+                    title="🗑️ Remove"
                     error
                     onPress={() => vm.removeSubtask(index)}
                     halfWidth
@@ -231,7 +231,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
         <CustomButton
           loading={vm.loading}
           onPress={handleSave}
-          title={task && !repeat ? "Update Task" : "Create Task"}
+          title={task && !repeat ? "✏️ Update Task" : "➕ Create Task"}
         />
       </View>
     </ScreenWrapper>

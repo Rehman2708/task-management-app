@@ -39,15 +39,15 @@ export const LoginScreen = () => {
       >
         <Logo height={150} />
         <>
-          <Text style={commonStyles.titleText}>Login</Text>
+          <Text style={commonStyles.titleText}>🔐 Login</Text>
           <Spacer size={20} />
           <CustomInput
-            title="Email or User ID"
+            title="📧 Email or User ID"
             value={identifier}
             onChangeText={setIdentifier}
           />
           <CustomInput
-            title="Password"
+            title="🔒 Password"
             value={password}
             secureTextEntry
             onChangeText={setPassword}
@@ -55,13 +55,17 @@ export const LoginScreen = () => {
 
           {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
 
-          <CustomButton title="Login" onPress={handleLogin} loading={loading} />
+          <CustomButton
+            title="🚀 Login"
+            onPress={handleLogin}
+            loading={loading}
+          />
           <CustomButton
             customStyle={{
               borderWidth: 0,
               height: 30,
             }}
-            title="Register"
+            title="📝 Register"
             outlined
             onPress={Register}
           />

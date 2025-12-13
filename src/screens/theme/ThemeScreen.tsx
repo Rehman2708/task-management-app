@@ -89,7 +89,7 @@ const ThemeScreen = () => {
   }, [user]);
 
   return (
-    <ScreenWrapper title="Theme" showBackbutton noPadding>
+    <ScreenWrapper title="🎨 Theme" showBackbutton noPadding>
       <ScrollView>
         <Column gap={12} style={[commonStyles.screenWrapper]}>
           {colors.map((item, index) => (
@@ -118,7 +118,7 @@ const ThemeScreen = () => {
                     <Text
                       style={[commonStyles.titleText, commonStyles.whiteText]}
                     >
-                      Selected
+                      ✅ Selected
                     </Text>
                   </Row>
                 )}

@@ -188,13 +188,13 @@ const NotificationScreen = () => {
   return (
     <ScreenWrapper
       noPadding
-      title="Notifications"
+      title="🔔 Notifications"
       showBackbutton
       hideNotificationButton
     >
       {notifications.length === 0 || loading ? (
         <EmptyState
-          text="No notifications!"
+          text="🔔 No notifications!"
           loading={loading}
           image={Images.noNotification}
           type={LoaderTypes.NotificationScreen}

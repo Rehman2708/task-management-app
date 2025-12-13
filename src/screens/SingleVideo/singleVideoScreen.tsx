@@ -43,7 +43,7 @@ const SingleVideoScreen = () => {
         <>
           <EmptyState
             loading={loading}
-            text={"Something went wrong"}
+            text={"⚠️ Something went wrong"}
             type={LoaderTypes.VideoScreen}
           />
           <Spacer size={18} />

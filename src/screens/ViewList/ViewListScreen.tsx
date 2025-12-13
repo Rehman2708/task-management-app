@@ -85,7 +85,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
           <CustomButton
             onPress={() => toggleItemCompletion(index)}
             iconName="checkmark-done-outline"
-            title="Send"
+            title="Complete"
             sendButton
             success
           />
@@ -147,7 +147,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
               scrollEnabled={false}
               ListEmptyComponent={
                 <Text style={commonStyles.smallText}>
-                  No items in this list.
+                  📋 No items in this list.
                 </Text>
               }
             />
@@ -160,13 +160,13 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
         alignItems="center"
       >
         <CustomButton
-          title="Edit"
+          title="✏️ Edit"
           onPress={() => navigation.navigate(ROUTES.CREATE_LIST, { list })}
           rounded
           halfWidth
         />
         <CustomButton
-          title="Delete"
+          title="🗑️ Delete"
           onPress={() => setShowAlert(true)}
           rounded
           halfWidth
@@ -189,7 +189,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
           isVisible={showAlert}
           onClose={() => setShowAlert(false)}
           onConfirm={deleteList}
-          title={"Delete List"}
+          title={"🗑️ Delete List"}
           subTitle={"Are you sure you want to delete this list?"}
           error
           loading={loading}

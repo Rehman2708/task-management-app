@@ -71,7 +71,7 @@ const UpdateProfileScreen = () => {
   };
 
   return (
-    <ScreenWrapper showBackbutton title="Update Profile">
+    <ScreenWrapper showBackbutton title="👤 Update Profile">
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
         <ImageModal
           onChange={updateProfilePicture}
@@ -116,21 +116,25 @@ const UpdateProfileScreen = () => {
           }
         />
         <CustomInput
-          title="User Id"
+          title="🆔 User Id"
           editable={false}
           value={user?.userId}
           onChangeText={() => {}}
         />
-        <CustomInput title="Name" onChangeText={setUserName} value={userName} />
         <CustomInput
-          title="About"
+          title="👤 Name"
+          onChangeText={setUserName}
+          value={userName}
+        />
+        <CustomInput
+          title="💭 About"
           onChangeText={setUserAbout}
           value={userAbout}
           multiline
         />
         {hasChanges && (
           <CustomButton
-            title={loading ? "Updating..." : "Update"}
+            title={loading ? "⏳ Updating..." : "✏️ Update"}
             onPress={updateProfile}
             disabled={loading || !userName.trim()}
           />

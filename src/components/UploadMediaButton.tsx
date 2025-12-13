@@ -158,7 +158,7 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
       <CustomButton
         onPress={() => selectMedia(true)}
         loading={cameraLoading}
-        title="Camera"
+        title="📷 Camera"
         disabled={disabled || cameraLoading || galleryLoading}
         sendButton
         iconName={isVideo ? "videocam-outline" : "camera-outline"}
@@ -176,7 +176,7 @@ export const UploadMediaButton: React.FC<UploadMediaButtonProps> = ({
       <CustomButton
         onPress={() => selectMedia(false)}
         loading={galleryLoading}
-        title="Gallery"
+        title="🖼️ Gallery"
         disabled={disabled || cameraLoading || galleryLoading}
         sendButton
         iconName="image-outline"

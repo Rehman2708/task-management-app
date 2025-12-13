@@ -61,27 +61,27 @@ export const RegisterScreen = () => {
         ]}
       >
         <Logo height={150} />
-        <Text style={commonStyles.titleText}>Register</Text>
+        <Text style={commonStyles.titleText}>📝 Register</Text>
         <Spacer size={20} />
 
         {!otpSent ? (
           <>
-            <CustomInput title="Name" value={name} onChangeText={setName} />
+            <CustomInput title="👤 Name" value={name} onChangeText={setName} />
             <CustomInput
-              title="Email"
+              title="📧 Email"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
             />
             <CustomInput
-              title="Password"
+              title="🔒 Password"
               value={password}
               secureTextEntry
               onChangeText={setPassword}
               onValidate={setIsValidPassword}
             />
             <CustomInput
-              title="Partner User ID (Optional)"
+              title="👥 Partner User ID (Optional)"
               value={partnerUserId}
               onChangeText={setPartnerUserId}
             />
@@ -89,7 +89,7 @@ export const RegisterScreen = () => {
             {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
 
             <CustomButton
-              title="Send OTP"
+              title="📱 Send OTP"
               onPress={handleSendOTP}
               loading={otpLoading}
               disabled={!isValidPassword}
@@ -103,11 +103,11 @@ export const RegisterScreen = () => {
                 { textAlign: "center", marginBottom: 20 },
               ]}
             >
-              We've sent a 6-digit OTP to {email}
+              📱 We've sent a 6-digit OTP to {email}
             </Text>
 
             <CustomInput
-              title="Enter OTP"
+              title="🔢 Enter OTP"
               value={otp}
               onChangeText={setOtp}
               keyboardType="numeric"
@@ -117,7 +117,7 @@ export const RegisterScreen = () => {
             {error ? <Text style={commonStyles.errorText}>{error}</Text> : null}
 
             <CustomButton
-              title="Verify & Register"
+              title="✅ Verify & Register"
               onPress={handleVerifyOTP}
               loading={loading}
             />
@@ -127,7 +127,7 @@ export const RegisterScreen = () => {
                 borderWidth: 0,
                 height: 30,
               }}
-              title="Resend OTP"
+              title="🔄 Resend OTP"
               onPress={resendOTP}
               outlined
               loading={otpLoading}
@@ -140,7 +140,7 @@ export const RegisterScreen = () => {
             borderWidth: 0,
             height: 30,
           }}
-          title="Login"
+          title="🔐 Login"
           onPress={Login}
           outlined
         />

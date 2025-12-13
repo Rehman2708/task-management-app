@@ -132,11 +132,11 @@ const TasksCard = ({
                 </Row>
               </Row>
               <Text numberOfLines={2} style={commonStyles.tinyText}>
-                {item.description || "No Description"}
+                {item.description || "📝 No Description"}
               </Text>
               <Row justifyContent="space-between" alignItems="center">
                 <Row alignItems="center">
-                  <Text style={commonStyles.tTinyText}>Creator: </Text>
+                  <Text style={commonStyles.tTinyText}>👤 Creator: </Text>
                   <Avatar
                     name={
                       item?.createdByDetails
@@ -176,7 +176,7 @@ const TasksCard = ({
                 </Row>
                 <Row alignItems="center" gap={4}>
                   <Text style={[commonStyles.tTinyText]}>
-                    For {item.assignedTo}
+                    👥 For {item.assignedTo}
                   </Text>
                   <AssignedIcon
                     type={item.assignedTo as AssignedTo}

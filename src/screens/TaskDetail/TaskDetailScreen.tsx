@@ -211,7 +211,7 @@ export default function TaskDetailScreen({ route }: any) {
                 <CustomButton
                   onPress={() => handleUpdateStatus(item._id)}
                   iconName="checkmark-done-outline"
-                  title="Send"
+                  title="Complete"
                   sendButton
                   loading={subtaskStatusLoading === item._id}
                   success
@@ -256,7 +256,7 @@ export default function TaskDetailScreen({ route }: any) {
         {error || taskDetailLoading ? (
           <EmptyState
             type={LoaderTypes.TaskDetailScreen}
-            text="Retry"
+            text="🔄 Retry"
             button={fetchTaskDetail}
             error
             loading={taskDetailLoading}
@@ -294,7 +294,7 @@ export default function TaskDetailScreen({ route }: any) {
               )}
               <Row justifyContent="flex-end" alignItems="center" gap={4}>
                 <Text style={[commonStyles.tinyText]}>
-                  For {task.assignedTo}
+                  👥 For {task.assignedTo}
                 </Text>
                 <AssignedIcon
                   type={task.assignedTo as AssignedTo}
@@ -304,7 +304,7 @@ export default function TaskDetailScreen({ route }: any) {
               </Row>
               {task.subtasks?.length > 0 && (
                 <View style={styles.container}>
-                  <Text style={commonStyles.subTitleText}>Subtasks</Text>
+                  <Text style={commonStyles.subTitleText}>📋 Subtasks</Text>
                   <Spacer size={8} />
                   <FlatList
                     data={task.subtasks}

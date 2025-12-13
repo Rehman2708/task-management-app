@@ -49,7 +49,7 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
 
   return (
     <ScreenWrapper
-      title={list ? "Edit List" : "Create List"}
+      title={list ? "✏️ Edit List" : "📋 Create List"}
       showBackbutton
       image={image.length ? image : undefined}
       noPadding
@@ -63,32 +63,32 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
         >
           <ImageModal defaultImage={image} onChange={setImage} />
 
-          <CustomInput title="Title" value={title} onChangeText={setTitle} />
+          <CustomInput title="📝 Title" value={title} onChangeText={setTitle} />
 
           <CustomInput
-            title="Description"
+            title="📄 Description"
             value={description}
             onChangeText={setDescription}
             multiline
-            placeholder={"Enter full description…"}
+            placeholder={"📄 Enter full description…"}
           />
 
           <Spacer size={16} />
 
           {/* Add List Items */}
-          <Text style={commonStyles.subTitleText}>List Items</Text>
+          <Text style={commonStyles.subTitleText}>📋 List Items</Text>
           <Row alignItems="center" justifyContent="space-between">
             <CustomInput
               value={newItem}
               onChangeText={setNewItem}
-              placeholder="Enter item..."
+              placeholder="📝 Enter item..."
               fullFlex
               multiline
               inputStyle={{ minHeight: 50 }}
             />
             <Spacer size={12} position="right" />
             <CustomButton
-              title="Add"
+              title="➕ Add"
               onPress={addItem}
               small
               disabled={!newItem.trim()}
@@ -113,7 +113,7 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
                 </Text>
                 <Spacer size={12} position="right" />
                 <CustomButton
-                  title="Add"
+                  title="🗑️ Remove"
                   onPress={() => removeItem(index)}
                   small
                   sendButton
@@ -128,7 +128,7 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
         </KeyboardAwareScrollView>
 
         <CustomButton
-          title={list?._id ? "Update" : "Save"}
+          title={list?._id ? "✏️ Update" : "💾 Save"}
           loading={loading}
           onPress={handleSave}
         />

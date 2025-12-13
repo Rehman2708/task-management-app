@@ -219,7 +219,7 @@ export default function GlobalCommentsModal({
             justifyContent="space-between"
             style={{ paddingHorizontal: 12, paddingVertical: 16 }}
           >
-            <Text style={commonStyles.subTitleText}>Comments</Text>
+            <Text style={commonStyles.subTitleText}>💬 Comments</Text>
             <Ionicons
               name="close"
               size={30}
@@ -235,7 +235,7 @@ export default function GlobalCommentsModal({
           >
             {initialLoading || comments.length === 0 ? (
               <EmptyState
-                text="No Comments"
+                text="💬 No Comments"
                 loading={initialLoading}
                 type={LoaderTypes.Comment}
               />
@@ -290,7 +290,7 @@ export default function GlobalCommentsModal({
                     ))}
                   </View>
                 )}
-                ListEmptyComponent={<EmptyState text="No Comments" />}
+                ListEmptyComponent={<EmptyState text="💬 No Comments" />}
               />
             )}
 
@@ -313,7 +313,7 @@ export default function GlobalCommentsModal({
                 </Row>
               )}
               <CustomInput
-                placeholder="Add comment..."
+                placeholder="💬 Add comment..."
                 value={newComment}
                 onChangeText={setNewComment}
                 fullFlex
@@ -327,7 +327,7 @@ export default function GlobalCommentsModal({
               />
               <CustomButton
                 onPress={handleSendComment}
-                title="Send"
+                title="📤 Send"
                 sendButton
                 loading={addingComment}
                 disabled={newComment?.length < 1}

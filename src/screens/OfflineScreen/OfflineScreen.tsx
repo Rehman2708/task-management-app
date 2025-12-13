@@ -36,7 +36,7 @@ export default function OfflineScreen() {
 
   return (
     <EmptyState
-      text="No Internet Connection"
+      text="📶 No Internet Connection"
       subtext="Please check your network settings"
       error
       // button={handleRetry}

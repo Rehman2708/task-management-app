@@ -125,7 +125,7 @@ export default function CreateVideoScreen() {
   const canUpload = isPlayable && !loading;
   return (
     <ScreenWrapper
-      title="Add Video"
+      title="🎥 Add Video"
       showBackbutton
       // subTitle="Videos > Add Video"
       noPadding
@@ -147,17 +147,17 @@ export default function CreateVideoScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <CustomInput
-            title="Title"
+            title="📝 Title"
             value={title}
             onChangeText={setTitle}
             editable={!loading}
             maxLength={50}
           />
           <CustomInput
-            title="Video URL"
+            title="🔗 Video URL"
             value={videoUrl}
             onChangeText={setVideoUrl}
-            placeholder="Enter video URL"
+            placeholder="🔗 Enter video URL"
             multiline
             inputStyle={{ maxHeight: 100, minHeight: 100 }}
             editable={!loading}
@@ -179,7 +179,7 @@ export default function CreateVideoScreen() {
 
             {isVideoUrlValid && (
               <CustomButton
-                title="Test"
+                title="🧪 Test"
                 onPress={handleTest}
                 disabled={!canTest}
                 customStyle={commonStyles.fullFlex}
@@ -217,7 +217,7 @@ export default function CreateVideoScreen() {
 
           {isPlayable && (
             <CustomButton
-              title="Upload Video"
+              title="📤 Upload Video"
               onPress={() => handleSave()}
               loading={loading}
               disabled={!canUpload}
@@ -236,12 +236,12 @@ export default function CreateVideoScreen() {
       >
         <View style={styles.modalContainer}>
           <Text style={commonStyles.titleText}>
-            Added Videos({filteredVideos.length})
+            🎥 Added Videos({filteredVideos.length})
           </Text>
           <Spacer size={12} />
 
           <CustomInput
-            placeholder="Search by title"
+            placeholder="🔍 Search by title"
             value={search}
             onChangeText={setSearch}
           />
@@ -279,7 +279,7 @@ export default function CreateVideoScreen() {
                 onEndReached={handleLoadMore}
                 onEndReachedThreshold={0.5}
                 ListEmptyComponent={
-                  <Text style={commonStyles.errorText}>No videos found</Text>
+                  <Text style={commonStyles.errorText}>🎥 No videos found</Text>
                 }
                 ListFooterComponent={
                   isFetchingMore ? (
@@ -291,7 +291,10 @@ export default function CreateVideoScreen() {
           )}
 
           <Spacer size={20} />
-          <CustomButton title="Close" onPress={() => setModalVisible(false)} />
+          <CustomButton
+            title="❌ Close"
+            onPress={() => setModalVisible(false)}
+          />
         </View>
       </Modal>
     </ScreenWrapper>

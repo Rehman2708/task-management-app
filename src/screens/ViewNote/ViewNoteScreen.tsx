@@ -138,13 +138,13 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
           alignItems="center"
         >
           <CustomButton
-            title="Edit"
+            title="✏️ Edit"
             onPress={() => navigation.navigate(ROUTES.CREATE_NOTE, { note })}
             rounded
             halfWidth
           />
           <CustomButton
-            title="Delete"
+            title="🗑️ Delete"
             onPress={() => setShowAlert(true)}
             halfWidth
             rounded
@@ -168,7 +168,7 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
           isVisible={showAlert}
           onClose={() => setShowAlert(false)}
           onConfirm={deleteNote}
-          title={"Delete Note"}
+          title={"🗑️ Delete Note"}
           subTitle={"Are you sure you want to delete this note?"}
           error
           loading={loading}

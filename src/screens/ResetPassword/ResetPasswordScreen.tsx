@@ -53,15 +53,19 @@ const ResetPasswordScreen = () => {
   };
 
   return (
-    <ScreenWrapper hideNotificationButton showBackbutton title="Reset Password">
+    <ScreenWrapper
+      hideNotificationButton
+      showBackbutton
+      title="🔒 Reset Password"
+    >
       <CustomInput
-        title="Current Password"
+        title="🔐 Current Password"
         value={form.oldPassword}
         secureTextEntry
         onChangeText={(value) => handleChange("oldPassword", value)}
       />
       <CustomInput
-        title="New Password"
+        title="🔑 New Password"
         value={form.newPassword}
         secureTextEntry
         onChangeText={(value) => handleChange("newPassword", value)}
@@ -69,7 +73,7 @@ const ResetPasswordScreen = () => {
       />
       <View style={{ flex: 1 }} />
       <CustomButton
-        title="Reset"
+        title="🔄 Reset"
         onPress={resetPassword}
         loading={loading}
         disabled={!isValidPassword}

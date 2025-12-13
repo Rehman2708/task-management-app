@@ -42,7 +42,7 @@ export const AndroidDateTimePicker = ({
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
       <CustomButton
-        title={dueDateTime ? formatDate(dueDateTime) : "No date selected"}
+        title={dueDateTime ? formatDate(dueDateTime) : "📅 No date selected"}
         rounded
         onPress={() => setShowDatePicker(true)}
         customStyle={{ height: 30, width: "auto" }}
