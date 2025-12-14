@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { dimensions, isAndroid } from "../tools";
+import { useHelper } from "./helper";
 
 /**
  * Shared toast styling utilities
@@ -9,10 +10,10 @@ export const createBaseToastStyles = (theme: any) =>
     baseToastContainer: {
       borderWidth: 1,
       borderLeftWidth: 6,
-      borderRadius: 8,
+      borderRadius: 12,
       marginHorizontal: 16,
       marginTop: 8,
-      padding: isAndroid ? 10 : 16,
+      padding: isAndroid ? 8 : 12,
       elevation: 4,
       shadowColor: "#000",
       width: dimensions.width * 0.9,
@@ -28,15 +29,14 @@ export const createBaseToastStyles = (theme: any) =>
       flex: 1,
     },
     title: {
-      fontSize: theme.fontSizes.md,
-      fontFamily: theme.fonts.semibold,
+      fontSize: theme.fontSizes.sm,
+      fontFamily: theme.fonts.medium,
       color: theme.colors.text,
     },
     message: {
-      fontSize: theme.fontSizes.sm,
-      fontFamily: theme.fonts.medium,
+      fontSize: theme.fontSizes.xs,
+      fontFamily: theme.fonts.regular,
       color: theme.colors.textLight,
-      lineHeight: 18,
     },
   });
 
@@ -47,6 +47,7 @@ export const getToastBorderColor = (
   type: "success" | "error" | "info" | "warning" | "primary",
   theme: any
 ) => {
+  const { themeColor } = useHelper();
   switch (type) {
     case "success":
       return theme.colors.success;
@@ -56,8 +57,8 @@ export const getToastBorderColor = (
       return theme.colors.warning;
     case "info":
     case "primary":
-      return theme.colors.primary;
+      return themeColor.dark;
     default:
-      return theme.colors.primary;
+      return themeColor.dark;
   }
 };

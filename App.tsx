@@ -35,12 +35,20 @@ import {
 
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
-    const data = notification.request.content.data;
+    // Parse data from dataString if data is undefined
+    let data = notification.request.content.data;
+
+    if (!data && (notification.request.content as any).dataString) {
+      try {
+        data = JSON.parse((notification.request.content as any).dataString);
+      } catch (error) {
+        console.error("Failed to parse notification dataString:", error);
+      }
+    }
 
     // Check if app is in foreground and this is a comment notification
     const currentAppState = AppState.currentState;
     const isAppInForeground = currentAppState === "active";
-
     const isComment = isCommentNotification(data);
 
     if (isAppInForeground && isComment) {
@@ -55,6 +63,9 @@ Notifications.setNotificationHandler({
         message: notification.request.content.body || undefined,
         notificationData: data,
         duration: 5000,
+        onPress: () => {
+          handleNotificationNavigation(data);
+        },
       });
 
       // Don't show the push notification
@@ -141,11 +152,6 @@ export default function App() {
                   actionIdentifier === NotificationAction.Complete &&
                   data?.type === NotificationData.SubtaskReminder
                 ) {
-                  console.log("📱 Handling subtask completion:", {
-                    taskId: data.taskId,
-                    subtaskId: data.subtaskId,
-                    userId: data.userId,
-                  });
                   await handleSubtaskCompletion(
                     data.taskId,
                     data.subtaskId,
@@ -165,7 +171,6 @@ export default function App() {
                   if (userId) {
                     await handleCommentReply(userText, data, userId);
                   } else {
-                    // Show error notification
                     await showErrorNotification(
                       "❌ Error",
                       "Please log in to reply to comments."
@@ -176,23 +181,25 @@ export default function App() {
                 ) {
                   // Handle view actions (view_task, view_note, view_list, view_video)
                   if (navigationRef.isReady()) {
-                    handleNotificationNavigation(data);
+                    await handleNotificationNavigation(data);
                   } else {
                     setLaunchedFromNotification(data);
                   }
-                } else if (!actionIdentifier && data) {
-                  // Handle regular notification tap (no action button)
+                } else if (
+                  (!actionIdentifier ||
+                    actionIdentifier ===
+                      "expo.modules.notifications.actions.DEFAULT") &&
+                  data
+                ) {
+                  // Handle regular notification tap (no action button or default action)
                   if (navigationRef.isReady()) {
-                    handleNotificationNavigation(data);
+                    await handleNotificationNavigation(data);
                   } else {
                     setLaunchedFromNotification(data);
                   }
                 }
               } catch (error) {
-                console.error(
-                  "❌ Error handling notification response:",
-                  error
-                );
+                console.error("Error handling notification response:", error);
               }
             }
           );
@@ -236,7 +243,7 @@ export default function App() {
         ref={navigationRef}
         onReady={() => {
           if (launchedFromNotification) {
-            // handleNotificationNavigation(launchedFromNotification);
+            handleNotificationNavigation(launchedFromNotification);
             clearLaunchedFromNotification();
           }
         }}

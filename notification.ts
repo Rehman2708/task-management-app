@@ -182,7 +182,7 @@ async function setupNotificationCategories() {
       );
     }
   } catch (error) {
-    console.error("❌ Failed to setup notification categories:", error);
+    console.error("Failed to setup notification categories:", error);
   }
 }
 
@@ -193,11 +193,16 @@ export async function getNotificationPermission() {
       return null;
     }
 
-    await Promise.all([setupAndroidChannels(), setupNotificationCategories()]);
+    // Set up channels and categories sequentially to ensure proper setup
+    await setupAndroidChannels();
+    await setupNotificationCategories();
+
+    // Small delay to ensure everything is registered
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     return true;
   } catch (error) {
-    console.error("❌ Failed to setup notifications:", error);
+    console.error("Failed to setup notifications:", error);
     return null;
   }
 }
@@ -218,96 +223,99 @@ export async function registerForPushNotificationsAsync() {
 export function navigate(name: string, params?: any) {
   if (navigationRef.isReady()) {
     (navigationRef as any).navigate(name, params);
-  } else {
   }
 }
 
 export const handleNotificationNavigation = async (data?: any) => {
   if (!data) return;
 
-  // Clear related notifications when opening the item
-  const { clearCommentNotifications, clearNotificationGroup } = await import(
-    "./src/utils/notificationHelpers"
-  );
+  try {
+    // Import notification helpers
+    const notificationHelpers = await import("./src/utils/notificationHelpers");
+    const { clearCommentNotifications, clearNotificationGroup } =
+      notificationHelpers;
 
-  switch (data.type) {
-    case NotificationData.Note:
-      if (data.noteId) {
-        if (data.isComment || data.isGrouped) {
-          await clearCommentNotifications(data.noteId, "note");
+    switch (data.type) {
+      case NotificationData.Note:
+        if (data.noteId) {
+          if (data.isComment || data.isGrouped) {
+            await clearCommentNotifications(data.noteId, "note");
+          }
+          navigate(ROUTES.VIEW_NOTE, {
+            noteId: data.noteId,
+            showComments: data.isComment || data.isGrouped,
+          });
+        } else {
+          navigate(ROUTES.NOTES);
         }
-        navigate(ROUTES.VIEW_NOTE, {
-          noteId: data.noteId,
-          showComments: data.isComment || data.isGrouped,
-        });
-      } else {
-        navigate(ROUTES.NOTES);
-      }
-      break;
+        break;
 
-    case NotificationData.List:
-      if (data.listId) {
-        if (data.isComment || data.isGrouped) {
-          await clearCommentNotifications(data.listId, "list");
+      case NotificationData.List:
+        if (data.listId) {
+          if (data.isComment || data.isGrouped) {
+            await clearCommentNotifications(data.listId, "list");
+          }
+          navigate(ROUTES.VIEW_LIST, {
+            listId: data.listId,
+            showComments: data.isComment || data.isGrouped,
+          });
+        } else {
+          navigate(ROUTES.LISTS);
         }
-        navigate(ROUTES.VIEW_LIST, {
-          listId: data.listId,
-          showComments: data.isComment || data.isGrouped,
-        });
-      } else {
-        navigate(ROUTES.LISTS);
-      }
-      break;
+        break;
 
-    case NotificationData.Task:
-      if (data.taskId) {
-        if (data.isComment || data.isGrouped) {
-          await clearCommentNotifications(data.taskId, "task");
+      case NotificationData.Task:
+        if (data.taskId) {
+          if (data.isComment || data.isGrouped) {
+            await clearCommentNotifications(data.taskId, "task");
+          }
+          navigate(ROUTES.TASK_DETAIL, {
+            taskId: data.taskId,
+            readOnly: !data.isActive,
+            showComments: data.isComment || data.isGrouped,
+            commentSubtaskId: data.commentSubtaskId,
+          });
+        } else {
+          navigate(ROUTES.TASKS);
         }
-        navigate(ROUTES.TASK_DETAIL, {
-          taskId: data.taskId,
-          readOnly: !data.isActive,
-          showComments: data.isComment || data.isGrouped,
-          commentSubtaskId: data.commentSubtaskId,
-        });
-      } else {
-        navigate(ROUTES.TASKS);
-      }
-      break;
+        break;
 
-    case NotificationData.SubtaskReminder:
-      if (data.taskId) {
-        await clearNotificationGroup(data.taskId);
-        navigate(ROUTES.TASK_DETAIL, {
-          taskId: data.taskId,
-          readOnly: false,
-          commentSubtaskId: data.subtaskId,
-        });
-      } else {
-        navigate(ROUTES.TASKS);
-      }
-      break;
-
-    case NotificationData.Profile:
-      navigate(ROUTES.PROFILE);
-      break;
-
-    case NotificationData.Video:
-      if (data.videoData) {
-        if (data.isComment || data.isGrouped) {
-          await clearCommentNotifications(data.videoData.id, "video");
+      case NotificationData.SubtaskReminder:
+        if (data.taskId) {
+          await clearNotificationGroup(data.taskId);
+          navigate(ROUTES.TASK_DETAIL, {
+            taskId: data.taskId,
+            readOnly: false,
+            commentSubtaskId: data.subtaskId,
+          });
+        } else {
+          navigate(ROUTES.TASKS);
         }
-        navigate(ROUTES.SINGLE_VIDEO, {
-          video: data.videoData,
-          showComments: data.isComment || data.isGrouped,
-        });
-      } else {
-        navigate(ROUTES.REELS);
-      }
-      break;
+        break;
 
-    default:
-      break;
+      case NotificationData.Profile:
+        navigate(ROUTES.PROFILE);
+        break;
+
+      case NotificationData.Video:
+        if (data.videoData) {
+          if (data.isComment || data.isGrouped) {
+            await clearCommentNotifications(data.videoData.id, "video");
+          }
+          navigate(ROUTES.SINGLE_VIDEO, {
+            video: data.videoData,
+            showComments: data.isComment || data.isGrouped,
+          });
+        } else {
+          navigate(ROUTES.REELS);
+        }
+        break;
+
+      default:
+        break;
+    }
+  } catch (error) {
+    console.error("Error handling notification navigation:", error);
   }
 };
 
@@ -361,10 +369,7 @@ export const handleCommentReply = async (
   userId: string
 ) => {
   if (!commentText?.trim() || !userId) {
-    console.warn("❌ Invalid comment reply data:", {
-      commentText: !!commentText,
-      userId: !!userId,
-    });
+    console.warn("Invalid comment reply data");
     return;
   }
 
@@ -396,8 +401,6 @@ export const handleCommentReply = async (
             successMessage = "Reply sent to task!";
           }
           success = true;
-        } else {
-          console.warn("❌ No taskId provided for task comment");
         }
         break;
 
@@ -410,8 +413,6 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to note!";
-        } else {
-          console.warn("❌ No noteId provided for note comment");
         }
         break;
 
@@ -424,8 +425,6 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to list!";
-        } else {
-          console.warn("❌ No listId provided for list comment");
         }
         break;
 
@@ -438,8 +437,6 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to video!";
-        } else {
-          console.warn("❌ No videoData.id provided for video comment");
         }
         break;
 
@@ -454,11 +451,10 @@ export const handleCommentReply = async (
       );
       await showSuccessNotification("💬 Reply Sent!", successMessage);
     } else {
-      console.warn("❌ Comment reply failed - no success flag set");
       throw new Error("Failed to process reply");
     }
   } catch (error) {
-    console.error("❌ Error sending comment reply:", error);
+    console.error("Error sending comment reply:", error);
 
     // Show error notification
     const { showErrorNotification } = await import(

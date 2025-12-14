@@ -7,6 +7,7 @@ import {
   createBaseToastStyles,
   getToastBorderColor,
 } from "../utils/toastStyles";
+import { Row } from "../tools";
 
 interface CommentNotificationToastProps {
   title: string;
@@ -45,7 +46,7 @@ const CommentNotificationToast: React.FC<CommentNotificationToastProps> = ({
       onPress={handlePress}
       activeOpacity={0.8}
     >
-      <View style={styles.toastContent}>
+      <Row alignItems="center">
         {hasImage && (
           <Image
             source={{ uri: notificationData.image }}
@@ -57,47 +58,23 @@ const CommentNotificationToast: React.FC<CommentNotificationToastProps> = ({
             }}
           />
         )}
-        <View style={[baseStyles.contentContainer, styles.textContent]}>
-          <Text style={[baseStyles.title, styles.titleSpacing]}>{title}</Text>
-          {message && (
-            <Text style={[baseStyles.message, styles.messageSpacing]}>
-              {message}
-            </Text>
-          )}
-          <Text style={styles.tapHint}>Tap to view</Text>
+        <View style={[baseStyles.contentContainer]}>
+          <Text style={[baseStyles.title]}>{title}</Text>
+          {message && <Text style={[baseStyles.message]}>{message}</Text>}
         </View>
-      </View>
+      </Row>
     </TouchableOpacity>
   );
 };
 
 const commentToastStyles = (theme: any) =>
   StyleSheet.create({
-    toastContent: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-    },
     notificationImage: {
       width: 50,
       height: 50,
-      borderRadius: 8,
+      borderRadius: 10,
       marginRight: 12,
       backgroundColor: theme.colors.loaderBg,
-    },
-    textContent: {
-      flex: 1,
-    },
-    titleSpacing: {
-      marginBottom: 4,
-    },
-    messageSpacing: {
-      marginBottom: 6,
-    },
-    tapHint: {
-      fontSize: theme.fontSizes.xs,
-      fontFamily: theme.fonts.medium,
-      color: theme.colors.primary,
-      fontStyle: "italic",
     },
   });
 

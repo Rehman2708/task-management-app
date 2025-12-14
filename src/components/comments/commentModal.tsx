@@ -65,6 +65,7 @@ const CommentItem = memo(
       <AnimatedListItem
         key={comment._id ?? `${comment.by}-${index}`}
         index={index}
+        animate={false}
       >
         <CommentCard
           url={comment.image}
