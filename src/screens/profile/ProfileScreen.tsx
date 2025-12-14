@@ -115,7 +115,7 @@ export default function ProfileScreen() {
     // },
   ];
   return (
-    <ScreenWrapper title="Profile" noPadding>
+    <ScreenWrapper title="👤 Profile" noPadding>
       {loadingUserDetail ? (
         <ScreenLoader type={LoaderTypes.ProfileScreen} />
       ) : (

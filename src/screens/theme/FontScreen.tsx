@@ -94,6 +94,7 @@ const FontScreen = () => {
                       color: theme.colors.text,
                     }}
                   >
+                    {isSelected ? "✅ " : ""}
                     {font}
                   </Text>
 

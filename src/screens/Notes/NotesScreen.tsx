@@ -164,7 +164,7 @@ export default function NotesScreen() {
                       swiper && commonStyles.whiteText,
                     ]}
                   >
-                    👤 Creator:{" "}
+                    Creator:{" "}
                   </Text>
                   <Avatar
                     name={

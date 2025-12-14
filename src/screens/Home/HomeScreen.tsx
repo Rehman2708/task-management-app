@@ -99,7 +99,10 @@ export default function HomeScreen({ navigation }: any) {
         {tabs.map((item) => (
           <Pressable
             key={item.value}
-            style={[commonStyles.fullFlex, { paddingVertical: 10 }]}
+            style={[
+              commonStyles.fullFlex,
+              { paddingBottom: 10, paddingTop: 4 },
+            ]}
             onPress={() => setTab(item.value)}
           >
             <Text
