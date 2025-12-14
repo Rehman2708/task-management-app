@@ -3,6 +3,12 @@ import * as Device from "expo-device";
 import { Platform } from "react-native";
 import { ROUTES } from "./src/enums/routes";
 import { createNavigationContainerRef } from "@react-navigation/native";
+import {
+  NotificationData,
+  NotificationCategory,
+  NotificationAction,
+  NotificationChannel,
+} from "./src/enums/notifications";
 
 export const navigationRef = createNavigationContainerRef();
 
@@ -16,7 +22,19 @@ export async function ensurePermission() {
   let finalStatus = existingStatus;
 
   if (existingStatus !== "granted") {
-    const { status } = await Notifications.requestPermissionsAsync();
+    // Request permissions with action buttons support
+    const { status } = await Notifications.requestPermissionsAsync({
+      ios: {
+        allowAlert: true,
+        allowBadge: true,
+        allowSound: true,
+        allowDisplayInCarPlay: true,
+        allowCriticalAlerts: false,
+        provideAppNotificationSettings: true,
+        allowProvisional: false,
+        allowAnnouncements: false,
+      },
+    });
     finalStatus = status;
   }
 
@@ -33,32 +51,32 @@ async function setupAndroidChannels() {
 
   const channels = [
     {
-      id: "note",
+      id: NotificationChannel.Note,
       name: "Notes",
       description: "Notifications for notes and note comments",
     },
     {
-      id: "task",
+      id: NotificationChannel.Task,
       name: "Tasks",
       description: "Notifications for tasks and task comments",
     },
     {
-      id: "video",
+      id: NotificationChannel.Video,
       name: "Videos",
       description: "Notifications for videos and video comments",
     },
     {
-      id: "profile",
+      id: NotificationChannel.Profile,
       name: "Profile Updates",
       description: "Notifications for profile and partner updates",
     },
     {
-      id: "list",
+      id: NotificationChannel.List,
       name: "Lists",
       description: "Notifications for lists and list comments",
     },
     {
-      id: "subtask_reminder",
+      id: NotificationChannel.SubtaskReminder,
       name: "Subtask Reminders",
       description: "Reminders for upcoming subtask due dates",
     },
@@ -87,7 +105,7 @@ async function setupNotificationCategories() {
       viewTitle: string
     ) => [
       {
-        identifier: "reply",
+        identifier: NotificationAction.Reply,
         buttonTitle: "Reply",
         options: {
           opensAppToForeground: false,
@@ -108,30 +126,53 @@ async function setupNotificationCategories() {
     ];
 
     // Set up notification categories with action buttons
-    await Notifications.setNotificationCategoryAsync("subtask_reminder", [
-      {
-        identifier: "complete",
-        buttonTitle: "Mark Complete",
-        options: {
-          opensAppToForeground: false, // Action can be handled in background
+    await Notifications.setNotificationCategoryAsync(
+      NotificationCategory.SubtaskReminder,
+      [
+        {
+          identifier: NotificationAction.Complete,
+          buttonTitle: "Mark Complete",
+          options: {
+            opensAppToForeground: false, // Action can be handled in background
+          },
         },
-      },
-      {
-        identifier: "view",
-        buttonTitle: "View Task",
-        options: {
-          opensAppToForeground: true,
+        {
+          identifier: NotificationAction.View,
+          buttonTitle: "View Task",
+          options: {
+            opensAppToForeground: true,
+          },
         },
-      },
-    ]);
+      ]
+    );
 
     // Comment categories with consistent structure
     const commentCategories = [
-      { id: "comment", viewId: "view", viewTitle: "View" },
-      { id: "task_comment", viewId: "view_task", viewTitle: "View Task" },
-      { id: "note_comment", viewId: "view_note", viewTitle: "View Note" },
-      { id: "list_comment", viewId: "view_list", viewTitle: "View List" },
-      { id: "video_comment", viewId: "view_video", viewTitle: "View Video" },
+      {
+        id: NotificationCategory.Comment,
+        viewId: NotificationAction.View,
+        viewTitle: "View",
+      },
+      {
+        id: NotificationCategory.TaskComment,
+        viewId: NotificationAction.ViewTask,
+        viewTitle: "View Task",
+      },
+      {
+        id: NotificationCategory.NoteComment,
+        viewId: NotificationAction.ViewNote,
+        viewTitle: "View Note",
+      },
+      {
+        id: NotificationCategory.ListComment,
+        viewId: NotificationAction.ViewList,
+        viewTitle: "View List",
+      },
+      {
+        id: NotificationCategory.VideoComment,
+        viewId: NotificationAction.ViewVideo,
+        viewTitle: "View Video",
+      },
     ];
 
     for (const category of commentCategories) {
@@ -140,10 +181,8 @@ async function setupNotificationCategories() {
         createCommentActions(category.viewId, category.viewTitle)
       );
     }
-
-    console.log("✅ Notification categories setup completed");
   } catch (error) {
-    console.error("❌ Failed to setup notification categories:", error);
+    console.error("Failed to setup notification categories:", error);
   }
 }
 
@@ -151,17 +190,19 @@ export async function getNotificationPermission() {
   try {
     const hasPermission = await ensurePermission();
     if (!hasPermission) {
-      console.log("❌ Notification permission denied");
       return null;
     }
 
-    console.log("📱 Setting up notification channels and categories...");
-    await Promise.all([setupAndroidChannels(), setupNotificationCategories()]);
+    // Set up channels and categories sequentially to ensure proper setup
+    await setupAndroidChannels();
+    await setupNotificationCategories();
 
-    console.log("✅ Notification permissions and setup completed");
+    // Small delay to ensure everything is registered
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     return true;
   } catch (error) {
-    console.error("❌ Failed to setup notifications:", error);
+    console.error("Failed to setup notifications:", error);
     return null;
   }
 }
@@ -182,105 +223,99 @@ export async function registerForPushNotificationsAsync() {
 export function navigate(name: string, params?: any) {
   if (navigationRef.isReady()) {
     (navigationRef as any).navigate(name, params);
-  } else {
-    console.log("⏳ Navigation not ready yet, storing for later");
   }
 }
 
 export const handleNotificationNavigation = async (data?: any) => {
   if (!data) return;
 
-  // Log grouped notification info for debugging
-  if (data.isGrouped && data.commentCount) {
-    console.log(
-      `📱 Opening grouped notification with ${data.commentCount} comments`
-    );
-  }
+  try {
+    // Import notification helpers
+    const notificationHelpers = await import("./src/utils/notificationHelpers");
+    const { clearCommentNotifications, clearNotificationGroup } =
+      notificationHelpers;
 
-  // Clear related notifications when opening the item
-  const { clearCommentNotifications, clearNotificationGroup } = await import(
-    "./src/utils/notificationHelpers"
-  );
-
-  switch (data.type) {
-    case "note":
-      if (data.noteId) {
-        if (data.isComment || data.isGrouped) {
-          await clearCommentNotifications(data.noteId, "note");
+    switch (data.type) {
+      case NotificationData.Note:
+        if (data.noteId) {
+          if (data.isComment || data.isGrouped) {
+            await clearCommentNotifications(data.noteId, "note");
+          }
+          navigate(ROUTES.VIEW_NOTE, {
+            noteId: data.noteId,
+            showComments: data.isComment || data.isGrouped,
+          });
+        } else {
+          navigate(ROUTES.NOTES);
         }
-        navigate(ROUTES.VIEW_NOTE, {
-          noteId: data.noteId,
-          showComments: data.isComment || data.isGrouped,
-        });
-      } else {
-        navigate(ROUTES.NOTES);
-      }
-      break;
+        break;
 
-    case "list":
-      if (data.listId) {
-        if (data.isComment || data.isGrouped) {
-          await clearCommentNotifications(data.listId, "list");
+      case NotificationData.List:
+        if (data.listId) {
+          if (data.isComment || data.isGrouped) {
+            await clearCommentNotifications(data.listId, "list");
+          }
+          navigate(ROUTES.VIEW_LIST, {
+            listId: data.listId,
+            showComments: data.isComment || data.isGrouped,
+          });
+        } else {
+          navigate(ROUTES.LISTS);
         }
-        navigate(ROUTES.VIEW_LIST, {
-          listId: data.listId,
-          showComments: data.isComment || data.isGrouped,
-        });
-      } else {
-        navigate(ROUTES.LISTS);
-      }
-      break;
+        break;
 
-    case "task":
-      if (data.taskId) {
-        if (data.isComment || data.isGrouped) {
-          await clearCommentNotifications(data.taskId, "task");
+      case NotificationData.Task:
+        if (data.taskId) {
+          if (data.isComment || data.isGrouped) {
+            await clearCommentNotifications(data.taskId, "task");
+          }
+          navigate(ROUTES.TASK_DETAIL, {
+            taskId: data.taskId,
+            readOnly: !data.isActive,
+            showComments: data.isComment || data.isGrouped,
+            commentSubtaskId: data.commentSubtaskId,
+          });
+        } else {
+          navigate(ROUTES.TASKS);
         }
-        navigate(ROUTES.TASK_DETAIL, {
-          taskId: data.taskId,
-          readOnly: !data.isActive,
-          showComments: data.isComment || data.isGrouped,
-          commentSubtaskId: data.commentSubtaskId,
-        });
-      } else {
-        navigate(ROUTES.TASKS);
-      }
-      break;
+        break;
 
-    case "subtask_reminder":
-      if (data.taskId) {
-        await clearNotificationGroup(data.taskId);
-        navigate(ROUTES.TASK_DETAIL, {
-          taskId: data.taskId,
-          readOnly: false,
-          commentSubtaskId: data.subtaskId,
-        });
-      } else {
-        navigate(ROUTES.TASKS);
-      }
-      break;
-
-    case "profile":
-      navigate(ROUTES.PROFILE);
-      break;
-
-    case "video":
-      if (data.videoData) {
-        if (data.isComment || data.isGrouped) {
-          await clearCommentNotifications(data.videoData.id, "video");
+      case NotificationData.SubtaskReminder:
+        if (data.taskId) {
+          await clearNotificationGroup(data.taskId);
+          navigate(ROUTES.TASK_DETAIL, {
+            taskId: data.taskId,
+            readOnly: false,
+            commentSubtaskId: data.subtaskId,
+          });
+        } else {
+          navigate(ROUTES.TASKS);
         }
-        navigate(ROUTES.SINGLE_VIDEO, {
-          video: data.videoData,
-          showComments: data.isComment || data.isGrouped,
-        });
-      } else {
-        navigate(ROUTES.REELS);
-      }
-      break;
+        break;
 
-    default:
-      console.log("Unhandled notification type:", data.type);
-      break;
+      case NotificationData.Profile:
+        navigate(ROUTES.PROFILE);
+        break;
+
+      case NotificationData.Video:
+        if (data.videoData) {
+          if (data.isComment || data.isGrouped) {
+            await clearCommentNotifications(data.videoData.id, "video");
+          }
+          navigate(ROUTES.SINGLE_VIDEO, {
+            video: data.videoData,
+            showComments: data.isComment || data.isGrouped,
+          });
+        } else {
+          navigate(ROUTES.REELS);
+        }
+        break;
+
+      default:
+        break;
+    }
+  } catch (error) {
+    console.error("Error handling notification navigation:", error);
   }
 };
 
@@ -333,21 +368,8 @@ export const handleCommentReply = async (
   notificationData: any,
   userId: string
 ) => {
-  console.log("📱 handleCommentReply called with:", {
-    commentText: commentText?.substring(0, 50) + "...",
-    type: notificationData?.type,
-    userId,
-    hasTaskId: !!notificationData?.taskId,
-    hasNoteId: !!notificationData?.noteId,
-    hasListId: !!notificationData?.listId,
-    hasVideoData: !!notificationData?.videoData,
-  });
-
   if (!commentText?.trim() || !userId) {
-    console.warn("❌ Invalid comment reply data:", {
-      commentText: !!commentText,
-      userId: !!userId,
-    });
+    console.warn("Invalid comment reply data");
     return;
   }
 
@@ -358,17 +380,13 @@ export const handleCommentReply = async (
     let success = false;
     let successMessage = "";
 
-    console.log("📱 Processing comment reply for type:", type);
-
     switch (type) {
-      case "task":
+      case NotificationData.Task:
         if (taskId) {
-          console.log("📱 Adding task comment:", { taskId, commentSubtaskId });
           const { TaskRepo } = await import("./src/repositories/task");
 
           if (commentSubtaskId) {
             // Reply to subtask comment
-            console.log("📱 Adding subtask comment");
             await TaskRepo.addSubtaskComment(taskId, commentSubtaskId, {
               userId: userId,
               text: commentText.trim(),
@@ -376,7 +394,6 @@ export const handleCommentReply = async (
             successMessage = "Reply sent to subtask!";
           } else {
             // Reply to task comment
-            console.log("📱 Adding task comment");
             await TaskRepo.addTaskComment(taskId, {
               by: userId,
               text: commentText.trim(),
@@ -384,14 +401,11 @@ export const handleCommentReply = async (
             successMessage = "Reply sent to task!";
           }
           success = true;
-        } else {
-          console.warn("❌ No taskId provided for task comment");
         }
         break;
 
-      case "note":
+      case NotificationData.Note:
         if (noteId) {
-          console.log("📱 Adding note comment:", { noteId });
           const { NotesRepo } = await import("./src/repositories/notes");
           await NotesRepo.addNoteComment(noteId, {
             createdBy: userId,
@@ -399,14 +413,11 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to note!";
-        } else {
-          console.warn("❌ No noteId provided for note comment");
         }
         break;
 
-      case "list":
+      case NotificationData.List:
         if (listId) {
-          console.log("📱 Adding list comment:", { listId });
           const { ListsRepo } = await import("./src/repositories/lists");
           await ListsRepo.addListComment(listId, {
             createdBy: userId,
@@ -414,14 +425,11 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to list!";
-        } else {
-          console.warn("❌ No listId provided for list comment");
         }
         break;
 
-      case "video":
+      case NotificationData.Video:
         if (videoData?.id) {
-          console.log("📱 Adding video comment:", { videoId: videoData.id });
           const { VideoRepo } = await import("./src/repositories/videos");
           await VideoRepo.addVideoComment(videoData.id, {
             createdBy: userId,
@@ -429,8 +437,6 @@ export const handleCommentReply = async (
           });
           success = true;
           successMessage = "Reply sent to video!";
-        } else {
-          console.warn("❌ No videoData.id provided for video comment");
         }
         break;
 
@@ -439,18 +445,16 @@ export const handleCommentReply = async (
     }
 
     if (success) {
-      console.log("✅ Comment reply successful:", successMessage);
       // Show success notification
       const { showSuccessNotification } = await import(
         "./src/utils/notificationUtils"
       );
       await showSuccessNotification("💬 Reply Sent!", successMessage);
     } else {
-      console.warn("❌ Comment reply failed - no success flag set");
       throw new Error("Failed to process reply");
     }
   } catch (error) {
-    console.error("❌ Error sending comment reply:", error);
+    console.error("Error sending comment reply:", error);
 
     // Show error notification
     const { showErrorNotification } = await import(

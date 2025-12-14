@@ -21,8 +21,6 @@ export const clearNotificationGroup = async (groupId: string) => {
         );
       }
     }
-
-    console.log(`🧹 Cleared notifications for group: ${groupId}`);
   } catch (error) {
     console.error("Error clearing notification group:", error);
   }
@@ -53,8 +51,6 @@ export const clearCommentNotifications = async (
         );
       }
     }
-
-    console.log(`🧹 Cleared comment notifications for ${itemType}: ${itemId}`);
   } catch (error) {
     console.error("Error clearing comment notifications:", error);
   }
@@ -66,7 +62,6 @@ export const clearCommentNotifications = async (
 export const clearAllNotifications = async () => {
   try {
     await Notifications.dismissAllNotificationsAsync();
-    console.log("🧹 Cleared all notifications");
   } catch (error) {
     console.error("Error clearing all notifications:", error);
   }
@@ -91,7 +86,6 @@ export const getNotificationBadgeCount = async (): Promise<number> => {
 export const setNotificationBadgeCount = async (count: number) => {
   try {
     await Notifications.setBadgeCountAsync(count);
-    console.log(`🔢 Set badge count to: ${count}`);
   } catch (error) {
     console.error("Error setting badge count:", error);
   }
@@ -116,7 +110,7 @@ export const areNotificationsEnabled = async (): Promise<boolean> => {
 export const getPresentedNotifications = async () => {
   try {
     const notifications = await Notifications.getPresentedNotificationsAsync();
-    console.log(`📱 Found ${notifications.length} presented notifications`);
+
     return notifications;
   } catch (error) {
     console.error("Error getting presented notifications:", error);
