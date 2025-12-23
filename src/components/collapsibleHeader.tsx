@@ -32,8 +32,9 @@ import { useTheme } from "../infrastructure/theme";
 import { useAuthStore } from "../store/authStore";
 import { useCommonStyles } from "../styles/commonstyles";
 import CustomHeader from "./CustomHeader";
-import { dimensions, isAndroid, isDarkMode, Spacer } from "../tools";
+import { dimensions, isAndroid, isDarkMode, Row, Spacer } from "../tools";
 import { useHelper } from "../utils/helper";
+import CustomMenu, { IMenuContentItem } from "./customMenu";
 
 const { width: screenWidth } = Dimensions.get("window");
 export const HEADER_MAX_HEIGHT = 300;
@@ -46,6 +47,7 @@ interface CollapsibleHeaderTabsProps {
   subTitle?: string;
   children: React.ReactNode;
   onRefresh?: () => Promise<void>;
+  menuItem?: IMenuContentItem[];
 }
 
 const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
@@ -55,6 +57,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
   title,
   children,
   onRefresh,
+  menuItem,
 }) => {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -221,15 +224,18 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
             color={theme.colors.white}
           />
         </TouchableOpacity>
-        {currentImageUri && (
-          <TouchableOpacity onPress={() => setShowImage(true)}>
-            <Ionicons
-              name="expand-outline"
-              size={26}
-              color={theme.colors.white}
-            />
-          </TouchableOpacity>
-        )}
+        <Row>
+          {currentImageUri && (
+            <TouchableOpacity onPress={() => setShowImage(true)}>
+              <Ionicons
+                name="expand-outline"
+                size={26}
+                color={theme.colors.white}
+              />
+            </TouchableOpacity>
+          )}
+          {menuItem?.length && <CustomMenu content={menuItem} />}
+        </Row>
       </Animated.View>
 
       {/* Sticky Header */}
@@ -246,6 +252,7 @@ const CollapsibleHeaderTabs: React.FC<CollapsibleHeaderTabsProps> = ({
           showBackbutton
           hideNotificationButton
           whiteBg={!isDarkMode}
+          menuItem={menuItem}
         />
       </Animated.View>
 

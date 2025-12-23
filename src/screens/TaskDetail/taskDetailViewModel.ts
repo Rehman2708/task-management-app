@@ -4,13 +4,18 @@ import { SubtaskStatus } from "../../enums/tasks";
 import { useAuthStore } from "../../store/authStore";
 import { useUtilStore } from "../../store/utils";
 import { useHelper } from "../../utils/helper";
+import { useNavigation } from "@react-navigation/native";
+import { Task } from "../../types/task";
 
 export function useTaskDetailViewModel(taskId: string) {
   const { user } = useAuthStore();
   const { refetchTask } = useUtilStore();
   const { triggerVibration } = useHelper();
+  const navigation = useNavigation();
 
-  const [task, setTask] = useState<any>(null);
+  const [task, setTask] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [taskCommentCount, setTaskCommentCount] = useState(0);
   const [subtaskCommentCounts, setSubtaskCommentCounts] = useState<
     Record<string, number>
@@ -76,6 +81,22 @@ export function useTaskDetailViewModel(taskId: string) {
     [taskId, user?.userId, refetchTask]
   );
 
+  const handleDeleteTask = async () => {
+    try {
+      setLoading(true);
+      const response = await TaskRepo.deleteTask(taskId, user?.userId ?? "");
+      console.log(response);
+      refetchTask();
+      navigation.goBack();
+    } catch (err: any) {
+      console.error("Delete task error:", err);
+      setError(err.message || "Failed to delete task");
+    } finally {
+      setLoading(false);
+      setShowAlert(false);
+    }
+  };
+
   useEffect(() => {
     fetchTaskDetail();
   }, [fetchTaskDetail]);
@@ -91,5 +112,9 @@ export function useTaskDetailViewModel(taskId: string) {
     setTaskCommentCount,
     subtaskCommentCounts,
     setSubtaskCommentCounts,
+    showAlert,
+    loading,
+    setShowAlert,
+    handleDeleteTask,
   };
 }

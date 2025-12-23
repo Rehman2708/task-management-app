@@ -6,7 +6,7 @@ import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, Row, Spacer } from "../../tools";
 import { useHelper } from "../../utils/helper";
-import { AssignedTo, SubtaskStatus } from "../../enums/tasks";
+import { AssignedTo, SubtaskStatus, TaskStatus } from "../../enums/tasks";
 import { AppUrl } from "../../utils/appUrl";
 
 import CustomButton from "../../components/customButton";
@@ -19,6 +19,9 @@ import { AssignedIcon } from "../CreateTask/components/subtaskItem";
 import CommentsModal from "../../components/comments/commentModal";
 import { Subtask } from "../../types/task";
 import AnimatedListItem from "../../components/animatedListItem";
+import AlertModal from "../../components/AlertModal";
+import { ROUTES } from "../../enums/routes";
+import { useNavigation } from "@react-navigation/native";
 
 export default function TaskDetailScreen({ route }: any) {
   const {
@@ -39,8 +42,12 @@ export default function TaskDetailScreen({ route }: any) {
     setTaskCommentCount,
     subtaskCommentCounts,
     setSubtaskCommentCounts,
+    loading,
+    showAlert,
+    setShowAlert,
+    handleDeleteTask,
   } = useTaskDetailViewModel(taskId);
-
+  const navigation: any = useNavigation();
   const { formatDate } = useHelper();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -251,7 +258,20 @@ export default function TaskDetailScreen({ route }: any) {
       <CollapsibleHeaderTabs
         headerImage={task?.image}
         title={task?.title}
-        subTitle={formatDate(task?.createdAt)}
+        subTitle={formatDate(task?.createdAt as string)}
+        menuItem={[
+          {
+            title: `${
+              task?.status === TaskStatus.Completed ? "Repeat" : "Edit"
+            } Task`,
+            onPress: () =>
+              navigation.navigate(ROUTES.CREATE_TASK, {
+                task: task,
+                repeat: task?.status === TaskStatus.Completed,
+              }),
+          },
+          { title: "Delete Task", onPress: () => setShowAlert(true) },
+        ]}
       >
         {error || taskDetailLoading ? (
           <EmptyState
@@ -302,7 +322,7 @@ export default function TaskDetailScreen({ route }: any) {
                   size={12}
                 />
               </Row>
-              {task.subtasks?.length > 0 && (
+              {task?.subtasks?.length > 0 && (
                 <View style={styles.container}>
                   <Text style={commonStyles.subTitleText}>📋 Subtasks</Text>
                   <Spacer size={8} />
@@ -344,6 +364,15 @@ export default function TaskDetailScreen({ route }: any) {
                 }))
             : setTaskCommentCount
         }
+      />
+      <AlertModal
+        isVisible={showAlert}
+        loading={loading}
+        onClose={() => setShowAlert(false)}
+        onConfirm={handleDeleteTask}
+        title={"🗑️ Delete Task"}
+        subTitle={"Are you sure you want to delete this task?"}
+        error
       />
     </View>
   );

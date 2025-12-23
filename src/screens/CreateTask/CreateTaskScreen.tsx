@@ -13,7 +13,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { AndroidDateTimePicker, AssignedIcon } from "./components/subtaskItem";
 import { useHelper } from "../../utils/helper";
 import ImageModal from "../../components/imageModal";
-import { AssignedTo, Priority } from "../../enums/tasks";
+import { AssignedTo, Priority, TaskStatus } from "../../enums/tasks";
 import { useTheme } from "../../infrastructure/theme";
 // Pass `task` prop for edit mode
 export const CreateTaskScreen = ({ route, navigation }: any) => {
@@ -41,7 +41,13 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
   };
   return (
     <ScreenWrapper
-      title={task ? "✏️ Edit Task" : "➕ Create Task"}
+      title={`${
+        task
+          ? task?.status === TaskStatus.Completed
+            ? "✏️ Create"
+            : "➕ Edit"
+          : "➕ Create"
+      } Task`}
       showBackbutton
       image={vm.image.length ? vm.image : undefined}
       noPadding

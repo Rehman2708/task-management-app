@@ -140,7 +140,9 @@ export default function ListsScreen() {
                     swiper && commonStyles.whiteText,
                   ]}
                 >
-                  {item.description}
+                  {item?.description?.length > 0
+                    ? item.description
+                    : "📝 No Description"}
                 </Text>
                 {swiper &&
                   item.items.map((item, index) => (

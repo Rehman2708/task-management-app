@@ -32,6 +32,7 @@ import {
   getCommentNotificationTitle,
   showErrorNotification,
 } from "./src/utils/notificationUtils";
+import { Provider } from "react-native-paper";
 
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
@@ -239,19 +240,21 @@ export default function App() {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <NavigationContainer
-        ref={navigationRef}
-        onReady={() => {
-          if (launchedFromNotification) {
-            handleNotificationNavigation(launchedFromNotification);
-            clearLaunchedFromNotification();
-          }
-        }}
-      >
-        <StatusBar backgroundColor={"#00000030"} translucent />
-        {!isConnected ? <OfflineScreen /> : <AppNavigator />}
-      </NavigationContainer>
-      <Toast config={toastConfig} />
+      <Provider>
+        <NavigationContainer
+          ref={navigationRef}
+          onReady={() => {
+            if (launchedFromNotification) {
+              handleNotificationNavigation(launchedFromNotification);
+              clearLaunchedFromNotification();
+            }
+          }}
+        >
+          <StatusBar backgroundColor={"#00000030"} translucent />
+          {!isConnected ? <OfflineScreen /> : <AppNavigator />}
+        </NavigationContainer>
+        <Toast config={toastConfig} />
+      </Provider>
     </GestureHandlerRootView>
   );
 }

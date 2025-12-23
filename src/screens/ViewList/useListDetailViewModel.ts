@@ -7,6 +7,8 @@ import { useNavigation } from "@react-navigation/native";
 export function useViewListViewModel(listId?: string) {
   const [list, setList] = useState<List | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const [showPinAlert, setShowPinAlert] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
@@ -21,6 +23,7 @@ export function useViewListViewModel(listId?: string) {
       setLoading(true);
       const data = await ListsRepo.getSingleList(listId);
       setList(data);
+      setPinned(data?.pinned ?? false);
       setTotalComments(data?.comments?.length ?? 0);
     } catch (err: any) {
       console.error("Get list error:", err);
@@ -42,6 +45,19 @@ export function useViewListViewModel(listId?: string) {
       setError(err.message || "Failed to delete list");
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handlePinUnpinList = async () => {
+    try {
+      setLoading(true);
+      await ListsRepo.pinList(listId ?? "", !pinned, user?.userId ?? "");
+      getList();
+      refetchLists();
+    } catch (err: any) {
+    } finally {
+      setLoading(false);
+      setShowPinAlert(false);
     }
   };
 
@@ -88,5 +104,9 @@ export function useViewListViewModel(listId?: string) {
     refetch: getList,
     totalComments,
     setTotalComments,
+    pinned,
+    showPinAlert,
+    setShowPinAlert,
+    handlePinUnpinList,
   };
 }
