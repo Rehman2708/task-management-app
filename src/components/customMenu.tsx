@@ -5,7 +5,7 @@ import { useTheme } from "../infrastructure/theme";
 import { useHelper } from "../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
 
-const useStyles = (error?: boolean) => {
+const useStyles = () => {
   const theme = useTheme();
   return StyleSheet.create({
     container: {
@@ -20,13 +20,16 @@ const useStyles = (error?: boolean) => {
       paddingLeft: 20,
     },
     titleStyle: {
-      color: error ? theme.colors.error : theme.colors.text,
+      color: theme.colors.text,
       fontFamily: theme.fonts.regular,
       marginTop: -2,
       fontWeight: "500",
       textAlign: "center",
       paddingRight: 22,
       fontSize: theme.fontSizes.md,
+    },
+    errorTitleStyle: {
+      color: theme.colors.error,
     },
     activeTitleStyle: {
       paddingLeft: 20,
@@ -37,6 +40,7 @@ const useStyles = (error?: boolean) => {
 export interface IMenuContentItem {
   title: string;
   onPress?: () => void;
+  error?: boolean;
 }
 
 interface ICustomMenuProps {
@@ -110,7 +114,10 @@ const CustomMenu: React.FC<ICustomMenuProps> = ({
               <Divider style={{ backgroundColor: theme.colors.border }} />
             )}
             <Menu.Item
-              titleStyle={menuStyles.titleStyle}
+              titleStyle={[
+                menuStyles.titleStyle,
+                item.error && menuStyles.errorTitleStyle,
+              ]}
               style={[
                 menuStyles.titleStyle,
                 showActiveIcon && menuStyles.activeTitleStyle,

@@ -117,7 +117,11 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
             title: `${pinned ? "Unpin" : "Pin"} List`,
             onPress: () => setShowPinAlert(true),
           },
-          { title: "Delete List", onPress: () => setShowAlert(true) },
+          {
+            title: "Delete List",
+            onPress: () => setShowAlert(true),
+            error: true,
+          },
         ]}
       >
         {loading ? (

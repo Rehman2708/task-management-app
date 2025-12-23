@@ -270,7 +270,11 @@ export default function TaskDetailScreen({ route }: any) {
                 repeat: task?.status === TaskStatus.Completed,
               }),
           },
-          { title: "Delete Task", onPress: () => setShowAlert(true) },
+          {
+            title: "Delete Task",
+            onPress: () => setShowAlert(true),
+            error: true,
+          },
         ]}
       >
         {error || taskDetailLoading ? (

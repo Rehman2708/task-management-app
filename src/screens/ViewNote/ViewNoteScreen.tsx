@@ -117,7 +117,11 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
               title: `${pinned ? "Unpin" : "Pin"} Note`,
               onPress: () => setShowPinAlert(true),
             },
-            { title: "Delete Note", onPress: () => setShowAlert(true) },
+            {
+              title: "Delete Note",
+              onPress: () => setShowAlert(true),
+              error: true,
+            },
           ]}
         >
           {gettingNote ? (
