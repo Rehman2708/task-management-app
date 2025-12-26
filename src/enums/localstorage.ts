@@ -3,4 +3,5 @@ export enum LocalStorageKey {
   USER = "User",
   COLOR = "Color",
   FONT = "Font",
+  BIOMETRIC_ENABLED = "BiometricEnabled",
 }

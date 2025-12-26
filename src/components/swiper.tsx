@@ -22,6 +22,7 @@ const Swiper: React.FC<SwiperProps> = ({
 }) => {
   const swipeableRef = useRef<Swipeable>(null);
   const { triggerVibration } = useHelper();
+
   const handleSwipeOpen = useCallback(() => {
     if (!closeInstant) {
       const timer = setTimeout(() => {
@@ -32,7 +33,7 @@ const Swiper: React.FC<SwiperProps> = ({
     } else {
       swipeableRef.current?.close();
     }
-  }, []);
+  }, [closeInstant]);
 
   return (
     <Swipeable
@@ -43,6 +44,15 @@ const Swiper: React.FC<SwiperProps> = ({
       containerStyle={containerStyle}
       onActivated={() => triggerVibration()}
       onSwipeableClose={onEnded}
+      // Fix gesture conflicts with FlatList and tab navigation
+      friction={2}
+      overshootFriction={8}
+      enableTrackpadTwoFingerGesture={false}
+      // Reduce sensitivity to prevent accidental swipes during scrolling
+      leftThreshold={40}
+      rightThreshold={40}
+      // Improve gesture recognition
+      useNativeAnimations={true}
     >
       {children}
     </Swipeable>

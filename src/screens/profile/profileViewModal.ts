@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AuthRepo } from "../../repositories/auth";
-import { CommonActions, useNavigation } from "@react-navigation/native";
+import {
+  CommonActions,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import * as Device from "expo-device";
 import { useAuthStore } from "../../store/authStore";
 import ToastService from "../../utils/toastService";
+import { BiometricSettings } from "../../utils/biometricSettings";
+import { BiometricAuth } from "../../utils/biometricAuth";
 
 export function useProfileViewModel() {
   const { updateUser, user, logout: storeLogout } = useAuthStore();
@@ -13,6 +19,17 @@ export function useProfileViewModel() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [partnerInput, setPartnerInput] = useState("");
   const [showAlert, setShowAlert] = useState(false);
+  const [biometricDisplayText, setBiometricDisplayText] =
+    useState("🔐 Biometric Auth");
+
+  const [showBiometricAlert, setShowBiometricAlert] = useState(false);
+  const [biometricAlertTitle, setBiometricAlertTitle] = useState("");
+  const [biometricAlertSubTitle, setBiometricAlertSubTitle] = useState("");
+  const [biometricAlertError, setBiometricAlertError] = useState(false);
+  const [biometricAlertLoading, setBiometricAlertLoading] = useState(false);
+  const [biometricAlertOnConfirm, setBiometricAlertOnConfirm] = useState<
+    (() => void) | null
+  >(null);
 
   const addPartner = async (partner: string) => {
     setLoading(true);
@@ -32,13 +49,18 @@ export function useProfileViewModel() {
       if (response?.success && response?.user) {
         updateUser(response.user);
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      ToastService.error({
+        title: "Error",
+        message: `${err.message}`,
+      });
     } finally {
       setLoading(false);
     }
   };
+
   const navigation: any = useNavigation();
+
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
@@ -61,9 +83,162 @@ export function useProfileViewModel() {
     }
   };
 
+  const showBiometricAlertModal = (
+    title: string,
+    subTitle: string,
+    onConfirm?: () => void,
+    error: boolean = false,
+    loading: boolean = false
+  ) => {
+    setBiometricAlertTitle(title);
+    setBiometricAlertSubTitle(subTitle);
+    setBiometricAlertError(error);
+    setBiometricAlertLoading(loading);
+    setBiometricAlertOnConfirm(onConfirm ? () => onConfirm : null);
+    setShowBiometricAlert(true);
+  };
+
+  const hideBiometricAlert = () => {
+    setShowBiometricAlert(false);
+    setBiometricAlertLoading(false);
+  };
+
+  const toggleBiometricAuth = async () => {
+    try {
+      const capabilities = await BiometricAuth.getCapabilities(true);
+
+      if (!capabilities.hasHardware) {
+        showBiometricAlertModal(
+          "Not Supported",
+          "This device doesn't support biometric authentication."
+        );
+        return;
+      }
+
+      if (!capabilities.isEnrolled) {
+        showBiometricAlertModal(
+          `${capabilities.primaryType} Not Set Up`,
+          `No ${capabilities.primaryType.toLowerCase()} data is enrolled on this device. Please set up ${capabilities.primaryType.toLowerCase()} in your device settings first.`,
+          () => {
+            hideBiometricAlert();
+            setTimeout(() => {
+              showBiometricAlertModal(
+                "Setup Instructions",
+                `To set up ${capabilities.primaryType}:\n\n1. Go to your device Settings\n2. Find Security or ${capabilities.primaryType} settings\n3. Follow the setup instructions\n4. Return to this app and try again`
+              );
+            }, 300);
+          }
+        );
+        return;
+      }
+
+      const currentSetting = await BiometricSettings.getBiometricSetting();
+      const biometricType = capabilities.primaryType;
+
+      if (currentSetting) {
+        showBiometricAlertModal(
+          `Disable ${biometricType}`,
+          `Are you sure you want to disable ${biometricType} authentication?\n\nYou will need to enter your credentials each time you open the app.`,
+          async () => {
+            setBiometricAlertLoading(true);
+            try {
+              await BiometricSettings.setBiometricSetting(false);
+              await updateBiometricDisplayText(true);
+              hideBiometricAlert();
+              setTimeout(() => {
+                showBiometricAlertModal(
+                  "Disabled",
+                  `${biometricType} authentication has been disabled.`
+                );
+              }, 300);
+            } catch (error) {
+              setBiometricAlertLoading(false);
+              showBiometricAlertModal(
+                "Error",
+                "Failed to disable biometric authentication. Please try again.",
+                undefined,
+                true
+              );
+            }
+          },
+          true
+        );
+      } else {
+        showBiometricAlertModal(
+          `Enable ${biometricType}`,
+          `Would you like to enable ${biometricType} authentication for faster and more secure access?\n\nYou can disable this anytime in your profile settings.`,
+          async () => {
+            setBiometricAlertLoading(true);
+            try {
+              const result = await BiometricAuth.authenticate(
+                `Use ${biometricType} to enable secure login`,
+                false
+              );
+
+              if (result.success) {
+                await BiometricSettings.setBiometricSetting(true);
+                await updateBiometricDisplayText(true);
+                hideBiometricAlert();
+                setTimeout(() => {
+                  showBiometricAlertModal(
+                    "Enabled",
+                    `${biometricType} authentication has been enabled successfully!`
+                  );
+                }, 300);
+              } else {
+                setBiometricAlertLoading(false);
+                let errorTitle = "Authentication Failed";
+                let errorMessage =
+                  result.error || "Could not enable biometric authentication.";
+
+                if (result.authType === "passcode") {
+                  errorTitle = "Passcode Used";
+                  errorMessage = `You used your device passcode instead of ${biometricType}. Please try again and use ${biometricType} to enable this feature.`;
+                }
+
+                showBiometricAlertModal(
+                  errorTitle,
+                  errorMessage,
+                  () => {
+                    hideBiometricAlert();
+                    setTimeout(() => toggleBiometricAuth(), 300);
+                  },
+                  true
+                );
+              }
+            } catch (error) {
+              console.error("Error enabling biometric auth:", error);
+              setBiometricAlertLoading(false);
+              showBiometricAlertModal(
+                "Error",
+                "An unexpected error occurred. Please try again.",
+                undefined,
+                true
+              );
+            }
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Error toggling biometric auth:", error);
+      showBiometricAlertModal(
+        "Error",
+        "An error occurred while updating biometric settings. Please try again.",
+        undefined,
+        true
+      );
+    }
+  };
+
+  const updateBiometricDisplayText = async (forceRefresh: boolean = false) => {
+    const displayText = await BiometricSettings.getBiometricDisplayText(
+      forceRefresh
+    );
+    setBiometricDisplayText(displayText);
+  };
+
   const changeThemeScreen = () => navigation.navigate(ROUTES.THEME);
   const changeFontScreen = () => navigation.navigate(ROUTES.FONT);
-
   const createVideoScreen = () => navigation.navigate(ROUTES.CREATE_VIDEO);
   const resetPasswordScreen = () => navigation.navigate(ROUTES.RESET_PASSWORD);
   const updateProfileScreen = () => navigation.navigate(ROUTES.UPDATE_PROFILE);
@@ -105,13 +280,21 @@ export function useProfileViewModel() {
     update();
     return setInterval(update, 1000);
   }
+
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
     const timer = startCountdown("2026-04-27T00:00:00+05:30", setTimeLeft);
-
-    return () => clearInterval(timer); // cleanup
+    updateBiometricDisplayText();
+    return () => clearInterval(timer);
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      updateBiometricDisplayText(true);
+    }, [])
+  );
+
   function getTimeLeft() {
     return `${timeLeft}`;
   }
@@ -126,6 +309,7 @@ export function useProfileViewModel() {
         const data = await AuthRepo.getUserDetails(user.userId);
         if (data?.user) {
           updateUser(data.user);
+          await updateBiometricDisplayText(true);
           return data.user;
         }
       }
@@ -146,6 +330,7 @@ export function useProfileViewModel() {
     handleLogout,
     changeThemeScreen,
     changeFontScreen,
+    toggleBiometricAuth,
     createVideoScreen,
     updateProfileScreen,
     loggingOut,
@@ -158,5 +343,13 @@ export function useProfileViewModel() {
     resetPasswordScreen,
     addEmailScreen,
     testToastScreen,
+    biometricDisplayText,
+    showBiometricAlert,
+    biometricAlertTitle,
+    biometricAlertSubTitle,
+    biometricAlertError,
+    biometricAlertLoading,
+    biometricAlertOnConfirm,
+    hideBiometricAlert,
   };
 }

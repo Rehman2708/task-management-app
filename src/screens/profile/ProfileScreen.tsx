@@ -35,6 +35,7 @@ export default function ProfileScreen() {
     handleLogout,
     changeThemeScreen,
     changeFontScreen,
+    toggleBiometricAuth,
     createVideoScreen,
     updateProfileScreen,
     loggingOut,
@@ -47,6 +48,14 @@ export default function ProfileScreen() {
     resetPasswordScreen,
     addEmailScreen,
     testToastScreen,
+    biometricDisplayText,
+    showBiometricAlert,
+    biometricAlertTitle,
+    biometricAlertSubTitle,
+    biometricAlertError,
+    biometricAlertLoading,
+    biometricAlertOnConfirm,
+    hideBiometricAlert,
   } = useProfileViewModel();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -100,6 +109,10 @@ export default function ProfileScreen() {
     {
       title: "🔤 Change font",
       onPress: changeFontScreen,
+    },
+    {
+      title: biometricDisplayText,
+      onPress: toggleBiometricAuth,
     },
     {
       title: "🔒 Reset password",
@@ -388,6 +401,19 @@ export default function ProfileScreen() {
           subTitle={"Are you sure you want to logout?"}
           error
           loading={loggingOut}
+        />
+      )}
+
+      {/* Biometric Settings AlertModal */}
+      {showBiometricAlert && (
+        <AlertModal
+          isVisible={showBiometricAlert}
+          onClose={hideBiometricAlert}
+          onConfirm={biometricAlertOnConfirm}
+          title={biometricAlertTitle}
+          subTitle={biometricAlertSubTitle}
+          error={biometricAlertError}
+          loading={biometricAlertLoading}
         />
       )}
     </ScreenWrapper>

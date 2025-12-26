@@ -159,6 +159,12 @@ export default function HomeScreen({ navigation }: any) {
             updateCellsBatchingPeriod={50}
             initialNumToRender={10}
             windowSize={8}
+            // Improve scroll performance and reduce gesture conflicts
+            scrollEventThrottle={16}
+            bounces={true}
+            bouncesZoom={false}
+            alwaysBounceVertical={false}
+            directionalLockEnabled={true}
           />
         )}
       </View>

@@ -219,6 +219,12 @@ const NotificationScreen = () => {
               <ScreenLoader count={4} type={LoaderTypes.NotificationScreen} />
             ) : null
           }
+          // Improve scroll performance and reduce gesture conflicts
+          scrollEventThrottle={16}
+          bounces={true}
+          bouncesZoom={false}
+          alwaysBounceVertical={false}
+          directionalLockEnabled={true}
         />
       )}
     </ScreenWrapper>
