@@ -188,13 +188,13 @@ const NotificationScreen = () => {
   return (
     <ScreenWrapper
       noPadding
-      title="Notifications"
+      title="🔔 Notifications"
       showBackbutton
       hideNotificationButton
     >
       {notifications.length === 0 || loading ? (
         <EmptyState
-          text="No notifications!"
+          text="🔔 No notifications!"
           loading={loading}
           image={Images.noNotification}
           type={LoaderTypes.NotificationScreen}
@@ -219,6 +219,12 @@ const NotificationScreen = () => {
               <ScreenLoader count={4} type={LoaderTypes.NotificationScreen} />
             ) : null
           }
+          // Improve scroll performance and reduce gesture conflicts
+          scrollEventThrottle={16}
+          bounces={true}
+          bouncesZoom={false}
+          alwaysBounceVertical={false}
+          directionalLockEnabled={true}
         />
       )}
     </ScreenWrapper>

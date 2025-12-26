@@ -8,14 +8,14 @@ import { useAuthStore } from "../../store/authStore";
 
 export function useLoginViewModel() {
   const { updateUser } = useAuthStore();
-  const [userId, setUserId] = useState("");
+  const [identifier, setIdentifier] = useState(""); // email or userId
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigation: any = useNavigation();
   const loginUser = async () => {
-    if (!userId || !password) {
-      setError("Please enter both User ID and Password");
+    if (!identifier || !password) {
+      setError("Please enter both Email/User ID and Password");
       return;
     }
 
@@ -27,12 +27,12 @@ export function useLoginViewModel() {
 
       const payload = Device.isDevice
         ? {
-            userId: userId.trim(),
+            identifier: identifier.trim(),
             password,
             notificationToken: notToken,
           }
         : {
-            userId: userId.trim(),
+            identifier: identifier.trim(),
             password,
           };
       const response = await AuthRepo.login(payload);
@@ -58,8 +58,8 @@ export function useLoginViewModel() {
   const Register = () => navigation.navigate(ROUTES.REGISTER);
 
   return {
-    userId,
-    setUserId,
+    identifier,
+    setIdentifier,
     password,
     setPassword,
     loading,

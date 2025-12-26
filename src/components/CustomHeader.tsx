@@ -8,6 +8,7 @@ import { useHelper } from "../utils/helper";
 import { ROUTES } from "../enums/routes";
 import { useTheme } from "../infrastructure/theme";
 import TextTicker from "react-native-text-ticker";
+import CustomMenu, { IMenuContentItem } from "./customMenu";
 interface HeaderProps {
   title?: string;
   subTitle?: string;
@@ -18,6 +19,7 @@ interface HeaderProps {
   showImage?: boolean;
   onBackButtonPress?: () => void;
   onSearchPress?: () => void;
+  menuItem?: IMenuContentItem[];
 }
 const CustomHeader = ({
   title,
@@ -29,6 +31,7 @@ const CustomHeader = ({
   onBackButtonPress,
   onSearchPress,
   hideNotificationButton,
+  menuItem,
 }: HeaderProps) => {
   const navigation: any = useNavigation();
   const { loggedInUser, triggerVibration } = useHelper();
@@ -160,6 +163,9 @@ const CustomHeader = ({
                 />
               </TouchableOpacity>
             </>
+          )}
+          {menuItem?.length && (
+            <CustomMenu whiteBg={whiteBg} content={menuItem} />
           )}
         </Row>
       </Row>

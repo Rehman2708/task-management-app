@@ -1,7 +1,7 @@
 // theme.ts
 import { fontMap, FontName } from "../../assets/fonts";
 import { useAuthStore } from "../store/authStore";
-import { isDarkMode } from "../tools";
+import { isAndroid, isDarkMode } from "../tools";
 
 export function useTheme() {
   const { user } = useAuthStore();
@@ -34,11 +34,11 @@ export function useTheme() {
     fonts: getFonts((user?.font as FontName) || "Montserrat"),
     fontSizes: {
       xxs: 10,
-      xs: 12,
-      sm: 14,
-      md: 15,
-      lg: 17,
-      xl: 19,
+      xs: isAndroid ? 11 : 12,
+      sm: isAndroid ? 13 : 14,
+      md: isAndroid ? 14 : 15,
+      lg: isAndroid ? 15 : 17,
+      xl: isAndroid ? 17 : 19,
     },
     radius: {
       sm: 4,

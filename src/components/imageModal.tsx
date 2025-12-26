@@ -98,7 +98,7 @@ const ImageModal = ({
             (selectedImage ? (
               <Image style={styles.image} source={{ uri: selectedImage }} />
             ) : (
-              <Text style={commonStyles.subTitleText}>Add Image</Text>
+              <Text style={commonStyles.subTitleText}>🖼️ Add Image</Text>
             ))}
         </Pressable>
       </Row>
@@ -109,13 +109,13 @@ const ImageModal = ({
             <Row style={styles.searchRow}>
               <CustomInput
                 onChangeText={setText}
-                placeholder="Search here"
+                placeholder="🔍 Search here"
                 fullFlex
                 value={text}
               />
               <CustomButton
                 onPress={getImages}
-                title="Search"
+                title="🔍 Search"
                 small
                 rounded
                 customStyle={{ width: 70 }}
@@ -125,7 +125,7 @@ const ImageModal = ({
             {loading || error.trim().length > 0 || images.length <= 0 ? (
               <View style={{ minHeight: 270 }}>
                 <EmptyState
-                  text={error.trim().length > 0 ? error : "No Image"}
+                  text={error.trim().length > 0 ? error : "🖼️ No Image"}
                   loading={loading}
                   type={LoaderTypes.ImageModal}
                 />
@@ -168,7 +168,7 @@ const ImageModal = ({
               />
               <Spacer position="right" size={8} />
               <CustomButton
-                title="Close"
+                title="❌ Close"
                 small
                 rounded
                 onPress={() => setShowModal(false)}
@@ -190,7 +190,7 @@ const ImageModal = ({
             onChange
               ? () => (
                   <Row style={{ margin: 16 }}>
-                    <CustomButton title="Set" rounded onPress={onSelect} />
+                    <CustomButton title="✅ Set" rounded onPress={onSelect} />
                   </Row>
                 )
               : undefined

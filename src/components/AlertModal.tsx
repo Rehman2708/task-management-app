@@ -19,7 +19,7 @@ const AlertModal = ({
   isVisible: boolean;
   loading: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm?: () => void;
   title: string;
   subTitle: string;
 }) => {
@@ -56,24 +56,33 @@ const AlertModal = ({
           }}
         >
           <Text style={[commonStyles.titleText]}>{title}</Text>
-          <Text style={[commonStyles.subTitleText]}>{subTitle}</Text>
-          <Row justifyContent="space-between">
+          <Text style={[commonStyles.basicText]}>{subTitle}</Text>
+          {onConfirm ? (
+            <Row justifyContent="space-between">
+              <CustomButton
+                onPress={onClose}
+                title="❌ Cancel"
+                halfWidth
+                rounded
+                outlined
+              />
+              <CustomButton
+                title="✅ Confirm"
+                halfWidth
+                rounded
+                onPress={onConfirm}
+                error={error}
+                loading={loading}
+              />
+            </Row>
+          ) : (
             <CustomButton
               onPress={onClose}
-              title="Cancel"
-              halfWidth
+              title="✅ OK"
               rounded
-              outlined
-            />
-            <CustomButton
-              title="Confirm"
-              halfWidth
-              rounded
-              onPress={onConfirm}
               error={error}
-              loading={loading}
             />
-          </Row>
+          )}
         </View>
       </View>
     </Modal>

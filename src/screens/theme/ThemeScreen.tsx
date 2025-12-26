@@ -1,5 +1,5 @@
 import { TouchableOpacity, ScrollView, Text } from "react-native";
-import { Column, Row } from "../../tools";
+import { Column, Row, Spacer } from "../../tools";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { LinearGradient } from "expo-linear-gradient";
@@ -9,6 +9,7 @@ import { ROUTES } from "../../enums/routes";
 import { AuthRepo } from "../../repositories/auth"; // ensure this path matches your structure
 import { useAuthStore } from "../../store/authStore";
 import { useTheme } from "../../infrastructure/theme";
+import ToastService from "../../utils/toastService";
 
 const colors = [
   // Calm & Trust
@@ -59,6 +60,10 @@ const ThemeScreen = () => {
       });
       if (res?.user) {
         updateUser(res.user);
+        ToastService.success({
+          title: "Theme updated",
+          message: "Theme updated successfully!",
+        });
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -84,7 +89,7 @@ const ThemeScreen = () => {
   }, [user]);
 
   return (
-    <ScreenWrapper title="Theme" showBackbutton noPadding>
+    <ScreenWrapper title="🎨 Theme" showBackbutton noPadding>
       <ScrollView>
         <Column gap={12} style={[commonStyles.screenWrapper]}>
           {colors.map((item, index) => (
@@ -113,7 +118,7 @@ const ThemeScreen = () => {
                     <Text
                       style={[commonStyles.titleText, commonStyles.whiteText]}
                     >
-                      Selected
+                      ✅ Selected
                     </Text>
                   </Row>
                 )}
@@ -121,6 +126,7 @@ const ThemeScreen = () => {
             </TouchableOpacity>
           ))}
         </Column>
+        <Spacer size={50} />
       </ScrollView>
     </ScreenWrapper>
   );

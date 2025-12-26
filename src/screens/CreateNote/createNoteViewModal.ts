@@ -7,6 +7,7 @@ import {
 } from "../../repositories/notes";
 import { useUtilStore } from "../../store/utils";
 import { useAuthStore } from "../../store/authStore";
+import ToastService from "../../utils/toastService";
 
 export function useNoteDetailViewModel(note?: Note) {
   const { refetchNotes } = useUtilStore();
@@ -52,6 +53,10 @@ export function useNoteDetailViewModel(note?: Note) {
         setNoteText(updatedNote.note);
         setNoteTitle(updatedNote.title);
         setNoteImage(updatedNote.image);
+        ToastService.success({
+          title: "Note updated",
+          message: "Note updated successfully!",
+        });
       } else {
         // Create new note
         const payload: CreateNotePayload = {

@@ -27,6 +27,7 @@ export enum LoaderTypes {
   ListDetailScreen = "listDetailScreen",
   NotesDetailScreen = "notesdetail",
   VideoScreen = "VideoScreen",
+  ProfileScreen = "profileScreen",
 }
 
 interface ScreenLoaderProps {
@@ -137,8 +138,8 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
           style={[
             styles.block,
             {
-              height,
-              width,
+              height: height as any,
+              width: width as any,
               borderRadius: radius,
               backgroundColor: theme.colors.loaderBg,
               overflow: "hidden",
@@ -340,7 +341,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
             {index % getRandomInt(0, 5) ? (
               <ShimmerBlock
                 index={index}
-                height={"100%" as any}
+                height="100%"
                 width={120}
                 radius={0}
               />
@@ -455,6 +456,43 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
     [renderLines, ShimmerBlock]
   );
 
+  const renderProfileLoader = useCallback(
+    () => (
+      <View style={{ paddingHorizontal: 16, paddingTop: 20 }}>
+        {/* Profile images section */}
+        <Row
+          justifyContent="center"
+          alignItems="center"
+          gap={8}
+          style={{ marginBottom: 30 }}
+        >
+          <ShimmerBlock index={0} height={140} width={140} radius={70} />
+          <ShimmerBlock index={1} height={40} width={40} radius={20} />
+          <ShimmerBlock index={2} height={140} width={140} radius={70} />
+        </Row>
+
+        {/* Profile info lines */}
+        <Column gap={8} style={{ marginBottom: 30 }}>
+          {renderLines(6, ["60%", "80%", "70%", "100%", "90%"], 16)}
+        </Column>
+
+        {/* Partner section or add partner input */}
+        <Column gap={12} style={{ marginBottom: 40 }}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ShimmerBlock
+              key={i}
+              index={5}
+              height={45}
+              width="100%"
+              radius={8}
+            />
+          ))}
+        </Column>
+      </View>
+    ),
+    [renderLines, ShimmerBlock, theme.colors.primary]
+  );
+
   const renderLoader = useMemo(() => {
     switch (type) {
       case LoaderTypes.ImageModal:
@@ -477,6 +515,8 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         return renderNoteDetailLoader();
       case LoaderTypes.ListDetailScreen:
         return renderNoteDetailLoader(true);
+      case LoaderTypes.ProfileScreen:
+        return renderProfileLoader();
       default:
         return (
           <View style={styles.center}>
@@ -497,6 +537,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
     renderNotesLoader,
     renderTaskDetailLoader,
     renderNoteDetailLoader,
+    renderProfileLoader,
     styles.center,
     themeColor,
     theme.colors.primary,

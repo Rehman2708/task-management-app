@@ -47,8 +47,8 @@ export default function HomeScreen({ navigation }: any) {
   // 🔥 Memoized tabs
   const tabs = useMemo(
     () => [
-      { title: "Active", value: "Active" as const },
-      { title: "History", value: "History" as const },
+      { title: "⚡ Active", value: "Active" as const },
+      { title: "📚 History", value: "History" as const },
     ],
     []
   );
@@ -69,7 +69,7 @@ export default function HomeScreen({ navigation }: any) {
             loading={loading}
             onClose={() => setShowAlert(undefined)}
             onConfirm={() => handleDeleteTask(item._id!)}
-            title={"Delete Task"}
+            title={"🗑️ Delete Task"}
             subTitle={"Are you sure you want to delete this task?"}
             error
           />
@@ -99,7 +99,10 @@ export default function HomeScreen({ navigation }: any) {
         {tabs.map((item) => (
           <Pressable
             key={item.value}
-            style={[commonStyles.fullFlex, { paddingVertical: 10 }]}
+            style={[
+              commonStyles.fullFlex,
+              { paddingBottom: 10, paddingTop: 4 },
+            ]}
             onPress={() => setTab(item.value)}
           >
             <Text
@@ -126,7 +129,9 @@ export default function HomeScreen({ navigation }: any) {
         {/* Empty / Loader */}
         {loading || tasks.length === 0 ? (
           <EmptyState
-            text={tab === "Active" ? "No active tasks" : "Nothing to show"}
+            text={
+              tab === "Active" ? "📝 No active tasks" : "📭 Nothing to show"
+            }
             button={() => fetchTasks(1, true)}
             loading={loading}
             error={!!error?.length}
@@ -154,6 +159,12 @@ export default function HomeScreen({ navigation }: any) {
             updateCellsBatchingPeriod={50}
             initialNumToRender={10}
             windowSize={8}
+            // Improve scroll performance and reduce gesture conflicts
+            scrollEventThrottle={16}
+            bounces={true}
+            bouncesZoom={false}
+            alwaysBounceVertical={false}
+            directionalLockEnabled={true}
           />
         )}
       </View>

@@ -5,7 +5,8 @@ export class AppUrl {
 
   // 🔹 Auth APIs
   public static loginEndPoint = `${this.BASE_URL}/auth/login`;
-  public static registerEndPoint = `${this.BASE_URL}/auth/register`;
+  public static sendOTPEndPoint = `${this.BASE_URL}/auth/send-otp`;
+  public static verifyOTPEndPoint = `${this.BASE_URL}/auth/verify-otp`;
   public static connectPartnerEndPoint = `${this.BASE_URL}/auth/connect-partner`;
   public static getUserEndPoint = (userId: string) =>
     `${this.BASE_URL}/auth/${userId}`;
@@ -14,6 +15,7 @@ export class AppUrl {
   public static updateThemeEndPoint = `${this.BASE_URL}/auth/update-theme`;
   public static updateFontEndPoint = `${this.BASE_URL}/auth/update-font`;
   public static updatePasswordEndPoint = `${this.BASE_URL}/auth/update-password`;
+  public static addEmailEndPoint = `${this.BASE_URL}/auth/add-email`;
   // 🔹 Task APIs
   public static getAllTasks = `${this.BASE_URL}/tasks`;
   public static getCompletedTasks = `${this.BASE_URL}/tasks/history`;

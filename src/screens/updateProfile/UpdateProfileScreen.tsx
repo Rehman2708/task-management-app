@@ -13,6 +13,7 @@ import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { useTheme } from "../../infrastructure/theme";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import ToastService from "../../utils/toastService";
 
 const UpdateProfileScreen = () => {
   const { user, updateUser } = useAuthStore();
@@ -48,9 +49,17 @@ const UpdateProfileScreen = () => {
       });
 
       if (res?.user) {
+        ToastService.success({
+          title: "Profile updated",
+          message: "Profile updated successfully!",
+        });
         updateUser(res.user);
       }
     } catch (error) {
+      ToastService.error({
+        title: "Update profile error",
+        message: error as string,
+      });
       console.log("Update profile error:", error);
     } finally {
       setLoading(false);
@@ -62,7 +71,7 @@ const UpdateProfileScreen = () => {
   };
 
   return (
-    <ScreenWrapper showBackbutton title="Update Profile">
+    <ScreenWrapper showBackbutton title="👤 Update Profile">
       <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
         <ImageModal
           onChange={updateProfilePicture}
@@ -107,21 +116,25 @@ const UpdateProfileScreen = () => {
           }
         />
         <CustomInput
-          title="User Id"
+          title="🆔 User Id"
           editable={false}
           value={user?.userId}
           onChangeText={() => {}}
         />
-        <CustomInput title="Name" onChangeText={setUserName} value={userName} />
         <CustomInput
-          title="About"
+          title="👤 Name"
+          onChangeText={setUserName}
+          value={userName}
+        />
+        <CustomInput
+          title="💭 About"
           onChangeText={setUserAbout}
           value={userAbout}
           multiline
         />
         {hasChanges && (
           <CustomButton
-            title={loading ? "Updating..." : "Update"}
+            title={loading ? "⏳ Updating..." : "✏️ Update"}
             onPress={updateProfile}
             disabled={loading || !userName.trim()}
           />

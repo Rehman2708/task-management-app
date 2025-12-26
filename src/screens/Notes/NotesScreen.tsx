@@ -225,7 +225,7 @@ export default function NotesScreen() {
           loading={initialLoading}
           onClose={() => setShowAlert(undefined)}
           onConfirm={() => handlePinUnpinNote(item._id, item.pinned ?? false)}
-          title={`${!item.pinned ? "Pin" : "Unpin"} Note?`}
+          title={`${!item.pinned ? "📌 Pin" : "📌 Unpin"} Note?`}
           subTitle={`${!item.pinned ? "Pin" : "Unpin"} this note?`}
         />
       </AnimatedListItem>
@@ -241,7 +241,7 @@ export default function NotesScreen() {
 
   return (
     <ScreenWrapper
-      title="Notes"
+      title="📝 Notes"
       image={noteImages}
       // onSearchPress={toggleSearch}
       noPadding
@@ -258,7 +258,7 @@ export default function NotesScreen() {
       <View style={commonStyles.screenWrapper}>
         {notes?.length === 0 || initialLoading ? (
           <EmptyState
-            text="No notes found"
+            text="📝 No notes found"
             button={() => fetchNotes(1, true)}
             loading={initialLoading}
             error={!!error?.length}
@@ -268,7 +268,7 @@ export default function NotesScreen() {
           <>
             {showSearch && (
               <CustomInput
-                placeholder="Search here..."
+                placeholder="🔍 Search here..."
                 onChangeText={searchNotes}
               />
             )}

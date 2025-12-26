@@ -6,6 +6,7 @@ import CustomHeader from "./CustomHeader";
 import { isAndroid, Spacer } from "../tools";
 import { useTheme } from "../infrastructure/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { IMenuContentItem } from "./customMenu";
 
 const ScreenWrapper = ({
   children,
@@ -19,6 +20,7 @@ const ScreenWrapper = ({
   noPadding,
   rightIcon,
   hideNotificationButton,
+  menuItem,
 }: {
   children: React.ReactNode;
   title?: string;
@@ -31,6 +33,7 @@ const ScreenWrapper = ({
   image?: string | string[];
   rightIcon?: React.ReactNode;
   hideNotificationButton?: boolean;
+  menuItem?: IMenuContentItem[];
 }) => {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -64,6 +67,7 @@ const ScreenWrapper = ({
               onSearchPress={onSearchPress}
               hideNotificationButton={hideNotificationButton}
               rightIcon={rightIcon}
+              menuItem={menuItem}
             />
           </View>
           {/* {!subTitle && <TimeDisplay />} */}

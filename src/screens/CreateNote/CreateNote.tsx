@@ -51,7 +51,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
 
   return (
     <ScreenWrapper
-      title={note ? "Edit Note" : "Create Note"}
+      title={note ? "✏️ Edit Note" : "📝 Create Note"}
       showBackbutton
       image={noteImage.length ? noteImage : undefined}
       noPadding
@@ -66,7 +66,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
           <ImageModal defaultImage={noteImage} onChange={setNoteImage} />
 
           <CustomInput
-            title="Title"
+            title="📝 Title"
             value={noteTitle}
             onChangeText={setNoteTitle}
             editable={!appendMode}
@@ -74,7 +74,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
           {note && (
             <Row alignItems="center" justifyContent="center" gap={8}>
               <Text style={commonStyles.smallText}>
-                Append to existing note
+                ➕ Append to existing note
               </Text>
               <Switch
                 value={appendMode}
@@ -93,12 +93,12 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
             </Row>
           )}
           <CustomInput
-            title="Note"
+            title="📄 Note"
             value={noteText}
             onChangeText={setNoteText}
             multiline
             placeholder={
-              appendMode ? "Enter text to append…" : "Enter full note…"
+              appendMode ? "➕ Enter text to append…" : "📝 Enter full note…"
             }
           />
 
@@ -106,7 +106,7 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
           {success && <Text style={styles.success}>{success}</Text>}
         </KeyboardAwareScrollView>
         <CustomButton
-          title={note?._id ? "Update" : "Save"}
+          title={note?._id ? "✏️ Update" : "💾 Save"}
           loading={loading}
           onPress={handleSave}
         />

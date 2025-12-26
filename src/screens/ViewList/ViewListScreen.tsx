@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Alert, Pressable, FlatList } from "react-native";
+import { View, Text, Pressable, FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
@@ -37,6 +37,10 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
     toggleItemCompletion,
     totalComments,
     setTotalComments,
+    pinned,
+    showPinAlert,
+    setShowPinAlert,
+    handlePinUnpinList,
   } = useViewListViewModel(listId);
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -85,7 +89,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
           <CustomButton
             onPress={() => toggleItemCompletion(index)}
             iconName="checkmark-done-outline"
-            title="Send"
+            title="Complete"
             sendButton
             success
           />
@@ -104,6 +108,21 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
         headerImage={list?.image}
         title={list?.title}
         subTitle={formatDate(list?.createdAt!)}
+        menuItem={[
+          {
+            title: "Edit List",
+            onPress: () => navigation.navigate(ROUTES.CREATE_LIST, { list }),
+          },
+          {
+            title: `${pinned ? "Unpin" : "Pin"} List`,
+            onPress: () => setShowPinAlert(true),
+          },
+          {
+            title: "Delete List",
+            onPress: () => setShowAlert(true),
+            error: true,
+          },
+        ]}
       >
         {loading ? (
           <EmptyState
@@ -147,33 +166,14 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
               scrollEnabled={false}
               ListEmptyComponent={
                 <Text style={commonStyles.smallText}>
-                  No items in this list.
+                  📋 No items in this list.
                 </Text>
               }
             />
+            <Spacer size={50} />
           </>
         )}
       </CollapsibleHeader>
-      <Row
-        justifyContent="space-between"
-        style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
-        alignItems="center"
-      >
-        <CustomButton
-          title="Edit"
-          onPress={() => navigation.navigate(ROUTES.CREATE_LIST, { list })}
-          rounded
-          halfWidth
-        />
-        <CustomButton
-          title="Delete"
-          onPress={() => setShowAlert(true)}
-          rounded
-          halfWidth
-          error
-          loading={updating}
-        />
-      </Row>
       {listId && (
         <CommentsModal
           visible={commentsModalVisible}
@@ -189,10 +189,20 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
           isVisible={showAlert}
           onClose={() => setShowAlert(false)}
           onConfirm={deleteList}
-          title={"Delete List"}
+          title={"🗑️ Delete List"}
           subTitle={"Are you sure you want to delete this list?"}
           error
           loading={loading}
+        />
+      )}
+      {showPinAlert && (
+        <AlertModal
+          isVisible={showPinAlert}
+          loading={loading}
+          onClose={() => setShowPinAlert(false)}
+          onConfirm={handlePinUnpinList}
+          title={`${!pinned ? "📌 Pin" : "📌 Unpin"} List?`}
+          subTitle={`${!pinned ? "Pin" : "Unpin"} this list?`}
         />
       )}
     </View>

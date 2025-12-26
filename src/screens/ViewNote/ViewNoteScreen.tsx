@@ -1,4 +1,4 @@
-import { View, Text, Alert, Pressable } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import { Note, NotesRepo } from "../../repositories/notes";
 import { useHelper } from "../../utils/helper";
@@ -41,6 +41,8 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   const [note, setNote] = useState<Note>();
   const [gettingNote, setGettingNote] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const [showPinAlert, setShowPinAlert] = useState(false);
   const [commentsModalVisible, setCommentsModalVisible] = useState(
     showComments ?? false
   );
@@ -54,6 +56,7 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
       if (noteId) {
         const data = await NotesRepo.getSingleNote(noteId);
         setNote(data);
+        setPinned(data?.pinned ?? false);
         setTotalComments(data?.comments?.length ?? 0);
       }
     } catch (err: any) {
@@ -76,6 +79,19 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
     }
   };
 
+  const handlePinUnpinNote = async () => {
+    try {
+      setLoading(true);
+      await NotesRepo.pinNote(noteId ?? "", !pinned, user?.userId ?? "");
+      getNote();
+      refetchNotes();
+    } catch (err: any) {
+    } finally {
+      setLoading(false);
+      setShowPinAlert(false);
+    }
+  };
+
   useEffect(() => {});
   useEffect(() => {
     getNote();
@@ -92,6 +108,21 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
           headerImage={note?.image}
           title={note?.title}
           subTitle={formatDate(note?.createdAt!)}
+          menuItem={[
+            {
+              title: "Edit Note",
+              onPress: () => navigation.navigate(ROUTES.CREATE_NOTE, { note }),
+            },
+            {
+              title: `${pinned ? "Unpin" : "Pin"} Note`,
+              onPress: () => setShowPinAlert(true),
+            },
+            {
+              title: "Delete Note",
+              onPress: () => setShowAlert(true),
+              error: true,
+            },
+          ]}
         >
           {gettingNote ? (
             <EmptyState
@@ -132,26 +163,6 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
             </>
           )}
         </CollapsibleHeader>
-        <Row
-          justifyContent="space-between"
-          style={{ paddingHorizontal: isAndroid ? 8 : 16 }}
-          alignItems="center"
-        >
-          <CustomButton
-            title="Edit"
-            onPress={() => navigation.navigate(ROUTES.CREATE_NOTE, { note })}
-            rounded
-            halfWidth
-          />
-          <CustomButton
-            title="Delete"
-            onPress={() => setShowAlert(true)}
-            halfWidth
-            rounded
-            error
-            loading={loading}
-          />
-        </Row>
       </>
       {note && (
         <CommentsModal
@@ -168,10 +179,20 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
           isVisible={showAlert}
           onClose={() => setShowAlert(false)}
           onConfirm={deleteNote}
-          title={"Delete Note"}
+          title={"🗑️ Delete Note"}
           subTitle={"Are you sure you want to delete this note?"}
           error
           loading={loading}
+        />
+      )}
+      {showPinAlert && (
+        <AlertModal
+          isVisible={showPinAlert}
+          loading={loading}
+          onClose={() => setShowPinAlert(false)}
+          onConfirm={handlePinUnpinNote}
+          title={`${!pinned ? "📌 Pin" : "📌 Unpin"} Note?`}
+          subTitle={`${!pinned ? "Pin" : "Unpin"} this note?`}
         />
       )}
     </View>

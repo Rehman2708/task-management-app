@@ -6,6 +6,7 @@ import { IVideo } from "../../types/videos";
 import { Alert } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 import { UploadRepo } from "../../repositories/upload";
+import ToastService from "../../utils/toastService";
 
 export const useReelsViewModal = () => {
   const { user } = useAuthStore();
@@ -59,7 +60,10 @@ export const useReelsViewModal = () => {
       }
     } catch (err) {
       console.error("Delete video error:", err);
-      Alert.alert("Error", "Failed to delete the video. Please try again.");
+      ToastService.error({
+        title: "Error",
+        message: "Failed to delete the video. Please try again",
+      });
     }
   }, []);
 

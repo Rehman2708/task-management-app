@@ -14,6 +14,8 @@ import { useHelper } from "../../utils/helper";
 import { IUser } from "../../types/auth";
 import { useNotificationStore } from "../../store/notificationStore";
 import { handleNotificationNavigation } from "../../../notification";
+import { BiometricSettings } from "../../utils/biometricSettings";
+import { BiometricAuth } from "../../utils/biometricAuth";
 
 const SplashScreen = () => {
   const { themeColor } = useHelper();
@@ -43,26 +45,108 @@ const SplashScreen = () => {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      const { data: user, success } = await getDataFromAsyncStorage(
-        LocalStorageKey.USER
-      );
-      updateUser(user as IUser);
-      fetchUserDetails(user?.userId!);
+  const checkBiometricAndNavigate = async (user: IUser) => {
+    try {
+      const biometricStatus = await BiometricSettings.shouldPromptBiometric();
+
+      if (biometricStatus.shouldPrompt) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [
+              {
+                name: ROUTES.BIOMETRIC_AUTH,
+                params: {
+                  allowSkip: false,
+                  isRequired: true,
+                },
+              },
+            ],
+          })
+        );
+      } else if (biometricStatus.isFirstTime) {
+        await BiometricAuth.showEnableBiometricAlert(
+          async () => {
+            await BiometricSettings.setBiometricSetting(true);
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: ROUTES.BIOMETRIC_AUTH,
+                    params: {
+                      allowSkip: true,
+                      isRequired: false,
+                    },
+                  },
+                ],
+              })
+            );
+          },
+          async () => {
+            await BiometricSettings.setBiometricSetting(false);
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: ROUTES.TABS }],
+              })
+            );
+          }
+        );
+      } else {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: ROUTES.TABS }],
+          })
+        );
+      }
+    } catch (error) {
+      console.error("Error checking biometric auth:", error);
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: success && user ? ROUTES.TABS : ROUTES.LOGIN }],
+          routes: [{ name: ROUTES.TABS }],
         })
       );
-      // ✅ After navigation reset, handle notification launch if any
-      if (launchedFromNotification) {
-        setTimeout(() => {
-          handleNotificationNavigation(launchedFromNotification);
-          clearLaunchedFromNotification();
-        }, 500); // wait until navigation tree is ready
-      } else {
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: user, success } = await getDataFromAsyncStorage(
+          LocalStorageKey.USER
+        );
+        updateUser(user as IUser);
+
+        if (success && user) {
+          const userData = user as IUser;
+          await fetchUserDetails(userData.userId);
+          await checkBiometricAndNavigate(userData);
+        } else {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: ROUTES.LOGIN }],
+            })
+          );
+        }
+
+        if (launchedFromNotification) {
+          setTimeout(() => {
+            handleNotificationNavigation(launchedFromNotification);
+            clearLaunchedFromNotification();
+          }, 500);
+        }
+      } catch (error) {
+        console.error("Error in splash screen:", error);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: ROUTES.LOGIN }],
+          })
+        );
       }
     })();
   }, []);

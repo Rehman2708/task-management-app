@@ -2,6 +2,7 @@ export enum ROUTES {
   SPLASH = "Splash",
   LOGIN = "Login",
   REGISTER = "Register",
+  BIOMETRIC_AUTH = "BiometricAuth",
   TABS = "Main",
   TASKS = "Tasks",
   HISTORY = "History",
@@ -21,5 +22,7 @@ export enum ROUTES {
   FONT = "Font",
   SINGLE_VIDEO = "SingleVideo",
   UPDATE_PROFILE = "UpdateProfile",
+  ADD_EMAIL = "AddEmail",
   NOTIFICATION = "Notification",
+  TEST_TOAST = "TestToast",
 }

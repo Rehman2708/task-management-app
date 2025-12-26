@@ -2,7 +2,7 @@ import { Text, Image, ImageSourcePropType, View } from "react-native";
 import { Column, isAndroid, Row } from "../tools";
 import { useCommonStyles } from "../styles/commonstyles";
 import CustomButton from "./customButton";
-import { Images } from "../../assets/images/images";
+import { errorDark, Images, noDataDark } from "../../assets/images/images";
 import { useTheme } from "../infrastructure/theme";
 import ScreenLoader, { LoaderTypes } from "./screenLoader";
 
@@ -14,6 +14,7 @@ const EmptyState = ({
   loading,
   error,
   type,
+  isDark,
 }: {
   image?: ImageSourcePropType;
   text: string;
@@ -22,8 +23,10 @@ const EmptyState = ({
   loading?: boolean;
   error?: boolean;
   type?: LoaderTypes;
+  isDark?: boolean;
 }) => {
-  const errorImage = Images.error;
+  image = isDark ? noDataDark : Images.noData;
+  const errorImage = isDark ? errorDark : Images.error;
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
   if (loading) {
@@ -42,16 +45,32 @@ const EmptyState = ({
         source={error ? errorImage : image}
       />
       <Column alignItems="center">
-        <Text style={commonStyles.subTitleText}>
-          {text ?? "Something went wrong!"}
+        <Text
+          style={[
+            commonStyles.subTitleText,
+            isDark && { color: theme.colors.white },
+          ]}
+        >
+          {error
+            ? "⚠️ Something went wrong!"
+            : text ?? "⚠️ Something went wrong!"}
         </Text>
-        {subtext && <Text style={commonStyles.smallText}>{subtext}</Text>}
+        {subtext && (
+          <Text
+            style={[
+              commonStyles.smallText,
+              isDark && { color: theme.colors.white },
+            ]}
+          >
+            {subtext}
+          </Text>
+        )}
       </Column>
       {button && (
         <Row style={commonStyles.fullWidth}>
           <CustomButton
             loading={loading}
-            title="Refresh"
+            title="🔄 Refresh"
             onPress={button}
             halfWidth
             rounded

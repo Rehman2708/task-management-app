@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   Pressable,
-  Alert,
   TouchableOpacity,
   Image,
   StyleSheet,
@@ -19,10 +18,11 @@ import CustomInput from "../../components/customInput";
 import CustomButton from "../../components/customButton";
 import { useHelper } from "../../utils/helper";
 import { Ionicons } from "@expo/vector-icons";
-import ScreenLoader from "../../components/screenLoader";
+import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import ImageView from "react-native-image-viewing";
 import AnimatedListItem from "../../components/animatedListItem";
 import AlertModal from "../../components/AlertModal";
+import ToastService from "../../utils/toastService";
 
 export default function ProfileScreen() {
   const {
@@ -35,6 +35,7 @@ export default function ProfileScreen() {
     handleLogout,
     changeThemeScreen,
     changeFontScreen,
+    toggleBiometricAuth,
     createVideoScreen,
     updateProfileScreen,
     loggingOut,
@@ -45,6 +46,16 @@ export default function ProfileScreen() {
     loadingUserDetail,
     fetchUserDetails,
     resetPasswordScreen,
+    addEmailScreen,
+    testToastScreen,
+    biometricDisplayText,
+    showBiometricAlert,
+    biometricAlertTitle,
+    biometricAlertSubTitle,
+    biometricAlertError,
+    biometricAlertLoading,
+    biometricAlertOnConfirm,
+    hideBiometricAlert,
   } = useProfileViewModel();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -55,6 +66,11 @@ export default function ProfileScreen() {
   const [footerText, setFooterText] = useState(
     currentImageIndex === 0 ? user?.about : user?.partner?.about
   );
+
+  // Update footer text when user or partner data changes
+  useEffect(() => {
+    setFooterText(currentImageIndex === 0 ? user?.about : user?.partner?.about);
+  }, [user?.about, user?.partner?.about, currentImageIndex]);
   const imageItems = [];
 
   if (user?.image) {
@@ -74,30 +90,47 @@ export default function ProfileScreen() {
 
   const tabs = [
     {
-      title: "Update profile",
+      title: "👤 Update profile",
       onPress: updateProfileScreen,
     },
+    // Show "Add Email" option only for users without email
+    ...(!user?.email
+      ? [
+          {
+            title: "📧 Add Email",
+            onPress: addEmailScreen,
+          },
+        ]
+      : []),
     {
-      title: "Change theme",
+      title: "🎨 Change theme",
       onPress: changeThemeScreen,
     },
     {
-      title: "Change font",
+      title: "🔤 Change font",
       onPress: changeFontScreen,
     },
     {
-      title: "Reset password",
+      title: biometricDisplayText,
+      onPress: toggleBiometricAuth,
+    },
+    {
+      title: "🔒 Reset password",
       onPress: resetPasswordScreen,
     },
     {
-      title: "Add video",
+      title: "🎥 Add video",
       onPress: createVideoScreen,
     },
+    // {
+    //   title: "🧪 Test Toast",
+    //   onPress: testToastScreen,
+    // },
   ];
   return (
-    <ScreenWrapper title="Profile" noPadding>
-      {loading ? (
-        <ScreenLoader />
+    <ScreenWrapper title="👤 Profile" noPadding>
+      {loadingUserDetail ? (
+        <ScreenLoader type={LoaderTypes.ProfileScreen} />
       ) : (
         <>
           <ScrollView
@@ -189,10 +222,14 @@ export default function ProfileScreen() {
                       <Text
                         style={[
                           ProfileScreenStyles.nameText,
-                          { color: themeColor?.dark ?? theme.colors.primary },
+                          {
+                            color:
+                              user?.partner?.theme?.dark ??
+                              theme.colors.primary,
+                          },
                         ]}
                       >
-                        {getInitials(partnerId ?? "")}
+                        {getInitials(user?.partner?.name ?? "")}
                       </Text>
                     )}
                   </Row>
@@ -200,14 +237,20 @@ export default function ProfileScreen() {
               </Row>
 
               <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-                <Text style={[commonStyles.smallText]}>Name:</Text>
+                <Text style={[commonStyles.smallText]}>👤 Name:</Text>
                 <Text style={[commonStyles.subTitleText]}>
                   {user?.name || "N/A"}
                 </Text>
               </Row>
+              {user?.email && (
+                <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
+                  <Text style={[commonStyles.smallText]}>📧 Email:</Text>
+                  <Text style={[commonStyles.subTitleText]}>{user.email}</Text>
+                </Row>
+              )}
               {user?.about && (
                 <Row gap={isAndroid ? 6 : 8}>
-                  <Text style={[commonStyles.smallText]}>About me:</Text>
+                  <Text style={[commonStyles.smallText]}>💭 About me:</Text>
                   <Text style={[commonStyles.subTitleText, { maxWidth: 300 }]}>
                     {user.about}
                   </Text>
@@ -216,20 +259,15 @@ export default function ProfileScreen() {
               {partnerId ? (
                 <>
                   <Row gap={isAndroid ? 6 : 8} alignItems="flex-end">
-                    <Text style={[commonStyles.smallText]}>Partner:</Text>
-                    <Text
-                      style={[
-                        commonStyles.subTitleText,
-                        // { fontFamily: `${user?.partner?.font}SemiBold` },
-                      ]}
-                    >
+                    <Text style={[commonStyles.smallText]}>👥 Partner:</Text>
+                    <Text style={[commonStyles.subTitleText]}>
                       {user?.partner?.name || "N/A"}
                     </Text>
                   </Row>
                   {user?.partner?.about && (
                     <Row gap={isAndroid ? 6 : 8}>
                       <Text style={[commonStyles.smallText]}>
-                        About partner:
+                        💭 About partner:
                       </Text>
                       <Text
                         style={[
@@ -248,7 +286,9 @@ export default function ProfileScreen() {
               ) : (
                 <Column>
                   <Spacer size={50} />
-                  <Text style={[commonStyles.basicText]}>Add Partner Id:</Text>
+                  <Text style={[commonStyles.basicText]}>
+                    👥 Add Partner Id:
+                  </Text>
 
                   <CustomInput
                     value={partnerInput}
@@ -256,15 +296,21 @@ export default function ProfileScreen() {
                   />
 
                   <CustomButton
-                    title="Add"
+                    title="➕ Add"
                     outlined
-                    onPress={() => {
+                    loading={loading}
+                    onPress={async () => {
                       if (!partnerInput) {
-                        Alert.alert("Error", "Please enter Partner ID");
+                        ToastService.error({
+                          title: "Error",
+                          message: "Please enter Partner ID",
+                        });
                         return;
                       }
-                      addPartner(partnerInput);
-                      setPartnerInput("");
+                      const success = await addPartner(partnerInput);
+                      if (success) {
+                        setPartnerInput("");
+                      }
                     }}
                   />
                 </Column>
@@ -316,7 +362,7 @@ export default function ProfileScreen() {
                         { color: theme.colors.error },
                       ]}
                     >
-                      Logout
+                      🚪 Logout
                     </Text>
                   )}
                 </Row>
@@ -351,10 +397,23 @@ export default function ProfileScreen() {
           isVisible={showAlert}
           onClose={() => setShowAlert(false)}
           onConfirm={handleLogout}
-          title={"Logout"}
-          subTitle={"Are you sure you want to Logout?"}
+          title={"🚪 Logout"}
+          subTitle={"Are you sure you want to logout?"}
           error
           loading={loggingOut}
+        />
+      )}
+
+      {/* Biometric Settings AlertModal */}
+      {showBiometricAlert && (
+        <AlertModal
+          isVisible={showBiometricAlert}
+          onClose={hideBiometricAlert}
+          onConfirm={biometricAlertOnConfirm}
+          title={biometricAlertTitle}
+          subTitle={biometricAlertSubTitle}
+          error={biometricAlertError}
+          loading={biometricAlertLoading}
         />
       )}
     </ScreenWrapper>

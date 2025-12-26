@@ -140,7 +140,9 @@ export default function ListsScreen() {
                     swiper && commonStyles.whiteText,
                   ]}
                 >
-                  {item.description}
+                  {item?.description?.length > 0
+                    ? item.description
+                    : "📝 No Description"}
                 </Text>
                 {swiper &&
                   item.items.map((item, index) => (
@@ -268,7 +270,7 @@ export default function ListsScreen() {
           loading={initialLoading}
           onClose={() => setShowAlert(undefined)}
           onConfirm={() => handlePinUnpinList(item._id, item.pinned ?? false)}
-          title={`${!item.pinned ? "Pin" : "Unpin"} List?`}
+          title={`${!item.pinned ? "📌 Pin" : "📌 Unpin"} List?`}
           subTitle={`${!item.pinned ? "Pin" : "Unpin"} this list?`}
         />
       </AnimatedListItem>
@@ -284,7 +286,7 @@ export default function ListsScreen() {
 
   return (
     <ScreenWrapper
-      title="Lists"
+      title="📋 Lists"
       image={listImages}
       noPadding
       // onSearchPress={toggleSearch}
@@ -301,7 +303,7 @@ export default function ListsScreen() {
       <View style={commonStyles.screenWrapper}>
         {lists?.length === 0 || initialLoading ? (
           <EmptyState
-            text="No lists found"
+            text="📋 No lists found"
             button={() => fetchLists(1, true)}
             loading={initialLoading}
             error={!!error?.length}
@@ -311,7 +313,7 @@ export default function ListsScreen() {
           <>
             {showSearch && (
               <CustomInput
-                placeholder="Search lists..."
+                placeholder="🔍 Search lists..."
                 onChangeText={searchLists}
               />
             )}

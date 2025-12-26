@@ -19,6 +19,9 @@ import FontScreen from "../screens/theme/FontScreen";
 import CreateListScreen from "../screens/CreateList/CreateListScreen";
 import ViewListScreen from "../screens/ViewList/ViewListScreen";
 import ResetPasswordScreen from "../screens/ResetPassword/ResetPasswordScreen";
+import { AddEmailScreen } from "../screens/AddEmail/AddEmailScreen";
+import TestToastScreen from "../screens/TestToast/TestToastScreen";
+import BiometricAuthScreen from "../screens/BiometricAuth/BiometricAuthScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +36,10 @@ export default function AppNavigator() {
       <Stack.Screen name={ROUTES.SPLASH} component={SplashScreen} />
       <Stack.Screen name={ROUTES.REGISTER} component={RegisterScreen} />
       <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
+      <Stack.Screen
+        name={ROUTES.BIOMETRIC_AUTH}
+        component={BiometricAuthScreen}
+      />
       <Stack.Screen name={ROUTES.TABS} component={Tabs} />
       <Stack.Screen name={ROUTES.CREATE_TASK} component={CreateTaskScreen} />
       <Stack.Screen name={ROUTES.TASK_DETAIL} component={TaskDetailScreen} />
@@ -53,6 +60,8 @@ export default function AppNavigator() {
         name={ROUTES.RESET_PASSWORD}
         component={ResetPasswordScreen}
       />
+      <Stack.Screen name={ROUTES.ADD_EMAIL} component={AddEmailScreen} />
+      <Stack.Screen name={ROUTES.TEST_TOAST} component={TestToastScreen} />
     </Stack.Navigator>
   );
 }

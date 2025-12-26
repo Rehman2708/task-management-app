@@ -7,42 +7,60 @@ export class AuthRepo {
    * 🔹 Login
    */
   static async login({
-    userId,
+    identifier,
     password,
     notificationToken,
   }: {
-    userId: string;
+    identifier: string; // email or userId
     password: string;
     notificationToken?: string | null;
   }) {
     const response = await ApiService.getApiResponse(
       AppUrl.loginEndPoint,
       HttpMethods.POST,
-      { userId, password, notificationToken }
+      { identifier, password, notificationToken }
     );
     return response;
   }
 
   /**
-   * 🔹 Register
+   * 🔹 Send OTP for Registration
    */
-  static async register({
+  static async sendOTP({
     name,
-    userId,
+    email,
     password,
     partnerUserId,
-    notificationToken,
   }: {
     name: string;
-    userId: string;
+    email: string;
     password: string;
     partnerUserId?: string;
+  }) {
+    const response = await ApiService.getApiResponse(
+      AppUrl.sendOTPEndPoint,
+      HttpMethods.POST,
+      { name, email, password, partnerUserId }
+    );
+    return response;
+  }
+
+  /**
+   * 🔹 Verify OTP and Register
+   */
+  static async verifyOTP({
+    email,
+    otp,
+    notificationToken,
+  }: {
+    email: string;
+    otp: string;
     notificationToken?: string | null;
   }) {
     const response = await ApiService.getApiResponse(
-      AppUrl.registerEndPoint,
+      AppUrl.verifyOTPEndPoint,
       HttpMethods.POST,
-      { name, userId, password, partnerUserId, notificationToken }
+      { email, otp, notificationToken }
     );
     return response;
   }
@@ -140,7 +158,7 @@ export class AuthRepo {
   }
 
   /**
-   * 🔹 Update Theme (Light & Dark)
+   * 🔹 Update Password
    */
   static async updatePassword(payload: {
     userId: string;
@@ -155,6 +173,17 @@ export class AuthRepo {
       AppUrl.updatePasswordEndPoint,
       HttpMethods.PUT,
       data
+    );
+  }
+
+  /**
+   * 🔹 Add Email to Existing User
+   */
+  static async addEmail(payload: { userId: string; email: string }) {
+    return ApiService.getApiResponse(
+      AppUrl.addEmailEndPoint,
+      HttpMethods.PUT,
+      payload
     );
   }
 }
