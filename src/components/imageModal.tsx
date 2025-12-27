@@ -118,7 +118,7 @@ const ImageModal = ({
                 title="🔍 Search"
                 small
                 rounded
-                customStyle={{ width: 70 }}
+                customStyle={{ width: 80 }}
               />
             </Row>
 
