@@ -244,10 +244,8 @@ export default function App() {
         <NavigationContainer
           ref={navigationRef}
           onReady={() => {
-            if (launchedFromNotification) {
-              handleNotificationNavigation(launchedFromNotification);
-              clearLaunchedFromNotification();
-            }
+            // Navigation from notifications is now handled in splash screen after authentication
+            // This prevents double navigation when biometric auth is required
           }}
         >
           <StatusBar backgroundColor={"#00000030"} translucent />

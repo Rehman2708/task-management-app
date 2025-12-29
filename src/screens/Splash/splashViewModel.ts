@@ -102,12 +102,58 @@ export function useSplashViewModel() {
 
   const handleBiometricSuccess = () => {
     setShowBiometricModal(false);
-    navigateToMainApp();
+
+    // If there's a pending notification, navigate to tabs first then to notification
+    if (launchedFromNotification) {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: ROUTES.TABS }],
+        })
+      );
+
+      // Navigate to notification target after tabs are loaded
+      setTimeout(() => {
+        handleNotificationNavigation(launchedFromNotification);
+        clearLaunchedFromNotification();
+      }, 500);
+    } else {
+      // Normal navigation to tabs
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: ROUTES.TABS }],
+        })
+      );
+    }
   };
 
   const handleBiometricSkip = () => {
     setShowBiometricModal(false);
-    navigateToMainApp();
+
+    // If there's a pending notification, navigate to tabs first then to notification
+    if (launchedFromNotification) {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: ROUTES.TABS }],
+        })
+      );
+
+      // Navigate to notification target after tabs are loaded
+      setTimeout(() => {
+        handleNotificationNavigation(launchedFromNotification);
+        clearLaunchedFromNotification();
+      }, 500);
+    } else {
+      // Normal navigation to tabs
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: ROUTES.TABS }],
+        })
+      );
+    }
   };
 
   const initializeApp = async () => {
