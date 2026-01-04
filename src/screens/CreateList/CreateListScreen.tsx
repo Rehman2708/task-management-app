@@ -10,6 +10,9 @@ import { useCommonStyles } from "../../styles/commonstyles";
 import { Row, Spacer } from "../../tools";
 import { List } from "../../repositories/lists";
 import { createNoteStyle } from "../CreateNote/styles";
+import SimpleList from "../../components/SimpleList";
+import { useNavigation } from "@react-navigation/native";
+import { ROUTES } from "../../enums/routes";
 
 interface ListDetailScreenProps {
   route: {
@@ -21,6 +24,7 @@ interface ListDetailScreenProps {
 }
 
 export default function CreateListScreen({ route }: ListDetailScreenProps) {
+  const navigation: any = useNavigation();
   const { list } = route.params || {};
   const {
     title,
@@ -37,6 +41,8 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
     setNewItem,
     addItem,
     removeItem,
+    updateItemText,
+    reorderItems,
   } = useListDetailViewModel(list);
 
   const theme = useTheme();
@@ -44,7 +50,16 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
   const styles = createNoteStyle(theme);
 
   const handleSave = async () => {
-    await saveList();
+    const res = await saveList();
+    if (res) {
+      navigation.reset({
+        index: 1,
+        routes: [
+          { name: ROUTES.TABS },
+          { name: ROUTES.VIEW_LIST, params: { listId: res._id } },
+        ],
+      });
+    }
   };
 
   return (
@@ -98,31 +113,21 @@ export default function CreateListScreen({ route }: ListDetailScreenProps) {
             />
           </Row>
 
-          <FlatList
-            data={items}
-            keyExtractor={(_, i) => i.toString()}
-            scrollEnabled={false}
-            renderItem={({ item, index }) => (
-              <Row
-                justifyContent="space-between"
-                alignItems="center"
-                style={commonStyles.cardContainer}
-              >
-                <Text style={[commonStyles.basicText, commonStyles.fullFlex]}>
-                  {item.text}
-                </Text>
-                <Spacer size={12} position="right" />
-                <CustomButton
-                  title="🗑️ Remove"
-                  onPress={() => removeItem(index)}
-                  small
-                  sendButton
-                  error
-                  iconName="remove-circle-outline"
-                />
-              </Row>
-            )}
-          />
+          {items.length > 0 ? (
+            <SimpleList
+              data={items}
+              onToggleComplete={() => {}} // No completion toggle in create mode
+              onUpdateText={updateItemText}
+              onDelete={removeItem}
+              onReorder={reorderItems}
+              scrollEnabled={false}
+              showCompletionToggle={false}
+            />
+          ) : (
+            <Text style={commonStyles.smallText}>
+              📝 No items added yet. Add some items above!
+            </Text>
+          )}
 
           {error && <Text style={styles.error}>{error}</Text>}
         </KeyboardAwareScrollView>

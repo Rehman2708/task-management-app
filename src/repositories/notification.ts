@@ -37,4 +37,12 @@ export class NotificationRepo {
       payload
     );
   }
+
+  // 🔹 Mark all notifications as read for a user
+  static async markAllNotificationsAsRead(userId: string) {
+    return ApiService.getApiResponse(
+      AppUrl.markAllNotificationsRead(userId),
+      HttpMethods.PATCH
+    );
+  }
 }

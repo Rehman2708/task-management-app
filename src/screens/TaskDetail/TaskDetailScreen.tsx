@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import { View, Text, FlatList, Pressable, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
@@ -21,7 +27,7 @@ import { Subtask } from "../../types/task";
 import AnimatedListItem from "../../components/animatedListItem";
 import AlertModal from "../../components/AlertModal";
 import { ROUTES } from "../../enums/routes";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 export default function TaskDetailScreen({ route }: any) {
   const {
@@ -109,6 +115,13 @@ export default function TaskDetailScreen({ route }: any) {
   const handleUpdateStatus = useCallback(
     (id: string) => updateSubtaskStatus(id, SubtaskStatus.Completed),
     [updateSubtaskStatus]
+  );
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchTaskDetail();
+    }, [fetchTaskDetail])
   );
 
   // 🔹 Compute once per render — outside renderSubtask

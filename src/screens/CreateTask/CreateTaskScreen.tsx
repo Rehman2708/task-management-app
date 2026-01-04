@@ -15,6 +15,7 @@ import { useHelper } from "../../utils/helper";
 import ImageModal from "../../components/imageModal";
 import { AssignedTo, Priority, TaskStatus } from "../../enums/tasks";
 import { useTheme } from "../../infrastructure/theme";
+import { ROUTES } from "../../enums/routes";
 // Pass `task` prop for edit mode
 export const CreateTaskScreen = ({ route, navigation }: any) => {
   const { task, repeat } = route.params || {};
@@ -36,7 +37,13 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
   const handleSave = async () => {
     const res = await vm.saveTask();
     if (res) {
-      navigation.goBack();
+      navigation.reset({
+        index: 1,
+        routes: [
+          { name: ROUTES.TABS },
+          { name: ROUTES.TASK_DETAIL, params: { taskId: res._id } },
+        ],
+      });
     }
   };
   return (

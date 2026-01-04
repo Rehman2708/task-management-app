@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
 import {
-  View,
   Text,
   FlatList,
   RefreshControl,
@@ -21,6 +20,7 @@ import { handleNotificationNavigation } from "../../../notification";
 import Swiper from "../../components/swiper";
 import { Ionicons } from "@expo/vector-icons";
 import AnimatedListItem from "../../components/animatedListItem";
+import AlertModal from "../../components/AlertModal";
 
 interface NotificationItem {
   _id: string;
@@ -43,6 +43,8 @@ const NotificationScreen = () => {
   const [loading, setLoading] = useState(false); // initial or refresh loading
   const [loadingMore, setLoadingMore] = useState(false); // pagination loading
   const [refreshing, setRefreshing] = useState(false);
+  const [markingAllAsRead, setMarkingAllAsRead] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const userId = loggedInUser?.userId;
 
   // ------------------ Fetch Notifications ------------------ //
@@ -119,6 +121,34 @@ const NotificationScreen = () => {
     markAsRead(notificationId);
     if (notData) handleNotificationNavigation(notData);
   };
+  const markAllAsRead = async () => {
+    if (!userId || markingAllAsRead) return;
+
+    setMarkingAllAsRead(true);
+    try {
+      await NotificationRepo.markAllNotificationsAsRead(userId);
+
+      // Update local state to mark all notifications as read
+      setNotifications((prev) =>
+        prev.map((notification) => ({
+          ...notification,
+          isRead: true,
+        }))
+      );
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+    } finally {
+      setShowAlert(false);
+      setMarkingAllAsRead(false);
+    }
+  };
+  // ------------------ Mark all notifications as read ------------------ //
+  const handleMarkAll = async () => {
+    setShowAlert(true);
+  };
+
+  // Check if there are any unread notifications
+  const hasUnreadNotifications = notifications.some((n) => !n.isRead);
 
   // ------------------ Render notification item ------------------ //
   const renderItem = ({
@@ -191,6 +221,21 @@ const NotificationScreen = () => {
       title="🔔 Notifications"
       showBackbutton
       hideNotificationButton
+      rightIcon={
+        notifications.length > 0 && hasUnreadNotifications ? (
+          <TouchableOpacity onPress={handleMarkAll} disabled={markingAllAsRead}>
+            {markingAllAsRead ? (
+              <ActivityIndicator size="small" color={theme.colors.white} />
+            ) : (
+              <Ionicons
+                name="checkmark-done"
+                size={26}
+                color={theme.colors.white}
+              />
+            )}
+          </TouchableOpacity>
+        ) : null
+      }
     >
       {notifications.length === 0 || loading ? (
         <EmptyState
@@ -227,6 +272,14 @@ const NotificationScreen = () => {
           directionalLockEnabled={true}
         />
       )}
+      <AlertModal
+        isVisible={showAlert}
+        loading={markingAllAsRead}
+        onClose={() => setShowAlert(false)}
+        onConfirm={markAllAsRead}
+        title={"Mark All as Read"}
+        subTitle={"Are you sure you want to mark all notifications as read?"}
+      />
     </ScreenWrapper>
   );
 };

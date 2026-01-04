@@ -7,13 +7,10 @@ import {
   UpdateListPayload,
 } from "../../repositories/lists";
 import { useUtilStore } from "../../store/utils";
-import { useNavigation } from "@react-navigation/native";
-import { ROUTES } from "../../enums/routes";
 import ToastService from "../../utils/toastService";
 
 export function useListDetailViewModel(list?: List) {
   const { refetchLists } = useUtilStore();
-  const navigation = useNavigation();
   const [title, setTitle] = useState(list?.title || "");
   const [description, setDescription] = useState(list?.description || "");
   const [image, setImage] = useState(list?.image || "");
@@ -45,6 +42,21 @@ export function useListDetailViewModel(list?: List) {
     setItems(updated);
   };
 
+  const updateItemText = (index: number, newText: string) => {
+    const updated = [...items];
+    updated[index].text = newText;
+    setItems(updated);
+  };
+
+  const reorderItems = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+
+    const updated = [...items];
+    const [movedItem] = updated.splice(fromIndex, 1);
+    updated.splice(toIndex, 0, movedItem);
+    setItems(updated);
+  };
+
   const saveList = async () => {
     if (!title.trim()) {
       setError("List title cannot be empty");
@@ -69,6 +81,9 @@ export function useListDetailViewModel(list?: List) {
           message: "List updated successfully!",
         });
         setItems(updated.items);
+        refetchLists();
+        setLoading(false);
+        return updated;
       } else {
         const payload: CreateListPayload = {
           title,
@@ -79,13 +94,14 @@ export function useListDetailViewModel(list?: List) {
         };
         const created = await ListsRepo.createList(payload);
         setItems(created.items);
+        refetchLists();
+        setLoading(false);
+        return created;
       }
     } catch (err: any) {
       console.error("Save list error:", err);
       setError(err.message || "Failed to save list");
-    } finally {
       refetchLists();
-      navigation.navigate(ROUTES.LISTS);
       setLoading(false);
     }
   };
@@ -102,6 +118,8 @@ export function useListDetailViewModel(list?: List) {
     setNewItem,
     addItem,
     removeItem,
+    updateItemText,
+    reorderItems,
     loading,
     error,
     saveList,

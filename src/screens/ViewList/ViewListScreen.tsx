@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { ROUTES } from "../../enums/routes";
@@ -16,6 +16,7 @@ import { AppUrl } from "../../utils/appUrl";
 import CommentsModal from "../../components/comments/commentModal";
 import AnimatedListItem from "../../components/animatedListItem";
 import AlertModal from "../../components/AlertModal";
+import { useCallback } from "react";
 
 interface ViewListScreenProps {
   route: {
@@ -41,6 +42,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
     showPinAlert,
     setShowPinAlert,
     handlePinUnpinList,
+    refetch,
   } = useViewListViewModel(listId);
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -52,6 +54,13 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
 
   const handleOpenComments = () => setCommentsModalVisible(true);
   const [showAlert, setShowAlert] = useState(false);
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
 
   const renderListItem = ({ item, index }: { item: any; index: number }) => (
     <AnimatedListItem index={index}>
@@ -159,6 +168,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
             <Spacer size={12} />
             <Text style={[commonStyles.basicText]}>{list?.description}</Text>
             <Spacer size={16} />
+
             <FlatList
               data={list?.items || []}
               keyExtractor={(_, i) => i.toString()}
@@ -170,6 +180,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
                 </Text>
               }
             />
+
             <Spacer size={50} />
           </>
         )}

@@ -96,6 +96,8 @@ export class AppUrl {
   // 🔹 Notification APIs
   public static getNotifications = `${this.BASE_URL}/notifications`;
   public static markNotificationsRead = `${this.BASE_URL}/notifications/mark-read`;
+  public static markAllNotificationsRead = (userId: string) =>
+    `${this.BASE_URL}/notifications/mark-all-read/${userId}`;
 
   // 🔹 File Upload APIs (Images & Videos)
   public static uploadFile = `${this.BASE_URL}/file/upload`;

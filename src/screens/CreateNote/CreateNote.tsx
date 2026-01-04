@@ -45,8 +45,16 @@ export default function NoteDetailScreen({ route }: NoteDetailScreenProps) {
   const [appendMode, setAppendMode] = useState(false); // ⬅️ new state
 
   const handleSave = async () => {
-    await saveNote(appendMode); // pass appendMode flag
-    navigation.navigate(ROUTES.NOTES);
+    const res = await saveNote(appendMode);
+    if (res) {
+      navigation.reset({
+        index: 1,
+        routes: [
+          { name: ROUTES.TABS },
+          { name: ROUTES.VIEW_NOTE, params: { noteId: res._id } },
+        ],
+      });
+    }
   };
 
   return (

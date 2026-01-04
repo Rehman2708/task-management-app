@@ -6,7 +6,7 @@ import { useCommonStyles } from "../../styles/commonstyles";
 import CustomButton from "../../components/customButton";
 import { Column, isAndroid, Row, Spacer } from "../../tools";
 import { ROUTES } from "../../enums/routes";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { LoaderTypes } from "../../components/screenLoader";
 import { useUtilStore } from "../../store/utils";
 import { useAuthStore } from "../../store/authStore";
@@ -17,6 +17,7 @@ import { AppUrl } from "../../utils/appUrl";
 import CommentsModal from "../../components/comments/commentModal";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import AlertModal from "../../components/AlertModal";
+import { useCallback } from "react";
 
 interface NoteDetailScreenProps {
   route: {
@@ -96,6 +97,13 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   useEffect(() => {
     getNote();
   }, []);
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      getNote();
+    }, [])
+  );
   return (
     <View
       style={[

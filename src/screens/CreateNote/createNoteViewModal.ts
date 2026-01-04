@@ -57,6 +57,9 @@ export function useNoteDetailViewModel(note?: Note) {
           title: "Note updated",
           message: "Note updated successfully!",
         });
+        refetchNotes();
+        setLoading(false);
+        return updatedNote;
       } else {
         // Create new note
         const payload: CreateNotePayload = {
@@ -68,11 +71,13 @@ export function useNoteDetailViewModel(note?: Note) {
         const createdNote = await NotesRepo.createNote(payload);
         setSuccess("Note created successfully");
         setNoteText(createdNote.note);
+        refetchNotes();
+        setLoading(false);
+        return createdNote;
       }
     } catch (err: any) {
       console.error("Save note error:", err);
       setError(err.message || "Failed to save note");
-    } finally {
       refetchNotes();
       setLoading(false);
     }
