@@ -5,7 +5,14 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { View, Text, FlatList, Pressable, Animated } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  Animated,
+  DeviceEventEmitter,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../infrastructure/theme";
 import { useTaskDetailViewModel } from "./taskDetailViewModel";
@@ -123,6 +130,25 @@ export default function TaskDetailScreen({ route }: any) {
       fetchTaskDetail();
     }, [fetchTaskDetail])
   );
+
+  // Listen for notification events to open comment modal
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener(
+      "openCommentModal",
+      (eventData) => {
+        if (eventData?.isComment || eventData?.isGrouped) {
+          setCommentModal({
+            visible: true,
+            subtaskId: eventData?.commentSubtaskId ?? undefined,
+          });
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // 🔹 Compute once per render — outside renderSubtask
   const uniqueDates = useMemo(() => {

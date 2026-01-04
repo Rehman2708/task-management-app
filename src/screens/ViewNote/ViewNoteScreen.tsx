@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, DeviceEventEmitter } from "react-native";
 import { useEffect, useState } from "react";
 import { Note, NotesRepo } from "../../repositories/notes";
 import { useHelper } from "../../utils/helper";
@@ -96,6 +96,22 @@ const ViewNoteScreen = ({ route }: NoteDetailScreenProps) => {
   useEffect(() => {});
   useEffect(() => {
     getNote();
+  }, []);
+
+  // Listen for notification events to open comment modal
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener(
+      "openCommentModal",
+      (eventData) => {
+        if (eventData?.isComment || eventData?.isGrouped) {
+          setCommentsModalVisible(true);
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   // Refresh data when screen comes into focus

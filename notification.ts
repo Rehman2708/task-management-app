@@ -226,6 +226,45 @@ export function navigate(name: string, params?: any) {
   }
 }
 
+// Helper function to check if user is on the target screen for the same item
+const isOnTargetScreen = (targetRoute: string, targetParams: any): boolean => {
+  if (!navigationRef.isReady()) return false;
+
+  const currentState = navigationRef.getState();
+  const currentRoute = currentState?.routes?.[currentState.index];
+
+  if (!currentRoute || currentRoute.name !== targetRoute) return false;
+
+  // Check if the params match for the same item
+  const currentParams = currentRoute.params as any;
+
+  switch (targetRoute) {
+    case ROUTES.VIEW_NOTE:
+      return currentParams?.noteId === targetParams?.noteId;
+    case ROUTES.VIEW_LIST:
+      return currentParams?.listId === targetParams?.listId;
+    case ROUTES.TASK_DETAIL:
+      return currentParams?.taskId === targetParams?.taskId;
+    case ROUTES.SINGLE_VIDEO:
+      return currentParams?.video?._id === targetParams?.video?._id;
+    default:
+      return false;
+  }
+};
+
+// Helper function to trigger comment modal on current screen
+const triggerCommentModal = (data: any) => {
+  // Import DeviceEventEmitter for cross-component communication
+  const { DeviceEventEmitter } = require("react-native");
+
+  // Emit event to open comment modal on current screen
+  DeviceEventEmitter.emit("openCommentModal", {
+    isComment: data.isComment,
+    isGrouped: data.isGrouped,
+    commentSubtaskId: data.commentSubtaskId,
+  });
+};
+
 export const handleNotificationNavigation = async (data?: any) => {
   if (!data) return;
 
@@ -241,10 +280,21 @@ export const handleNotificationNavigation = async (data?: any) => {
           if (data.isComment || data.isGrouped) {
             await clearCommentNotifications(data.noteId, "note");
           }
-          navigate(ROUTES.VIEW_NOTE, {
+
+          const noteParams = {
             noteId: data.noteId,
             showComments: data.isComment || data.isGrouped,
-          });
+          };
+
+          // Check if user is already on the same note screen
+          if (
+            (data.isComment || data.isGrouped) &&
+            isOnTargetScreen(ROUTES.VIEW_NOTE, noteParams)
+          ) {
+            triggerCommentModal(data);
+          } else {
+            navigate(ROUTES.VIEW_NOTE, noteParams);
+          }
         } else {
           navigate(ROUTES.NOTES);
         }
@@ -255,10 +305,21 @@ export const handleNotificationNavigation = async (data?: any) => {
           if (data.isComment || data.isGrouped) {
             await clearCommentNotifications(data.listId, "list");
           }
-          navigate(ROUTES.VIEW_LIST, {
+
+          const listParams = {
             listId: data.listId,
             showComments: data.isComment || data.isGrouped,
-          });
+          };
+
+          // Check if user is already on the same list screen
+          if (
+            (data.isComment || data.isGrouped) &&
+            isOnTargetScreen(ROUTES.VIEW_LIST, listParams)
+          ) {
+            triggerCommentModal(data);
+          } else {
+            navigate(ROUTES.VIEW_LIST, listParams);
+          }
         } else {
           navigate(ROUTES.LISTS);
         }
@@ -269,12 +330,23 @@ export const handleNotificationNavigation = async (data?: any) => {
           if (data.isComment || data.isGrouped) {
             await clearCommentNotifications(data.taskId, "task");
           }
-          navigate(ROUTES.TASK_DETAIL, {
+
+          const taskParams = {
             taskId: data.taskId,
             readOnly: !data.isActive,
             showComments: data.isComment || data.isGrouped,
             commentSubtaskId: data.commentSubtaskId,
-          });
+          };
+
+          // Check if user is already on the same task screen
+          if (
+            (data.isComment || data.isGrouped) &&
+            isOnTargetScreen(ROUTES.TASK_DETAIL, taskParams)
+          ) {
+            triggerCommentModal(data);
+          } else {
+            navigate(ROUTES.TASK_DETAIL, taskParams);
+          }
         } else {
           navigate(ROUTES.TASKS);
         }
@@ -302,10 +374,21 @@ export const handleNotificationNavigation = async (data?: any) => {
           if (data.isComment || data.isGrouped) {
             await clearCommentNotifications(data.videoData.id, "video");
           }
-          navigate(ROUTES.SINGLE_VIDEO, {
+
+          const videoParams = {
             video: data.videoData,
             showComments: data.isComment || data.isGrouped,
-          });
+          };
+
+          // Check if user is already on the same video screen
+          if (
+            (data.isComment || data.isGrouped) &&
+            isOnTargetScreen(ROUTES.SINGLE_VIDEO, videoParams)
+          ) {
+            triggerCommentModal(data);
+          } else {
+            navigate(ROUTES.SINGLE_VIDEO, videoParams);
+          }
         } else {
           navigate(ROUTES.REELS);
         }

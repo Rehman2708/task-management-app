@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  DeviceEventEmitter,
 } from "react-native";
 import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
@@ -116,6 +117,22 @@ function VideoItemComponent({
   useEffect(() => {
     setCommentsModalVisible(showComments ?? false);
   }, [item._id, showComments]);
+
+  // Listen for notification events to open comment modal
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener(
+      "openCommentModal",
+      (eventData) => {
+        if (eventData?.isComment || eventData?.isGrouped) {
+          setCommentsModalVisible(true);
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (!mutedIcon) return;

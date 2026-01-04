@@ -1,5 +1,11 @@
-import React, { useState } from "react";
-import { View, Text, Pressable, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  FlatList,
+  DeviceEventEmitter,
+} from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../../infrastructure/theme";
 import { useCommonStyles } from "../../styles/commonstyles";
@@ -61,6 +67,22 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
       refetch();
     }, [refetch])
   );
+
+  // Listen for notification events to open comment modal
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener(
+      "openCommentModal",
+      (eventData) => {
+        if (eventData?.isComment || eventData?.isGrouped) {
+          setCommentsModalVisible(true);
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const renderListItem = ({ item, index }: { item: any; index: number }) => (
     <AnimatedListItem index={index}>
