@@ -23,6 +23,7 @@ import ImageView from "react-native-image-viewing";
 import AnimatedListItem from "../../components/animatedListItem";
 import AlertModal from "../../components/AlertModal";
 import ToastService from "../../utils/toastService";
+import React from "react";
 
 export default function ProfileScreen() {
   const {
@@ -56,6 +57,7 @@ export default function ProfileScreen() {
     biometricAlertLoading,
     biometricAlertOnConfirm,
     hideBiometricAlert,
+    setImageViewVisible,
   } = useProfileViewModel();
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -66,6 +68,11 @@ export default function ProfileScreen() {
   const [footerText, setFooterText] = useState(
     currentImageIndex === 0 ? user?.about : user?.partner?.about
   );
+
+  // Pass the setIsVisible function to the view model
+  React.useEffect(() => {
+    setImageViewVisible(setIsVisible);
+  }, [setImageViewVisible]);
 
   // Update footer text when user or partner data changes
   useEffect(() => {
@@ -322,7 +329,10 @@ export default function ProfileScreen() {
               {tabs.map((item, index) => {
                 return (
                   <AnimatedListItem key={index}>
-                    <TouchableOpacity onPress={item.onPress}>
+                    <TouchableOpacity
+                      onPress={item.onPress}
+                      disabled={item.loading}
+                    >
                       <Row
                         style={[commonStyles.cardContainer]}
                         justifyContent="space-between"
@@ -331,11 +341,18 @@ export default function ProfileScreen() {
                         <Text style={[commonStyles.basicText]}>
                           {item.title}
                         </Text>
-                        <Ionicons
-                          name="chevron-forward-outline"
-                          size={20}
-                          color={theme.colors.text}
-                        />
+                        {item.loading ? (
+                          <ActivityIndicator
+                            size="small"
+                            color={theme.colors.primary}
+                          />
+                        ) : (
+                          <Ionicons
+                            name="chevron-forward-outline"
+                            size={20}
+                            color={theme.colors.text}
+                          />
+                        )}
                       </Row>
                     </TouchableOpacity>
                   </AnimatedListItem>

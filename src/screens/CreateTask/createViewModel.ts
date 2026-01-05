@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { TaskRepo } from "../../repositories/task";
-import {
-  AssignedTo,
-  Frequency,
-  Priority,
-  SubtaskStatus,
-} from "../../enums/tasks";
+import { Frequency, Priority, SubtaskStatus } from "../../enums/tasks";
 import {
   CreateTaskPayload,
   Subtask,
@@ -22,10 +17,6 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
   const [description, setDescription] = useState(
     initialTask?.description || ""
   );
-  const [assignedTo, setAssignedTo] = useState<AssignedTo>(
-    initialTask?.assignedTo ||
-      (user?.partner?.userId ? AssignedTo.Both : AssignedTo.Me)
-  );
   const [frequency, setFrequency] = useState<Frequency>(
     initialTask?.frequency || Frequency.Once
   );
@@ -37,6 +28,7 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
     initialTask?.subtasks?.map((st: any) => ({
       _id: st._id,
       title: st.title,
+      assignedTo: st.assignedTo || (user?.partner?.userId ? "Both" : "Me"),
       dueDateTime: repeat
         ? (() => {
             const original = new Date(st.dueDateTime);
@@ -60,6 +52,7 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
     })) || [
       {
         title: "",
+        assignedTo: user?.partner?.userId ? "Both" : "Me",
         dueDateTime: new Date(Date.now() + 60 * 60 * 1000),
         status: SubtaskStatus.Pending,
       },
@@ -74,6 +67,7 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
       ...prev,
       {
         title: "",
+        assignedTo: user?.partner?.userId ? "Both" : "Me",
         dueDateTime: new Date(Date.now() + 60 * 60 * 1000),
         status: SubtaskStatus.Pending,
       },
@@ -85,6 +79,16 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
   };
 
   const updateSubtask = (index: number, field: keyof Subtask, value: any) => {
+    // Validate "Both" assignment when no partner exists
+    if (field === "assignedTo" && value === "Both" && !user?.partner?.userId) {
+      ToastService.warning({
+        title: "Partner Required",
+        message:
+          "You need to add a partner before assigning subtasks to 'Both'. Please add a partner first or select 'Me'.",
+      });
+      return;
+    }
+
     setSubtasks((prev) =>
       prev.map((st, i) => (i === index ? { ...st, [field]: value } : st))
     );
@@ -108,7 +112,6 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
       const payload: CreateTaskPayload | UpdateTaskPayload = {
         title,
         description,
-        assignedTo,
         frequency,
         priority,
         image,
@@ -120,6 +123,7 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
           : initialTask?.createdBy || user?.userId,
         subtasks: subtasks?.map((st) => ({
           title: st.title,
+          assignedTo: st.assignedTo || (user?.partner?.userId ? "Both" : "Me"),
           dueDateTime: st.dueDateTime,
           status: st.status || SubtaskStatus.Pending,
           updatedBy: st.updatedBy || null,
@@ -153,8 +157,6 @@ export function useCreateTaskViewModel(initialTask: any, repeat: boolean) {
     setTitle,
     description,
     setDescription,
-    assignedTo,
-    setAssignedTo,
     frequency,
     setFrequency,
     priority,

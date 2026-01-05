@@ -7,13 +7,17 @@ import {
 } from "@react-navigation/native";
 import { ROUTES } from "../../enums/routes";
 import * as Device from "expo-device";
+import { InteractionManager } from "react-native";
 import { useAuthStore } from "../../store/authStore";
+import { useNotificationStore } from "../../store/notificationStore";
 import ToastService from "../../utils/toastService";
 import { BiometricSettings } from "../../utils/biometricSettings";
 import { BiometricAuth } from "../../utils/biometricAuth";
 
 export function useProfileViewModel() {
   const { updateUser, user, logout: storeLogout } = useAuthStore();
+  const { clearLaunchedFromNotification, setAppInForeground } =
+    useNotificationStore();
   const [loadingUserDetail, setLoadingUserDetail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -21,6 +25,9 @@ export function useProfileViewModel() {
   const [showAlert, setShowAlert] = useState(false);
   const [biometricDisplayText, setBiometricDisplayText] =
     useState("🔐 Biometric Auth");
+  const [imageViewVisible, setImageViewVisible] = useState<
+    ((visible: boolean) => void) | null
+  >(null);
 
   const [showBiometricAlert, setShowBiometricAlert] = useState(false);
   const [biometricAlertTitle, setBiometricAlertTitle] = useState("");
@@ -64,11 +71,43 @@ export function useProfileViewModel() {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
+      // First, close all modals
+      setShowAlert(false);
+      hideBiometricAlert();
+      if (imageViewVisible) {
+        imageViewVisible(false);
+      }
+
+      // Hide any active toasts immediately
+      ToastService.hide();
+
+      // Wait for all interactions to complete
+      await new Promise((resolve) => {
+        InteractionManager.runAfterInteractions(() => {
+          setTimeout(resolve, 300);
+        });
+      });
+
       if (user?.userId) {
         if (Device.isDevice) {
           await AuthRepo.logout(user?.userId);
         }
+
+        // Clear all stores and state
         await storeLogout();
+
+        // Clear notification store
+        clearLaunchedFromNotification();
+        setAppInForeground(true);
+
+        // Wait for another interaction cycle before navigation
+        await new Promise((resolve) => {
+          InteractionManager.runAfterInteractions(() => {
+            setTimeout(resolve, 100);
+          });
+        });
+
+        // Reset navigation stack
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -77,10 +116,10 @@ export function useProfileViewModel() {
         );
       }
     } catch (error) {
-      console.log("Something went wrong!");
-    } finally {
+      console.log("Something went wrong during logout:", error);
       setLoggingOut(false);
     }
+    // Note: Don't set setLoggingOut(false) in finally block since we're navigating away
   };
 
   const showBiometricAlertModal = (
@@ -351,5 +390,6 @@ export function useProfileViewModel() {
     biometricAlertLoading,
     biometricAlertOnConfirm,
     hideBiometricAlert,
+    setImageViewVisible,
   };
 }

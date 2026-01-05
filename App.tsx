@@ -17,7 +17,14 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useCommonStyles } from "./src/styles/commonstyles";
 import { FontAsset } from "./assets/fonts";
 import { useTheme } from "./src/infrastructure/theme";
-import { StatusBar, TextInput, Text, AppState } from "react-native";
+import {
+  StatusBar,
+  TextInput,
+  Text,
+  AppState,
+  View,
+  Vibration,
+} from "react-native";
 import * as Notifications from "expo-notifications";
 import { useNotificationStore } from "./src/store/notificationStore";
 import { useNetwork } from "./src/utils/useNetwork";
@@ -58,7 +65,7 @@ Notifications.setNotificationHandler({
         notification.request.content.title || "New Comment",
         data
       );
-
+      Vibration.vibrate(30);
       ToastService.commentNotification({
         title,
         message: notification.request.content.body || undefined,

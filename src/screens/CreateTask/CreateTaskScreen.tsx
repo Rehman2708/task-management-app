@@ -13,7 +13,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { AndroidDateTimePicker, AssignedIcon } from "./components/subtaskItem";
 import { useHelper } from "../../utils/helper";
 import ImageModal from "../../components/imageModal";
-import { AssignedTo, Priority, TaskStatus } from "../../enums/tasks";
+import { Priority, TaskStatus } from "../../enums/tasks";
 import { useTheme } from "../../infrastructure/theme";
 import { ROUTES } from "../../enums/routes";
 // Pass `task` prop for edit mode
@@ -78,74 +78,6 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
             onChangeText={vm.setDescription}
             multiline
           />
-          {loggedInUser?.partner?.userId && (
-            <>
-              <Text style={commonStyles.smallText}>👥 For</Text>
-              <Row gap={isAndroid ? 14 : 16} alignItems="center">
-                {["Me", "Partner", "Both"].map((option, index) => (
-                  <TouchableOpacity
-                    key={option}
-                    onPress={() => vm.setAssignedTo(option as any)}
-                    style={[
-                      styles.assignButton,
-                      vm.assignedTo === option
-                        ? styles.assignButtonActive
-                        : styles.assignButtonInactive,
-                      {},
-                    ]}
-                  >
-                    <Row gap={6} alignItems="center">
-                      <AssignedIcon
-                        type={option as AssignedTo}
-                        color={
-                          vm.assignedTo === option
-                            ? theme.colors.white
-                            : themeColor.dark
-                        }
-                      />
-                      <Text
-                        style={[
-                          commonStyles.smallText,
-                          vm.assignedTo === option
-                            ? styles.assignTextActive
-                            : styles.assignTextInactive,
-                        ]}
-                      >
-                        {option}
-                      </Text>
-                    </Row>
-                  </TouchableOpacity>
-                ))}
-              </Row>
-            </>
-          )}
-
-          {/* <Text style={commonStyles.smallText}>Frequency</Text>
-          <Row gap={isAndroid ? 14 : 16} alignItems="center">
-            {["Once", "Daily", "Weekly"].map((option) => (
-              <TouchableOpacity
-                key={option}
-                onPress={() => vm.setFrequency(option as any)}
-                style={[
-                  styles.assignButton,
-                  vm.frequency === option
-                    ? styles.assignButtonActive
-                    : styles.assignButtonInactive,
-                ]}
-              >
-                <Text
-                  style={[
-                    commonStyles.smallText,
-                    vm.frequency === option
-                      ? styles.assignTextActive
-                      : styles.assignTextInactive,
-                  ]}
-                >
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </Row> */}
 
           <Text style={commonStyles.smallText}>🚨 Priority</Text>
           <Row gap={isAndroid ? 14 : 16} alignItems="center">
@@ -189,6 +121,72 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 onChangeText={(text) => vm.updateSubtask(index, "title", text)}
                 maxLength={50}
               />
+
+              {/* Subtask Assignment */}
+              {loggedInUser?.partner?.userId && (
+                <>
+                  <Text style={[commonStyles.smallText, { marginTop: 8 }]}>
+                    👤 Assigned to
+                  </Text>
+                  <Row
+                    gap={isAndroid ? 8 : 10}
+                    alignItems="center"
+                    style={{ marginBottom: 8 }}
+                  >
+                    {["Me", "Partner", "Both"].map((option) => (
+                      <TouchableOpacity
+                        key={option}
+                        onPress={() =>
+                          vm.updateSubtask(
+                            index,
+                            "assignedTo",
+                            option as "Me" | "Partner" | "Both"
+                          )
+                        }
+                        style={[
+                          styles.assignButton,
+                          (subtask?.assignedTo ||
+                            (loggedInUser?.partner?.userId ? "Both" : "Me")) ===
+                          option
+                            ? styles.assignButtonActive
+                            : styles.assignButtonInactive,
+                          { paddingHorizontal: 8, paddingVertical: 4 },
+                        ]}
+                      >
+                        <Row gap={4} alignItems="center">
+                          <AssignedIcon
+                            type={option as "Me" | "Partner" | "Both"}
+                            size={12}
+                            color={
+                              (subtask?.assignedTo ||
+                                (loggedInUser?.partner?.userId
+                                  ? "Both"
+                                  : "Me")) === option
+                                ? theme.colors.white
+                                : themeColor.dark
+                            }
+                          />
+                          <Text
+                            style={[
+                              commonStyles.smallText,
+                              { fontSize: 11 },
+                              (subtask?.assignedTo ||
+                                (loggedInUser?.partner?.userId
+                                  ? "Both"
+                                  : "Me")) === option
+                                ? styles.assignTextActive
+                                : styles.assignTextInactive,
+                            ]}
+                          >
+                            {option}
+                          </Text>
+                        </Row>
+                      </TouchableOpacity>
+                    ))}
+                  </Row>
+                </>
+              )}
+
               <Row justifyContent="space-between" alignItems="center">
                 <Row gap={isAndroid ? 5 : 6} alignItems="center">
                   <Text style={commonStyles.smallText}>📅 Due:</Text>
@@ -217,7 +215,7 @@ export const CreateTaskScreen = ({ route, navigation }: any) => {
                 {vm.subtasks?.length > 1 && (
                   <CustomButton
                     small
-                    title="🗑️ Remove"
+                    title="Remove"
                     error
                     onPress={() => vm.removeSubtask(index)}
                     halfWidth

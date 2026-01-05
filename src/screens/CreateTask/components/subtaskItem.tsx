@@ -3,7 +3,6 @@ import { View } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import CustomButton from "../../../components/customButton";
 import { Ionicons } from "@expo/vector-icons";
-import { AssignedTo } from "../../../enums/tasks";
 import { useHelper } from "../../../utils/helper";
 
 export const AndroidDateTimePicker = ({
@@ -70,7 +69,7 @@ export const AndroidDateTimePicker = ({
 };
 
 interface AssignedIconProps {
-  type: AssignedTo;
+  type: "Me" | "Partner" | "Both";
   size?: number;
   color?: string;
 }

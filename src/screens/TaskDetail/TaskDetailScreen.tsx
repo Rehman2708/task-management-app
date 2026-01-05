@@ -19,8 +19,9 @@ import { useTaskDetailViewModel } from "./taskDetailViewModel";
 import { useCommonStyles } from "../../styles/commonstyles";
 import { Column, Row, Spacer } from "../../tools";
 import { useHelper } from "../../utils/helper";
-import { AssignedTo, SubtaskStatus, TaskStatus } from "../../enums/tasks";
+import { SubtaskStatus, TaskStatus } from "../../enums/tasks";
 import { AppUrl } from "../../utils/appUrl";
+import { useAuthStore } from "../../store/authStore";
 
 import CustomButton from "../../components/customButton";
 import { LoaderTypes } from "../../components/screenLoader";
@@ -44,6 +45,7 @@ export default function TaskDetailScreen({ route }: any) {
     commentSubtaskId,
   } = route.params;
 
+  const { user } = useAuthStore();
   const {
     task,
     taskDetailLoading,
@@ -168,10 +170,14 @@ export default function TaskDetailScreen({ route }: any) {
       const backgroundColor =
         item.status === SubtaskStatus.Completed
           ? `${theme.colors.success}20`
+          : item.status === SubtaskStatus.PartiallyComplete
+          ? `${theme.colors.warning}20`
           : `${theme.colors.error}20`;
       const borderColor =
         item.status === SubtaskStatus.Completed
           ? `${theme.colors.success}40`
+          : item.status === SubtaskStatus.PartiallyComplete
+          ? `${theme.colors.warning}40`
           : `${theme.colors.error}40`;
       const scale = getScaleAnim(item._id);
       const commentCount = subtaskCommentCounts[item._id] ?? 0;
@@ -190,6 +196,60 @@ export default function TaskDetailScreen({ route }: any) {
 
       const highlightToday = hasMultipleDates && isToday;
 
+      // Check if current user can complete this subtask
+      const canComplete = (() => {
+        // If subtask has its own assignment, use that
+        if (item.assignedTo) {
+          if (item.assignedTo === "Both") {
+            // For "Both" assignments, check if current user hasn't completed yet
+            return !item.completedBy?.includes(user?.userId || "");
+          }
+          if (item.assignedTo === "Me" && task?.ownerUserId === user?.userId)
+            return true;
+          if (
+            item.assignedTo === "Partner" &&
+            task?.ownerUserId !== user?.userId
+          )
+            return true;
+          return false;
+        }
+
+        // Fallback to task-level assignment (legacy tasks)
+        if (task?.assignedTo) {
+          if (task.assignedTo === "Both") return true; // Both can complete any subtask
+          if (task.assignedTo === "Me" && task?.ownerUserId === user?.userId)
+            return true;
+          if (
+            task.assignedTo === "Partner" &&
+            task?.ownerUserId !== user?.userId
+          )
+            return true;
+          return false;
+        }
+
+        // Default fallback for very old tasks with no assignment info
+        return true;
+      })();
+
+      // Get completion status for "Both" assignments
+      const getCompletionStatus = () => {
+        if (item.assignedTo !== "Both" || !item.completedBy) return null;
+
+        const ownerCompleted = item.completedBy.includes(
+          task?.ownerUserId || ""
+        );
+        const partnerCompleted = item.completedBy.some(
+          (id) => id !== task?.ownerUserId
+        );
+
+        if (ownerCompleted && partnerCompleted) return "Both completed";
+        if (ownerCompleted) return "Owner completed";
+        if (partnerCompleted) return "Partner completed";
+        return null;
+      };
+
+      const completionStatus = getCompletionStatus();
+
       return (
         <AnimatedListItem index={index}>
           <Column
@@ -205,7 +265,45 @@ export default function TaskDetailScreen({ route }: any) {
           >
             <Row justifyContent="space-between" alignItems="center">
               <Column gap={6} style={commonStyles.fullFlex}>
-                <Text style={commonStyles.basicText}>{item.title}</Text>
+                <Row alignItems="center" justifyContent="space-between">
+                  <Text style={[commonStyles.basicText, commonStyles.fullFlex]}>
+                    {item.title}
+                  </Text>
+                  {/* Show subtask assignment if it exists, otherwise show task-level assignment */}
+                  {(item.assignedTo || task?.assignedTo) && (
+                    <Row alignItems="center" gap={4}>
+                      <AssignedIcon
+                        type={item.assignedTo || task?.assignedTo || "Me"}
+                        size={14}
+                        color={theme.colors.textLight}
+                      />
+                      <Text
+                        style={[
+                          commonStyles.tTinyText,
+                          { color: theme.colors.textLight },
+                        ]}
+                      >
+                        {item.assignedTo
+                          ? item.assignedTo
+                          : `Task: ${task?.assignedTo}`}
+                      </Text>
+                    </Row>
+                  )}
+                </Row>
+
+                {/* Show completion status for "Both" assignments */}
+                {item.status === SubtaskStatus.PartiallyComplete &&
+                  completionStatus && (
+                    <Text
+                      style={[
+                        commonStyles.tTinyText,
+                        { color: theme.colors.warning, fontStyle: "italic" },
+                      ]}
+                    >
+                      📋 {completionStatus}
+                    </Text>
+                  )}
+
                 {item.dueDateTime && (
                   <Row alignItems="center">
                     <Ionicons
@@ -223,7 +321,8 @@ export default function TaskDetailScreen({ route }: any) {
             </Row>
 
             {!readOnly &&
-              item.status === SubtaskStatus.Pending &&
+              (item.status === SubtaskStatus.Pending ||
+                item.status === SubtaskStatus.PartiallyComplete) &&
               task?.createdAt && (
                 <Row alignItems="center" style={commonStyles.fullFlex}>
                   <Text style={commonStyles.tTinyText}>Time left: </Text>
@@ -253,16 +352,39 @@ export default function TaskDetailScreen({ route }: any) {
                 </Row>
               </Pressable>
 
-              {!readOnly && item.status === SubtaskStatus.Pending && (
-                <CustomButton
-                  onPress={() => handleUpdateStatus(item._id)}
-                  iconName="checkmark-done-outline"
-                  title="Complete"
-                  sendButton
-                  loading={subtaskStatusLoading === item._id}
-                  success
-                />
-              )}
+              {!readOnly &&
+                (item.status === SubtaskStatus.Pending ||
+                  item.status === SubtaskStatus.PartiallyComplete) &&
+                (canComplete ? (
+                  <CustomButton
+                    onPress={() => handleUpdateStatus(item._id)}
+                    iconName="checkmark-done-outline"
+                    title={
+                      item.status === SubtaskStatus.PartiallyComplete
+                        ? "Complete My Part"
+                        : "Complete"
+                    }
+                    sendButton
+                    loading={subtaskStatusLoading === item._id}
+                    success
+                  />
+                ) : (
+                  <Text
+                    style={[
+                      commonStyles.tTinyText,
+                      { color: theme.colors.textLight, fontStyle: "italic" },
+                    ]}
+                  >
+                    {item.assignedTo === "Both" &&
+                    item.completedBy?.includes(user?.userId || "")
+                      ? "You completed this"
+                      : item.assignedTo
+                      ? "Not assigned to you"
+                      : task?.assignedTo && task.assignedTo !== "Both"
+                      ? `Task assigned to ${task.assignedTo}`
+                      : "Not assigned to you"}
+                  </Text>
+                ))}
             </Row>
           </Column>
         </AnimatedListItem>
@@ -271,8 +393,10 @@ export default function TaskDetailScreen({ route }: any) {
     [
       theme,
       commonStyles,
-      hasMultipleDates, // include here now
+      hasMultipleDates,
       task?.createdAt,
+      task?.ownerUserId,
+      user?.userId,
       readOnly,
       subtaskStatusLoading,
       handleUpdateStatus,
@@ -335,6 +459,24 @@ export default function TaskDetailScreen({ route }: any) {
                   <Text numberOfLines={3} style={commonStyles.tinyText}>
                     {taskSubtitle}
                   </Text>
+                  {/* Show task-level assignment if it exists (legacy tasks) */}
+                  {task.assignedTo && (
+                    <Row alignItems="center" gap={6} style={{ marginTop: 4 }}>
+                      <AssignedIcon
+                        type={task.assignedTo}
+                        size={14}
+                        color={theme.colors.textLight}
+                      />
+                      <Text
+                        style={[
+                          commonStyles.tinyText,
+                          { color: theme.colors.textLight },
+                        ]}
+                      >
+                        Task assigned to: {task.assignedTo}
+                      </Text>
+                    </Row>
+                  )}
                 </Column>
                 <Spacer size={6} position="right" />
                 <Pressable onPress={() => handleOpenComments()}>
@@ -355,17 +497,7 @@ export default function TaskDetailScreen({ route }: any) {
               {task.description && (
                 <Text style={commonStyles.smallText}>{task.description}</Text>
               )}
-              <Row justifyContent="flex-end" alignItems="center" gap={4}>
-                <Text style={[commonStyles.tinyText]}>
-                  👥 For {task.assignedTo}
-                </Text>
-                <AssignedIcon
-                  type={task.assignedTo as AssignedTo}
-                  color={theme.colors.textLight}
-                  size={12}
-                />
-              </Row>
-              {task?.subtasks?.length > 0 && (
+              {task?.subtasks?.length && task.subtasks.length > 0 && (
                 <View style={styles.container}>
                   <Text style={commonStyles.subTitleText}>📋 Subtasks</Text>
                   <Spacer size={8} />

@@ -1,10 +1,4 @@
-import {
-  AssignedTo,
-  Frequency,
-  Priority,
-  SubtaskStatus,
-  TaskStatus,
-} from "../enums/tasks";
+import { Frequency, Priority, SubtaskStatus, TaskStatus } from "../enums/tasks";
 export interface SubtaskComment {
   text: string;
   createdBy: string;
@@ -18,6 +12,8 @@ export interface Subtask {
   _id: string;
   title: string;
   status?: SubtaskStatus;
+  assignedTo?: "Me" | "Partner" | "Both";
+  completedBy?: string[]; // Array of userIds who completed this subtask
   dueDateTime: string;
   completedAt?: string | Date | null;
   updatedBy?: string | null;
@@ -32,10 +28,10 @@ export interface Task {
   description?: string;
   ownerUserId: string;
   createdBy?: string;
-  assignedTo?: AssignedTo;
   priority?: Priority;
   status?: TaskStatus;
   frequency?: Frequency;
+  assignedTo?: "Me" | "Partner" | "Both"; // Task-level assignment for legacy support
   subtasks?: Subtask[];
   comments?: { by: string; text: string; date?: Date }[];
   template?: any; // optional for templates
@@ -57,19 +53,19 @@ export interface CreateTaskPayload {
   description?: string;
   ownerUserId: string;
   createdBy?: string;
-  assignedTo?: AssignedTo;
   priority?: Priority;
   frequency?: Frequency;
+  assignedTo?: "Me" | "Partner" | "Both"; // Task-level assignment for legacy support
   subtasks?: Subtask[];
 }
 
 export interface UpdateTaskPayload {
   title?: string;
   description?: string;
-  assignedTo?: AssignedTo;
   priority?: Priority;
   frequency?: Frequency;
   status?: TaskStatus;
+  assignedTo?: "Me" | "Partner" | "Both"; // Task-level assignment for legacy support
   subtasks?: Subtask[];
   comments?: { createdBy: string; text: string }[];
 }

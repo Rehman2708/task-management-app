@@ -6,14 +6,9 @@ export enum TaskStatus {
 
 export enum SubtaskStatus {
   Pending = "Pending",
+  PartiallyComplete = "PartiallyComplete",
   Completed = "Completed",
   Expired = "Expired",
-}
-
-export enum AssignedTo {
-  Me = "Me",
-  Partner = "Partner",
-  Both = "Both",
 }
 
 export enum Priority {

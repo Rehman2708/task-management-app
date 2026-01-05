@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import CardWrapper from "./cardWrapper";
 import { useTheme } from "../infrastructure/theme";
 import { AssignedIcon } from "../screens/CreateTask/components/subtaskItem";
-import { AssignedTo, SubtaskStatus } from "../enums/tasks";
+import { SubtaskStatus } from "../enums/tasks";
 
 const TasksCard = ({
   item,
@@ -171,19 +171,22 @@ const TasksCard = ({
                         (item) => item.status === SubtaskStatus.Completed
                       ).length
                     }
-                    /{item.subtasks?.length}
+                    /{item.subtasks?.length} completed
                   </Text>
                 </Row>
-                <Row alignItems="center" gap={4}>
-                  <Text style={[commonStyles.tTinyText]}>
-                    👥 For {item.assignedTo}
-                  </Text>
-                  <AssignedIcon
-                    type={item.assignedTo as AssignedTo}
-                    color={theme.colors.textLight}
-                    size={10}
-                  />
-                </Row>
+                {/* Show task-level assignment if it exists (legacy tasks) */}
+                {item.assignedTo && (
+                  <Row alignItems="center" gap={4}>
+                    <AssignedIcon
+                      type={item.assignedTo}
+                      size={12}
+                      color={theme.colors.textLight}
+                    />
+                    <Text style={[commonStyles.tTinyText, { fontSize: 10 }]}>
+                      Task: {item.assignedTo}
+                    </Text>
+                  </Row>
+                )}
               </Row>
             </Column>
           </Row>

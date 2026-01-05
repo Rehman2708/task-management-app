@@ -14,7 +14,7 @@ export const createBaseToastStyles = (theme: any) =>
       marginHorizontal: 16,
       marginTop: 8,
       padding: isAndroid ? 8 : 12,
-      elevation: 4,
+      elevation: 1000, // High elevation for Android to appear above modals
       shadowColor: "#000",
       width: dimensions.width * 0.9,
       backgroundColor: theme.colors.background,
@@ -24,6 +24,7 @@ export const createBaseToastStyles = (theme: any) =>
       },
       shadowOpacity: 0.1,
       shadowRadius: 4,
+      zIndex: 10001, // Just above modal z-index (10000)
     },
     contentContainer: {
       flex: 1,

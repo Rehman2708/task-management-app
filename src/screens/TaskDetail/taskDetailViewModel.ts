@@ -54,23 +54,16 @@ export function useTaskDetailViewModel(taskId: string) {
     async (subtaskId: string, status: SubtaskStatus) => {
       try {
         setSubtaskStatusLoading(subtaskId);
-        await TaskRepo.updateSubtaskStatus(taskId, subtaskId, {
+        const response = await TaskRepo.updateSubtaskStatus(taskId, subtaskId, {
           userId: user?.userId ?? "",
           status,
         });
 
-        setTask((prev: any) =>
-          prev
-            ? {
-                ...prev,
-                subtasks: prev.subtasks.map((s: any) =>
-                  s._id === subtaskId ? { ...s, status } : s
-                ),
-              }
-            : prev
-        );
-
-        refetchTask();
+        // Use the actual response from backend instead of optimistic update
+        if (response) {
+          setTask(response);
+          refetchTask();
+        }
       } catch (err) {
         console.error("Subtask update error:", err);
       } finally {
@@ -78,7 +71,7 @@ export function useTaskDetailViewModel(taskId: string) {
         setSubtaskStatusLoading(null);
       }
     },
-    [taskId, user?.userId, refetchTask]
+    [taskId, user?.userId, triggerVibration]
   );
 
   const handleDeleteTask = async () => {
