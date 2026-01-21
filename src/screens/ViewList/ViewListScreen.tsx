@@ -55,18 +55,11 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
   const navigation: any = useNavigation();
   const { formatDate } = useHelper();
   const [commentsModalVisible, setCommentsModalVisible] = useState(
-    showComments ?? false
+    showComments ?? false,
   );
 
   const handleOpenComments = () => setCommentsModalVisible(true);
   const [showAlert, setShowAlert] = useState(false);
-
-  // Refresh data when screen comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch])
-  );
 
   // Listen for notification events to open comment modal
   useEffect(() => {
@@ -76,7 +69,7 @@ export default function ViewListScreen({ route }: ViewListScreenProps) {
         if (eventData?.isComment || eventData?.isGrouped) {
           setCommentsModalVisible(true);
         }
-      }
+      },
     );
 
     return () => {

@@ -15,7 +15,7 @@ export function useViewListViewModel(listId?: string) {
   const { user } = useAuthStore();
   const { refetchLists } = useUtilStore();
   const [totalComments, setTotalComments] = useState(
-    list?.comments?.length ?? 0
+    list?.comments?.length ?? 0,
   );
   const getList = async () => {
     if (!listId) return;
