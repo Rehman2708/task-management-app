@@ -100,9 +100,11 @@ export default function HomeScreen({ navigation }: any) {
       title={`Hey, ${loggedInUser?.name?.trim()}!`}
       noPadding
     >
-      {/* Header with Search */}
       <Row
-        style={{ alignItems: "center", paddingHorizontal: 16, paddingTop: 8 }}
+        style={{
+          alignItems: "flex-end",
+          paddingHorizontal: 12,
+        }}
       >
         <View style={{ flex: 1 }}>
           {/* Tabs */}
@@ -128,7 +130,7 @@ export default function HomeScreen({ navigation }: any) {
                       borderBottomWidth: tab === item.value ? 2 : 0,
                       borderBottomColor:
                         tab === item.value ? themeColor.dark : "transparent",
-                      paddingBottom: 6,
+                      height: 30,
                     },
                   ]}
                 >
@@ -140,28 +142,26 @@ export default function HomeScreen({ navigation }: any) {
         </View>
       </Row>
       <View style={[commonStyles.screenWrapper]}>
-        <View>
-          <CustomInput
-            placeholder="🔍 Search tasks..."
-            value={searchQuery}
-            onChangeText={handleSearch}
-            showClearIcon
-          />
-          {searching && (
-            <Text
-              style={[
-                commonStyles.smallText,
-                {
-                  textAlign: "center",
-                  marginTop: 4,
-                  color: theme.colors.text,
-                },
-              ]}
-            >
-              Searching...
-            </Text>
-          )}
-        </View>
+        <CustomInput
+          placeholder="🔍 Search tasks..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+          showClearIcon
+        />
+        {searching && (
+          <Text
+            style={[
+              commonStyles.smallText,
+              {
+                textAlign: "center",
+                marginTop: 4,
+                marginBottom: 12,
+              },
+            ]}
+          >
+            Searching...
+          </Text>
+        )}
         {/* Empty / Loader */}
         {loading || tasks.length === 0 ? (
           <EmptyState
