@@ -9,22 +9,33 @@ import {
 import { AppUrl } from "../utils/appUrl";
 
 export class TaskRepo {
-  static async getActiveTasks(params: { ownerUserId: string }) {
-    const { ownerUserId } = params;
-    const url = `${AppUrl.getAllTasks}/${ownerUserId}`;
+  static async getActiveTasks(params: {
+    ownerUserId: string;
+    search?: string;
+  }) {
+    const { ownerUserId, search } = params;
+    const queryParts: string[] = [];
+    if (search && search.trim())
+      queryParts.push(`search=${encodeURIComponent(search.trim())}`);
+    const query = queryParts.length ? `?${queryParts.join("&")}` : "";
+
+    const url = `${AppUrl.getAllTasks}/${ownerUserId}${query}`;
     return ApiService.getApiResponse(url, HttpMethods.GET);
   }
 
-  // 🔹 Get completed/expired tasks (history) with optional pagination
+  // 🔹 Get completed/expired tasks (history) with optional pagination and search
   static async getCompletedTasks(params: {
     ownerUserId: string;
     page?: number;
     pageSize?: number;
+    search?: string;
   }) {
-    const { ownerUserId, page, pageSize } = params;
+    const { ownerUserId, page, pageSize, search } = params;
     const queryParts: string[] = [];
     if (page !== undefined) queryParts.push(`page=${page}`);
     if (pageSize !== undefined) queryParts.push(`pageSize=${pageSize}`);
+    if (search && search.trim())
+      queryParts.push(`search=${encodeURIComponent(search.trim())}`);
     const query = queryParts.length ? `?${queryParts.join("&")}` : "";
 
     const url = `${AppUrl.getCompletedTasks}/${ownerUserId}${query}`;
@@ -35,7 +46,7 @@ export class TaskRepo {
   static async getTaskById(taskId: string) {
     return ApiService.getApiResponse(
       AppUrl.getTaskById(taskId),
-      HttpMethods.GET
+      HttpMethods.GET,
     );
   }
 
@@ -44,7 +55,7 @@ export class TaskRepo {
     return ApiService.getApiResponse(
       AppUrl.createTask,
       HttpMethods.POST,
-      payload
+      payload,
     );
   }
 
@@ -53,7 +64,7 @@ export class TaskRepo {
     return ApiService.getApiResponse(
       AppUrl.updateTask(taskId),
       HttpMethods.PUT,
-      payload
+      payload,
     );
   }
 
@@ -62,7 +73,7 @@ export class TaskRepo {
     return ApiService.getApiResponse(
       AppUrl.deleteTask(taskId),
       HttpMethods.DELETE,
-      { userId }
+      { userId },
     );
   }
 
@@ -71,7 +82,7 @@ export class TaskRepo {
     return ApiService.getApiResponse(
       AppUrl.addTaskComment(taskId),
       HttpMethods.POST,
-      payload
+      payload,
     );
   }
 
@@ -79,12 +90,12 @@ export class TaskRepo {
   static async addSubtaskComment(
     taskId: string,
     subtaskId: string,
-    payload: AddCommentPayload
+    payload: AddCommentPayload,
   ) {
     return ApiService.getApiResponse(
       AppUrl.addSubtaskComment(taskId, subtaskId),
       HttpMethods.POST,
-      payload
+      payload,
     );
   }
 
@@ -92,12 +103,12 @@ export class TaskRepo {
   static async updateSubtaskStatus(
     taskId: string,
     subtaskId: string,
-    payload: UpdateSubtaskStatusPayload
+    payload: UpdateSubtaskStatusPayload,
   ) {
     return ApiService.getApiResponse(
       AppUrl.updateSubtaskStatus(taskId, subtaskId),
       HttpMethods.PATCH,
-      payload
+      payload,
     );
   }
 
@@ -105,7 +116,7 @@ export class TaskRepo {
   static async getTaskComments(taskId: string) {
     return ApiService.getApiResponse(
       AppUrl.getTaskComments(taskId),
-      HttpMethods.GET
+      HttpMethods.GET,
     );
   }
 
@@ -113,7 +124,7 @@ export class TaskRepo {
   static async getSubtaskComments(taskId: string, subtaskId: string) {
     return ApiService.getApiResponse(
       AppUrl.getSubtaskComments(taskId, subtaskId),
-      HttpMethods.GET
+      HttpMethods.GET,
     );
   }
 }

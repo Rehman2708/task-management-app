@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { NotesRepo, Note } from "../../repositories/notes";
 import { useAuthStore } from "../../store/authStore";
+import { useDebounce } from "../../hooks/useDebounce";
 
 export function useNotesListViewModel(userId?: string) {
   const { user } = useAuthStore();
-  const [allNotes, setAllNotes] = useState<Note[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [showSearch, setShowSearch] = useState(false);
   const [cardView, setCardView] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true); // 🟢 First load or refresh
   const [loadingMore, setLoadingMore] = useState(false); // 🟢 Pagination
@@ -17,17 +16,28 @@ export function useNotesListViewModel(userId?: string) {
   const [totalPages, setTotalPages] = useState(1);
   const [showAlert, setShowAlert] = useState<string | undefined>(undefined);
 
-  const toggleSearch = () => setShowSearch((prev) => !prev);
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
+
   const toggleView = () => setCardView((prev) => !prev);
 
   useEffect(() => {
     setPage(1);
-    setAllNotes([]);
     setNotes([]);
     fetchNotes(1, true);
   }, [user?.userId]);
 
-  const fetchNotes = async (requestedPage = page, isInitial = false) => {
+  // Effect to trigger search when debounced query changes
+  useEffect(() => {
+    fetchNotes(1, true, debouncedSearchQuery);
+  }, [debouncedSearchQuery]);
+
+  const fetchNotes = async (
+    requestedPage = page,
+    isInitial = false,
+    search = debouncedSearchQuery,
+  ) => {
     if (!user?.userId) return;
 
     try {
@@ -40,15 +50,14 @@ export function useNotesListViewModel(userId?: string) {
         ownerUserId: user.userId,
         page: requestedPage,
         pageSize,
+        search: search.trim() || undefined,
       });
 
       const { notes: fetchedNotes, totalPages: total } = response;
 
       if (requestedPage === 1) {
-        setAllNotes(fetchedNotes);
         setNotes(fetchedNotes);
       } else {
-        setAllNotes((prev) => [...prev, ...fetchedNotes]);
         setNotes((prev) => [...prev, ...fetchedNotes]);
       }
 
@@ -65,7 +74,7 @@ export function useNotesListViewModel(userId?: string) {
 
   const loadMoreNotes = () => {
     if (page < totalPages && !loadingMore) {
-      fetchNotes(page + 1);
+      fetchNotes(page + 1, false, debouncedSearchQuery);
     }
   };
 
@@ -73,7 +82,7 @@ export function useNotesListViewModel(userId?: string) {
     try {
       setInitialLoading(true);
       await NotesRepo.pinNote(noteId, !pinned, user?.userId ?? "");
-      fetchNotes(1, true);
+      fetchNotes(1, true, debouncedSearchQuery);
     } catch (err: any) {
       console.error("Pin/unpin note error:", err);
       setError(err.message || "Failed to pin/unpin note");
@@ -83,19 +92,10 @@ export function useNotesListViewModel(userId?: string) {
     }
   };
 
-  const searchNotes = (searchText: string) => {
-    if (!searchText.trim()) {
-      setNotes(allNotes);
-      return;
-    }
-    const lower = searchText.toLowerCase();
-    const filtered = allNotes.filter(
-      (note) =>
-        note.title.toLowerCase().includes(lower) ||
-        note.note.toLowerCase().includes(lower)
-    );
-    setNotes(filtered);
-  };
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    // Don't call fetchNotes here - let the debounced effect handle it
+  }, []);
 
   const noteImages: string[] = notes
     .map((note) => note.image)
@@ -112,14 +112,14 @@ export function useNotesListViewModel(userId?: string) {
     handlePinUnpinNote,
     showAlert,
     setShowAlert,
-    searchNotes,
     page,
     totalPages,
-    showSearch,
-    toggleSearch,
     noteImages,
     toggleView,
     cardView,
     pageSize,
+    // Search functionality
+    searchQuery,
+    handleSearch,
   };
 }

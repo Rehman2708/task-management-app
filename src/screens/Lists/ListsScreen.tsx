@@ -52,13 +52,13 @@ export default function ListsScreen() {
     handlePinUnpinList,
     setShowAlert,
     showAlert,
-    toggleSearch,
-    showSearch,
-    searchLists,
     listImages,
     toggleView,
     cardView,
     pageSize,
+    // Search functionality
+    searchQuery,
+    handleSearch,
   } = useListsViewModel();
 
   useEffect(() => {
@@ -289,7 +289,6 @@ export default function ListsScreen() {
       title="📋 Lists"
       image={listImages}
       noPadding
-      // onSearchPress={toggleSearch}
       rightIcon={
         <TouchableOpacity onPress={toggleView}>
           <Ionicons
@@ -301,9 +300,16 @@ export default function ListsScreen() {
       }
     >
       <View style={commonStyles.screenWrapper}>
+        <CustomInput
+          placeholder="🔍 Search lists..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+        />
         {lists?.length === 0 || initialLoading ? (
           <EmptyState
-            text="📋 No lists found"
+            text={
+              searchQuery.trim() ? "🔍 No lists found" : "📋 No lists found"
+            }
             button={() => fetchLists(1, true)}
             loading={initialLoading}
             error={!!error?.length}
@@ -311,12 +317,6 @@ export default function ListsScreen() {
           />
         ) : (
           <>
-            {showSearch && (
-              <CustomInput
-                placeholder="🔍 Search lists..."
-                onChangeText={searchLists}
-              />
-            )}
             {!cardView ? (
               <FlatList
                 data={lists}

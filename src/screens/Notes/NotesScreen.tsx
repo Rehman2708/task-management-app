@@ -44,19 +44,19 @@ export default function NotesScreen() {
     loadingMore,
     error,
     fetchNotes,
+    loadMoreNotes,
     handlePinUnpinNote,
     showAlert,
     setShowAlert,
-    searchNotes,
-    loadMoreNotes,
     page,
     totalPages,
-    showSearch,
-    toggleSearch,
     noteImages,
     toggleView,
     cardView,
     pageSize,
+    // Search functionality
+    searchQuery,
+    handleSearch,
   } = useNotesListViewModel();
   const navigation: any = useNavigation();
 
@@ -243,7 +243,6 @@ export default function NotesScreen() {
     <ScreenWrapper
       title="📝 Notes"
       image={noteImages}
-      // onSearchPress={toggleSearch}
       noPadding
       rightIcon={
         <TouchableOpacity onPress={toggleView}>
@@ -256,9 +255,17 @@ export default function NotesScreen() {
       }
     >
       <View style={commonStyles.screenWrapper}>
+        <CustomInput
+          placeholder="🔍 Search notes..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+          showClearIcon
+        />
         {notes?.length === 0 || initialLoading ? (
           <EmptyState
-            text="📝 No notes found"
+            text={
+              searchQuery.trim() ? "🔍 No notes found" : "📝 No notes found"
+            }
             button={() => fetchNotes(1, true)}
             loading={initialLoading}
             error={!!error?.length}
@@ -266,12 +273,6 @@ export default function NotesScreen() {
           />
         ) : (
           <>
-            {showSearch && (
-              <CustomInput
-                placeholder="🔍 Search here..."
-                onChangeText={searchNotes}
-              />
-            )}
             {!cardView ? (
               <FlatList
                 data={notes}

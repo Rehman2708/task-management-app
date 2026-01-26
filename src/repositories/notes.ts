@@ -45,18 +45,21 @@ export interface UpdateNotePayload {
 }
 
 export class NotesRepo {
-  // 🔹 Get all notes (with optional pagination)
+  // 🔹 Get all notes (with optional pagination and search)
   static async getAllNotes(params: {
     ownerUserId: string;
     page?: number;
     pageSize?: number;
+    search?: string;
   }) {
-    const { ownerUserId, page, pageSize } = params;
+    const { ownerUserId, page, pageSize, search } = params;
 
-    // Build query string if pagination values exist
+    // Build query string if pagination or search values exist
     const queryParts: string[] = [];
     if (page !== undefined) queryParts.push(`page=${page}`);
     if (pageSize !== undefined) queryParts.push(`pageSize=${pageSize}`);
+    if (search && search.trim())
+      queryParts.push(`search=${encodeURIComponent(search.trim())}`);
     const query = queryParts.length ? `?${queryParts.join("&")}` : "";
 
     const url = `${AppUrl.getAllNotes}/${ownerUserId}${query}`;
@@ -74,7 +77,7 @@ export class NotesRepo {
     return ApiService.getApiResponse(
       AppUrl.createNote,
       HttpMethods.POST,
-      payload
+      payload,
     );
   }
 
@@ -83,7 +86,7 @@ export class NotesRepo {
     return ApiService.getApiResponse(
       AppUrl.updateNote(noteId),
       HttpMethods.PUT,
-      payload
+      payload,
     );
   }
 
@@ -94,7 +97,7 @@ export class NotesRepo {
       HttpMethods.DELETE,
       {
         userId,
-      }
+      },
     );
   }
   // 🔹 Pin or Unpin a note
@@ -102,14 +105,14 @@ export class NotesRepo {
     return ApiService.getApiResponse(
       AppUrl.pinUnpinNote(noteId), // You need to add this in your AppUrl file
       HttpMethods.PATCH,
-      { pinned, userId }
+      { pinned, userId },
     );
   }
 
   // 🔹 Add a comment to a note
   static async addNoteComment(
     noteId: string,
-    payload: { createdBy: string; text: string }
+    payload: { createdBy: string; text: string },
   ) {
     const url = AppUrl.addNoteComment(noteId);
     return ApiService.getApiResponse(url, HttpMethods.POST, payload);

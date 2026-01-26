@@ -53,16 +53,19 @@ export interface UpdateListPayload {
 }
 
 export class ListsRepo {
-  // 🔹 Get all lists (optionally paginated)
+  // 🔹 Get all lists (optionally paginated and searchable)
   static async getAllLists(params: {
     ownerUserId: string;
     page?: number;
     pageSize?: number;
+    search?: string;
   }) {
-    const { ownerUserId, page, pageSize } = params;
+    const { ownerUserId, page, pageSize, search } = params;
     const queryParts: string[] = [];
     if (page !== undefined) queryParts.push(`page=${page}`);
     if (pageSize !== undefined) queryParts.push(`pageSize=${pageSize}`);
+    if (search && search.trim())
+      queryParts.push(`search=${encodeURIComponent(search.trim())}`);
     const query = queryParts.length ? `?${queryParts.join("&")}` : "";
 
     const url = `${AppUrl.getAllLists}/${ownerUserId}${query}`;
@@ -80,7 +83,7 @@ export class ListsRepo {
     return ApiService.getApiResponse(
       AppUrl.createList,
       HttpMethods.POST,
-      payload
+      payload,
     );
   }
 
@@ -89,7 +92,7 @@ export class ListsRepo {
     return ApiService.getApiResponse(
       AppUrl.updateList(listId),
       HttpMethods.PUT,
-      payload
+      payload,
     );
   }
 
@@ -98,7 +101,7 @@ export class ListsRepo {
     return ApiService.getApiResponse(
       AppUrl.deleteList(listId),
       HttpMethods.DELETE,
-      { userId }
+      { userId },
     );
   }
 
@@ -107,7 +110,7 @@ export class ListsRepo {
     return ApiService.getApiResponse(
       AppUrl.pinUnpinList(listId),
       HttpMethods.PATCH,
-      { pinned, userId }
+      { pinned, userId },
     );
   }
 
@@ -116,19 +119,19 @@ export class ListsRepo {
     listId: string,
     itemIndex: number,
     completed: boolean,
-    userId: string
+    userId: string,
   ) {
     return ApiService.getApiResponse(
       AppUrl.toggleListItem(listId, itemIndex),
       HttpMethods.PATCH,
-      { completed, userId }
+      { completed, userId },
     );
   }
 
   // 🔹 Add a comment to a list
   static async addListComment(
     listId: string,
-    payload: { createdBy: string; text: string }
+    payload: { createdBy: string; text: string },
   ) {
     const url = AppUrl.addListComment(listId);
     return ApiService.getApiResponse(url, HttpMethods.POST, payload);

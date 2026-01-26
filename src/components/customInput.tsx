@@ -31,6 +31,7 @@ export type CustomInputProps = {
   rounded?: boolean;
   inputStyle?: StyleProp<TextStyle>;
   maxLength?: number;
+  showClearIcon?: boolean;
 };
 
 const CustomInput = ({
@@ -49,9 +50,11 @@ const CustomInput = ({
   rounded,
   inputStyle,
   maxLength,
+  showClearIcon,
 }: CustomInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [maxChar, setMaxChar] = useState<number | undefined>(maxLength);
+  const [char, setChar] = useState<string | undefined>("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const { themeColor } = useHelper();
@@ -100,6 +103,7 @@ const CustomInput = ({
             secureTextEntry && styles.passwordInput,
             rounded && styles.rounded,
             inputStyle,
+            showClearIcon && { paddingRight: 60 },
           ]}
           placeholder={placeholder}
           placeholderTextColor={theme.colors.border}
@@ -109,6 +113,7 @@ const CustomInput = ({
           onChangeText={(text) => {
             setIsDirty(true);
             onChangeText(text);
+            setChar(text);
             if (secureTextEntry) validatePassword(text);
           }}
           value={value}
@@ -128,6 +133,25 @@ const CustomInput = ({
               size={24}
               color={themeColor.dark}
             />
+          </TouchableOpacity>
+        )}
+        {showClearIcon && char && (
+          <TouchableOpacity
+            onPress={() => {
+              setIsDirty(false);
+              onChangeText("");
+              setChar(undefined);
+              if (secureTextEntry) validatePassword("");
+            }}
+            style={{
+              position: "absolute",
+              height: "100%",
+              paddingHorizontal: 16,
+              right: 0,
+              justifyContent: "center",
+            }}
+          >
+            <Ionicons name="close" size={24} color={theme.colors.text} />
           </TouchableOpacity>
         )}
       </View>

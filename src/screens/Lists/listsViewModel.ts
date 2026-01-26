@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { ListsRepo, List } from "../../repositories/lists";
+import { useDebounce } from "../../hooks/useDebounce";
 
 export function useListsViewModel(userId?: string) {
   const { user } = useAuthStore();
 
-  const [allLists, setAllLists] = useState<List[]>([]);
   const [lists, setLists] = useState<List[]>([]);
-  const [showSearch, setShowSearch] = useState(false);
   const [cardView, setCardView] = useState(false);
 
   const [initialLoading, setInitialLoading] = useState(true);
@@ -18,17 +17,28 @@ export function useListsViewModel(userId?: string) {
   const [totalPages, setTotalPages] = useState(1);
   const [showAlert, setShowAlert] = useState<string | undefined>(undefined);
 
-  const toggleSearch = () => setShowSearch((prev) => !prev);
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
+
   const toggleView = () => setCardView((prev) => !prev);
 
   useEffect(() => {
     setPage(1);
-    setAllLists([]);
     setLists([]);
     fetchLists(1, true);
   }, [user?.userId]);
 
-  const fetchLists = async (requestedPage = page, isInitial = false) => {
+  // Effect to trigger search when debounced query changes
+  useEffect(() => {
+    fetchLists(1, true, debouncedSearchQuery);
+  }, [debouncedSearchQuery]);
+
+  const fetchLists = async (
+    requestedPage = page,
+    isInitial = false,
+    search = debouncedSearchQuery,
+  ) => {
     if (!user?.userId) return;
     try {
       if (isInitial) setInitialLoading(true);
@@ -39,14 +49,13 @@ export function useListsViewModel(userId?: string) {
         ownerUserId: user.userId,
         page: requestedPage,
         pageSize,
+        search: search.trim() || undefined,
       });
 
       const { lists: fetchedLists, totalPages: total } = response;
       if (requestedPage === 1) {
-        setAllLists(fetchedLists);
         setLists(fetchedLists);
       } else {
-        setAllLists((prev) => [...prev, ...fetchedLists]);
         setLists((prev) => [...prev, ...fetchedLists]);
       }
       setTotalPages(total);
@@ -62,7 +71,7 @@ export function useListsViewModel(userId?: string) {
 
   const loadMoreLists = () => {
     if (page < totalPages && !loadingMore) {
-      fetchLists(page + 1);
+      fetchLists(page + 1, false, debouncedSearchQuery);
     }
   };
 
@@ -70,7 +79,7 @@ export function useListsViewModel(userId?: string) {
     try {
       setInitialLoading(true);
       await ListsRepo.pinList(listId, !pinned, user?.userId ?? "");
-      fetchLists(1, true);
+      fetchLists(1, true, debouncedSearchQuery);
     } catch (err: any) {
       console.error("Pin/unpin list error:", err);
       setError(err.message || "Failed to pin/unpin list");
@@ -80,20 +89,10 @@ export function useListsViewModel(userId?: string) {
     }
   };
 
-  const searchLists = (searchText: string) => {
-    if (!searchText.trim()) {
-      setLists(allLists);
-      return;
-    }
-
-    const lower = searchText.toLowerCase();
-    const filtered = allLists.filter(
-      (list) =>
-        list.title.toLowerCase().includes(lower) ||
-        list.items.some((item) => item.text.toLowerCase().includes(lower))
-    );
-    setLists(filtered);
-  };
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    // Don't call fetchLists here - let the debounced effect handle it
+  }, []);
 
   const listImages: string[] = lists
     .map((list) => list.image)
@@ -110,14 +109,14 @@ export function useListsViewModel(userId?: string) {
     handlePinUnpinList,
     showAlert,
     setShowAlert,
-    searchLists,
     page,
     totalPages,
-    showSearch,
-    toggleSearch,
     listImages,
     toggleView,
     cardView,
     pageSize,
+    // Search functionality
+    searchQuery,
+    handleSearch,
   };
 }

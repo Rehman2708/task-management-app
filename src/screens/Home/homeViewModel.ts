@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useAuthStore } from "../../store/authStore";
 import { TaskRepo } from "../../repositories/task";
 import { Task } from "../../types/task";
+import { useDebounce } from "../../hooks/useDebounce";
 
 export function useHomeScreenViewModel() {
   const { user } = useAuthStore();
@@ -17,13 +18,19 @@ export function useHomeScreenViewModel() {
   const [pageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
 
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searching, setSearching] = useState(false);
+  const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
+
   // 🔥 request token to avoid race conditions
   const requestIdRef = useRef(0);
 
   const fetchTasks = async (
     requestedPage = 1,
     isInitial = true,
-    forcedTab = tab
+    forcedTab = tab,
+    search = debouncedSearchQuery,
   ) => {
     if (!user?.userId) return;
 
@@ -36,17 +43,23 @@ export function useHomeScreenViewModel() {
 
       const isActive = forcedTab === "Active";
       const response = isActive
-        ? await TaskRepo.getActiveTasks({ ownerUserId: user.userId })
+        ? await TaskRepo.getActiveTasks({
+            ownerUserId: user.userId,
+            search: search.trim() || undefined,
+          })
         : await TaskRepo.getCompletedTasks({
             ownerUserId: user.userId,
             page: requestedPage,
             pageSize,
+            search: search.trim() || undefined,
           });
 
       // ❗ Ignore if outdated response (tab changed or new request triggered)
       if (requestId !== requestIdRef.current) return;
 
-      const fetchedTasks = isActive ? response || [] : response?.tasks || [];
+      const fetchedTasks = isActive
+        ? response?.tasks || response || []
+        : response?.tasks || [];
       const total = isActive ? 1 : response?.totalPages || 1;
 
       if (requestedPage === 1) setTasks(fetchedTasks);
@@ -66,9 +79,17 @@ export function useHomeScreenViewModel() {
     }
   };
 
+  // Effect to trigger search when debounced query changes
+  useEffect(() => {
+    setSearching(true);
+    fetchTasks(1, true, tab, debouncedSearchQuery).finally(() => {
+      setSearching(false);
+    });
+  }, [debouncedSearchQuery, tab]);
+
   const loadMoreTasks = () => {
     if (tab === "History" && page < totalPages && !loadingMore) {
-      fetchTasks(page + 1, false, "History");
+      fetchTasks(page + 1, false, "History", debouncedSearchQuery);
     }
   };
 
@@ -85,6 +106,15 @@ export function useHomeScreenViewModel() {
       setShowAlert(undefined);
     }
   };
+
+  // Search functionality - no toggle needed
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      setSearching(true);
+    }
+    // Don't call fetchTasks here - let the debounced effect handle it
+  }, []);
 
   const taskImages: string[] = tasks
     .map((task) => task.image)
@@ -105,5 +135,9 @@ export function useHomeScreenViewModel() {
     handleDeleteTask,
     taskImages,
     pageSize,
+    // Search functionality
+    searchQuery,
+    handleSearch,
+    searching,
   };
 }

@@ -16,6 +16,8 @@ import ScreenLoader, { LoaderTypes } from "../../components/screenLoader";
 import AnimatedListItem from "../../components/animatedListItem";
 import { Task } from "../../types/task";
 import AlertModal from "../../components/AlertModal";
+import { Ionicons } from "@expo/vector-icons";
+import CustomInput from "../../components/customInput";
 
 export default function HomeScreen({ navigation }: any) {
   const {
@@ -32,6 +34,10 @@ export default function HomeScreen({ navigation }: any) {
     setTab,
     taskImages,
     pageSize,
+    // Search functionality
+    searchQuery,
+    handleSearch,
+    searching,
   } = useHomeScreenViewModel();
 
   const { loggedInUser, themeColor } = useHelper();
@@ -50,7 +56,7 @@ export default function HomeScreen({ navigation }: any) {
       { title: "⚡ Active", value: "Active" as const },
       { title: "📚 History", value: "History" as const },
     ],
-    []
+    [],
   );
 
   // Memoized renderItem
@@ -76,7 +82,7 @@ export default function HomeScreen({ navigation }: any) {
         </AnimatedListItem>
       );
     },
-    [tab, handleDeleteTask, loadingMore]
+    [tab, handleDeleteTask, loadingMore],
   );
 
   // Footer Loader
@@ -94,43 +100,77 @@ export default function HomeScreen({ navigation }: any) {
       title={`Hey, ${loggedInUser?.name?.trim()}!`}
       noPadding
     >
-      {/* Tabs */}
-      <Row>
-        {tabs.map((item) => (
-          <Pressable
-            key={item.value}
-            style={[
-              commonStyles.fullFlex,
-              { paddingBottom: 10, paddingTop: 4 },
-            ]}
-            onPress={() => setTab(item.value)}
-          >
+      {/* Header with Search */}
+      <Row
+        style={{ alignItems: "center", paddingHorizontal: 16, paddingTop: 8 }}
+      >
+        <View style={{ flex: 1 }}>
+          {/* Tabs */}
+          <Row>
+            {tabs.map((item) => (
+              <Pressable
+                key={item.value}
+                style={[
+                  commonStyles.fullFlex,
+                  { paddingBottom: 10, paddingTop: 4 },
+                ]}
+                onPress={() => setTab(item.value)}
+              >
+                <Text
+                  style={[
+                    commonStyles.basicText,
+                    {
+                      textAlign: "center",
+                      color:
+                        tab === item.value
+                          ? themeColor.dark
+                          : theme.colors.text,
+                      borderBottomWidth: tab === item.value ? 2 : 0,
+                      borderBottomColor:
+                        tab === item.value ? themeColor.dark : "transparent",
+                      paddingBottom: 6,
+                    },
+                  ]}
+                >
+                  {item.title}
+                </Text>
+              </Pressable>
+            ))}
+          </Row>
+        </View>
+      </Row>
+      <View style={[commonStyles.screenWrapper]}>
+        <View>
+          <CustomInput
+            placeholder="🔍 Search tasks..."
+            value={searchQuery}
+            onChangeText={handleSearch}
+            showClearIcon
+          />
+          {searching && (
             <Text
               style={[
-                commonStyles.basicText,
+                commonStyles.smallText,
                 {
                   textAlign: "center",
-                  color:
-                    tab === item.value ? themeColor.dark : theme.colors.text,
-                  borderBottomWidth: tab === item.value ? 2 : 0,
-                  borderBottomColor:
-                    tab === item.value ? themeColor.dark : "transparent",
-                  paddingBottom: 6,
+                  marginTop: 4,
+                  color: theme.colors.text,
                 },
               ]}
             >
-              {item.title}
+              Searching...
             </Text>
-          </Pressable>
-        ))}
-      </Row>
-
-      <View style={[commonStyles.screenWrapper]}>
+          )}
+        </View>
         {/* Empty / Loader */}
         {loading || tasks.length === 0 ? (
           <EmptyState
             text={
-              tab === "Active" ? "📝 No active tasks" : "📭 Nothing to show"
+              searchQuery.trim()
+                ? "🔍 No tasks found"
+                : tab === "Active"
+                  ? "📝 No active tasks"
+                  : "📭 Nothing to show"
             }
             button={() => fetchTasks(1, true)}
             loading={loading}
@@ -139,33 +179,35 @@ export default function HomeScreen({ navigation }: any) {
             type={LoaderTypes.TaskScreen}
           />
         ) : (
-          <FlatList
-            data={tasks}
-            keyExtractor={(item) => String(item._id)}
-            renderItem={renderItem}
-            refreshControl={
-              <RefreshControl
-                onRefresh={() => fetchTasks(1, true)}
-                refreshing={loading}
-                colors={[themeColor.dark]}
-              />
-            }
-            onEndReached={tab === "History" ? loadMoreTasks : undefined}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={renderFooter}
-            showsVerticalScrollIndicator={false}
-            removeClippedSubviews
-            maxToRenderPerBatch={10}
-            updateCellsBatchingPeriod={50}
-            initialNumToRender={10}
-            windowSize={8}
-            // Improve scroll performance and reduce gesture conflicts
-            scrollEventThrottle={16}
-            bounces={true}
-            bouncesZoom={false}
-            alwaysBounceVertical={false}
-            directionalLockEnabled={true}
-          />
+          <>
+            <FlatList
+              data={tasks}
+              keyExtractor={(item) => String(item._id)}
+              renderItem={renderItem}
+              refreshControl={
+                <RefreshControl
+                  onRefresh={() => fetchTasks(1, true)}
+                  refreshing={loading}
+                  colors={[themeColor.dark]}
+                />
+              }
+              onEndReached={tab === "History" ? loadMoreTasks : undefined}
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={renderFooter}
+              showsVerticalScrollIndicator={false}
+              removeClippedSubviews
+              maxToRenderPerBatch={10}
+              updateCellsBatchingPeriod={50}
+              initialNumToRender={10}
+              windowSize={8}
+              // Improve scroll performance and reduce gesture conflicts
+              scrollEventThrottle={16}
+              bounces={true}
+              bouncesZoom={false}
+              alwaysBounceVertical={false}
+              directionalLockEnabled={true}
+            />
+          </>
         )}
       </View>
 
