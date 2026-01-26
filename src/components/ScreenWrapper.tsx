@@ -21,6 +21,7 @@ const ScreenWrapper = ({
   rightIcon,
   hideNotificationButton,
   menuItem,
+  noHeader,
 }: {
   children: React.ReactNode;
   title?: string;
@@ -34,6 +35,7 @@ const ScreenWrapper = ({
   rightIcon?: React.ReactNode;
   hideNotificationButton?: boolean;
   menuItem?: IMenuContentItem[];
+  noHeader?: boolean;
 }) => {
   const theme = useTheme();
   const commonStyles = useCommonStyles(theme);
@@ -45,7 +47,7 @@ const ScreenWrapper = ({
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <LinearHeader image={image} />
+      {!noHeader && <LinearHeader image={image} />}
 
       <View
         style={[

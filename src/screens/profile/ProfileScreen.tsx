@@ -40,7 +40,6 @@ export default function ProfileScreen() {
     createVideoScreen,
     updateProfileScreen,
     loggingOut,
-    getTimeLeft,
     partnerInput,
     setPartnerInput,
     partnerImage,
@@ -49,6 +48,7 @@ export default function ProfileScreen() {
     resetPasswordScreen,
     addEmailScreen,
     testToastScreen,
+    calendarScreen,
     biometricDisplayText,
     showBiometricAlert,
     biometricAlertTitle,
@@ -66,7 +66,7 @@ export default function ProfileScreen() {
   const [visible, setIsVisible] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [footerText, setFooterText] = useState(
-    currentImageIndex === 0 ? user?.about : user?.partner?.about
+    currentImageIndex === 0 ? user?.about : user?.partner?.about,
   );
 
   // Pass the setIsVisible function to the view model
@@ -100,6 +100,14 @@ export default function ProfileScreen() {
       title: "👤 Update profile",
       onPress: updateProfileScreen,
     },
+    {
+      title: "🎥 Add video",
+      onPress: createVideoScreen,
+    },
+    {
+      title: "📅 Calendar",
+      onPress: calendarScreen,
+    },
     // Show "Add Email" option only for users without email
     ...(!user?.email
       ? [
@@ -125,10 +133,7 @@ export default function ProfileScreen() {
       title: "🔒 Reset password",
       onPress: resetPasswordScreen,
     },
-    {
-      title: "🎥 Add video",
-      onPress: createVideoScreen,
-    },
+
     // {
     //   title: "🧪 Test Toast",
     //   onPress: testToastScreen,
@@ -323,16 +328,11 @@ export default function ProfileScreen() {
                 </Column>
               )}
               <Spacer size={20} />
-              <Text style={commonStyles.smallText}>{getTimeLeft()}</Text>
-              <Spacer size={20} />
 
               {tabs.map((item, index) => {
                 return (
                   <AnimatedListItem key={index}>
-                    <TouchableOpacity
-                      onPress={item.onPress}
-                      disabled={item.loading}
-                    >
+                    <TouchableOpacity onPress={item.onPress}>
                       <Row
                         style={[commonStyles.cardContainer]}
                         justifyContent="space-between"
@@ -341,18 +341,11 @@ export default function ProfileScreen() {
                         <Text style={[commonStyles.basicText]}>
                           {item.title}
                         </Text>
-                        {item.loading ? (
-                          <ActivityIndicator
-                            size="small"
-                            color={theme.colors.primary}
-                          />
-                        ) : (
-                          <Ionicons
-                            name="chevron-forward-outline"
-                            size={20}
-                            color={theme.colors.text}
-                          />
-                        )}
+                        <Ionicons
+                          name="chevron-forward-outline"
+                          size={20}
+                          color={theme.colors.text}
+                        />
                       </Row>
                     </TouchableOpacity>
                   </AnimatedListItem>

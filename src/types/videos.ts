@@ -13,6 +13,7 @@ export interface IVideoComment {
 export interface IVideo {
   _id: string;
   title: string;
+  description?: string;
   url: string;
   thumbnail?: string;
   createdBy: string;
@@ -30,6 +31,7 @@ export interface IVideo {
 
 export interface CreateVideoPayload {
   title: string;
+  description?: string;
   url: string; // URL or path of the uploaded video
   createdBy: string;
   thumbnail?: string;

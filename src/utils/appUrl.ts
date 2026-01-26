@@ -103,4 +103,16 @@ export class AppUrl {
   public static uploadFile = `${this.BASE_URL}/file/upload`;
   public static deleteFile = (uri: string) =>
     `${this.BASE_URL}/file/delete?uri=${encodeURIComponent(uri)}`;
+
+  // 🔹 Calendar APIs
+  public static getCalendarEvents = (userId: string) =>
+    `${this.BASE_URL}/calendar/${userId}`;
+  public static createCalendarEvent = (userId: string) =>
+    `${this.BASE_URL}/calendar/${userId}`;
+  public static updateCalendarEvent = (userId: string, eventId: string) =>
+    `${this.BASE_URL}/calendar/${userId}/${eventId}`;
+  public static deleteCalendarEvent = (userId: string, eventId: string) =>
+    `${this.BASE_URL}/calendar/${userId}/${eventId}`;
+  public static getCalendarEventsByRange = (userId: string) =>
+    `${this.BASE_URL}/calendar/${userId}/range`;
 }

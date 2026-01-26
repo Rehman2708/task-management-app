@@ -23,6 +23,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CommentsModal from "./comments/commentModal";
 import { AppUrl } from "../utils/appUrl";
 import throttle from "lodash.throttle";
+import TextTicker from "react-native-text-ticker";
 
 type Props = {
   item: IVideo;
@@ -67,10 +68,10 @@ function VideoItemComponent({
   const [isReady, setIsReady] = useState(false);
   const [isViewed, setIsViewed] = useState(item.partnerWatched ?? false);
   const [commentsModalVisible, setCommentsModalVisible] = useState(
-    showComments ?? false
+    showComments ?? false,
   );
   const [totalComments, setTotalComments] = useState(
-    item?.comments?.length ?? 0
+    item?.comments?.length ?? 0,
   );
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -87,7 +88,7 @@ function VideoItemComponent({
 
   const throttledSetCurrentTime = useCallback(
     throttle((time: number) => setCurrentTime(time), 200),
-    []
+    [],
   );
 
   const handleViewed = useCallback(async () => {
@@ -126,7 +127,7 @@ function VideoItemComponent({
         if (eventData?.isComment || eventData?.isGrouped) {
           setCommentsModalVisible(true);
         }
-      }
+      },
     );
 
     return () => {
@@ -311,6 +312,20 @@ function VideoItemComponent({
             ))}
           </Column>
         </Row>
+        {item?.description && (
+          <TextTicker
+            duration={item.description.length * 130}
+            loop
+            marqueeDelay={0}
+            style={[
+              commonStyles.basicText,
+              { color: theme.colors.white, margin: 12, marginTop: 0 },
+            ]}
+          >
+            {item.description}
+          </TextTicker>
+        )}
+
         <VideoTimeProgressBar currentTime={currentTime} duration={duration} />
       </Pressable>
 

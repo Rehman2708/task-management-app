@@ -36,6 +36,7 @@ export default function CreateVideoScreen() {
   const styles = createVideoStyle(theme);
   const navigation: any = useNavigation();
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +71,7 @@ export default function CreateVideoScreen() {
       const thumbnail = await generateThumbnail(asset);
       const payload: CreateVideoPayload = {
         title: title.trim(),
+        description: description.trim(),
         url: uri ?? videoUrl,
         createdBy: loggedInUser?.userId ?? "RehmanK",
         thumbnail,
@@ -77,6 +79,7 @@ export default function CreateVideoScreen() {
       await VideoRepo.createVideo(payload);
       setSuccess("Video uploaded successfully");
       setTitle("");
+      setDescription("");
       setVideoUrl("");
       setIsTested(false);
       setIsPlayable(false);
@@ -117,7 +120,7 @@ export default function CreateVideoScreen() {
 
   // Filter songs by title
   const filteredVideos = videosList.filter((item: IVideo) =>
-    item.title.toLowerCase().includes(search.toLowerCase())
+    item.title.toLowerCase().includes(search.toLowerCase()),
   );
   const isTitleValid = title.trim().length >= 3;
   const isVideoUrlValid = videoUrl.trim().length > 0;
@@ -152,6 +155,14 @@ export default function CreateVideoScreen() {
             onChangeText={setTitle}
             editable={!loading}
             maxLength={50}
+          />
+          <CustomInput
+            title="📄 Description"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            placeholder={"📄 Enter full description…"}
+            inputStyle={{ maxHeight: 100, minHeight: 80 }}
           />
           <CustomInput
             title="🔗 Video URL"

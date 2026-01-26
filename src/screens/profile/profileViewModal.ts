@@ -112,7 +112,7 @@ export function useProfileViewModel() {
           CommonActions.reset({
             index: 0,
             routes: [{ name: ROUTES.LOGIN }],
-          })
+          }),
         );
       }
     } catch (error) {
@@ -127,7 +127,7 @@ export function useProfileViewModel() {
     subTitle: string,
     onConfirm?: () => void,
     error: boolean = false,
-    loading: boolean = false
+    loading: boolean = false,
   ) => {
     setBiometricAlertTitle(title);
     setBiometricAlertSubTitle(subTitle);
@@ -149,7 +149,7 @@ export function useProfileViewModel() {
       if (!capabilities.hasHardware) {
         showBiometricAlertModal(
           "Not Supported",
-          "This device doesn't support biometric authentication."
+          "This device doesn't support biometric authentication.",
         );
         return;
       }
@@ -163,10 +163,10 @@ export function useProfileViewModel() {
             setTimeout(() => {
               showBiometricAlertModal(
                 "Setup Instructions",
-                `To set up ${capabilities.primaryType}:\n\n1. Go to your device Settings\n2. Find Security or ${capabilities.primaryType} settings\n3. Follow the setup instructions\n4. Return to this app and try again`
+                `To set up ${capabilities.primaryType}:\n\n1. Go to your device Settings\n2. Find Security or ${capabilities.primaryType} settings\n3. Follow the setup instructions\n4. Return to this app and try again`,
               );
             }, 300);
-          }
+          },
         );
         return;
       }
@@ -187,7 +187,7 @@ export function useProfileViewModel() {
               setTimeout(() => {
                 showBiometricAlertModal(
                   "Disabled",
-                  `${biometricType} authentication has been disabled.`
+                  `${biometricType} authentication has been disabled.`,
                 );
               }, 300);
             } catch (error) {
@@ -196,11 +196,11 @@ export function useProfileViewModel() {
                 "Error",
                 "Failed to disable biometric authentication. Please try again.",
                 undefined,
-                true
+                true,
               );
             }
           },
-          true
+          true,
         );
       } else {
         showBiometricAlertModal(
@@ -211,7 +211,7 @@ export function useProfileViewModel() {
             try {
               const result = await BiometricAuth.authenticate(
                 `Use ${biometricType} to enable secure login`,
-                false
+                false,
               );
 
               if (result.success) {
@@ -221,7 +221,7 @@ export function useProfileViewModel() {
                 setTimeout(() => {
                   showBiometricAlertModal(
                     "Enabled",
-                    `${biometricType} authentication has been enabled successfully!`
+                    `${biometricType} authentication has been enabled successfully!`,
                   );
                 }, 300);
               } else {
@@ -242,7 +242,7 @@ export function useProfileViewModel() {
                     hideBiometricAlert();
                     setTimeout(() => toggleBiometricAuth(), 300);
                   },
-                  true
+                  true,
                 );
               }
             } catch (error) {
@@ -252,10 +252,10 @@ export function useProfileViewModel() {
                 "Error",
                 "An unexpected error occurred. Please try again.",
                 undefined,
-                true
+                true,
               );
             }
-          }
+          },
         );
       }
     } catch (error) {
@@ -264,15 +264,14 @@ export function useProfileViewModel() {
         "Error",
         "An error occurred while updating biometric settings. Please try again.",
         undefined,
-        true
+        true,
       );
     }
   };
 
   const updateBiometricDisplayText = async (forceRefresh: boolean = false) => {
-    const displayText = await BiometricSettings.getBiometricDisplayText(
-      forceRefresh
-    );
+    const displayText =
+      await BiometricSettings.getBiometricDisplayText(forceRefresh);
     setBiometricDisplayText(displayText);
   };
 
@@ -283,10 +282,11 @@ export function useProfileViewModel() {
   const updateProfileScreen = () => navigation.navigate(ROUTES.UPDATE_PROFILE);
   const addEmailScreen = () => navigation.navigate(ROUTES.ADD_EMAIL);
   const testToastScreen = () => navigation.navigate(ROUTES.TEST_TOAST);
+  const calendarScreen = () => navigation.navigate(ROUTES.CALENDAR);
 
   function startCountdown(
     targetDate: Date | string,
-    callback: (text: string) => void
+    callback: (text: string) => void,
   ) {
     function update() {
       const now: Date = new Date();
@@ -320,23 +320,15 @@ export function useProfileViewModel() {
     return setInterval(update, 1000);
   }
 
-  const [timeLeft, setTimeLeft] = useState("");
-
   useEffect(() => {
-    const timer = startCountdown("2026-04-27T00:00:00+05:30", setTimeLeft);
     updateBiometricDisplayText();
-    return () => clearInterval(timer);
   }, []);
 
   useFocusEffect(
     React.useCallback(() => {
       updateBiometricDisplayText(true);
-    }, [])
+    }, []),
   );
-
-  function getTimeLeft() {
-    return `${timeLeft}`;
-  }
 
   const partnerId = user?.partner?.userId;
   const partnerImage = user?.partner?.image;
@@ -373,7 +365,6 @@ export function useProfileViewModel() {
     createVideoScreen,
     updateProfileScreen,
     loggingOut,
-    getTimeLeft,
     partnerInput,
     setPartnerInput,
     partnerImage,
@@ -382,6 +373,7 @@ export function useProfileViewModel() {
     resetPasswordScreen,
     addEmailScreen,
     testToastScreen,
+    calendarScreen,
     biometricDisplayText,
     showBiometricAlert,
     biometricAlertTitle,

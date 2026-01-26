@@ -24,4 +24,5 @@ export enum ROUTES {
   ADD_EMAIL = "AddEmail",
   NOTIFICATION = "Notification",
   TEST_TOAST = "TestToast",
+  CALENDAR = "Calendar",
 }

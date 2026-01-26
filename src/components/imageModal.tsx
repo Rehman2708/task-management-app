@@ -77,6 +77,10 @@ const ImageModal = ({
     getImages();
   }, []);
 
+  useEffect(() => {
+    setSelectedImage(defaultImage ?? "");
+  }, [defaultImage]);
+
   const onSelect = () => {
     setSelectedImage(currentImage?.uri);
     onChange?.(currentImage?.uri);

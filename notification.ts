@@ -80,6 +80,11 @@ async function setupAndroidChannels() {
       name: "Subtask Reminders",
       description: "Reminders for upcoming subtask due dates",
     },
+    {
+      id: NotificationChannel.CalendarEvent,
+      name: "Calendar Events",
+      description: "Daily reminders for upcoming calendar events",
+    },
   ];
 
   for (const c of channels) {
@@ -102,7 +107,7 @@ async function setupNotificationCategories() {
     // Helper function to create comment category actions
     const createCommentActions = (
       viewIdentifier: string,
-      viewTitle: string
+      viewTitle: string,
     ) => [
       {
         identifier: NotificationAction.Reply,
@@ -143,7 +148,7 @@ async function setupNotificationCategories() {
             opensAppToForeground: true,
           },
         },
-      ]
+      ],
     );
 
     // Comment categories with consistent structure
@@ -178,7 +183,7 @@ async function setupNotificationCategories() {
     for (const category of commentCategories) {
       await Notifications.setNotificationCategoryAsync(
         category.id,
-        createCommentActions(category.viewId, category.viewTitle)
+        createCommentActions(category.viewId, category.viewTitle),
       );
     }
   } catch (error) {
@@ -394,6 +399,11 @@ export const handleNotificationNavigation = async (data?: any) => {
         }
         break;
 
+      case NotificationData.CalendarEvent:
+        // Navigate to calendar screen when calendar event notification is tapped
+        navigate(ROUTES.CALENDAR);
+        break;
+
       default:
         break;
     }
@@ -406,7 +416,7 @@ export const handleNotificationNavigation = async (data?: any) => {
 export const handleSubtaskCompletion = async (
   taskId: string,
   subtaskId: string,
-  userId: string
+  userId: string,
 ) => {
   // Validate input
   if (!taskId || !subtaskId || !userId) {
@@ -424,23 +434,21 @@ export const handleSubtaskCompletion = async (
     });
 
     // Show success notification
-    const { showSuccessNotification } = await import(
-      "./src/utils/notificationUtils"
-    );
+    const { showSuccessNotification } =
+      await import("./src/utils/notificationUtils");
     await showSuccessNotification(
       "✅ Subtask Completed!",
-      "Great job! The subtask has been marked as completed."
+      "Great job! The subtask has been marked as completed.",
     );
   } catch (error) {
     console.error("Error completing subtask:", error);
 
     // Show error notification
-    const { showErrorNotification } = await import(
-      "./src/utils/notificationUtils"
-    );
+    const { showErrorNotification } =
+      await import("./src/utils/notificationUtils");
     await showErrorNotification(
       "❌ Error",
-      "Failed to mark subtask as completed. Please try again."
+      "Failed to mark subtask as completed. Please try again.",
     );
   }
 };
@@ -449,7 +457,7 @@ export const handleSubtaskCompletion = async (
 export const handleCommentReply = async (
   commentText: string,
   notificationData: any,
-  userId: string
+  userId: string,
 ) => {
   if (!commentText?.trim() || !userId) {
     console.warn("Invalid comment reply data");
@@ -529,9 +537,8 @@ export const handleCommentReply = async (
 
     if (success) {
       // Show success notification
-      const { showSuccessNotification } = await import(
-        "./src/utils/notificationUtils"
-      );
+      const { showSuccessNotification } =
+        await import("./src/utils/notificationUtils");
       await showSuccessNotification("💬 Reply Sent!", successMessage);
     } else {
       throw new Error("Failed to process reply");
@@ -540,12 +547,11 @@ export const handleCommentReply = async (
     console.error("Error sending comment reply:", error);
 
     // Show error notification
-    const { showErrorNotification } = await import(
-      "./src/utils/notificationUtils"
-    );
+    const { showErrorNotification } =
+      await import("./src/utils/notificationUtils");
     await showErrorNotification(
       "❌ Error",
-      "Failed to send reply. Please try again."
+      "Failed to send reply. Please try again.",
     );
   }
 };

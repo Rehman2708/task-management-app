@@ -5,6 +5,7 @@ export enum NotificationData {
   Note = "note",
   List = "list",
   SubtaskReminder = "subtask_reminder",
+  CalendarEvent = "calendar_event",
 }
 
 export enum NotificationCategory {
@@ -33,4 +34,5 @@ export enum NotificationChannel {
   Video = "video",
   Profile = "profile",
   SubtaskReminder = "subtask_reminder",
+  CalendarEvent = "calendar_event",
 }
