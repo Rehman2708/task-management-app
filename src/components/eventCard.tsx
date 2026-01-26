@@ -168,7 +168,7 @@ const EventCard = ({
                 </Row>
                 <Text
                   style={[
-                    commonStyles.basicText,
+                    commonStyles.smallText,
                     {
                       color: isPast
                         ? theme.colors.textLight

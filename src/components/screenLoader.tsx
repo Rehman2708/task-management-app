@@ -28,6 +28,7 @@ export enum LoaderTypes {
   NotesDetailScreen = "notesdetail",
   VideoScreen = "VideoScreen",
   ProfileScreen = "profileScreen",
+  CalendarScreen = "calendarScreen",
 }
 
 interface ScreenLoaderProps {
@@ -61,7 +62,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         duration: 1400,
         easing: Easing.linear,
         useNativeDriver: true,
-      })
+      }),
     );
     animation.start();
     return () => animation.stop();
@@ -119,7 +120,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
               easing: Easing.inOut(Easing.quad),
               useNativeDriver: true,
             }),
-          ])
+          ]),
         );
         const timeout = setTimeout(() => pulseAnim.start(), delay);
         return () => {
@@ -168,7 +169,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
           />
         </Animated.View>
       );
-    }
+    },
   );
 
   /** Helper to render multiple shimmer lines (memoized to avoid recreation) */
@@ -183,7 +184,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
           style={{ marginBottom: i < count - 1 ? 8 : 0 }}
         />
       )),
-    [] // ShimmerBlock is stable via memo
+    [], // ShimmerBlock is stable via memo
   );
 
   const getRandomInt = (min: number, max: number) =>
@@ -219,7 +220,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         }}
       />
     ),
-    [ShimmerBlock, theme.colors.border]
+    [ShimmerBlock, theme.colors.border],
   );
 
   const renderCommentLoader = useCallback(
@@ -265,7 +266,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         })}
       </Column>
     ),
-    [ShimmerBlock]
+    [ShimmerBlock],
   );
 
   const renderVideoLoader = useCallback(
@@ -287,7 +288,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         </Row>
       </View>
     ),
-    [renderLines, ShimmerBlock]
+    [renderLines, ShimmerBlock],
   );
 
   const renderNotificationLoader = useCallback(
@@ -323,20 +324,24 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         )}
       />
     ),
-    [count, renderLines, ShimmerBlock, theme.colors.border]
+    [count, renderLines, ShimmerBlock, theme.colors.border],
   );
 
   const renderTaskLoader = useCallback(
-    () => (
+    (isEvent: boolean) => (
       <FlatList
         data={Array.from({ length: count ?? 8 })}
         keyExtractor={(_, i) => i.toString()}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={!isEvent}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item, index }) => (
           <Row
             alignItems="center"
-            style={[styles.taskCard, { padding: 0, height: 110 }]}
+            style={[
+              styles.taskCard,
+              { padding: 0, height: isEvent ? 80 : 110 },
+            ]}
           >
             {index % getRandomInt(0, 5) ? (
               <ShimmerBlock
@@ -348,13 +353,19 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
             ) : null}
             <Spacer position="right" size={12} />
             <View style={styles.taskTextContainer}>
-              {renderLines(5, ["60%", "95%", "40%", "80%", "95%"])}
+              {renderLines(isEvent ? 3 : 5, [
+                "60%",
+                "95%",
+                "40%",
+                "80%",
+                "95%",
+              ])}
             </View>
           </Row>
         )}
       />
     ),
-    [count, renderLines, ShimmerBlock]
+    [count, renderLines, ShimmerBlock],
   );
 
   const renderNotesLoader = useCallback(
@@ -381,7 +392,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         ))}
       </View>
     ),
-    [count, renderLines, ShimmerBlock]
+    [count, renderLines, ShimmerBlock],
   );
 
   const renderTaskDetailLoader = useCallback(
@@ -420,7 +431,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         ))}
       </View>
     ),
-    [renderLines, ShimmerBlock, theme.colors.border]
+    [renderLines, ShimmerBlock, theme.colors.border],
   );
 
   const renderNoteDetailLoader = useCallback(
@@ -453,7 +464,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
           ))}
       </View>
     ),
-    [renderLines, ShimmerBlock]
+    [renderLines, ShimmerBlock],
   );
 
   const renderProfileLoader = useCallback(
@@ -490,7 +501,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         </Column>
       </View>
     ),
-    [renderLines, ShimmerBlock, theme.colors.primary]
+    [renderLines, ShimmerBlock, theme.colors.primary],
   );
 
   const renderLoader = useMemo(() => {
@@ -504,7 +515,7 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
       case LoaderTypes.NotificationScreen:
         return renderNotificationLoader();
       case LoaderTypes.TaskScreen:
-        return renderTaskLoader();
+        return renderTaskLoader(false);
       case LoaderTypes.NotesScreen:
         return renderNotesLoader();
       case LoaderTypes.ListScreen:
@@ -517,6 +528,8 @@ const ScreenLoader: React.FC<ScreenLoaderProps> = ({ type, count }) => {
         return renderNoteDetailLoader(true);
       case LoaderTypes.ProfileScreen:
         return renderProfileLoader();
+      case LoaderTypes.CalendarScreen:
+        return renderTaskLoader(true);
       default:
         return (
           <View style={styles.center}>

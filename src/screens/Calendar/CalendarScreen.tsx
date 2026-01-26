@@ -258,10 +258,6 @@ export default function CalendarScreen() {
     });
   }, [events, getLocalDateString, createLocalDate]);
 
-  if (initialLoading) {
-    return <ScreenLoader type={LoaderTypes.ProfileScreen} />;
-  }
-
   return (
     <ScreenWrapper title="Calendar" showBackbutton>
       <ScrollView
@@ -399,31 +395,36 @@ export default function CalendarScreen() {
           >
             All Events
           </Text>
-
-          {sortedEvents.length === 0 ? (
-            <Text
-              style={[
-                commonStyles.basicText,
-                {
-                  color: theme.colors.textLight,
-                  textAlign: "center",
-                  marginTop: 20,
-                },
-              ]}
-            >
-              No events scheduled
-            </Text>
+          {initialLoading ? (
+            <ScreenLoader type={LoaderTypes.CalendarScreen} count={5} />
           ) : (
-            sortedEvents.map((event) => {
-              return (
-                <EventCard
-                  key={event._id}
-                  item={event}
-                  onEdit={handleEditEvent}
-                  onDelete={handleDeleteEvent}
-                />
-              );
-            })
+            <>
+              {sortedEvents.length === 0 ? (
+                <Text
+                  style={[
+                    commonStyles.basicText,
+                    {
+                      color: theme.colors.textLight,
+                      textAlign: "center",
+                      marginTop: 20,
+                    },
+                  ]}
+                >
+                  No events scheduled
+                </Text>
+              ) : (
+                sortedEvents.map((event) => {
+                  return (
+                    <EventCard
+                      key={event._id}
+                      item={event}
+                      onEdit={handleEditEvent}
+                      onDelete={handleDeleteEvent}
+                    />
+                  );
+                })
+              )}
+            </>
           )}
         </View>
       </ScrollView>
